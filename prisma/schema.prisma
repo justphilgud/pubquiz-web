@@ -418,6 +418,7 @@ model meme_archive_entries {
 }
 
 model eventreihen {
+  reihenrollen benutzer_reihenrollen[]
   eventarten eventreihe_eventarten[]
   eventartrollen benutzer_eventartrollen[]
   verwalter eventreihe_verwaltung[]
@@ -1397,11 +1398,12 @@ enum LivePollPublicationMode {
 }
 
 model users {
+  reihenrollen benutzer_reihenrollen[] @relation("SeriesRoleUser")
   eventartrollen benutzer_eventartrollen[] @relation("EventTypeRoleUser")
   verwaltete_eventreihen eventreihe_verwaltung[] @relation("SeriesManagementUser")
   id Int @id @default(autoincrement())
 
-  // PersÃ¶nliche Daten
+  // Persönliche Daten
   name       String?
   email      String  @unique
   avatar_url String?
@@ -1544,6 +1546,21 @@ model eventreihe_verwaltung {
   created_at DateTime @default(now())
   updated_at DateTime @default(now()) @updatedAt
   benutzer users @relation("SeriesManagementUser", fields: [benutzer_id], references: [id], onDelete: Cascade)
+  eventreihe eventreihen @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Cascade)
+  @@id([benutzer_id, eventreihe_id])
+  @@index([eventreihe_id])
+  @@schema("pubquiz")
+}
+
+/// One format-independent role per user and event series. Product activation is separate.
+model benutzer_reihenrollen {
+  benutzer_id Int
+  eventreihe_id Int
+  rolle RoleAssignmentRole
+  zugewiesen_von_user_id Int?
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now()) @updatedAt
+  benutzer users @relation("SeriesRoleUser", fields: [benutzer_id], references: [id], onDelete: Cascade)
   eventreihe eventreihen @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Cascade)
   @@id([benutzer_id, eventreihe_id])
   @@index([eventreihe_id])

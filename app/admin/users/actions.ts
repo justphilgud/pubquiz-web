@@ -1,4 +1,5 @@
 "use server";
+import { readSeriesRoleForm } from "./seriesRoleFormPolicy";
 
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
@@ -77,7 +78,11 @@ function roleSelectionFromForm(formData: FormData) {
     ...(formData.get("roleAdministrator") === "on" || legacyGlobalRoles.includes("ADMIN") ? ["ADMIN" as const] : []),
     ...(formData.get("roleEditor") === "on" || legacyGlobalRoles.includes("EDITOR") ? ["EDITOR" as const] : []),
   ])];
-  return { globalRoles, eventSeriesAssignments: [] as { eventSeriesId: number; role: "EDITOR" | "EVENT_MANAGER" }[] };
+  let series;
+  try { series = readSeriesRoleForm(formData); } catch (error) {
+    throw new UserFormValidationError(error instanceof Error ? error.message : "Ungültige Reihenrollen.");
+  }
+  return { globalRoles, series, eventSeriesAssignments: series?.assignments ?? [] };
 }
 
 function actorId(session: { user?: { id?: string } }) {
@@ -118,7 +123,7 @@ async function createUser(formData: FormData) {
   const user = await withSerializableTransaction(async (transaction) => {
     await assertEventSeriesExist(
       transaction,
-      roleSelection.eventSeriesAssignments.map(({ eventSeriesId }) => eventSeriesId),
+      [...roleSelection.eventSeriesAssignments.map(({ eventSeriesId }) => eventSeriesId), ...(roleSelection.series?.managementIds ?? [])],
     );
     const created = await transaction.users.create({
       data: {
@@ -137,6 +142,9 @@ async function createUser(formData: FormData) {
       assignedById,
     });
 
+    if (roleSelection.series) await replaceEventSeriesRoleAssignments(transaction, {
+      userId: created.id, assignments: roleSelection.series.assignments, managementIds: roleSelection.series.managementIds, assignedById,
+    });
     return created;
   });
   logRoleAudit("role_assignment_added", { userId: user.id, scope: "USER_FORM" });
@@ -190,7 +198,7 @@ async function updateUser(formData: FormData) {
     if (existing.is_active && !isActive) await assertCanDeactivateUser(transaction, id);
     await assertEventSeriesExist(
       transaction,
-      roleSelection.eventSeriesAssignments.map(({ eventSeriesId }) => eventSeriesId),
+      [...roleSelection.eventSeriesAssignments.map(({ eventSeriesId }) => eventSeriesId), ...(roleSelection.series?.managementIds ?? [])],
     );
     await transaction.users.update({
       where: { id },
@@ -201,6 +209,9 @@ async function updateUser(formData: FormData) {
       roles: roleSelection.globalRoles,
       assignedById,
       verifyLegacy: true,
+    });
+    if (roleSelection.series) await replaceEventSeriesRoleAssignments(transaction, {
+      userId: id, assignments: roleSelection.series.assignments, managementIds: roleSelection.series.managementIds, assignedById,
     });
 
   });

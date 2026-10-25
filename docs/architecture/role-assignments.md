@@ -1,166 +1,110 @@
-# Rollen, Eventarten und gemeinsame Eventreihenverwaltung
+# Rollen, Eventarten und Eventreihenverwaltung
 
-Stand: 25. Oktober 2026. Erweiterung auf Basis von Main/PR #129. Auslieferung dieser
-Erweiterung erst nach separater Review; kein automatischer Merge oder Production-Release.
+Stand: 25. Oktober 2026, nach fachlicher Präzisierung im Review. Nur PR und Preview,
+kein automatischer Merge oder Production-Release.
 
-## Verantwortung und Berechtigungsquelle
+## Fachlicher Vertrag
 
-`app/roles/eventTypes.ts` definiert stabile Kennungen `QUIZ`, `BINGO` und
-`POWERPOINT_KARAOKE`. Der additive DB-Katalog `eventarten` sichert Referenzen ab.
-Bingo und PowerPoint-Karaoke sind nur administrative Freischaltungen/Rollen, noch
-keine spielbaren Funktionen. Ein weiterer Katalogeintrag benötigt eine bewusste
-Implementierung und Migration; er erteilt niemals automatisch Rechte.
+Eine Person erhält direkt beim Benutzer **eine Rolle je Eventreihe**: kein Zugriff,
+EDITOR oder EVENT_MANAGER. Dieselbe Person darf in verschiedenen Reihen andere
+Rollen haben. Die Eventreihe bestimmt unabhängig davon, welche Produkte (QUIZ,
+BINGO, POWERPOINT_KARAOKE) freigeschaltet sind. Später aktivierte Produkte verwenden
+die vorhandene Reihenrolle automatisch; das ist ausdrücklich gewünschtes Verhalten.
 
-Vier getrennte Fakten werden persistiert:
+Dies ersetzt das frühere Ziel einer Rolle pro Benutzer × Reihe × Eventart.
+Die separate Eventartrechte-Matrix entfällt. Produkt und Rolle bleiben zwei
+getrennte Voraussetzungen, aber Rollen werden nicht mehr je Produkt gepflegt.
 
-| Fakt | Tabelle | Wer ändert ihn? |
+| Fakt | Alleinige Quelle | Pflege |
 | --- | --- | --- |
-| Globale Rollen ADMIN/EDITOR | `benutzer_rollenzuweisungen`, GLOBAL | Admin |
-| Produkt pro Eventreihe aktiv/inaktiv | `eventreihe_eventarten` | Admin |
-| EDITOR/EVENT_MANAGER je Benutzer × Reihe × Eventart | `benutzer_eventartrollen` | Admin |
-| Gemeinsame Stammdaten/Branding verwalten | `eventreihe_verwaltung` | Admin |
+| Globale ADMIN-/Quiz-EDITOR-Rolle | GLOBAL in `benutzer_rollenzuweisungen` | Benutzerformular |
+| EDITOR/EVENT_MANAGER je Benutzer × Reihe | `benutzer_reihenrollen` | Benutzerformular |
+| Produktfreischaltung | `eventreihe_eventarten` | Eventreihe: Anlegen / Detail |
+| Gemeinsame Stammdaten/Branding | `eventreihe_verwaltung` | Benutzerformular, getrennte Checkbox |
 
-Diese Tabellen sind die alleinige Berechtigungsquelle. `users.role`,
-`eventreihe_benutzerrollen` und EVENT_SERIES-Zeilen in `benutzer_rollenzuweisungen`
-sind keine Fallbacks. Identität/Sitzung allein erteilt keine Rechte.
-`getActorPermissions` lädt alle Fakten mit aktivem Benutzerfilter bei jedem
-Serveraufruf neu. Es gibt keinen Session- oder Subdomain-Rechtecache.
+Diese Quellen sind die alleinige Berechtigungsquelle. `users.role`, alte
+EVENT_SERIES-Zuweisungen, `eventreihe_benutzerrollen` und die ehemalige Tabelle
+`benutzer_eventartrollen` erteilen keine zusätzlichen Rechte.
 
-`AuthorizationActor.assignments` enthält globale Rollen sowie ausschließlich die
-**wirksamen Quizrollen** aus den neuen Tabellen. Dadurch bleiben die in PR #129
-abgesicherten Fragen-, Quiz-, Medien-, Team-, Story- und Live-Objektprüfungen an ihrem
-bestehenden Ort. `eventTypeAssignments` enthält auch deaktivierte gespeicherte Rollen
-mit `enabled=false`; `hasEventTypeAccess` verlangt Produkt und Rolle gemeinsam.
-`managedEventSeriesIds` ist davon unabhängig. Client-Capabilities sind Anzeigehilfen,
-keine Sicherheitsgrenze. Unbekannte Rollen/Scopes/Eventarten wirken fail-closed.
+## Aufgaben je Format
 
-## Matrix und Objektgrenzen
+| Rolle | Quiz | Bingo (zukünftig) | PowerPoint-Karaoke (zukünftig) |
+| --- | --- | --- | --- |
+| Editor | Fragen/Inhalte im bisherigen Workflow | Begriffe/Feldinhalte, z. B. Bullshit-Bingo | Keine Editorfunktionen definiert, daher kein Format-Zugriff |
+| Eventmanager | Inhalte, Zusammenstellung, Durchführung/Auswertung im bisherigen Umfang | Inhaltsverwaltung und Durchführung | Durchführung |
+| Admin | Global | Global | Global |
 
-Alle Reihenrechte verlangen ein aktives Konto. Formatgebundene Rechte verlangen
-zusätzlich ein freigeschaltetes Produkt und den passenden Objektzugriff.
+Bingo und Karaoke bleiben nicht implementiert. Die Tabelle definiert ihre
+Rechtegrenze, keine bereits vorhandenen Spiele oder erfundenen Funktionen.
+`hasEventTypeAccess` lässt Karaoke-Editoren ausdrücklich nicht zu.
+Globale Quiz-Editoren erhalten keine Bingo-/Karaoke-/Reihenrechte.
+Gemeinsame Verwaltung erteilt keine Spielrechte und umgekehrt. Neue Eventmanager
+bekommen gemeinsame Verwaltung nicht automatisch; bisherige behalten ihr backgefülltes
+Recht. Nur Admin verwaltet Benutzer und Produktfreischaltungen.
 
-| Aktion | Admin | Globaler Quiz-Editor | Quiz-Editor einer Reihe | Quiz-Eventmanager | Bingo-/Karaoke-Eventmanager | Eventreihe verwalten |
-| --- | --- | --- | --- | --- | --- | --- |
-| Globale eigene Quizentwürfe bearbeiten | ja | ja, bisheriger Workflow | nein | nein | nein | nein |
-| Freigegebene globale Fragen sehen | ja | ja | ja | ja | keine Quizrechte daraus | nein |
-| Eigene Reihenentwürfe bearbeiten | ja | nur mit zusätzlicher Quizrolle | ja, bestehende Objektregeln | ja | keine Quizrechte | nein |
-| Reihenfragen freigeben | ja | nur mit zusätzlicher Managerrolle | nein | alle zugeordneten Reihen erforderlich | keine Quizrechte | nein |
-| Quiz zusammenstellen, moderieren, auswerten und Teams verwalten | ja | nein | nein | eigene Quizreihen | nein | nein |
-| Gemeinsame Stammdaten/Logo/Standardbranding | ja | nein | nein | nur mit Zusatzrecht | nur mit Zusatzrecht | ja |
-| Benutzer/Rollen/Produktfreischaltungen | ja | nein | nein | nein | nein | nein |
+## Serverseitige Durchsetzung
 
-Admin behält globalen Verwaltungs-/Inhaltszugriff. Auch Admin startet kein Quiz mit
-deaktiviertem Quizprodukt; der Runtime-Gate gilt zusätzlich. Globale Quizentwürfe
-sind keiner einzelnen Reihenfreischaltung unterworfen. Neue Produkte erhalten keine
-automatischen globalen Editorrechte. Gemeinsame Verwaltung kann ohne eine
-Formatrolle vergeben werden. Neue Formatmanager erhalten sie niemals implizit.
+`getActorPermissions` liest aktive Benutzer und die aktuellen Quellen je Aufruf.
+Aus Reihenrollen und Produktstatus entstehen `eventTypeAssignments`. Ausschließlich
+wirksame QUIZ-Rechte fließen in `AuthorizationActor.assignments` ein. Die bestehenden
+Objektprüfungen für Fragen, Quiz, Medien, Storys, Teams, Antworten und Livezustand
+bleiben bestehen. Keine Rechte aus ausgeblendeten Menüs, Sitzungsrollen oder Hosts.
 
-`canSaveScopedQuestion` prüft gespeicherten und angeforderten Zielbereich, bei
-bestehenden Fragen erneut unter Row-Lock. Globale Originale und Kopierverbote bleiben
-geschützt; mehrfach zugeordnete Inhalte behalten die bisherigen Jeder-Reihe-Regeln.
-`questionVisibilityWhere` filtert Suche, Ähnlichkeit und Dashboard; Urheberschaft
-allein erhält keinen privaten Bereichszugriff. Review-Dashboard und Quiz-Dashboard
-sind ebenfalls auf tatsächlich berechtigte Quizbereiche beschränkt.
-`questionQuizUsageWhere` schützt Quizverwendungen einschließlich Anzahl/Filter.
-Legacy-Frage-Actions behalten die VIEW-/EDIT-Objektprüfungen aus PR #129.
+Produktdeaktivierung sperrt Formatfunktionen, erhält Reihenrollen und Inhalte und
+entzieht keine gemeinsame Verwaltung. Ein laufendes Quiz verhindert Deaktivierung;
+Start und Deaktivierung teilen Advisory-/Quizlocks. Rechteentzug/Kontodeaktivierung
+greifen beim nächsten Serveraufruf. Bereits ausgelieferte Inhalte sind nicht rückrufbar.
+Kein Session-Reset. Subdomains verleihen keine Rechte.
 
-`getQuizSeriesChangeBlocker` schützt weiterhin Fragen, übernommene Storylinks,
-Story-Platzierungen und Umfragen. Ein Reihenwechsel entfernt oder genehmigt keine
-Inhalte. Gemeinsame Brandingrechte ersetzen keine Story-/Quizrechte. Stories sind
-im derzeitigen Produkt Quiz-Inhalte; gemeinsame zukünftige Designelemente werden
-in diesem Auftrag nicht neu modelliert. Templates behalten ihre bisherigen Admin-
-und Objektregeln; keine neue formatspezifische Templateimplementierung.
+Globale freigegebene Fragen dürfen im erlaubten Quiz verwendet werden. Globale
+Originale und Kopierregeln bleiben geschützt; mehrfach verwendete Fragen verlangen
+die bestehenden Rechte in allen betroffenen Reihen. Quiz-Editoren erhalten keine
+Quiz-/Teamverwaltung. Globale Teamlöschung und Lifecycle-Aktionen bleiben beim Admin.
 
-Medienupload-Autorisierung verwendet weiterhin Frage/Quiz/Template-Objektprüfungen;
-Reihenlogos verwenden das separate gemeinsame Verwaltungsrecht. Bereits bekannte
-öffentliche Bild-/Blobadressen lassen sich durch einen Rollenentzug nicht aus
-Browsern zurückrufen. Es wird keine neue private Medienauslieferung behauptet.
+## Schreiben, Migration und Kompatibilität
 
-## Deaktivierung, Runtime und Sitzungen
+Benutzeridentität, globale Rollen, Reihenrollen und gemeinsame Verwaltung werden in
+einer serialisierbaren Transaktion gespeichert; unbekannte IDs/Rollen und doppelte
+Reihen sind ungültig. Ein vollständiges neues Formular trägt einen Versionsmarker.
+Alte bereits geöffnete reine Identitätsformulare ohne diesen Marker erhalten
+Reihen-/Verwaltungsrechte. Veraltete Reihenfelder und die alte Matrix-Action werden
+verständlich abgewiesen. Letzter aktiver globaler Administrator bleibt geschützt.
 
-`setEventTypeEnabled` ändert ausschließlich die Produktfreischaltung. Inhalte und
-neue Rollen bleiben erhalten und werden nach Reaktivierung wieder wirksam. UI und
-Erfolgsmeldungen weisen darauf hin. Nicht freigeschaltete Rollen können im Voraus
-konfiguriert werden; dies schaltet kein Produkt frei.
+`20261025140000_event_type_permissions` bleibt unverändert. Die zusätzliche Migration
+`20261025160000_series_roles` übernimmt eindeutige vorherige Rollen je Reihe samt
+Zuweiser und Auditzeiten in die neue Quelle. Unterschiedliche Rollen desselben
+Benutzers in derselben Reihe führen zum transaktionalen Abbruch, nicht zu einer
+automatischen Höherstufung oder zum Verlust von Rechten. Vorherige Formatzeilen
+bleiben beim Backfill unverändert und werden anschließend nur als abgeleiteter
+Kompatibilitätsspiegel gepflegt. Direkte alte Matrix-Schreibzugriffe sind gesperrt. Für einen regulären Upgrade von Main existieren nach dem ersten Backfill
+nur Quizrollen; dadurch entstehen keine solchen Konflikte.
 
-Quiz-Deaktivierung prüft den tatsächlichen `quiz_praesentation_status`:
-`quiz_started_at IS NOT NULL AND quiz_stopped_at IS NULL` bedeutet RUNNING, auch bei
-archiviertem Quiz. Ein laufendes Quiz blockiert die Deaktivierung verständlich.
-Start und Produktänderung nehmen zuerst denselben transaktionalen Advisory-Lock
-(860012, Eventreihen-ID), danach die bestehenden Quiz-Row-Locks. Produktänderungen
-lesen unter Read Committed nach dem Warten den aktuellen Lifecycle. Das vermeidet
-einen veralteten Serializable-Snapshot. Matrix- und Kontoschreibvorgänge bleiben in
-einer serialisierbaren Transaktion mit begrenztem Retry.
+`syncLegacyQuizRoles` spiegelt die Reihenrolle in die alte Formattabelle, damit
+bereits ausgelieferte Preview-Instanzen keinen alten Rollenstand behalten. In die
+beiden älteren Quizrepräsentationen schreibt er ausschließlich wirksame Quizrechte,
+nie zurück in die maßgeblichen Reihenrollen. Sein Marker ist
+transaktionslokal und kommt nicht aus Formularen. Sperren/Reaktivieren eines
+Produkts ändern keine gespeicherte Reihenrolle. Globale Dual Writes bleiben erhalten.
 
-`requireQuizProductEnabled` prüft im gesperrten Antwort-/Startpfad erneut die aktuelle
-Freischaltung. Signierte Teamsitzungen und öffentlicher Join-Status verlangen das
-aktive Quizprodukt. JSON/ICS liefern keine Quiztermine deaktivierter Quizprodukte;
-öffentliche Reihenmetadaten bleiben unabhängig davon erhalten.
+Kein uneingeschränkter Code-Rollback auf Main nach Rechteänderungen: alter Code kann
+Quizmanager wieder als Brandingverwalter interpretieren. Bei notwendigem Rückfall
+Schreib-/sensible Zugriffspfade sperren, Quellen erhalten und korrigierten Code mit
+neuen Gates bereitstellen. Keine Legacy-Rückkopie und kein Restore bestehender Daten.
+Die Contract-Phase (Entfernen alter Tabellen) bleibt ein separater Auftrag.
 
-Rollenentzug und Kontodeaktivierung wirken beim nächsten Serveraufruf mit bestehendem
-Cookie. Bereits gelieferte Inhalte verschwinden nicht rückwirkend; ein bereits
-autorisierter gleichzeitiger Aufruf wird nicht zentral abgebrochen. Teamidentitäten
-haben weiterhin ihren getrennten signierten Zugang, keine Benutzerrollenzuweisung.
-Erfolgreiche Matrix-/Produktänderungen verwenden das bestehende technische Console-Audit mit IDs und Eventart, ohne Personendaten.
-Es gibt keinen Session-Reset. Reconnect, Antworten und Bewertung bleiben unverändert.
+## Bedienung und Prüfungen
 
-## Administrative Bedienung
+Unter `/admin/users` Benutzer anlegen oder **Bearbeiten**. Globale Rollen und darunter
+**Rollen je Eventreihe** pflegen; **Eventreihe verwalten** bleibt getrennt. **Speichern**
+übernimmt alles gemeinsam. Keine zusätzliche Benutzerwahl oder globale Rollenmatrix.
+Reihenrollen bleiben auch bei gesperrten Produkten in Liste/Formular sichtbar.
 
-`/admin/users`: Globale Rollen im bestehenden Kontoformular, daneben eine unabhängige
-Eventartrechte-Matrix mit Benutzerwahl, Eventreihen als Zeilen und drei Eventarten
-als Spalten. „Kein Zugriff“ löscht nur die betreffende neue Zuweisung. Die separate
-Checkbox „Eventreihe verwalten“ verleiht weder Quiz- noch Benutzer-/Produktrechte.
-Die Tabelle scrollt auf schmalen Bildschirmen horizontal. Die bisherige Benutzerliste
-wird ausdrücklich als Zusammenfassung **wirksamer Quizrollen** gekennzeichnet.
-Kontospeichern verändert keine Eventart- oder gemeinsamen Verwaltungsrechte.
-Neue Konten können zunächst ohne Rechte angelegt werden (Least Privilege); danach
-vergibt der Admin die gewünschten Matrixrechte. Letzter aktiver Admin bleibt geschützt.
+Unter `/admin/eventreihen` beim Anlegen **Freigeschaltete Eventarten** auswählen;
+keine Vorauswahl. Spätere Änderungen in der Detailseite. Gemeinsame Verwalter dürfen
+keine Produkte aktivieren. Bestehende individuelle Werte bleiben erhalten.
 
-`/admin/eventreihen/:id`: Produktfreischaltungen sichtbar; nur Admin kann sie ändern.
-Gemeinsame Verwalter können Stammdaten/Branding bearbeiten. Ohne Quizverwaltungsrecht
-werden keine Quizobjekte/Quizanzahlen ausgegeben. Die Rollenübersicht bezeichnet ihre
-bestehenden Profile ausdrücklich als Quizprofile und erläutert Zusatzrechte.
-
-## Migration und Kompatibilität
-
-`20261025140000_event_type_permissions` ist eine additive Transaktion:
-Katalog/Tabellen/FKs/Indizes und Rollen-Check-Constraint anlegen; bestehende Reihen
-für QUIZ aktivieren; ausschließlich aktuelle EVENT_SERIES-Assignments auf Quiz
-übertragen; nur bisherigen EVENT_MANAGERn gemeinsame Verwaltung zuweisen.
-Zuweiser und Auditzeiten werden beim Backfill übernommen. Globale Rollen, Benutzer,
-Inhalte, Zuordnungen und Ergebnisse bleiben unverändert. Keine Bingo-/Karaoke-
-Freischaltung oder -Zuweisung durch den Backfill, auch nicht für Admin.
-
-Legacy-Schreibpfade sind bewusst nicht weiter als Rechtequelle kompatibel:
-Alte Membership-Actions und Reihenfelder alter Kontoformulare werden verständlich
-abgewiesen; der alte interne Reihen-Writer wirft einen Validierungsfehler.
-Datenbanktrigger sperren direkte/alte EVENT_SERIES- und Membership-Schreibvorgänge
-nach dem Backfill. Nur `syncLegacyQuizRoles` setzt transaktionslokal den Marker für
-die Projektion wirksamer Quizrechte in beide Altstrukturen. Globale Dual Writes
-bleiben erhalten. Dieses Flag ist keine Clientberechtigung und wird nie aus
-Formulareingaben übernommen. Reaktivierung restauriert die Quizprojektion aus den
-neuen gespeicherten Rechten. Neue Quellen werden nie aus Legacy-Daten rekonstruiert.
-
-Der frühere Expand-and-Contract-Vertrag aus Paket 1.5 wird damit für Reihenrechte
-bewusst abgelöst. Ein uneingeschränkter Rollback auf Main #129 würde ein neues
-Quizmanagerrecht wieder als Brandingrecht interpretieren und kann ein bereits entzogenes
-gemeinsames Recht wieder erteilen. Deshalb ist ein bloßer Code-Rollback nach Matrixänderungen
-**nicht sicher**. Siehe verbindlichen [Migrations-/Rückfallplan](../operations/event-type-permissions-20261025.md).
-Die spätere Contract-Phase (Entfernen der Altstrukturen) ist weiterhin ein separater
-Auftrag; keine Historie wird gelöscht oder zurückgesetzt.
-
-## Erweiterungsgrenze und Prüfungen
-
-Eventreihe bleibt Grenze für Produkte, Benutzerzuweisungen und gemeinsame Verwaltung.
-Fragen bleiben Quiz-Inhalte mit GLOBAL/mehrfachen Reihen, keine implizite universelle
-Inhaltstabelle. Es wird kein neues Eventobjekt mit zwingend genau einer Eventart
-angelegt. Gemischte Veranstaltungen, neue Navigation, gemeinsames Designsystem,
-Subdomains und eigentliche Bingo-/Karaokefunktionen bleiben separate Aufgaben.
-
-`npm run test:authorization`: echte Actions/API mit echten Guards und isolierten
-Auth-/Persistenzadaptern. `eventTypes.test.ts`: getrennte Rechtekombinationen und
-Produktgates. `scripts/testing/event-types.integration.test.ts`: echtes PostgreSQL,
-frische leere QA-Datenbank, unveränderte Bestandsdaten, Backfill, Legacy-Sperre,
-reale Admin-/Konto-/Start-Actions, laufende/konkurrierende Starts und Deaktivierung.
-CI führt den DB-Test im bestehenden isolierten PostgreSQL-Job aus. Lokale
-Browserabnahme und verbleibende Grenzen stehen im Betriebsbericht.
+Automatische Prüfungen: Formularparser, Format-/Produktgates, echte Guards/Actions,
+PostgreSQL-Migration einschließlich Konfliktabbruch, Benutzeranlage/-änderung,
+Rechteentzug, aktuelle Konten, Quizstart und konkurrierende Deaktivierung. Die
+gehostete Browserabnahme ergänzt diese Tests. Gemischte Events und eigentliche
+Bingo-/Karaokefunktionen bleiben separate Aufgaben.

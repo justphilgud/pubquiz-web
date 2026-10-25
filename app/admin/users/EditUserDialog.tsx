@@ -131,6 +131,7 @@ export default function EditUserDialog({
                 eventSeries={assignmentData.eventSeries}
                 initialGlobalRoles={user.globalRoles}
                 initialEventSeriesAssignments={initialEventSeriesAssignments}
+                initialManagementIds={assignmentData.managementAssignments?.filter(a => a.userId === user.id).map(a => a.eventSeriesId)}
                 locale={locale}
                 messages={messages}
               />

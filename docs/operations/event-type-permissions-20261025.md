@@ -1,5 +1,19 @@
 # Eventartenrechte: Umsetzung, Migration und Abnahme
 
+> **Aktueller fachlicher Vertrag nach Reviewkorrektur:** Rollen werden direkt im
+> Benutzerformular je Eventreihe vergeben; Produktfreischaltungen beim Anlegen bzw.
+> Bearbeiten der Eventreihe. Keine zusätzliche Eventartrechte-Matrix, keine Rollen
+> je Format. Die unten dokumentierte erste Umsetzung/Browserabnahme ist historisch
+> und wird durch die neue Reihenrollen-Abnahme ergänzt. Maßgeblich sind die aktuelle
+> [Architektur](../architecture/role-assignments.md) und
+> [Adminanleitung](../admin-guide/benutzer-und-rollen.md).
+> Zusatzmigration `20261025160000_series_roles` erhält alte Formatzeilen/Auditdaten,
+> übernimmt eindeutige Reihenrollen und stoppt nur bei tatsächlich widersprüchlichen
+> früheren Preview-Zuweisungen. Kein Zurücksetzen einer Historie oder Quizsession.
+> Karaoke-Editoren haben keine Formatfunktionen. Gemeinsame Verwaltung bleibt
+> unabhängig. Weiterhin ausschließlich PR/Preview, kein Merge/Production-Release.
+
+
 Stand: 25. Oktober 2026. Ausgangs-Main `5920a568afb6d650d52a9c819e347170b993ed80`
 (PR #129). Review-Branch `codex/event-type-permissions`. Dieser Auftrag autorisiert
 **keinen Merge und kein Production-Deployment**. Maßgeblich ist der aktuelle

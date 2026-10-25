@@ -44,7 +44,7 @@ const roleFields = readFileSync("app/admin/users/UserRoleFields.tsx", "utf8");
 const seriesPicker = readFileSync("app/admin/users/EventSeriesPicker.tsx", "utf8");
 const assignmentWrites = readFileSync("app/roles/roleAssignmentWrites.server.ts", "utf8");
 
-const matrix = readFileSync("app/admin/users/EventTypeRightsManager.tsx", "utf8");
+const matrix = readFileSync("app/admin/users/UserRoleFields.tsx", "utf8");
 const eventTypeActions = readFileSync("app/roles/eventTypeActions.ts", "utf8");
 const eventTypeWrites = readFileSync("app/roles/eventTypeWrites.server.ts", "utf8");
 
@@ -201,22 +201,22 @@ test("event-series picker searches, preserves archive filtering and selects in b
 test("identity forms separate global roles from the event type matrix", () => {
   assert.match(userCreator, /UserRoleFields/); assert.match(userEditor, /UserRoleFields/);
   assert.match(roleFields, /Globaler Quiz-Editor/); assert.doesNotMatch(roleFields, /name="roleEventManager"/);
-  assert.match(matrix, /EVENT_TYPES.map/); assert.match(matrix, /Eventreihe verwalten/);
-  assert.match(matrix, /overflow-x-auto/); assert.match(matrix, /min-h-11/);
+  assert.match(matrix, /eventSeries.map/); assert.match(matrix, /Eventreihe verwalten/);
+  assert.match(matrix, /Rollen je Eventreihe/); assert.match(matrix, /min-h-11/);
   assert.match(seriesPicker, /SearchInput/);
 });
 
 test("identity/global role writes stay atomic and leave event type rights untouched", () => {
   assert.match(userActions, /withSerializableTransaction[\s\S]+users\.create[\s\S]+replaceGlobalRoleAssignments/);
-  assert.doesNotMatch(userActions, /await replaceEventSeriesRoleAssignments/);
-  assert.match(eventTypeActions, /withSerializableTransaction/);
+  assert.match(userActions, /if \(roleSelection.series\) await replaceEventSeriesRoleAssignments/);
+  assert.match(assignmentWrites, /syncLegacyQuizRoles/);
 });
 test("user overview reads assignments without deserializing legacy EVENT_EDITOR rows", () => {
   const legacyEventEditorRow = { rolle: "EVENT_EDITOR" };
 
   assert.equal(legacyEventEditorRow.rolle, "EVENT_EDITOR");
   assert.match(userOverview, /getRoleAssignmentOptions/);
-  assert.match(membershipActions, /benutzer_rollenzuweisungen\.findMany/);
+  assert.match(membershipActions, /benutzer_reihenrollen\.findMany/);
   assert.doesNotMatch(
     membershipActions,
     /eventreihe_benutzerrollen\.(findMany|findFirst)/,
@@ -297,13 +297,13 @@ test("multiple event-series assignments allow different roles and reject duplica
 
 test("obsolete membership mutations fail closed instead of bypassing the matrix", () => {
   for (const action of ["addEventSeriesRoleAssignment", "changeEventSeriesRoleAssignment", "removeEventSeriesRoleAssignment"]) assert.ok(membershipActions.includes(action));
-  assert.match(membershipActions, /Eventartrechte-Matrix/);
+  assert.match(membershipActions, /Reihenrollen direkt beim Benutzer/);
   assert.doesNotMatch(membershipActions, /\.(create|update|delete)\(/);
 });
 
-test("user overview includes a separate authoritative event type matrix", () => {
-  assert.match(userOverview, /EventTypeRightsManager/); assert.match(userManagementList, /countEventSeriesRoleAssignments/);
-  assert.match(userEditor, /UserRoleFields/); assert.match(matrix, /getEventTypeMatrix/);
+test("user overview edits authoritative series roles within each user", () => {
+  assert.doesNotMatch(userOverview, /EventTypeRightsManager/); assert.match(userManagementList, /countEventSeriesRoleAssignments/);
+  assert.match(userEditor, /UserRoleFields/); assert.match(matrix, /eventSeriesRoles/);
 });
 
 test("event-series page exposes only a compact access summary", () => {
@@ -360,8 +360,8 @@ test("only the last active global administrator remains protected", () => {
 
 test("event type role changes do not require a manager successor", () => {
   assert.doesNotMatch(eventTypeActions, /last_event_manager|lastManager|activeManagerCount/);
-  assert.match(eventTypeActions, /benutzer_eventartrollen\.deleteMany/);
-  assert.match(eventTypeActions, /benutzer_eventartrollen\.upsert/);
+  assert.match(assignmentWrites, /benutzer_reihenrollen\.deleteMany/);
+  assert.match(assignmentWrites, /benutzer_reihenrollen\.upsert/);
 });
 
 test("deactivation and archiving do not require an event manager successor", () => {
@@ -397,9 +397,9 @@ test("user forms return controlled errors instead of unhandled action failures",
 });
 
 test("only the matrix projects effective Quiz roles into compatibility structures", () => {
-  assert.match(eventTypeActions, /withSerializableTransaction[\s\S]+syncLegacyQuizRoles/);
+  assert.match(userActions, /withSerializableTransaction[\s\S]+replaceEventSeriesRoleAssignments/);
   assert.match(eventTypeWrites, /eventreihe_benutzerrollen\.deleteMany/);
   assert.match(eventTypeWrites, /benutzer_rollenzuweisungen\.create/);
   assert.match(eventTypeWrites, /eventart: "QUIZ"[\s\S]+ist_freigeschaltet: true/);
-  assert.match(assignmentWrites, /Promise<never>[\s\S]+Eventartrechte-Matrix/);
+  assert.match(assignmentWrites, /syncLegacyQuizRoles/);
 });

@@ -80,6 +80,17 @@ test("real PostgreSQL migration, current Actions, product lifecycle and legacy g
   await assert.rejects(db.query("UPDATE pubquiz.benutzer_rollenzuweisungen SET rolle='EDITOR' WHERE benutzer_id=3"), { code: "42501" });
   await assert.rejects(db.query("DELETE FROM pubquiz.eventreihe_benutzerrollen WHERE benutzer_id=3"), { code: "42501" });
   await assert.rejects(db.query("INSERT INTO pubquiz.benutzer_eventartrollen(benutzer_id,eventreihe_id,eventart,rolle)VALUES(4,20,'BINGO','ADMIN')"), { code: "23514" });
+  const previousFormatRows = (await db.query("SELECT * FROM pubquiz.benutzer_eventartrollen ORDER BY benutzer_id,eventreihe_id,eventart")).rows;
+  const seriesMigration = readFileSync("prisma/migrations/20261025160000_series_roles/migration.sql", "utf8");
+  await db.query("INSERT INTO pubquiz.benutzer_eventartrollen(benutzer_id,eventreihe_id,eventart,rolle)VALUES(3,10,'BINGO','EDITOR')");
+  await assert.rejects(db.query(seriesMigration), { code: "P0001" });
+  await db.query("ROLLBACK");
+  assert.equal((await db.query("SELECT to_regclass('pubquiz.benutzer_reihenrollen') name")).rows[0].name,null);
+  await db.query("DELETE FROM pubquiz.benutzer_eventartrollen WHERE benutzer_id=3 AND eventreihe_id=10 AND eventart='BINGO'");
+  await db.query(seriesMigration);
+  assert.deepEqual((await db.query("SELECT * FROM pubquiz.benutzer_eventartrollen ORDER BY benutzer_id,eventreihe_id,eventart")).rows, previousFormatRows);
+  assert.equal((await db.query("SELECT count(*)::int n FROM pubquiz.benutzer_reihenrollen")).rows[0].n,3);
+  await assert.rejects(db.query("UPDATE pubquiz.benutzer_eventartrollen SET rolle='EDITOR' WHERE benutzer_id=3"), { code: "42501" });
   console.info("Event type DB stage: real Actions");
   const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: target.toString() }) });
   let currentUser = 1;
@@ -91,6 +102,7 @@ test("real PostgreSQL migration, current Actions, product lifecycle and legacy g
     export * as legacy from './app/eventreihen/membershipActions';
     export * as live from './app/quiz/[quizId]/praesentation/statusActions';
     export * as users from './app/admin/users/actions';
+    export * as series from './app/eventreihen/actions';
   `, resolveDir: process.cwd() }, bundle: true, write: false, platform: "node", format: "cjs", packages: "external", define: { "import.meta.url": JSON.stringify(import.meta.url) },
     plugins: [{ name: "adapters", setup(builder) {
       builder.onResolve({ filter: /^(server-only|@\/auth|@\/app\/lib\/prisma|next\/cache|next\/navigation)$/ }, args => ({ path: args.path, namespace: "fixture" }));
@@ -99,22 +111,37 @@ test("real PostgreSQL migration, current Actions, product lifecycle and legacy g
   });
   const runtime = { exports: {} };
   runInNewContext(bundled.outputFiles![0].text, { module: runtime, exports: runtime.exports, require: createRequire(import.meta.url), fixture, console, process, Buffer, URL, Request, Response, Date, setTimeout, clearTimeout, performance, TextEncoder, TextDecoder, structuredClone }, { filename: "event-type-actions.cjs" });
-  const api = runtime.exports as { live: typeof import("@/app/quiz/[quizId]/praesentation/statusActions"); users: typeof import("@/app/admin/users/actions"); actions: typeof import("@/app/roles/eventTypeActions"); actors: typeof import("@/app/roles/roleAssignments.server"); guard: typeof import("@/app/eventreihen/eventSeriesAccess.server"); legacy: typeof import("@/app/eventreihen/membershipActions") };
+  const api = runtime.exports as { series: typeof import("@/app/eventreihen/actions"); live: typeof import("@/app/quiz/[quizId]/praesentation/statusActions"); users: typeof import("@/app/admin/users/actions"); actions: typeof import("@/app/roles/eventTypeActions"); actors: typeof import("@/app/roles/roleAssignments.server"); guard: typeof import("@/app/eventreihen/eventSeriesAccess.server"); legacy: typeof import("@/app/eventreihen/membershipActions") };
   try {
     assert.equal((await api.actors.getActorPermissions(6)).assignments.length,0,"Legacy fields must never act as an authorization fallback");
     assert.equal((await api.actors.getActorPermissions(6)).managedEventSeriesIds?.length,0);
-    const matrix = await api.actions.getEventTypeMatrix(3);
-    assert.equal(matrix.find(r => r.eventSeriesId === 10)?.manageSeries, true);
-    assert.equal((await api.actions.saveEventTypeMatrix(3, [
-      {eventSeriesId:10,roles:{QUIZ:"EVENT_MANAGER"},manageSeries:false},
-      {eventSeriesId:20,roles:{QUIZ:"EDITOR",BINGO:"EVENT_MANAGER"},manageSeries:false},
-    ])).success, true);
+    async function saveSeriesRoles(userId: number, assignments: {eventSeriesId:number;role:"EDITOR"|"EVENT_MANAGER"}[], managementIds: number[] = []) {
+      const form = new FormData(); form.set("id",String(userId)); form.set("name",`User ${userId}`); form.set("email",`eventqa${userId}@example.invalid`); form.set("is_active","true");
+      form.set("seriesRolesVersion","1"); form.set("eventSeriesRoles",JSON.stringify(assignments));
+      for (const id of managementIds) form.append("manageEventSeriesIds",String(id));
+      return api.users.updateUserAction(form);
+    }
+    const seriesInput={name:"New format QA series",isPublic:false};
+    assert.equal((await api.series.createEventSeries(seriesInput,["UNKNOWN" as never])).success,false);
+    const createdSeries=await api.series.createEventSeries(seriesInput,["QUIZ","BINGO"]);
+    assert.equal(createdSeries.success,true);
+    assert.deepEqual((await db.query("SELECT eventart FROM pubquiz.eventreihe_eventarten WHERE eventreihe_id=$1 AND ist_freigeschaltet ORDER BY eventart",[createdSeries.eventSeriesId])).rows.map(r=>r.eventart),["BINGO","QUIZ"]);
+    assert.equal((await api.actions.saveEventTypeMatrix(3, [])).success,false,"Stale matrix must not write rights");
+    assert.equal((await saveSeriesRoles(3,[{eventSeriesId:10,role:"EVENT_MANAGER"},{eventSeriesId:20,role:"EDITOR"}])).success,true);
+    assert.equal((await saveSeriesRoles(3,[{eventSeriesId:999999,role:"EVENT_MANAGER"}])).success,false);
+    assert.equal((await db.query("SELECT count(*)::int n FROM pubquiz.benutzer_reihenrollen WHERE benutzer_id=3")).rows[0].n,2);
+    const create = new FormData(); create.set("name","Scoped new editor"); create.set("email","series-new@example.invalid"); create.set("password","Isolated-Series-Only-2026!");
+    create.set("seriesRolesVersion","1"); create.set("eventSeriesRoles",JSON.stringify([{eventSeriesId:20,role:"EDITOR"}]));
+    assert.equal((await api.users.createUserAction(create)).success,true);
+    const newUser=(await db.query("SELECT id FROM pubquiz.users WHERE email='series-new@example.invalid'")).rows[0].id;
+    assert.equal((await api.actors.getActorPermissions(newUser)).assignments.some(a=>a.eventSeriesId===20&&a.role==='EDITOR'),true);
     let actor = await api.actors.getActorPermissions(3);
     assert.equal(actor.assignments.filter(r => r.scopeType === "EVENT_SERIES").length, 2);
     assert.equal(actor.eventTypeAssignments?.find(r => r.eventType === "BINGO")?.enabled, false);
     assert.equal((await api.actions.setEventTypeEnabled(20,"BINGO",true)).success, true);
     actor = await api.actors.getActorPermissions(3);
-    assert.equal(actor.eventTypeAssignments?.find(r => r.eventType === "BINGO")?.enabled, true);
+    assert.equal(actor.eventTypeAssignments?.find(r => r.eventType === "BINGO" && r.eventSeriesId === 20)?.enabled, true);
+    assert.equal(actor.eventTypeAssignments?.find(r => r.eventType === "BINGO" && r.eventSeriesId === 20)?.role, "EDITOR");
     currentUser = 3;
     await assert.rejects(api.actions.setEventTypeEnabled(10,"QUIZ",false), /REDIRECT/);
     await assert.rejects(api.actions.saveEventTypeMatrix(4, []), /REDIRECT/);
@@ -124,7 +151,7 @@ test("real PostgreSQL migration, current Actions, product lifecycle and legacy g
     const identity = new FormData();
     identity.set("id","3"); identity.set("name","Manager A"); identity.set("email","eventqa3@example.invalid"); identity.set("is_active","true");
     assert.equal((await api.users.updateUserAction(identity)).success,true);
-    assert.equal((await api.actors.getActorPermissions(3)).eventTypeAssignments?.length,3);
+    assert.equal((await api.actors.getActorPermissions(3)).eventTypeAssignments?.length,6);
     await api.live.starteQuiz(11,0);
     assert.equal((await api.actions.setEventTypeEnabled(10,"QUIZ",false)).success, false);
     await db.query("UPDATE pubquiz.quiz_praesentation_status SET quiz_stopped_at=NOW() WHERE quiz_id=11");
@@ -132,7 +159,7 @@ test("real PostgreSQL migration, current Actions, product lifecycle and legacy g
     await assert.rejects(api.live.starteQuiz(11,0), /nicht freigeschaltet/);
     actor = await api.actors.getActorPermissions(3);
     assert.equal(actor.assignments.some(r => r.eventSeriesId === 10), false);
-    assert.equal((await db.query("SELECT count(*)::int n FROM pubquiz.benutzer_eventartrollen WHERE benutzer_id=3 AND eventreihe_id=10")).rows[0].n,1);
+    assert.equal((await db.query("SELECT count(*)::int n FROM pubquiz.benutzer_reihenrollen WHERE benutzer_id=3 AND eventreihe_id=10")).rows[0].n,1);
     assert.equal((await api.actions.setEventTypeEnabled(10,"QUIZ",true)).success, true);
     assert.equal((await api.actors.getActorPermissions(3)).assignments.some(r => r.eventSeriesId === 10),true);
     await db.query("INSERT INTO pubquiz.quiz(quiz_id,eventreihe_id,titel)VALUES(14,10,'Isolierter Start-Deaktivierungs-Race')");
@@ -155,8 +182,12 @@ test("real PostgreSQL migration, current Actions, product lifecycle and legacy g
     assert.equal((await api.actors.getActorPermissions(3)).assignments.length,0);
     await db.query("UPDATE pubquiz.users SET is_active=true WHERE id=3");
     assert.equal((await api.legacy.addEventSeriesRoleAssignment({userId:4,eventSeriesId:20,role:"EVENT_MANAGER"})).success,false);
+    assert.equal((await saveSeriesRoles(4,[])).success,true);
+    assert.equal((await api.actors.getActorPermissions(4)).assignments.length,0);
+    assert.equal((await db.query("SELECT count(*)::int n FROM pubquiz.benutzer_eventartrollen WHERE benutzer_id=4")).rows[0].n,0,"Old Preview instances must not retain revoked format roles");
+    await saveSeriesRoles(4,[{eventSeriesId:10,role:"EDITOR"}]);
     // Restore only synthetic QA role configuration for the following browser acceptance.
-    await api.actions.saveEventTypeMatrix(3,[{eventSeriesId:10,roles:{QUIZ:"EVENT_MANAGER"},manageSeries:true},{eventSeriesId:20,roles:{QUIZ:"EDITOR",BINGO:"EVENT_MANAGER"},manageSeries:false}]);
+    await saveSeriesRoles(3,[{eventSeriesId:10,role:"EVENT_MANAGER"},{eventSeriesId:20,role:"EDITOR"}],[10]);
     console.info(`Isolated QA database retained for browser acceptance: ${name}`);
   } finally { await prisma.$disconnect(); }
 });

@@ -1,3 +1,4 @@
+import { EVENT_TYPES } from "./eventTypes";
 import type { Session } from "next-auth";
 import { prisma } from "@/app/lib/prisma";
 import {
@@ -44,16 +45,16 @@ export async function getUserRoleAssignments(userId: number): Promise<RoleAssign
 export async function getActorPermissions(userId: number): Promise<AuthorizationActor> {
   const [globals, roles, management] = await Promise.all([
     getUserRoleAssignments(userId),
-    prisma.benutzer_eventartrollen.findMany({
+    prisma.benutzer_reihenrollen.findMany({
       where: { benutzer_id: userId, benutzer: { is_active: true } },
       include: { eventreihe: { select: { eventarten: true } } },
     }),
     prisma.eventreihe_verwaltung.findMany({ where: { benutzer_id: userId, benutzer: { is_active: true } } }),
   ]);
-  const eventTypeAssignments = roles.map(row => ({
-    eventSeriesId: row.eventreihe_id, eventType: row.eventart, role: row.rolle,
-    enabled: row.eventreihe.eventarten.some(product => product.eventart === row.eventart && product.ist_freigeschaltet),
-  }));
+  const eventTypeAssignments = roles.flatMap(row => EVENT_TYPES.map(product => ({
+    eventSeriesId: row.eventreihe_id, eventType: product.id, role: row.rolle,
+    enabled: row.eventreihe.eventarten.some(p => p.eventart === product.id && p.ist_freigeschaltet),
+  })));
   return {
     userId, eventTypeAssignments, managedEventSeriesIds: management.map(row => row.eventreihe_id),
     assignments: [...globals, ...eventTypeAssignments.flatMap(row => row.eventType === "QUIZ" && row.enabled ? [{

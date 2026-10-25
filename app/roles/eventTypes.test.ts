@@ -6,16 +6,17 @@ test("catalogue has stable unique identifiers, no implied playable future format
   assert.deepEqual(EVENT_TYPES.map(t => t.id), ["QUIZ", "BINGO", "POWERPOINT_KARAOKE"]);
   assert.equal(EVENT_TYPES.filter(t => t.implemented).length, 1); assert.equal(isEventType("UNKNOWN"), false);
 });
-test("one person may manage Quiz in A, edit Quiz and manage Bingo in B", () => {
+test("one person may manage series A and edit all editorial formats in B", () => {
   const actor: AuthorizationActor = { userId: 3, assignments: [], eventTypeAssignments: [
     { eventSeriesId: 10, eventType: "QUIZ", role: "EVENT_MANAGER", enabled: true },
     { eventSeriesId: 20, eventType: "QUIZ", role: "EDITOR", enabled: true },
-    { eventSeriesId: 20, eventType: "BINGO", role: "EVENT_MANAGER", enabled: true },
+    { eventSeriesId: 20, eventType: "BINGO", role: "EDITOR", enabled: true },
   ] };
   assert.equal(hasEventTypeAccess(actor, 10, "QUIZ", "EVENT_MANAGER"), true);
   assert.equal(hasEventTypeAccess(actor, 20, "QUIZ", "EVENT_MANAGER"), false);
   assert.equal(hasEventTypeAccess(actor, 20, "QUIZ"), true);
-  assert.equal(hasEventTypeAccess(actor, 20, "BINGO", "EVENT_MANAGER"), true);
+  assert.equal(hasEventTypeAccess(actor, 20, "BINGO", "EVENT_MANAGER"), false);
+  assert.equal(hasEventTypeAccess(actor, 20, "BINGO"), true);
   assert.equal(hasEventTypeAccess(actor, 10, "BINGO"), false);
   assert.equal(canManageEventSeries(actor, 20), false);
 });
@@ -33,4 +34,12 @@ test("global Quiz editor gains no new product rights; admin stays global", () =>
   for (const t of EVENT_TYPES) assert.equal(hasEventTypeAccess(editor, 20, t.id), false);
   const admin: AuthorizationActor = { userId: 1, assignments: [{ role: "ADMIN", scopeType: "GLOBAL", eventSeriesId: null }] };
   for (const t of EVENT_TYPES) assert.equal(hasEventTypeAccess(admin, 20, t.id, "EVENT_MANAGER"), true);
+});
+
+test("Karaoke has no editor functions; manager role and product remain required", () => {
+  const editor: AuthorizationActor={userId:4,assignments:[],eventTypeAssignments:[{eventSeriesId:10,eventType:"POWERPOINT_KARAOKE",role:"EDITOR",enabled:true}]};
+  assert.equal(hasEventTypeAccess(editor,10,"POWERPOINT_KARAOKE"),false);
+  const manager={...editor,eventTypeAssignments:[{...editor.eventTypeAssignments![0],role:"EVENT_MANAGER"}]};
+  assert.equal(hasEventTypeAccess(manager,10,"POWERPOINT_KARAOKE"),true);
+  assert.equal(hasEventTypeAccess({...manager,eventTypeAssignments:[{...manager.eventTypeAssignments[0],enabled:false}]},10,"POWERPOINT_KARAOKE"),false);
 });

@@ -22,6 +22,7 @@ export type RoleAssignmentOptions = {
   users: { id: number; name: string | null; email: string }[];
   eventSeries: { id: number; name: string; archived: boolean }[];
   assignments: EventSeriesRoleAssignment[];
+  managementAssignments?: { userId: number; eventSeriesId: number }[];
 };
 
 export type RoleAssignmentActionResult = {
@@ -31,7 +32,7 @@ export type RoleAssignmentActionResult = {
 
 export async function getRoleAssignmentOptions(): Promise<RoleAssignmentOptions> {
   await requireAdmin();
-  const [users, eventSeries, assignments] = await Promise.all([
+  const [users, eventSeries, assignments, management] = await Promise.all([
     prisma.users.findMany({
       where: { is_active: true },
       orderBy: [{ name: "asc" }, { email: "asc" }],
@@ -41,11 +42,10 @@ export async function getRoleAssignmentOptions(): Promise<RoleAssignmentOptions>
       orderBy: { name: "asc" },
       select: { eventreihe_id: true, name: true, ist_archiviert: true },
     }),
-    prisma.benutzer_rollenzuweisungen.findMany({
-      where: { scope_typ: "EVENT_SERIES" },
+    prisma.benutzer_reihenrollen.findMany({
       orderBy: [{ eventreihe: { name: "asc" } }, { benutzer: { name: "asc" } }],
       select: {
-        rollenzuweisung_id: true,
+
         eventreihe_id: true,
         benutzer_id: true,
         rolle: true,
@@ -53,18 +53,20 @@ export async function getRoleAssignmentOptions(): Promise<RoleAssignmentOptions>
         benutzer: { select: { name: true, email: true } },
       },
     }),
+    prisma.eventreihe_verwaltung.findMany({ select: { benutzer_id: true, eventreihe_id: true } }),
   ]);
   return {
     users,
+    managementAssignments: management.map(m => ({ userId: m.benutzer_id, eventSeriesId: m.eventreihe_id })),
     eventSeries: eventSeries.map((series) => ({
       id: series.eventreihe_id,
       name: series.name,
       archived: series.ist_archiviert,
     })),
-    assignments: assignments.flatMap((assignment) =>
+    assignments: assignments.flatMap((assignment, index) =>
       assignment.eventreihe_id !== null && isEventSeriesAssignmentRole(assignment.rolle)
         ? [{
-            id: assignment.rollenzuweisung_id,
+            id: index + 1,
             eventSeriesId: assignment.eventreihe_id,
             eventSeriesName: assignment.eventreihe?.name ?? "",
             eventSeriesArchived: assignment.eventreihe?.ist_archiviert ?? false,
@@ -78,19 +80,19 @@ export async function getRoleAssignmentOptions(): Promise<RoleAssignmentOptions>
   };
 }
 
-/** Retained action exports fail closed; the event type matrix is authoritative. */
+/** Retained action exports fail closed; the user form is authoritative. */
 export async function addEventSeriesRoleAssignment(_input: { userId: number; eventSeriesId: number; role: string }): Promise<RoleAssignmentActionResult> {
   await requireAdmin();
   void _input;
-  return { success: false, message: "Bitte die Eventartrechte-Matrix verwenden." };
+  return { success: false, message: "Bitte die Reihenrollen direkt beim Benutzer bearbeiten." };
 }
 export async function changeEventSeriesRoleAssignment(_input: { assignmentId: number; role: string }): Promise<RoleAssignmentActionResult> {
   await requireAdmin();
   void _input;
-  return { success: false, message: "Bitte die Eventartrechte-Matrix verwenden." };
+  return { success: false, message: "Bitte die Reihenrollen direkt beim Benutzer bearbeiten." };
 }
 export async function removeEventSeriesRoleAssignment(_assignmentId: number): Promise<RoleAssignmentActionResult> {
   await requireAdmin();
   void _assignmentId;
-  return { success: false, message: "Bitte die Eventartrechte-Matrix verwenden." };
+  return { success: false, message: "Bitte die Reihenrollen direkt beim Benutzer bearbeiten." };
 }

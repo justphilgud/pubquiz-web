@@ -453,7 +453,8 @@ export const ModelName = {
   eventarten: 'eventarten',
   eventreihe_eventarten: 'eventreihe_eventarten',
   benutzer_eventartrollen: 'benutzer_eventartrollen',
-  eventreihe_verwaltung: 'eventreihe_verwaltung'
+  eventreihe_verwaltung: 'eventreihe_verwaltung',
+  benutzer_reihenrollen: 'benutzer_reihenrollen'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -469,7 +470,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "external_question_import_batches" | "external_question_import_items" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "meme_archive_sources" | "meme_archive_entries" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "live_polls" | "live_poll_revisions" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "live_poll_responses" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "meme_moderation_selections" | "meme_moderation_candidates" | "meme_presentations" | "meme_result_entries" | "meme_votes" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen" | "eventarten" | "eventreihe_eventarten" | "benutzer_eventartrollen" | "eventreihe_verwaltung"
+    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "external_question_import_batches" | "external_question_import_items" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "meme_archive_sources" | "meme_archive_entries" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "live_polls" | "live_poll_revisions" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "live_poll_responses" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "meme_moderation_selections" | "meme_moderation_candidates" | "meme_presentations" | "meme_result_entries" | "meme_votes" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen" | "eventarten" | "eventreihe_eventarten" | "benutzer_eventartrollen" | "eventreihe_verwaltung" | "benutzer_reihenrollen"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4691,6 +4692,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    benutzer_reihenrollen: {
+      payload: Prisma.$benutzer_reihenrollenPayload<ExtArgs>
+      fields: Prisma.benutzer_reihenrollenFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.benutzer_reihenrollenFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.benutzer_reihenrollenFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload>
+        }
+        findFirst: {
+          args: Prisma.benutzer_reihenrollenFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.benutzer_reihenrollenFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload>
+        }
+        findMany: {
+          args: Prisma.benutzer_reihenrollenFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload>[]
+        }
+        create: {
+          args: Prisma.benutzer_reihenrollenCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload>
+        }
+        createMany: {
+          args: Prisma.benutzer_reihenrollenCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.benutzer_reihenrollenCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload>[]
+        }
+        delete: {
+          args: Prisma.benutzer_reihenrollenDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload>
+        }
+        update: {
+          args: Prisma.benutzer_reihenrollenUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload>
+        }
+        deleteMany: {
+          args: Prisma.benutzer_reihenrollenDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.benutzer_reihenrollenUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.benutzer_reihenrollenUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload>[]
+        }
+        upsert: {
+          args: Prisma.benutzer_reihenrollenUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$benutzer_reihenrollenPayload>
+        }
+        aggregate: {
+          args: Prisma.Benutzer_reihenrollenAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBenutzer_reihenrollen>
+        }
+        groupBy: {
+          args: Prisma.benutzer_reihenrollenGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Benutzer_reihenrollenGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.benutzer_reihenrollenCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Benutzer_reihenrollenCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -5691,6 +5766,18 @@ export const Eventreihe_verwaltungScalarFieldEnum = {
 export type Eventreihe_verwaltungScalarFieldEnum = (typeof Eventreihe_verwaltungScalarFieldEnum)[keyof typeof Eventreihe_verwaltungScalarFieldEnum]
 
 
+export const Benutzer_reihenrollenScalarFieldEnum = {
+  benutzer_id: 'benutzer_id',
+  eventreihe_id: 'eventreihe_id',
+  rolle: 'rolle',
+  zugewiesen_von_user_id: 'zugewiesen_von_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Benutzer_reihenrollenScalarFieldEnum = (typeof Benutzer_reihenrollenScalarFieldEnum)[keyof typeof Benutzer_reihenrollenScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -6449,6 +6536,7 @@ export type GlobalOmitConfig = {
   eventreihe_eventarten?: Prisma.eventreihe_eventartenOmit
   benutzer_eventartrollen?: Prisma.benutzer_eventartrollenOmit
   eventreihe_verwaltung?: Prisma.eventreihe_verwaltungOmit
+  benutzer_reihenrollen?: Prisma.benutzer_reihenrollenOmit
 }
 
 /* Types for Logging */

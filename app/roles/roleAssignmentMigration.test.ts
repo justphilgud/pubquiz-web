@@ -11,7 +11,7 @@ const assignmentManager = readFileSync("app/eventreihen/EventSeriesMembershipMan
 const userEditor = readFileSync("app/admin/users/EditUserDialog.tsx", "utf8");
 const roleFields = readFileSync("app/admin/users/UserRoleFields.tsx", "utf8");
 const eventTypeWrites = readFileSync("app/roles/eventTypeWrites.server.ts", "utf8");
-const matrix = readFileSync("app/admin/users/EventTypeRightsManager.tsx", "utf8");
+const matrix = readFileSync("app/admin/users/UserRoleFields.tsx", "utf8");
 const documentation = readFileSync("docs/architecture/role-assignments.md", "utf8");
 
 test("assignment migration is additive and keeps every legacy structure", () => {
@@ -54,7 +54,7 @@ test("dual writes use serializable transactions and touch both representations",
   assert.match(userActions, /replaceGlobalRoleAssignments/);
   assert.match(eventTypeWrites, /benutzer_rollenzuweisungen\.create/);
   assert.match(eventTypeWrites, /eventreihe_benutzerrollen\.upsert/);
-  assert.match(membershipActions, /Eventartrechte-Matrix/);
+  assert.match(membershipActions, /Reihenrollen direkt beim Benutzer/);
 });
 
 test("role UI separates global and event-series roles and remains mobile safe", () => {
@@ -62,7 +62,7 @@ test("role UI separates global and event-series roles and remains mobile safe", 
   assert.match(userEditor, /UserRoleFields/);
   assert.match(assignmentManager, /eventSeriesArchived/);
   assert.match(roleFields, /Globale Rollen/);
-  assert.match(matrix, /overflow-x-auto/);
+  assert.match(matrix, /Rollen je Eventreihe/);
   assert.match(assignmentManager, /\[overflow-wrap:anywhere\]/);
   assert.match(assignmentManager, /min-h-11/);
   assert.match(assignmentManager, /aria-live="polite"/);

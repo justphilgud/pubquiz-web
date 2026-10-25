@@ -127,12 +127,13 @@ export function isLastActiveRoleHolder(activeHolderCount: number) {
 export function hasEventTypeAccess(actor: AuthorizationActor, eventSeriesId: number, eventType: EventType, minimum: EventTypeRole = "EDITOR") {
   if (!Number.isInteger(eventSeriesId) || eventSeriesId <= 0 || !isEventType(eventType)) return false;
   if (isAdministrator(actor)) return true;
+  if (eventType === "POWERPOINT_KARAOKE") minimum = "EVENT_MANAGER";
   return (actor.eventTypeAssignments ?? []).some(assignment => assignment.eventSeriesId === eventSeriesId &&
     assignment.eventType === eventType && assignment.enabled &&
     (assignment.role === "EVENT_MANAGER" || (minimum === "EDITOR" && assignment.role === "EDITOR")));
 }
 export function getVisibleEventSeriesIds(actor: AuthorizationActor) {
   return [...new Set([...(actor.managedEventSeriesIds ?? []), ...(actor.eventTypeAssignments ?? []).flatMap(a =>
-    a.enabled && isEventType(a.eventType) && (a.role === "EDITOR" || a.role === "EVENT_MANAGER") ? [a.eventSeriesId] : []),
+    a.enabled && isEventType(a.eventType) && (a.role === "EVENT_MANAGER" || (a.role === "EDITOR" && a.eventType !== "POWERPOINT_KARAOKE")) ? [a.eventSeriesId] : []),
     ...getActorEventSeriesIds(actor)])];
 }

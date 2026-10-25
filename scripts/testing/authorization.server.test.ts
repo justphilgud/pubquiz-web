@@ -105,7 +105,7 @@ function fixture(userId = 3, options: { disabled?: boolean; eventType?: string; 
   const db = {
     users: { findUnique: async () => ({ is_active: active, must_change_password: false }) },
     benutzer_rollenzuweisungen: { findMany: async ({ where }: { where: Row }) => active ? assignments.filter(row => row.benutzer_id === where.benutzer_id) : [] },
-    benutzer_eventartrollen: { findMany: async ({ where }: { where: Row }) => active ? assignments.filter(row => row.benutzer_id === where.benutzer_id && row.scope_typ === "EVENT_SERIES").map(row => ({
+    benutzer_reihenrollen: { findMany: async ({ where }: { where: Row }) => active ? assignments.filter(row => row.benutzer_id === where.benutzer_id && row.scope_typ === "EVENT_SERIES").map(row => ({
       ...row, eventart: options.eventType ?? "QUIZ", eventreihe: { eventarten: [{ eventart: options.eventType ?? "QUIZ", ist_freigeschaltet: !options.disabled }] },
     })) : [] },
     eventreihe_verwaltung: { findMany: async () => active ? (options.management ?? []).map(eventreihe_id => ({ eventreihe_id })) : [] },

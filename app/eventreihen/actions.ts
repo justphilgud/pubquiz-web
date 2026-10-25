@@ -19,6 +19,7 @@ import { getQuizTemporalStatus } from "@/app/quiz/quizMasterData";
 import { getActorForSession } from "@/app/roles/roleAssignments.server";
 import { canManageEventSeries, canManageEventSeriesQuizzes, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 import { listAssignablePresentationTemplates } from "@/app/rendering/presentationTemplates/presentationTemplateRepository.server";
+import { isEventType, type EventType } from "@/app/roles/eventTypes";
 import { persistEventSeriesUpdate } from "./eventSeriesRepository";
 
 async function getTemplateValidationOptions(additionallyAllowed: readonly string[] = []) {
@@ -168,8 +169,12 @@ async function hasDuplicateName(name: string, exceptId?: number) {
 
 export async function createEventSeries(
   input: EventSeriesInput,
+  enabledEventTypes: EventType[] = [],
 ): Promise<EventSeriesActionResult> {
   await requireAdmin();
+  if (!Array.isArray(enabledEventTypes) || enabledEventTypes.length > 3 || !enabledEventTypes.every(isEventType)) {
+    return { success: false, message: "Ungültige Eventartauswahl." };
+  }
   const validated = validateEventSeriesInput(
     input,
     await getTemplateValidationOptions(),
@@ -199,6 +204,7 @@ export async function createEventSeries(
     data: {
       slug,
       ...buildEventSeriesPersistenceData(validated.value),
+      eventarten: { create: [...new Set(enabledEventTypes)].map(eventart => ({ eventart, ist_freigeschaltet: true })) },
     },
     select: { eventreihe_id: true },
   });

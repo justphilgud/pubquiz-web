@@ -1,53 +1,47 @@
-# Benutzer, Eventarten und Rollen
+# Benutzer, Eventreihen und Rollen
 
-Administratoren verwalten Konten, globale Rollen, Eventartrechte und
-Produktfreischaltungen. Alle anderen Rollen erhalten keine Benutzerverwaltung.
-Die technische [Berechtigungsmatrix](../architecture/role-assignments.md) ist verbindlich.
+## Benutzer anlegen oder bearbeiten
 
-## Globale Rollen
+Als Administrator in **Benutzer** auf **Benutzer anlegen** oder beim betreffenden
+Benutzer auf **Bearbeiten** klicken. Im selben Formular:
 
-Im Kontoformular stehen **Administrator** und **Globaler Quiz-Editor**.
-Admin bleibt global zuständig. Der globale Editor darf eigene globale
-Quizentwürfe/Rückgaben im bisherigen Workflow bearbeiten und erhält keine
-Bingo-/Karaoke- oder Eventreihenrechte. Neue Konten können zunächst ohne Rechte
-angelegt werden. Kontoänderungen überschreiben keine Matrixrechte.
+1. Kontodaten und gegebenenfalls globale Rolle einstellen. **Globaler Quiz-Editor**
+   gilt nur für Quiz; **Administrator** bleibt global.
+2. Unter **Rollen je Eventreihe** für jede gewünschte Reihe **Editor** oder
+   **Eventmanager** wählen; **Kein Zugriff** entfernt die Reihenrolle.
+3. Bei Bedarf separat **Eventreihe verwalten** erlauben: gemeinsame Stammdaten und
+   Branding, keine zusätzlichen Spielrechte, Benutzerverwaltung oder Produktfreigabe.
+4. Mit **Speichern** übernehmen. Auch beim Anlegen können Reihenrollen sofort
+   vergeben werden. Keine zusätzliche Eventartrechte-Matrix nötig.
 
-## Rechte je Eventreihe und Eventart
+Eine Rolle gilt für die aktivierten Produkte der Reihe, auch bei späterer
+Freischaltung. Editor pflegt Quizinhalte und künftig Bingo-Begriffe/Feldinhalte.
+Für PowerPoint-Karaoke sind keine Editorfunktionen vorgesehen; Editor erhält dort
+keinen Format-Zugriff. Eventmanager führen Veranstaltungen durch. Bingo und Karaoke
+sind weiterhin keine spielbaren Funktionen dieser Version.
 
-In der Benutzerverwaltung unter **Eventartrechte** den Benutzer auswählen.
-Je Eventreihe für Quiz, Bingo und PowerPoint-Karaoke **Kein Zugriff**, **Editor** oder
-**Eventmanager** einstellen, anschließend **Eventartrechte speichern**.
-Nicht freigeschaltete Produkte sind gekennzeichnet. Gespeicherte Rollen bleiben
-wirkungslos, solange das Produkt gesperrt ist. Bingo und Karaoke sind noch keine
-verfügbaren Spiele; die Zuweisung bereitet lediglich ihre Administration vor.
+## Eventarten der Reihe
 
-**Eventreihe verwalten** ist eine separate Checkbox: Stammdaten und gemeinsames
-Branding, keine zusätzlichen Spielrechte, keine Benutzerverwaltung und keine
-Produktfreischaltung. Neue Eventmanager erhalten sie nicht automatisch. Bisherige
-Quizmanager behalten sie über die Migration. Die Benutzerliste unter der Matrix
-fasst nur die wirksamen Quizrollen zusammen; alle gespeicherten Rechte stehen darüber.
+Beim Anlegen einer Eventreihe unter **Freigeschaltete Eventarten** auswählen.
+Es gibt keine automatische Vorauswahl. Spätere Änderungen sind auf der Detailseite
+unter demselben Titel möglich; ausschließlich Administratoren dürfen sie ändern.
+Ohne Freischaltung bleibt der Format-Zugriff gesperrt, selbst bei vorhandener Rolle.
 
-## Produkte freischalten und deaktivieren
+Deaktivierung erhält Inhalte, Reihenrollen und gemeinsame Verwaltung. Nach erneuter
+Aktivierung gilt die bestehende Rolle wieder. Laufende Quizze müssen vor einer
+Quiz-Deaktivierung regulär beendet werden; keine Session zurücksetzen.
 
-In der Eventreihe unter **Freigeschaltete Eventarten** als Admin aktivieren oder
-deaktivieren. Während eines laufenden Quiz wird dessen Produktdeaktivierung
-abgelehnt. Das Quiz zuerst regulär beenden; kein Reset nötig.
-Bei Deaktivierung bleiben Inhalte und Rollen erhalten, ihr Zugriff wird gesperrt.
-Nach erneuter Aktivierung gelten die erhaltenen Zuweisungen wieder. Andere Rollen
-sehen den Produktstatus, dürfen ihn aber nicht ändern.
+## Bestehende Regeln und Übernahme
 
-## Bisherige Quizregeln bleiben bestehen
+Quiz-Editoren pflegen Inhalte, erhalten aber keine Quiz-/Teamverwaltung. Globale
+Fragen bleiben im bisherigen Freigabe-/Kopierworkflow geschützt. Mehrfach verwendete
+Inhalte verlangen die bisherigen Rechte in allen betroffenen Reihen.
 
-Quiz-Eventmanager verwalten Quiz, Moderation, Auswertung und Teams nur in ihren
-wirksamen Quizreihen. Quiz-Editoren erhalten keine Quiz-/Teamverwaltung. Die globale
-Teamlöschung, Zugangswörter und globale Lifecycle-Aktionen bleiben beim Admin.
-Freigegebene globale Fragen können im erlaubten Quiz verwendet werden; das globale
-Original und bestehende Kopierverbote bleiben geschützt. Bearbeitung/Freigabe
-mehrfach zugeordneter Reihenfragen verlangt die bisherigen Rechte in allen Reihen.
-Ein Quizwechsel mit unzulässigen Fragen/Storys/Umfragen wird ohne Inhaltsänderung
-abgewiesen.
+Die neue additive Übernahme erhält bestehende Quizrollen und individuelle Werte.
+Widersprüchliche alte Preview-Formatrollen werden nicht automatisch vereinheitlicht;
+in diesem Ausnahmefall stoppt die Migration mit konkreter Meldung. Es ist kein
+Konflikt des neuen Formularmodells, das nur eine Rolle je Reihe zulässt.
 
-Rechteentzug/Kontodeaktivierung greifen beim nächsten Serveraufruf auch mit offenem
-Fenster. Bereits ausgelieferte Inhalte lassen sich nicht zurückrufen. Nach einer
-Berechtigungsänderung Ansichten neu laden; die Präsentation danach lokal freigeben.
-Keine bestehende Quizsession zurücksetzen.
+Nach Berechtigungsänderungen geöffnete Ansichten neu laden und die Präsentation
+lokal freigeben. Rechteentzug greift bereits beim nächsten Serveraufruf. Kein Reset.
+Technische Details: [Rollenmodell](../architecture/role-assignments.md).

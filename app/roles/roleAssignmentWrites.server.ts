@@ -1,3 +1,4 @@
+import { syncLegacyQuizRoles } from "./eventTypeWrites.server";
 import "server-only";
 
 import type { Prisma } from "@/app/generated/prisma/client";
@@ -85,13 +86,27 @@ export async function replaceGlobalRoleAssignments(
   });
 }
 
-/** Obsolete pre-event-type writer: never update compatibility projections directly. */
+/** Canonical series roles. Quiz mirrors contain only currently enabled Quiz access. */
 export async function replaceEventSeriesRoleAssignments(
-  _transaction: Prisma.TransactionClient,
-  _input: { userId: number; assignments: readonly EventSeriesRoleAssignmentInput[]; assignedById: number; verifyLegacy?: boolean },
-): Promise<never> {
-  void _transaction; void _input;
-  throw new RoleAssignmentValidationError("Bitte die Eventartrechte-Matrix verwenden.");
+  transaction: Prisma.TransactionClient,
+  input: { userId: number; assignments: readonly EventSeriesRoleAssignmentInput[]; assignedById: number; managementIds?: readonly number[]; verifyLegacy?: boolean },
+) {
+  await transaction.benutzer_reihenrollen.deleteMany({ where: { benutzer_id: input.userId, eventreihe_id: { notIn: input.assignments.map(a => a.eventSeriesId) } } });
+  for (const assignment of input.assignments) {
+    await transaction.benutzer_reihenrollen.upsert({
+      where: { benutzer_id_eventreihe_id: { benutzer_id: input.userId, eventreihe_id: assignment.eventSeriesId } },
+      create: { benutzer_id: input.userId, eventreihe_id: assignment.eventSeriesId, rolle: assignment.role, zugewiesen_von_user_id: input.assignedById },
+      update: { rolle: assignment.role, zugewiesen_von_user_id: input.assignedById },
+    });
+  }
+  if (input.managementIds) {
+    await transaction.eventreihe_verwaltung.deleteMany({ where: { benutzer_id: input.userId, eventreihe_id: { notIn: [...input.managementIds] } } });
+    for (const eventSeriesId of input.managementIds) await transaction.eventreihe_verwaltung.upsert({
+      where: { benutzer_id_eventreihe_id: { benutzer_id: input.userId, eventreihe_id: eventSeriesId } },
+      create: { benutzer_id: input.userId, eventreihe_id: eventSeriesId, zugewiesen_von_user_id: input.assignedById }, update: {},
+    });
+  }
+  await syncLegacyQuizRoles(transaction, input.userId, input.assignedById);
 }
 
 export async function assertCanRemoveGlobalAdmin(

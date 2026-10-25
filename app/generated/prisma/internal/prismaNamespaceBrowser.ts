@@ -107,7 +107,8 @@ export const ModelName = {
   eventarten: 'eventarten',
   eventreihe_eventarten: 'eventreihe_eventarten',
   benutzer_eventartrollen: 'benutzer_eventartrollen',
-  eventreihe_verwaltung: 'eventreihe_verwaltung'
+  eventreihe_verwaltung: 'eventreihe_verwaltung',
+  benutzer_reihenrollen: 'benutzer_reihenrollen'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1085,6 +1086,18 @@ export const Eventreihe_verwaltungScalarFieldEnum = {
 } as const
 
 export type Eventreihe_verwaltungScalarFieldEnum = (typeof Eventreihe_verwaltungScalarFieldEnum)[keyof typeof Eventreihe_verwaltungScalarFieldEnum]
+
+
+export const Benutzer_reihenrollenScalarFieldEnum = {
+  benutzer_id: 'benutzer_id',
+  eventreihe_id: 'eventreihe_id',
+  rolle: 'rolle',
+  zugewiesen_von_user_id: 'zugewiesen_von_user_id',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Benutzer_reihenrollenScalarFieldEnum = (typeof Benutzer_reihenrollenScalarFieldEnum)[keyof typeof Benutzer_reihenrollenScalarFieldEnum]
 
 
 export const SortOrder = {
