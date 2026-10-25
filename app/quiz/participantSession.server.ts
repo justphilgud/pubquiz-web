@@ -13,6 +13,10 @@ export async function resolveParticipantSession(
     getTeamSessionSigningSecret(),
   );
   if (!payload || payload.quizId !== quizId) return null;
+  const enabled = await prisma.quiz.count({ where: { quiz_id: quizId, eventreihe: {
+    eventarten: { some: { eventart: "QUIZ", ist_freigeschaltet: true } },
+  } } });
+  if (!enabled) return null;
 
   return prisma.quiz_team_sessions.findFirst({
     where: {

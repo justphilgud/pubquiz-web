@@ -3,12 +3,14 @@ import {
   canEditGlobalQuestions,
   getActorEventSeriesIds,
   isAdministrator,
+  hasAnyEditorialAssignment,
   type AuthorizationActor,
 } from "@/app/roles/roleAssignmentPolicy";
 
 /** Query equivalent of canViewScopedQuestion; never use authorship as a scope grant. */
 export function questionVisibilityWhere(actor: AuthorizationActor): Prisma.fragenWhereInput {
   if (isAdministrator(actor)) return {};
+  if (!hasAnyEditorialAssignment(actor)) return { fragen_id: { in: [] } };
   return {
     OR: [
       { geltungsbereich: "GLOBAL", freigegeben: true },

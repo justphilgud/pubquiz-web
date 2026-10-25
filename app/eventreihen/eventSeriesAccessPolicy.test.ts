@@ -22,7 +22,7 @@ test("ADMIN has global event-series access", () => {
 
 test("EVENT_MANAGER is limited to its assigned series", () => {
   const manager = actor([{ role: "EVENT_MANAGER", scopeType: "EVENT_SERIES", eventSeriesId: 10 }]);
-  assert.equal(hasEventSeriesCapability({ actor: manager, eventSeriesId: 10, capability: "EDIT" }), true);
+  assert.equal(hasEventSeriesCapability({ actor: manager, eventSeriesId: 10, capability: "EDIT" }), false);
   assert.equal(hasEventSeriesCapability({ actor: manager, eventSeriesId: 10, capability: "REVIEW_QUESTION" }), true);
   assert.equal(hasEventSeriesCapability({ actor: manager, eventSeriesId: 10, capability: "MANAGE_MEMBERS" }), false);
   assert.equal(hasEventSeriesCapability({ actor: manager, eventSeriesId: 20, capability: "VIEW" }), false);

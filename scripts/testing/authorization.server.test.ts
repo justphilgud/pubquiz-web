@@ -20,6 +20,7 @@ before(async () => {
     export * as management from './app/fragen/editor/managementActions';
     export * as quizzes from './app/quiz/actions';
     export * as live from './app/api/quiz/live-snapshot/route';
+    export * as seriesAccess from './app/eventreihen/eventSeriesAccess.server';
   `, resolveDir: process.cwd(), sourcefile: "authorization-test-entry.ts" },
   define: { "import.meta.url": JSON.stringify(import.meta.url) },
   bundle: true, write: false, platform: "node", format: "cjs", packages: "external",
@@ -80,7 +81,7 @@ function question(id: number, scope: "GLOBAL" | "EVENT_SERIES", series: number[]
   };
 }
 
-function fixture(userId = 3) {
+function fixture(userId = 3, options: { disabled?: boolean; eventType?: string; management?: number[] } = {}) {
   const assignments = [
     { benutzer_id: 1, rolle: "ADMIN", scope_typ: "GLOBAL", eventreihe_id: null },
     { benutzer_id: 2, rolle: "EDITOR", scope_typ: "GLOBAL", eventreihe_id: null },
@@ -104,6 +105,10 @@ function fixture(userId = 3) {
   const db = {
     users: { findUnique: async () => ({ is_active: active, must_change_password: false }) },
     benutzer_rollenzuweisungen: { findMany: async ({ where }: { where: Row }) => active ? assignments.filter(row => row.benutzer_id === where.benutzer_id) : [] },
+    benutzer_eventartrollen: { findMany: async ({ where }: { where: Row }) => active ? assignments.filter(row => row.benutzer_id === where.benutzer_id && row.scope_typ === "EVENT_SERIES").map(row => ({
+      ...row, eventart: options.eventType ?? "QUIZ", eventreihe: { eventarten: [{ eventart: options.eventType ?? "QUIZ", ist_freigeschaltet: !options.disabled }] },
+    })) : [] },
+    eventreihe_verwaltung: { findMany: async () => active ? (options.management ?? []).map(eventreihe_id => ({ eventreihe_id })) : [] },
     eventreihen: {
       count: async ({ where }: { where: { eventreihe_id: { in: number[] } } }) => where.eventreihe_id.in.filter(id => [10, 20].includes(id)).length,
       findUnique: async ({ where }: { where: Row }) => ({ eventreihe_id: where.eventreihe_id, ist_archiviert: false }),
@@ -142,7 +147,7 @@ function fixture(userId = 3) {
     $transaction: async <T>(operation: (tx: unknown) => Promise<T>) => operation(db),
   };
   const state = { session: { user: { id: String(userId) } } as { user: { id: string } } | null, db };
-  const exports: { questions: typeof import("@/app/fragen/actions"); editor: typeof import("@/app/fragen/editor/actions"); duplicates: typeof import("@/app/fragen/editor/duplicateActions"); management: typeof import("@/app/fragen/editor/managementActions"); quizzes: typeof import("@/app/quiz/actions"); live: typeof import("@/app/api/quiz/live-snapshot/route") } = {} as never;
+  const exports: { seriesAccess: typeof import("@/app/eventreihen/eventSeriesAccess.server"); questions: typeof import("@/app/fragen/actions"); editor: typeof import("@/app/fragen/editor/actions"); duplicates: typeof import("@/app/fragen/editor/duplicateActions"); management: typeof import("@/app/fragen/editor/managementActions"); quizzes: typeof import("@/app/quiz/actions"); live: typeof import("@/app/api/quiz/live-snapshot/route") } = {} as never;
   const runtimeModule = { exports };
   runInNewContext(bundled.outputFiles![0].text, { exports, module: runtimeModule,
     require: createRequire(import.meta.url), fixture: state, console, process, Buffer, URL, Request, Response,
@@ -294,3 +299,29 @@ for (const user of [1, 3]) {
     assert.ok(f.snapshots() > 0);
   });
 }
+
+for (const options of [{ disabled: true }, { eventType: "BINGO" }, { eventType: "POWERPOINT_KARAOKE" }]) {
+  test(`real Quiz Actions/API deny incompatible product rights ${JSON.stringify(options)}`, async () => {
+    const f = fixture(3, options);
+    await assert.rejects(f.questions.getFrageDetails(101));
+    await assert.rejects(f.questions.getFrageDetails(104));
+    await assert.rejects(f.live.POST(new Request("http://localhost/api/quiz/live-snapshot", { method: "POST", body: JSON.stringify({ quizId: 11 }) })));
+    assert.equal(f.writes(), 0); assert.equal(f.snapshots(), 0);
+  });
+}
+test("shared branding permission grants no Quiz object or live access", async () => {
+  const f = fixture(3, { eventType: "BINGO", management: [10] });
+  assert.ok(await f.seriesAccess.requireEventSeriesEditor(10));
+  await assert.rejects(f.seriesAccess.requireEventSeriesAccess(10, "CONTROL_LIVE"));
+  await assert.rejects(f.questions.getFrageDetails(101));
+});
+test("Quiz manager without shared management cannot edit shared branding", async () => {
+  const f = fixture(3);
+  await assert.rejects(f.seriesAccess.requireEventSeriesEditor(10));
+  assert.ok(await f.seriesAccess.requireEventSeriesAccess(10, "CONTROL_LIVE"));
+});
+test("global Quiz editor remains global when a series product is disabled", async () => {
+  const f = fixture(2, { disabled: true });
+  assert.ok(await f.questions.getFrageForEdit(103));
+  await assert.rejects(f.questions.getFrageForEdit(101));
+});

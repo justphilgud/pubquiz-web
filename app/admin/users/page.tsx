@@ -1,3 +1,4 @@
+import { EventTypeRightsManager } from "./EventTypeRightsManager";
 import Link from "next/link";
 import { requireAdmin } from "@/app/lib/permissions";
 import { prisma } from "@/app/lib/prisma";
@@ -60,6 +61,8 @@ export default async function UsersPage() {
           <CreateUserDialog eventSeries={assignmentData.eventSeries} locale={locale} messages={messages} />
         </div>
 
+        <EventTypeRightsManager users={users} />
+        <p className="mb-3 text-sm text-slate-600">Die folgende Liste fasst wirksame Quizrollen zusammen. Alle gespeicherten Eventartrechte und die gemeinsame Reihenverwaltung stehen in der Matrix darüber.</p>
         <UserManagementList
           users={rows}
           assignmentData={assignmentData}

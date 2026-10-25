@@ -1,28 +1,53 @@
-# Benutzer und Rollen
+# Benutzer, Eventarten und Rollen
 
-Administratoren können Benutzer anlegen, bearbeiten, Rollen vergeben und Passwörter zurücksetzen. Das produktive Rollenmodell umfasst Administrator, globalen oder eventreihenbezogenen Editor sowie Eventmanager einer Eventreihe.
+Administratoren verwalten Konten, globale Rollen, Eventartrechte und
+Produktfreischaltungen. Alle anderen Rollen erhalten keine Benutzerverwaltung.
+Die technische [Berechtigungsmatrix](../architecture/role-assignments.md) ist verbindlich.
 
-## Teamverwaltung
+## Globale Rollen
 
-- Administrator: globale Teamverwaltung, Zugangswörter, Archivieren und Löschen.
-- Eventmanager: Zugangshilfe und Teamansicht ausschließlich für zugewiesene Eventreihen.
-- Editor: keine Teamverwaltung.
+Im Kontoformular stehen **Administrator** und **Globaler Quiz-Editor**.
+Admin bleibt global zuständig. Der globale Editor darf eigene globale
+Quizentwürfe/Rückgaben im bisherigen Workflow bearbeiten und erhält keine
+Bingo-/Karaoke- oder Eventreihenrechte. Neue Konten können zunächst ohne Rechte
+angelegt werden. Kontoänderungen überschreiben keine Matrixrechte.
 
-Die Übersicht `/admin/users/roles` wird direkt aus den produktiven Authorization-Policies berechnet und zeigt diesen Team-Scope ebenfalls an.
+## Rechte je Eventreihe und Eventart
 
-Globale Editoren dürfen eigene globale Entwürfe und Rückgaben bearbeiten. Eine
-Reihenrolle verleiht dagegen keine globalen Schreib- oder Kopierrechte. Eventmanager
-können freigegebene globale Fragen in eigenen Quiz verwenden; das Original bleibt
-geschützt. Mehrfach zugeordnete Reihenfragen benötigen zum Bearbeiten/Freigeben die
-jeweiligen Rechte für alle zugeordneten Reihen.
+In der Benutzerverwaltung unter **Eventartrechte** den Benutzer auswählen.
+Je Eventreihe für Quiz, Bingo und PowerPoint-Karaoke **Kein Zugriff**, **Editor** oder
+**Eventmanager** einstellen, anschließend **Eventartrechte speichern**.
+Nicht freigeschaltete Produkte sind gekennzeichnet. Gespeicherte Rollen bleiben
+wirkungslos, solange das Produkt gesperrt ist. Bingo und Karaoke sind noch keine
+verfügbaren Spiele; die Zuweisung bereitet lediglich ihre Administration vor.
 
-Deaktivierte Konten und entfernte Zuweisungen verlieren beim nächsten Serveraufruf
-ihren bisherigen Zugriff, auch wenn die Sitzung noch besteht. Bereits dargestellte
-Inhalte verschwinden dadurch nicht rückwirkend aus einem geöffneten Browser.
-Benutzerlöschung wird hier nicht neu spezifiziert.
+**Eventreihe verwalten** ist eine separate Checkbox: Stammdaten und gemeinsames
+Branding, keine zusätzlichen Spielrechte, keine Benutzerverwaltung und keine
+Produktfreischaltung. Neue Eventmanager erhalten sie nicht automatisch. Bisherige
+Quizmanager behalten sie über die Migration. Die Benutzerliste unter der Matrix
+fasst nur die wirksamen Quizrollen zusammen; alle gespeicherten Rechte stehen darüber.
 
-Ein Wechsel der Quiz-Eventreihe wird abgelehnt, wenn Fragen, relevante Story-Elemente
-oder Umfragen in der Zielreihe nicht zulässig sind. Es werden dabei keine Inhalte
-entfernt oder automatisch freigegeben. Globale Rechte, Rollenverwaltung und
-Produktsichtbarkeit bleiben unverändert. Technische Regeln und Prüfbelege:
-[Scope-basierte Rollenzuweisungen](../architecture/role-assignments.md).
+## Produkte freischalten und deaktivieren
+
+In der Eventreihe unter **Freigeschaltete Eventarten** als Admin aktivieren oder
+deaktivieren. Während eines laufenden Quiz wird dessen Produktdeaktivierung
+abgelehnt. Das Quiz zuerst regulär beenden; kein Reset nötig.
+Bei Deaktivierung bleiben Inhalte und Rollen erhalten, ihr Zugriff wird gesperrt.
+Nach erneuter Aktivierung gelten die erhaltenen Zuweisungen wieder. Andere Rollen
+sehen den Produktstatus, dürfen ihn aber nicht ändern.
+
+## Bisherige Quizregeln bleiben bestehen
+
+Quiz-Eventmanager verwalten Quiz, Moderation, Auswertung und Teams nur in ihren
+wirksamen Quizreihen. Quiz-Editoren erhalten keine Quiz-/Teamverwaltung. Die globale
+Teamlöschung, Zugangswörter und globale Lifecycle-Aktionen bleiben beim Admin.
+Freigegebene globale Fragen können im erlaubten Quiz verwendet werden; das globale
+Original und bestehende Kopierverbote bleiben geschützt. Bearbeitung/Freigabe
+mehrfach zugeordneter Reihenfragen verlangt die bisherigen Rechte in allen Reihen.
+Ein Quizwechsel mit unzulässigen Fragen/Storys/Umfragen wird ohne Inhaltsänderung
+abgewiesen.
+
+Rechteentzug/Kontodeaktivierung greifen beim nächsten Serveraufruf auch mit offenem
+Fenster. Bereits ausgelieferte Inhalte lassen sich nicht zurückrufen. Nach einer
+Berechtigungsänderung Ansichten neu laden; die Präsentation danach lokal freigeben.
+Keine bestehende Quizsession zurücksetzen.

@@ -256,6 +256,8 @@ export type usersWhereInput = {
   must_change_password?: Prisma.BoolFilter<"users"> | boolean
   created_at?: Prisma.DateTimeFilter<"users"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"users"> | Date | string
+  eventartrollen?: Prisma.Benutzer_eventartrollenListRelationFilter
+  verwaltete_eventreihen?: Prisma.Eventreihe_verwaltungListRelationFilter
   eventreihenrollen?: Prisma.Eventreihe_benutzerrollenListRelationFilter
   zugewiesene_eventreihenrollen?: Prisma.Eventreihe_benutzerrollenListRelationFilter
   rollenzuweisungen?: Prisma.Benutzer_rollenzuweisungenListRelationFilter
@@ -296,6 +298,8 @@ export type usersOrderByWithRelationInput = {
   must_change_password?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  eventartrollen?: Prisma.benutzer_eventartrollenOrderByRelationAggregateInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungOrderByRelationAggregateInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenOrderByRelationAggregateInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenOrderByRelationAggregateInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenOrderByRelationAggregateInput
@@ -339,6 +343,8 @@ export type usersWhereUniqueInput = Prisma.AtLeast<{
   must_change_password?: Prisma.BoolFilter<"users"> | boolean
   created_at?: Prisma.DateTimeFilter<"users"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"users"> | Date | string
+  eventartrollen?: Prisma.Benutzer_eventartrollenListRelationFilter
+  verwaltete_eventreihen?: Prisma.Eventreihe_verwaltungListRelationFilter
   eventreihenrollen?: Prisma.Eventreihe_benutzerrollenListRelationFilter
   zugewiesene_eventreihenrollen?: Prisma.Eventreihe_benutzerrollenListRelationFilter
   rollenzuweisungen?: Prisma.Benutzer_rollenzuweisungenListRelationFilter
@@ -412,6 +418,8 @@ export type usersCreateInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -452,6 +460,8 @@ export type usersUncheckedCreateInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -491,6 +501,8 @@ export type usersUpdateInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -531,6 +543,8 @@ export type usersUncheckedUpdateInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -1085,6 +1099,34 @@ export type usersUpdateOneWithoutZugewiesene_eventreihenrollenNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutZugewiesene_eventreihenrollenInput, Prisma.usersUpdateWithoutZugewiesene_eventreihenrollenInput>, Prisma.usersUncheckedUpdateWithoutZugewiesene_eventreihenrollenInput>
 }
 
+export type usersCreateNestedOneWithoutEventartrollenInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutEventartrollenInput, Prisma.usersUncheckedCreateWithoutEventartrollenInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutEventartrollenInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutEventartrollenNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutEventartrollenInput, Prisma.usersUncheckedCreateWithoutEventartrollenInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutEventartrollenInput
+  upsert?: Prisma.usersUpsertWithoutEventartrollenInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutEventartrollenInput, Prisma.usersUpdateWithoutEventartrollenInput>, Prisma.usersUncheckedUpdateWithoutEventartrollenInput>
+}
+
+export type usersCreateNestedOneWithoutVerwaltete_eventreihenInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutVerwaltete_eventreihenInput, Prisma.usersUncheckedCreateWithoutVerwaltete_eventreihenInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutVerwaltete_eventreihenInput
+  connect?: Prisma.usersWhereUniqueInput
+}
+
+export type usersUpdateOneRequiredWithoutVerwaltete_eventreihenNestedInput = {
+  create?: Prisma.XOR<Prisma.usersCreateWithoutVerwaltete_eventreihenInput, Prisma.usersUncheckedCreateWithoutVerwaltete_eventreihenInput>
+  connectOrCreate?: Prisma.usersCreateOrConnectWithoutVerwaltete_eventreihenInput
+  upsert?: Prisma.usersUpsertWithoutVerwaltete_eventreihenInput
+  connect?: Prisma.usersWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.usersUpdateToOneWithWhereWithoutVerwaltete_eventreihenInput, Prisma.usersUpdateWithoutVerwaltete_eventreihenInput>, Prisma.usersUncheckedUpdateWithoutVerwaltete_eventreihenInput>
+}
+
 export type usersCreateWithoutAktualitaet_gepruefte_fragenInput = {
   name?: string | null
   email: string
@@ -1095,6 +1137,8 @@ export type usersCreateWithoutAktualitaet_gepruefte_fragenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -1134,6 +1178,8 @@ export type usersUncheckedCreateWithoutAktualitaet_gepruefte_fragenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -1188,6 +1234,8 @@ export type usersUpdateWithoutAktualitaet_gepruefte_fragenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -1227,6 +1275,8 @@ export type usersUncheckedUpdateWithoutAktualitaet_gepruefte_fragenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -1265,6 +1315,8 @@ export type usersCreateWithoutErstellte_externe_frageimporteInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -1304,6 +1356,8 @@ export type usersUncheckedCreateWithoutErstellte_externe_frageimporteInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -1358,6 +1412,8 @@ export type usersUpdateWithoutErstellte_externe_frageimporteInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -1397,6 +1453,8 @@ export type usersUncheckedUpdateWithoutErstellte_externe_frageimporteInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -1435,6 +1493,8 @@ export type usersCreateWithoutBewertete_externe_frageimporteInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -1474,6 +1534,8 @@ export type usersUncheckedCreateWithoutBewertete_externe_frageimporteInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -1528,6 +1590,8 @@ export type usersUpdateWithoutBewertete_externe_frageimporteInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -1567,6 +1631,8 @@ export type usersUncheckedUpdateWithoutBewertete_externe_frageimporteInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -1605,6 +1671,8 @@ export type usersCreateWithoutErstellte_kategorienInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -1644,6 +1712,8 @@ export type usersUncheckedCreateWithoutErstellte_kategorienInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -1698,6 +1768,8 @@ export type usersUpdateWithoutErstellte_kategorienInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -1737,6 +1809,8 @@ export type usersUncheckedUpdateWithoutErstellte_kategorienInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -1775,6 +1849,8 @@ export type usersCreateWithoutErstellte_praesentationstemplatesInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -1814,6 +1890,8 @@ export type usersUncheckedCreateWithoutErstellte_praesentationstemplatesInput = 
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -1868,6 +1946,8 @@ export type usersUpdateWithoutErstellte_praesentationstemplatesInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -1907,6 +1987,8 @@ export type usersUncheckedUpdateWithoutErstellte_praesentationstemplatesInput = 
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -1945,6 +2027,8 @@ export type usersCreateWithoutErstellte_story_elementeInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -1984,6 +2068,8 @@ export type usersUncheckedCreateWithoutErstellte_story_elementeInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -2038,6 +2124,8 @@ export type usersUpdateWithoutErstellte_story_elementeInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -2077,6 +2165,8 @@ export type usersUncheckedUpdateWithoutErstellte_story_elementeInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -2115,6 +2205,8 @@ export type usersCreateWithoutErstellte_story_revisionenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -2154,6 +2246,8 @@ export type usersUncheckedCreateWithoutErstellte_story_revisionenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -2208,6 +2302,8 @@ export type usersUpdateWithoutErstellte_story_revisionenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -2247,6 +2343,8 @@ export type usersUncheckedUpdateWithoutErstellte_story_revisionenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -2285,6 +2383,8 @@ export type usersCreateWithoutErstellte_live_pollsInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -2324,6 +2424,8 @@ export type usersUncheckedCreateWithoutErstellte_live_pollsInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -2378,6 +2480,8 @@ export type usersUpdateWithoutErstellte_live_pollsInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -2417,6 +2521,8 @@ export type usersUncheckedUpdateWithoutErstellte_live_pollsInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -2455,6 +2561,8 @@ export type usersCreateWithoutErstellte_live_poll_revisionenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -2494,6 +2602,8 @@ export type usersUncheckedCreateWithoutErstellte_live_poll_revisionenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -2548,6 +2658,8 @@ export type usersUpdateWithoutErstellte_live_poll_revisionenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -2587,6 +2699,8 @@ export type usersUncheckedUpdateWithoutErstellte_live_poll_revisionenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -2625,6 +2739,8 @@ export type usersCreateWithoutErstellte_story_verknuepfungenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -2664,6 +2780,8 @@ export type usersUncheckedCreateWithoutErstellte_story_verknuepfungenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -2718,6 +2836,8 @@ export type usersUpdateWithoutErstellte_story_verknuepfungenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -2757,6 +2877,8 @@ export type usersUncheckedUpdateWithoutErstellte_story_verknuepfungenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -2795,6 +2917,8 @@ export type usersCreateWithoutBewertete_team_antwortenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -2834,6 +2958,8 @@ export type usersUncheckedCreateWithoutBewertete_team_antwortenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -2888,6 +3014,8 @@ export type usersUpdateWithoutBewertete_team_antwortenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -2927,6 +3055,8 @@ export type usersUncheckedUpdateWithoutBewertete_team_antwortenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -2965,6 +3095,8 @@ export type usersCreateWithoutModerierte_live_poll_antwortenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -3004,6 +3136,8 @@ export type usersUncheckedCreateWithoutModerierte_live_poll_antwortenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -3058,6 +3192,8 @@ export type usersUpdateWithoutModerierte_live_poll_antwortenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -3097,6 +3233,8 @@ export type usersUncheckedUpdateWithoutModerierte_live_poll_antwortenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -3135,6 +3273,8 @@ export type usersCreateWithoutErstellte_fragevorlagenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -3174,6 +3314,8 @@ export type usersUncheckedCreateWithoutErstellte_fragevorlagenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -3217,6 +3359,8 @@ export type usersCreateWithoutBewertete_fragevorlagenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -3256,6 +3400,8 @@ export type usersUncheckedCreateWithoutBewertete_fragevorlagenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -3310,6 +3456,8 @@ export type usersUpdateWithoutErstellte_fragevorlagenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -3349,6 +3497,8 @@ export type usersUncheckedUpdateWithoutErstellte_fragevorlagenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -3398,6 +3548,8 @@ export type usersUpdateWithoutBewertete_fragevorlagenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -3437,6 +3589,8 @@ export type usersUncheckedUpdateWithoutBewertete_fragevorlagenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -3475,6 +3629,8 @@ export type usersCreateWithoutErstellte_meme_auswahlenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -3514,6 +3670,8 @@ export type usersUncheckedCreateWithoutErstellte_meme_auswahlenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -3557,6 +3715,8 @@ export type usersCreateWithoutFinalisierte_meme_auswahlenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -3596,6 +3756,8 @@ export type usersUncheckedCreateWithoutFinalisierte_meme_auswahlenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -3650,6 +3812,8 @@ export type usersUpdateWithoutErstellte_meme_auswahlenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -3689,6 +3853,8 @@ export type usersUncheckedUpdateWithoutErstellte_meme_auswahlenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -3738,6 +3904,8 @@ export type usersUpdateWithoutFinalisierte_meme_auswahlenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -3777,6 +3945,8 @@ export type usersUncheckedUpdateWithoutFinalisierte_meme_auswahlenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -3815,6 +3985,8 @@ export type usersCreateWithoutModerierte_meme_kandidatenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -3854,6 +4026,8 @@ export type usersUncheckedCreateWithoutModerierte_meme_kandidatenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -3908,6 +4082,8 @@ export type usersUpdateWithoutModerierte_meme_kandidatenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -3947,6 +4123,8 @@ export type usersUncheckedUpdateWithoutModerierte_meme_kandidatenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -3985,6 +4163,8 @@ export type usersCreateWithoutGestartete_meme_praesentationenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -4024,6 +4204,8 @@ export type usersUncheckedCreateWithoutGestartete_meme_praesentationenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -4067,6 +4249,8 @@ export type usersCreateWithoutGeschlossene_meme_votingsInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -4106,6 +4290,8 @@ export type usersUncheckedCreateWithoutGeschlossene_meme_votingsInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -4149,6 +4335,8 @@ export type usersCreateWithoutFinalisierte_meme_ergebnisseInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -4188,6 +4376,8 @@ export type usersUncheckedCreateWithoutFinalisierte_meme_ergebnisseInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -4242,6 +4432,8 @@ export type usersUpdateWithoutGestartete_meme_praesentationenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -4281,6 +4473,8 @@ export type usersUncheckedUpdateWithoutGestartete_meme_praesentationenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -4330,6 +4524,8 @@ export type usersUpdateWithoutGeschlossene_meme_votingsInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -4369,6 +4565,8 @@ export type usersUncheckedUpdateWithoutGeschlossene_meme_votingsInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -4418,6 +4616,8 @@ export type usersUpdateWithoutFinalisierte_meme_ergebnisseInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -4457,6 +4657,8 @@ export type usersUncheckedUpdateWithoutFinalisierte_meme_ergebnisseInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -4495,6 +4697,8 @@ export type usersCreateWithoutModerierte_live_text_antwortenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -4534,6 +4738,8 @@ export type usersUncheckedCreateWithoutModerierte_live_text_antwortenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -4588,6 +4794,8 @@ export type usersUpdateWithoutModerierte_live_text_antwortenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -4627,6 +4835,8 @@ export type usersUncheckedUpdateWithoutModerierte_live_text_antwortenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -4665,6 +4875,8 @@ export type usersCreateWithoutErstellte_text_ersatzregelnInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -4704,6 +4916,8 @@ export type usersUncheckedCreateWithoutErstellte_text_ersatzregelnInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -4747,6 +4961,8 @@ export type usersCreateWithoutAktualisierte_text_ersatzregelnInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -4786,6 +5002,8 @@ export type usersUncheckedCreateWithoutAktualisierte_text_ersatzregelnInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -4840,6 +5058,8 @@ export type usersUpdateWithoutErstellte_text_ersatzregelnInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -4879,6 +5099,8 @@ export type usersUncheckedUpdateWithoutErstellte_text_ersatzregelnInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -4928,6 +5150,8 @@ export type usersUpdateWithoutAktualisierte_text_ersatzregelnInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -4967,6 +5191,8 @@ export type usersUncheckedUpdateWithoutAktualisierte_text_ersatzregelnInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -5005,6 +5231,8 @@ export type usersCreateWithoutRollenzuweisungenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
@@ -5044,6 +5272,8 @@ export type usersUncheckedCreateWithoutRollenzuweisungenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
@@ -5087,6 +5317,8 @@ export type usersCreateWithoutZugewiesene_rollenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
@@ -5126,6 +5358,8 @@ export type usersUncheckedCreateWithoutZugewiesene_rollenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
@@ -5180,6 +5414,8 @@ export type usersUpdateWithoutRollenzuweisungenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
@@ -5219,6 +5455,8 @@ export type usersUncheckedUpdateWithoutRollenzuweisungenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
@@ -5268,6 +5506,8 @@ export type usersUpdateWithoutZugewiesene_rollenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
@@ -5307,6 +5547,8 @@ export type usersUncheckedUpdateWithoutZugewiesene_rollenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
@@ -5345,6 +5587,8 @@ export type usersCreateWithoutEventreihenrollenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
@@ -5384,6 +5628,8 @@ export type usersUncheckedCreateWithoutEventreihenrollenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
@@ -5427,6 +5673,8 @@ export type usersCreateWithoutZugewiesene_eventreihenrollenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
@@ -5466,6 +5714,8 @@ export type usersUncheckedCreateWithoutZugewiesene_eventreihenrollenInput = {
   must_change_password?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
@@ -5520,6 +5770,8 @@ export type usersUpdateWithoutEventreihenrollenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
@@ -5559,6 +5811,8 @@ export type usersUncheckedUpdateWithoutEventreihenrollenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
@@ -5608,6 +5862,8 @@ export type usersUpdateWithoutZugewiesene_eventreihenrollenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
@@ -5647,7 +5903,365 @@ export type usersUncheckedUpdateWithoutZugewiesene_eventreihenrollenInput = {
   must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
   eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
+  erstellte_live_polls?: Prisma.live_pollsUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_live_poll_revisionen?: Prisma.live_poll_revisionsUncheckedUpdateManyWithoutCreated_byNestedInput
+  moderierte_live_poll_antworten?: Prisma.live_poll_responsesUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_meme_auswahlen?: Prisma.meme_moderation_selectionsUncheckedUpdateManyWithoutCreated_byNestedInput
+  finalisierte_meme_auswahlen?: Prisma.meme_moderation_selectionsUncheckedUpdateManyWithoutFinalized_byNestedInput
+  moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUncheckedUpdateManyWithoutReviewed_byNestedInput
+  gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
+  geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
+  finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
+}
+
+export type usersCreateWithoutEventartrollenInput = {
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutBenutzerInput
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
+  erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
+  erstellte_live_polls?: Prisma.live_pollsCreateNestedManyWithoutCreated_byInput
+  erstellte_live_poll_revisionen?: Prisma.live_poll_revisionsCreateNestedManyWithoutCreated_byInput
+  moderierte_live_poll_antworten?: Prisma.live_poll_responsesCreateNestedManyWithoutModerated_byInput
+  erstellte_meme_auswahlen?: Prisma.meme_moderation_selectionsCreateNestedManyWithoutCreated_byInput
+  finalisierte_meme_auswahlen?: Prisma.meme_moderation_selectionsCreateNestedManyWithoutFinalized_byInput
+  moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesCreateNestedManyWithoutReviewed_byInput
+  gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
+  geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
+  finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
+}
+
+export type usersUncheckedCreateWithoutEventartrollenInput = {
+  id?: number
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutBenutzerInput
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
+  erstellte_live_polls?: Prisma.live_pollsUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_live_poll_revisionen?: Prisma.live_poll_revisionsUncheckedCreateNestedManyWithoutCreated_byInput
+  moderierte_live_poll_antworten?: Prisma.live_poll_responsesUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_meme_auswahlen?: Prisma.meme_moderation_selectionsUncheckedCreateNestedManyWithoutCreated_byInput
+  finalisierte_meme_auswahlen?: Prisma.meme_moderation_selectionsUncheckedCreateNestedManyWithoutFinalized_byInput
+  moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUncheckedCreateNestedManyWithoutReviewed_byInput
+  gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
+  geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
+  finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
+}
+
+export type usersCreateOrConnectWithoutEventartrollenInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutEventartrollenInput, Prisma.usersUncheckedCreateWithoutEventartrollenInput>
+}
+
+export type usersUpsertWithoutEventartrollenInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutEventartrollenInput, Prisma.usersUncheckedUpdateWithoutEventartrollenInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutEventartrollenInput, Prisma.usersUncheckedCreateWithoutEventartrollenInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutEventartrollenInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutEventartrollenInput, Prisma.usersUncheckedUpdateWithoutEventartrollenInput>
+}
+
+export type usersUpdateWithoutEventartrollenInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUpdateManyWithoutBenutzerNestedInput
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
+  erstellte_live_polls?: Prisma.live_pollsUpdateManyWithoutCreated_byNestedInput
+  erstellte_live_poll_revisionen?: Prisma.live_poll_revisionsUpdateManyWithoutCreated_byNestedInput
+  moderierte_live_poll_antworten?: Prisma.live_poll_responsesUpdateManyWithoutModerated_byNestedInput
+  erstellte_meme_auswahlen?: Prisma.meme_moderation_selectionsUpdateManyWithoutCreated_byNestedInput
+  finalisierte_meme_auswahlen?: Prisma.meme_moderation_selectionsUpdateManyWithoutFinalized_byNestedInput
+  moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUpdateManyWithoutReviewed_byNestedInput
+  gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
+  geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
+  finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
+}
+
+export type usersUncheckedUpdateWithoutEventartrollenInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  verwaltete_eventreihen?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutBenutzerNestedInput
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedUpdateManyWithoutReviewed_byNestedInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedUpdateManyWithoutUpdated_byNestedInput
+  erstellte_live_polls?: Prisma.live_pollsUncheckedUpdateManyWithoutCreated_byNestedInput
+  erstellte_live_poll_revisionen?: Prisma.live_poll_revisionsUncheckedUpdateManyWithoutCreated_byNestedInput
+  moderierte_live_poll_antworten?: Prisma.live_poll_responsesUncheckedUpdateManyWithoutModerated_byNestedInput
+  erstellte_meme_auswahlen?: Prisma.meme_moderation_selectionsUncheckedUpdateManyWithoutCreated_byNestedInput
+  finalisierte_meme_auswahlen?: Prisma.meme_moderation_selectionsUncheckedUpdateManyWithoutFinalized_byNestedInput
+  moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUncheckedUpdateManyWithoutReviewed_byNestedInput
+  gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedUpdateManyWithoutStarted_byNestedInput
+  geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedUpdateManyWithoutVoting_closed_byNestedInput
+  finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedUpdateManyWithoutReviewed_byNestedInput
+}
+
+export type usersCreateWithoutVerwaltete_eventreihenInput = {
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutBenutzerInput
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesCreateNestedManyWithoutCreated_byInput
+  erstellte_story_elemente?: Prisma.story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenCreateNestedManyWithoutCreated_byInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenCreateNestedManyWithoutReviewed_byInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesCreateNestedManyWithoutUpdated_byInput
+  erstellte_live_polls?: Prisma.live_pollsCreateNestedManyWithoutCreated_byInput
+  erstellte_live_poll_revisionen?: Prisma.live_poll_revisionsCreateNestedManyWithoutCreated_byInput
+  moderierte_live_poll_antworten?: Prisma.live_poll_responsesCreateNestedManyWithoutModerated_byInput
+  erstellte_meme_auswahlen?: Prisma.meme_moderation_selectionsCreateNestedManyWithoutCreated_byInput
+  finalisierte_meme_auswahlen?: Prisma.meme_moderation_selectionsCreateNestedManyWithoutFinalized_byInput
+  moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesCreateNestedManyWithoutReviewed_byInput
+  gestartete_meme_praesentationen?: Prisma.meme_presentationsCreateNestedManyWithoutStarted_byInput
+  geschlossene_meme_votings?: Prisma.meme_presentationsCreateNestedManyWithoutVoting_closed_byInput
+  finalisierte_meme_ergebnisse?: Prisma.meme_presentationsCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsCreateNestedManyWithoutReviewed_byInput
+}
+
+export type usersUncheckedCreateWithoutVerwaltete_eventreihenInput = {
+  id?: number
+  name?: string | null
+  email: string
+  avatar_url?: string | null
+  password_hash: string
+  role?: $Enums.UserRole
+  is_active?: boolean
+  must_change_password?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutBenutzerInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutZugewiesen_vonInput
+  erstellte_kategorien?: Prisma.fragenkategorieUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_team_antworten?: Prisma.team_antwortenUncheckedCreateNestedManyWithoutBewertet_vonInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUncheckedCreateNestedManyWithoutReviewed_byInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUncheckedCreateNestedManyWithoutAktualitaet_geprueft_vonInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutCreated_byInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUncheckedCreateNestedManyWithoutUpdated_byInput
+  erstellte_live_polls?: Prisma.live_pollsUncheckedCreateNestedManyWithoutCreated_byInput
+  erstellte_live_poll_revisionen?: Prisma.live_poll_revisionsUncheckedCreateNestedManyWithoutCreated_byInput
+  moderierte_live_poll_antworten?: Prisma.live_poll_responsesUncheckedCreateNestedManyWithoutModerated_byInput
+  erstellte_meme_auswahlen?: Prisma.meme_moderation_selectionsUncheckedCreateNestedManyWithoutCreated_byInput
+  finalisierte_meme_auswahlen?: Prisma.meme_moderation_selectionsUncheckedCreateNestedManyWithoutFinalized_byInput
+  moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUncheckedCreateNestedManyWithoutReviewed_byInput
+  gestartete_meme_praesentationen?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutStarted_byInput
+  geschlossene_meme_votings?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutVoting_closed_byInput
+  finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUncheckedCreateNestedManyWithoutResult_finalized_byInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUncheckedCreateNestedManyWithoutCreated_byInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUncheckedCreateNestedManyWithoutReviewed_byInput
+}
+
+export type usersCreateOrConnectWithoutVerwaltete_eventreihenInput = {
+  where: Prisma.usersWhereUniqueInput
+  create: Prisma.XOR<Prisma.usersCreateWithoutVerwaltete_eventreihenInput, Prisma.usersUncheckedCreateWithoutVerwaltete_eventreihenInput>
+}
+
+export type usersUpsertWithoutVerwaltete_eventreihenInput = {
+  update: Prisma.XOR<Prisma.usersUpdateWithoutVerwaltete_eventreihenInput, Prisma.usersUncheckedUpdateWithoutVerwaltete_eventreihenInput>
+  create: Prisma.XOR<Prisma.usersCreateWithoutVerwaltete_eventreihenInput, Prisma.usersUncheckedCreateWithoutVerwaltete_eventreihenInput>
+  where?: Prisma.usersWhereInput
+}
+
+export type usersUpdateToOneWithWhereWithoutVerwaltete_eventreihenInput = {
+  where?: Prisma.usersWhereInput
+  data: Prisma.XOR<Prisma.usersUpdateWithoutVerwaltete_eventreihenInput, Prisma.usersUncheckedUpdateWithoutVerwaltete_eventreihenInput>
+}
+
+export type usersUpdateWithoutVerwaltete_eventreihenInput = {
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutBenutzerNestedInput
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutZugewiesen_vonNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutZugewiesen_vonNestedInput
+  erstellte_kategorien?: Prisma.fragenkategorieUpdateManyWithoutCreated_byNestedInput
+  bewertete_team_antworten?: Prisma.team_antwortenUpdateManyWithoutBewertet_vonNestedInput
+  erstellte_praesentationstemplates?: Prisma.presentation_templatesUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_elemente?: Prisma.story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_revisionen?: Prisma.story_element_revisionenUpdateManyWithoutCreated_byNestedInput
+  erstellte_story_verknuepfungen?: Prisma.frage_story_elementeUpdateManyWithoutCreated_byNestedInput
+  erstellte_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutCreated_byNestedInput
+  bewertete_fragevorlagen?: Prisma.frage_vorlagenUpdateManyWithoutReviewed_byNestedInput
+  aktualitaet_gepruefte_fragen?: Prisma.fragenUpdateManyWithoutAktualitaet_geprueft_vonNestedInput
+  moderierte_live_text_antworten?: Prisma.live_text_response_publicationsUpdateManyWithoutModerated_byNestedInput
+  erstellte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutCreated_byNestedInput
+  aktualisierte_text_ersatzregeln?: Prisma.public_text_replacement_rulesUpdateManyWithoutUpdated_byNestedInput
+  erstellte_live_polls?: Prisma.live_pollsUpdateManyWithoutCreated_byNestedInput
+  erstellte_live_poll_revisionen?: Prisma.live_poll_revisionsUpdateManyWithoutCreated_byNestedInput
+  moderierte_live_poll_antworten?: Prisma.live_poll_responsesUpdateManyWithoutModerated_byNestedInput
+  erstellte_meme_auswahlen?: Prisma.meme_moderation_selectionsUpdateManyWithoutCreated_byNestedInput
+  finalisierte_meme_auswahlen?: Prisma.meme_moderation_selectionsUpdateManyWithoutFinalized_byNestedInput
+  moderierte_meme_kandidaten?: Prisma.meme_moderation_candidatesUpdateManyWithoutReviewed_byNestedInput
+  gestartete_meme_praesentationen?: Prisma.meme_presentationsUpdateManyWithoutStarted_byNestedInput
+  geschlossene_meme_votings?: Prisma.meme_presentationsUpdateManyWithoutVoting_closed_byNestedInput
+  finalisierte_meme_ergebnisse?: Prisma.meme_presentationsUpdateManyWithoutResult_finalized_byNestedInput
+  erstellte_externe_frageimporte?: Prisma.external_question_import_batchesUpdateManyWithoutCreated_byNestedInput
+  bewertete_externe_frageimporte?: Prisma.external_question_import_itemsUpdateManyWithoutReviewed_byNestedInput
+}
+
+export type usersUncheckedUpdateWithoutVerwaltete_eventreihenInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  avatar_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  is_active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  must_change_password?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutBenutzerNestedInput
+  zugewiesene_eventreihenrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutBenutzerNestedInput
   zugewiesene_rollen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutZugewiesen_vonNestedInput
   erstellte_kategorien?: Prisma.fragenkategorieUncheckedUpdateManyWithoutCreated_byNestedInput
@@ -5681,6 +6295,8 @@ export type usersUncheckedUpdateWithoutZugewiesene_eventreihenrollenInput = {
  */
 
 export type UsersCountOutputType = {
+  eventartrollen: number
+  verwaltete_eventreihen: number
   eventreihenrollen: number
   zugewiesene_eventreihenrollen: number
   rollenzuweisungen: number
@@ -5711,6 +6327,8 @@ export type UsersCountOutputType = {
 }
 
 export type UsersCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  eventartrollen?: boolean | UsersCountOutputTypeCountEventartrollenArgs
+  verwaltete_eventreihen?: boolean | UsersCountOutputTypeCountVerwaltete_eventreihenArgs
   eventreihenrollen?: boolean | UsersCountOutputTypeCountEventreihenrollenArgs
   zugewiesene_eventreihenrollen?: boolean | UsersCountOutputTypeCountZugewiesene_eventreihenrollenArgs
   rollenzuweisungen?: boolean | UsersCountOutputTypeCountRollenzuweisungenArgs
@@ -5748,6 +6366,20 @@ export type UsersCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extens
    * Select specific fields to fetch from the UsersCountOutputType
    */
   select?: Prisma.UsersCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountEventartrollenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.benutzer_eventartrollenWhereInput
+}
+
+/**
+ * UsersCountOutputType without action
+ */
+export type UsersCountOutputTypeCountVerwaltete_eventreihenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.eventreihe_verwaltungWhereInput
 }
 
 /**
@@ -5951,6 +6583,8 @@ export type usersSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   must_change_password?: boolean
   created_at?: boolean
   updated_at?: boolean
+  eventartrollen?: boolean | Prisma.users$eventartrollenArgs<ExtArgs>
+  verwaltete_eventreihen?: boolean | Prisma.users$verwaltete_eventreihenArgs<ExtArgs>
   eventreihenrollen?: boolean | Prisma.users$eventreihenrollenArgs<ExtArgs>
   zugewiesene_eventreihenrollen?: boolean | Prisma.users$zugewiesene_eventreihenrollenArgs<ExtArgs>
   rollenzuweisungen?: boolean | Prisma.users$rollenzuweisungenArgs<ExtArgs>
@@ -6022,6 +6656,8 @@ export type usersSelectScalar = {
 
 export type usersOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "avatar_url" | "password_hash" | "role" | "is_active" | "must_change_password" | "created_at" | "updated_at", ExtArgs["result"]["users"]>
 export type usersInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  eventartrollen?: boolean | Prisma.users$eventartrollenArgs<ExtArgs>
+  verwaltete_eventreihen?: boolean | Prisma.users$verwaltete_eventreihenArgs<ExtArgs>
   eventreihenrollen?: boolean | Prisma.users$eventreihenrollenArgs<ExtArgs>
   zugewiesene_eventreihenrollen?: boolean | Prisma.users$zugewiesene_eventreihenrollenArgs<ExtArgs>
   rollenzuweisungen?: boolean | Prisma.users$rollenzuweisungenArgs<ExtArgs>
@@ -6057,6 +6693,8 @@ export type usersIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type $usersPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "users"
   objects: {
+    eventartrollen: Prisma.$benutzer_eventartrollenPayload<ExtArgs>[]
+    verwaltete_eventreihen: Prisma.$eventreihe_verwaltungPayload<ExtArgs>[]
     eventreihenrollen: Prisma.$eventreihe_benutzerrollenPayload<ExtArgs>[]
     zugewiesene_eventreihenrollen: Prisma.$eventreihe_benutzerrollenPayload<ExtArgs>[]
     rollenzuweisungen: Prisma.$benutzer_rollenzuweisungenPayload<ExtArgs>[]
@@ -6490,6 +7128,8 @@ readonly fields: usersFieldRefs;
  */
 export interface Prisma__usersClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  eventartrollen<T extends Prisma.users$eventartrollenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$eventartrollenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$benutzer_eventartrollenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  verwaltete_eventreihen<T extends Prisma.users$verwaltete_eventreihenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$verwaltete_eventreihenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$eventreihe_verwaltungPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   eventreihenrollen<T extends Prisma.users$eventreihenrollenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$eventreihenrollenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$eventreihe_benutzerrollenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   zugewiesene_eventreihenrollen<T extends Prisma.users$zugewiesene_eventreihenrollenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$zugewiesene_eventreihenrollenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$eventreihe_benutzerrollenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   rollenzuweisungen<T extends Prisma.users$rollenzuweisungenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.users$rollenzuweisungenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$benutzer_rollenzuweisungenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -6946,6 +7586,54 @@ export type usersDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Limit how many users to delete.
    */
   limit?: number
+}
+
+/**
+ * users.eventartrollen
+ */
+export type users$eventartrollenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the benutzer_eventartrollen
+   */
+  select?: Prisma.benutzer_eventartrollenSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the benutzer_eventartrollen
+   */
+  omit?: Prisma.benutzer_eventartrollenOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.benutzer_eventartrollenInclude<ExtArgs> | null
+  where?: Prisma.benutzer_eventartrollenWhereInput
+  orderBy?: Prisma.benutzer_eventartrollenOrderByWithRelationInput | Prisma.benutzer_eventartrollenOrderByWithRelationInput[]
+  cursor?: Prisma.benutzer_eventartrollenWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Benutzer_eventartrollenScalarFieldEnum | Prisma.Benutzer_eventartrollenScalarFieldEnum[]
+}
+
+/**
+ * users.verwaltete_eventreihen
+ */
+export type users$verwaltete_eventreihenArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the eventreihe_verwaltung
+   */
+  select?: Prisma.eventreihe_verwaltungSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the eventreihe_verwaltung
+   */
+  omit?: Prisma.eventreihe_verwaltungOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.eventreihe_verwaltungInclude<ExtArgs> | null
+  where?: Prisma.eventreihe_verwaltungWhereInput
+  orderBy?: Prisma.eventreihe_verwaltungOrderByWithRelationInput | Prisma.eventreihe_verwaltungOrderByWithRelationInput[]
+  cursor?: Prisma.eventreihe_verwaltungWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Eventreihe_verwaltungScalarFieldEnum | Prisma.Eventreihe_verwaltungScalarFieldEnum[]
 }
 
 /**

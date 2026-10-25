@@ -1,11 +1,7 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { prisma } from "@/app/lib/prisma";
 import { requireAdmin } from "@/app/lib/permissions";
-import { deRoleMessages } from "@/app/i18n/messages/de/roles";
-import { logRoleAudit } from "@/app/roles/roleAudit.server";
-import { withSerializableTransaction } from "@/app/roles/serializableTransaction.server";
 import {
   isEventSeriesAssignmentRole,
   type EventSeriesAssignmentRole,
@@ -32,22 +28,6 @@ export type RoleAssignmentActionResult = {
   success: boolean;
   message: string;
 };
-
-function revalidateRolePages(eventSeriesId: number) {
-  revalidatePath("/admin/users");
-  revalidatePath("/admin/eventreihen");
-  revalidatePath(`/admin/eventreihen/${eventSeriesId}`);
-}
-
-function legacyEventSeriesRole(role: EventSeriesAssignmentRole) {
-  return role === "EDITOR" ? "EVENT_EDITOR" as const : "EVENT_MANAGER" as const;
-}
-
-function actorId(session: { user?: { id?: string } }) {
-  const id = Number(session.user?.id);
-  if (!Number.isInteger(id) || id <= 0) throw new Error("Ungültige Anmeldung.");
-  return id;
-}
 
 export async function getRoleAssignmentOptions(): Promise<RoleAssignmentOptions> {
   await requireAdmin();
@@ -98,171 +78,19 @@ export async function getRoleAssignmentOptions(): Promise<RoleAssignmentOptions>
   };
 }
 
-export async function addEventSeriesRoleAssignment(input: {
-  userId: number;
-  eventSeriesId: number;
-  role: string;
-}): Promise<RoleAssignmentActionResult> {
-  const session = await requireAdmin();
-  if (!Number.isInteger(input.userId) || !Number.isInteger(input.eventSeriesId) ||
-    !isEventSeriesAssignmentRole(input.role)) {
-    logRoleAudit("invalid_role_assignment_rejected", { scope: "EVENT_SERIES" });
-    return { success: false, message: deRoleMessages.messages.invalidAssignment };
-  }
-  const role = input.role;
-  const assignedById = actorId(session);
-  try {
-    const result = await withSerializableTransaction(async (transaction) => {
-      const [user, eventSeries, assignment, legacy] = await Promise.all([
-        transaction.users.findFirst({ where: { id: input.userId, is_active: true }, select: { id: true } }),
-        transaction.eventreihen.findFirst({
-          where: { eventreihe_id: input.eventSeriesId, ist_archiviert: false },
-          select: { eventreihe_id: true },
-        }),
-        transaction.benutzer_rollenzuweisungen.findFirst({
-          where: {
-            benutzer_id: input.userId,
-            eventreihe_id: input.eventSeriesId,
-            scope_typ: "EVENT_SERIES",
-          },
-          select: { rollenzuweisung_id: true },
-        }),
-        transaction.eventreihe_benutzerrollen.findUnique({
-          where: {
-            benutzer_id_eventreihe_id: {
-              benutzer_id: input.userId,
-              eventreihe_id: input.eventSeriesId,
-            },
-          },
-          select: { eventreihe_benutzerrolle_id: true },
-        }),
-      ]);
-      if (!user || !eventSeries) return "missing" as const;
-      if (Boolean(assignment) !== Boolean(legacy)) return "inconsistent" as const;
-      if (assignment) return "duplicate" as const;
-      await transaction.benutzer_rollenzuweisungen.create({
-        data: {
-          benutzer_id: input.userId,
-          eventreihe_id: input.eventSeriesId,
-          rolle: role,
-          scope_typ: "EVENT_SERIES",
-          zugewiesen_von_user_id: assignedById,
-        },
-      });
-      await transaction.eventreihe_benutzerrollen.create({
-        data: {
-          benutzer_id: input.userId,
-          eventreihe_id: input.eventSeriesId,
-          rolle: legacyEventSeriesRole(role),
-          zugewiesen_von_user_id: assignedById,
-        },
-      });
-      return "created" as const;
-    });
-    if (result === "missing") return { success: false, message: deRoleMessages.messages.inactiveTarget };
-    if (result === "duplicate") return { success: false, message: deRoleMessages.messages.duplicateAssignment };
-    if (result === "inconsistent") {
-      logRoleAudit("legacy_assignment_inconsistency", {
-        userId: input.userId,
-        eventSeriesId: input.eventSeriesId,
-      });
-      return { success: false, message: deRoleMessages.messages.inconsistentAssignment };
-    }
-  } catch (error) {
-    if (typeof error === "object" && error !== null && "code" in error && error.code === "P2002") {
-      return { success: false, message: deRoleMessages.messages.duplicateAssignment };
-    }
-    throw error;
-  }
-  logRoleAudit("role_assignment_added", {
-    userId: input.userId,
-    eventSeriesId: input.eventSeriesId,
-    role,
-  });
-  revalidateRolePages(input.eventSeriesId);
-  return { success: true, message: deRoleMessages.messages.assignmentSaved };
-}
-
-
-export async function changeEventSeriesRoleAssignment(input: {
-  assignmentId: number;
-  role: string;
-}): Promise<RoleAssignmentActionResult> {
-  const session = await requireAdmin();
-  if (!Number.isInteger(input.assignmentId) || input.assignmentId <= 0 ||
-    !isEventSeriesAssignmentRole(input.role)) {
-    return { success: false, message: deRoleMessages.messages.invalidAssignment };
-  }
-  const role = input.role;
-  const assignedById = actorId(session);
-  const result = await withSerializableTransaction(async (transaction) => {
-    const existing = await transaction.benutzer_rollenzuweisungen.findUnique({
-      where: { rollenzuweisung_id: input.assignmentId },
-      select: {
-        benutzer_id: true,
-        eventreihe_id: true,
-        rolle: true,
-      },
-    });
-    if (!existing || existing.eventreihe_id === null ||
-      !isEventSeriesAssignmentRole(existing.rolle)) return { kind: "missing" as const };
-    if (existing.rolle === role) {
-      return { kind: "unchanged" as const, eventSeriesId: existing.eventreihe_id };
-    }
-    const legacy = await transaction.eventreihe_benutzerrollen.updateMany({
-      where: { benutzer_id: existing.benutzer_id, eventreihe_id: existing.eventreihe_id },
-      data: { rolle: legacyEventSeriesRole(role), zugewiesen_von_user_id: assignedById },
-    });
-    if (legacy.count !== 1) return { kind: "inconsistent" as const, eventSeriesId: existing.eventreihe_id };
-    await transaction.benutzer_rollenzuweisungen.update({
-      where: { rollenzuweisung_id: input.assignmentId },
-      data: { rolle: role, zugewiesen_von_user_id: assignedById },
-    });
-    return { kind: "changed" as const, eventSeriesId: existing.eventreihe_id };
-  });
-  if (result.kind === "missing") return { success: false, message: deRoleMessages.messages.assignmentNotFound };
-  if (result.kind === "inconsistent") {
-    logRoleAudit("legacy_assignment_inconsistency", { eventSeriesId: result.eventSeriesId });
-    return { success: false, message: deRoleMessages.messages.inconsistentAssignment };
-  }
-  revalidateRolePages(result.eventSeriesId);
-  if (result.kind === "changed") {
-    logRoleAudit("role_assignment_changed", { eventSeriesId: result.eventSeriesId, role });
-  }
-  return { success: true, message: deRoleMessages.messages.assignmentSaved };
-}
-
-export async function removeEventSeriesRoleAssignment(
-  assignmentId: number,
-): Promise<RoleAssignmentActionResult> {
+/** Retained action exports fail closed; the event type matrix is authoritative. */
+export async function addEventSeriesRoleAssignment(_input: { userId: number; eventSeriesId: number; role: string }): Promise<RoleAssignmentActionResult> {
   await requireAdmin();
-  if (!Number.isInteger(assignmentId) || assignmentId <= 0) {
-    return { success: false, message: deRoleMessages.messages.invalidAssignment };
-  }
-  const result = await withSerializableTransaction(async (transaction) => {
-    const assignment = await transaction.benutzer_rollenzuweisungen.findUnique({
-      where: { rollenzuweisung_id: assignmentId },
-      select: {
-        benutzer_id: true,
-        eventreihe_id: true,
-        rolle: true,
-      },
-    });
-    if (!assignment || assignment.eventreihe_id === null ||
-      !isEventSeriesAssignmentRole(assignment.rolle)) return { kind: "missing" as const };
-    const legacy = await transaction.eventreihe_benutzerrollen.deleteMany({
-      where: { benutzer_id: assignment.benutzer_id, eventreihe_id: assignment.eventreihe_id },
-    });
-    if (legacy.count !== 1) return { kind: "inconsistent" as const, eventSeriesId: assignment.eventreihe_id };
-    await transaction.benutzer_rollenzuweisungen.delete({ where: { rollenzuweisung_id: assignmentId } });
-    return { kind: "removed" as const, eventSeriesId: assignment.eventreihe_id };
-  });
-  if (result.kind === "missing") return { success: false, message: deRoleMessages.messages.assignmentNotFound };
-  if (result.kind === "inconsistent") {
-    logRoleAudit("legacy_assignment_inconsistency", { eventSeriesId: result.eventSeriesId });
-    return { success: false, message: deRoleMessages.messages.inconsistentAssignment };
-  }
-  logRoleAudit("role_assignment_removed", { eventSeriesId: result.eventSeriesId });
-  revalidateRolePages(result.eventSeriesId);
-  return { success: true, message: deRoleMessages.messages.assignmentRemoved };
+  void _input;
+  return { success: false, message: "Bitte die Eventartrechte-Matrix verwenden." };
+}
+export async function changeEventSeriesRoleAssignment(_input: { assignmentId: number; role: string }): Promise<RoleAssignmentActionResult> {
+  await requireAdmin();
+  void _input;
+  return { success: false, message: "Bitte die Eventartrechte-Matrix verwenden." };
+}
+export async function removeEventSeriesRoleAssignment(_assignmentId: number): Promise<RoleAssignmentActionResult> {
+  await requireAdmin();
+  void _assignmentId;
+  return { success: false, message: "Bitte die Eventartrechte-Matrix verwenden." };
 }

@@ -17,7 +17,7 @@ export function sessionUserId(session: Session) {
 export async function getUserRoleAssignments(userId: number): Promise<RoleAssignmentSnapshot[]> {
   if (!Number.isInteger(userId) || userId <= 0) return [];
   const rows = await prisma.benutzer_rollenzuweisungen.findMany({
-    where: { benutzer_id: userId, benutzer: { is_active: true } },
+    where: { benutzer_id: userId, scope_typ: "GLOBAL", benutzer: { is_active: true } },
     select: {
       rollenzuweisung_id: true,
       rolle: true,
@@ -25,7 +25,7 @@ export async function getUserRoleAssignments(userId: number): Promise<RoleAssign
       eventreihe_id: true,
     },
   });
-  const assignments = rows.map((row) => ({
+  const assignments = rows.filter(row => row.scope_typ === "GLOBAL").map((row) => ({
     id: row.rollenzuweisung_id,
     role: row.rolle,
     scopeType: row.scope_typ,
@@ -42,7 +42,24 @@ export async function getUserRoleAssignments(userId: number): Promise<RoleAssign
 }
 
 export async function getActorPermissions(userId: number): Promise<AuthorizationActor> {
-  return { userId, assignments: await getUserRoleAssignments(userId) };
+  const [globals, roles, management] = await Promise.all([
+    getUserRoleAssignments(userId),
+    prisma.benutzer_eventartrollen.findMany({
+      where: { benutzer_id: userId, benutzer: { is_active: true } },
+      include: { eventreihe: { select: { eventarten: true } } },
+    }),
+    prisma.eventreihe_verwaltung.findMany({ where: { benutzer_id: userId, benutzer: { is_active: true } } }),
+  ]);
+  const eventTypeAssignments = roles.map(row => ({
+    eventSeriesId: row.eventreihe_id, eventType: row.eventart, role: row.rolle,
+    enabled: row.eventreihe.eventarten.some(product => product.eventart === row.eventart && product.ist_freigeschaltet),
+  }));
+  return {
+    userId, eventTypeAssignments, managedEventSeriesIds: management.map(row => row.eventreihe_id),
+    assignments: [...globals, ...eventTypeAssignments.flatMap(row => row.eventType === "QUIZ" && row.enabled ? [{
+      role: row.role, scopeType: "EVENT_SERIES", eventSeriesId: row.eventSeriesId,
+    }] : [])],
+  };
 }
 
 export async function getActorForSession(session: Session): Promise<AuthorizationActor> {

@@ -148,6 +148,8 @@ jobs:
       EDITORIAL_IMPORT_TEST_DATABASE_URL: postgresql://editorial_ci:isolated-ci-only@127.0.0.1:5432/editorial_import_ci?schema=pubquiz
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -165,3 +167,8 @@ jobs:
         env:
           MEME_ARCHIVE_TEST_DATABASE_URL: postgresql://editorial_ci:isolated-ci-only@127.0.0.1:5432/meme_archive_ci
         run: node --import tsx --test app/quiz/memeArchive/archive.integration.test.ts
+
+      - name: PostgreSQL event type permission migration and real Actions
+        env:
+          EVENT_TYPE_TEST_DATABASE_URL: ${{ env.EDITORIAL_IMPORT_TEST_DATABASE_URL }}
+        run: node --import tsx --test scripts/testing/event-types.integration.test.ts

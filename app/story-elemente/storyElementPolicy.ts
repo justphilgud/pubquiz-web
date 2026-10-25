@@ -1,8 +1,6 @@
 import {
   canEditEventSeriesQuestions,
-  canManageEventSeries,
   canManageEventSeriesQuizzes,
-  canViewEventSeries,
   hasAnyEditorialAssignment,
   isAdministrator,
   type AuthorizationActor,
@@ -53,10 +51,10 @@ export function canViewStoryElement(
   if (isAdministrator(actor)) return true;
   if (story.scope === "GLOBAL") return hasAnyEditorialAssignment(actor);
   if (story.scope === "EVENT_SERIES") {
-    return story.eventSeriesId !== null && canViewEventSeries(actor, story.eventSeriesId);
+    return story.eventSeriesId !== null && canEditEventSeriesQuestions(actor, story.eventSeriesId);
   }
   return story.quizEventSeriesId !== null &&
-    canViewEventSeries(actor, story.quizEventSeriesId);
+    canEditEventSeriesQuestions(actor, story.quizEventSeriesId);
 }
 
 export function canEditStoryElement(
@@ -67,7 +65,7 @@ export function canEditStoryElement(
   if (isAdministrator(actor)) return true;
   if (story.scope === "GLOBAL") return false;
   if (story.scope === "EVENT_SERIES" && story.eventSeriesId !== null) {
-    return canManageEventSeries(actor, story.eventSeriesId) ||
+    return canManageEventSeriesQuizzes(actor, story.eventSeriesId) ||
       (story.createdByUserId === actor.userId &&
         canEditEventSeriesQuestions(actor, story.eventSeriesId));
   }
@@ -81,8 +79,8 @@ export function canArchiveStoryElement(
 ) {
   if (isAdministrator(actor)) return true;
   if (story.scope === "EVENT_SERIES" && story.eventSeriesId !== null) {
-    return canManageEventSeries(actor, story.eventSeriesId) ||
-      story.createdByUserId === actor.userId;
+    return canManageEventSeriesQuizzes(actor, story.eventSeriesId) ||
+      (story.createdByUserId === actor.userId && canEditEventSeriesQuestions(actor, story.eventSeriesId));
   }
   return story.scope === "QUIZ" && story.quizEventSeriesId !== null &&
     canManageEventSeriesQuizzes(actor, story.quizEventSeriesId);

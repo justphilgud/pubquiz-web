@@ -3,6 +3,7 @@ import {
   canEditGlobalQuestions,
   canReviewEventSeriesQuestions,
   isAdministrator,
+  hasAnyEditorialAssignment,
   type AuthorizationActor,
 } from "@/app/roles/roleAssignmentPolicy";
 
@@ -46,7 +47,7 @@ export function canUseQuestionScope(
 export function canViewScopedQuestion(actor: QuestionActorContext, question: QuestionScopeAccessContext) {
   if (isAdministrator(actor)) return true;
   if (question.scope === "GLOBAL") {
-    if (question.isApproved) return true;
+    if (question.isApproved) return hasAnyEditorialAssignment(actor);
     return canEditGlobalQuestions(actor) && actor.userId === question.createdByUserId;
   }
   return question.eventSeriesIds.some((id) => canEditEventSeriesQuestions(actor, id));

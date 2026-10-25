@@ -42,6 +42,7 @@ export default async function RolesAndPermissionsPage() {
         <div className="mt-5 max-w-3xl">
           <h1 className="text-3xl font-bold">{overview.title}</h1>
           <p className="mt-2 text-slate-600">{overview.introduction}</p>
+          <p className="mt-3 text-sm text-slate-600">Die Tabelle beschreibt Quizrechte bei freigeschaltetem Quiz-Produkt und passendem Objektzugriff. „Eventreihe verwalten“ ist ein unabhängiges Zusatzrecht. Bingo- und PowerPoint-Karaoke-Rollen verleihen keine Quizrechte; deren Spielfunktionen sind noch nicht verfügbar. Produktfreischaltungen und Rechtevergabe bleiben beim Administrator.</p>
         </div>
 
         <section className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label={overview.title}>

@@ -19,7 +19,6 @@ import {
 } from "@/app/roles/roleAssignmentWrites.server";
 import { withSerializableTransaction } from "@/app/roles/serializableTransaction.server";
 
-import { resolveUserRoleSelection } from "./userRoleFormPolicy";
 
 export type UserFormActionResult = {
   success: boolean;
@@ -69,31 +68,16 @@ function globalRolesFromForm(formData: FormData): GlobalRole[] {
   return [...new Set(values)];
 }
 
-function eventSeriesIdsFromForm(formData: FormData, name: string) {
-  return formData.getAll(name).map((value) => Number(value));
-}
-
 function roleSelectionFromForm(formData: FormData) {
-  const legacyGlobalRoles = globalRolesFromForm(formData);
-  try {
-    return resolveUserRoleSelection({
-      administrator:
-        formData.get("roleAdministrator") === "on" ||
-        legacyGlobalRoles.includes("ADMIN"),
-      editor:
-        formData.get("roleEditor") === "on" ||
-        legacyGlobalRoles.includes("EDITOR"),
-      editorScope: formData.get("editorScope") ?? "GLOBAL",
-      editorEventSeriesIds: eventSeriesIdsFromForm(formData, "editorEventSeriesIds"),
-      eventManager: formData.get("roleEventManager") === "on",
-      eventManagerEventSeriesIds: eventSeriesIdsFromForm(formData, "eventManagerEventSeriesIds"),
-    });
-  } catch (error) {
-    logRoleAudit("invalid_role_assignment_rejected", { scope: "USER_FORM" });
-    throw new UserFormValidationError(
-      error instanceof Error ? error.message : "Ungültige Rollenzuweisung.",
-    );
+  if (formData.has("roleEventManager") || formData.has("editorEventSeriesIds") || formData.has("eventManagerEventSeriesIds") || formData.get("editorScope") === "EVENT_SERIES") {
+    throw new UserFormValidationError("Bitte die Eventartrechte-Matrix verwenden. Alte Reihenformulare sind nicht mehr gültig.");
   }
+  const legacyGlobalRoles = globalRolesFromForm(formData);
+  const globalRoles: GlobalRole[] = [...new Set<GlobalRole>([
+    ...(formData.get("roleAdministrator") === "on" || legacyGlobalRoles.includes("ADMIN") ? ["ADMIN" as const] : []),
+    ...(formData.get("roleEditor") === "on" || legacyGlobalRoles.includes("EDITOR") ? ["EDITOR" as const] : []),
+  ])];
+  return { globalRoles, eventSeriesAssignments: [] as { eventSeriesId: number; role: "EDITOR" | "EVENT_MANAGER" }[] };
 }
 
 function actorId(session: { user?: { id?: string } }) {
@@ -152,11 +136,7 @@ async function createUser(formData: FormData) {
       roles: roleSelection.globalRoles,
       assignedById,
     });
-    await replaceEventSeriesRoleAssignments(transaction, {
-      userId: created.id,
-      assignments: roleSelection.eventSeriesAssignments,
-      assignedById,
-    });
+
     return created;
   });
   logRoleAudit("role_assignment_added", { userId: user.id, scope: "USER_FORM" });
@@ -222,12 +202,7 @@ async function updateUser(formData: FormData) {
       assignedById,
       verifyLegacy: true,
     });
-    await replaceEventSeriesRoleAssignments(transaction, {
-      userId: id,
-      assignments: roleSelection.eventSeriesAssignments,
-      assignedById,
-      verifyLegacy: true,
-    });
+
   });
   logRoleAudit("role_assignment_changed", { userId: id, scope: "USER_FORM" });
   revalidatePath("/admin/users");

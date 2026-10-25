@@ -315,3 +315,23 @@ export type eventreihe_benutzerrollen = Prisma.eventreihe_benutzerrollenModel
  * 
  */
 export type fragen_eventreihen = Prisma.fragen_eventreihenModel
+/**
+ * Model eventarten
+ * Stable product catalogue; adding a product never grants access.
+ */
+export type eventarten = Prisma.eventartenModel
+/**
+ * Model eventreihe_eventarten
+ *
+ */
+export type eventreihe_eventarten = Prisma.eventreihe_eventartenModel
+/**
+ * Model benutzer_eventartrollen
+ *
+ */
+export type benutzer_eventartrollen = Prisma.benutzer_eventartrollenModel
+/**
+ * Model eventreihe_verwaltung
+ *
+ */
+export type eventreihe_verwaltung = Prisma.eventreihe_verwaltungModel
