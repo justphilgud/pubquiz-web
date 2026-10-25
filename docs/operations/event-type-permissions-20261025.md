@@ -201,3 +201,36 @@ Der ausschließlich neue leere Testschemaufbau setzt deshalb `search_path` ausdr
 Frühe Fehler schließen nun ebenfalls ihre Testverbindungen; Phasen und Zeitlimits
 verhindern einen hängenden CI-Prozess. Keine Änderung der Produktionsmigration oder
 Produkt-/Objektprüfungen für diese Testharnesskorrektur.
+## Gehostete fachliche Preview für PR #130 (25.10.2026)
+
+Der manuelle Preview-Workflow erhält `isolated_pr130=true`. Diese Option ist
+an `codex/event-type-permissions` gebunden; dieser Branch darf umgekehrt nicht
+mit der gemeinsamen Preview-Datenbank deployt werden. Identitätsprüfung,
+exakte erfolgreiche Push-CI, Medienprüfung und Git-SHA-Prüfung bleiben aktiv.
+Die externe Preview-Freigabeliste und Environment-Branchpolicy werden um genau
+diesen Branch ergänzt; bestehende Regeln bleiben erhalten.
+
+Ziel ist die neue Datenbank `pr130_review_20261025` auf dem vorhandenen
+Nonproduction-Endpoint `ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech`,
+mit eigenem Login `pr130_review`. Das ist eine bewusste Ausnahme zur gemeinsamen
+Preview-DB auf wispy-bird. Keine Datenkopie aus Production. Nur synthetische
+Benutzer und Prüfreihen. `DATABASE_URL` und ein eigener `AUTH_SECRET` sind
+Vercel-seitig ausschließlich für diesen Preview-Branch hinterlegt. Der
+Workflow verwendet das separate Environment-Secret `PR130_DATABASE_URL`.
+Medien werden weiterhin aus der bestehenden Nonprod-Konfiguration geerbt;
+die Datenbankisolation bedeutet keine eigene Blob-Store-Isolation.
+
+Beim Neuaufbau zeigte sich ein bestehendes Baselineproblem: `0_init` enthält
+ein BOM und bereits die fünf Spalten der folgenden Draft-Migration. Nur in der
+neuen leeren Review-Datenbank wurde `0_init` ohne BOM ausgeführt und per
+`migrate resolve --applied` dokumentiert. Die bereits vorhandenen fünf Spalten
+wurden geprüft und die nachfolgende Draft-Migration entsprechend als angewandt
+aufgelöst. Fehlversuche bleiben in der Historie erhalten. Alle übrigen
+Migrationen einschließlich Eventartrechten liefen regulär mit `migrate deploy`;
+anschließender Status: aktuell. Historische Migrationsdateien, bestehende
+Datenbanken und deren Migrationshistorien bleiben unverändert.
+
+Admin-Matrix: `/admin/users`; Produktfreischaltungen: `/admin/eventreihen`.
+Zugangsdaten werden ausschließlich direkt an den Auftraggeber übermittelt,
+nicht im Repository oder PR veröffentlicht. Kein Merge und kein Production-
+Deployment im Rahmen dieser Bereitstellung.

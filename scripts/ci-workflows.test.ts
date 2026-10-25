@@ -193,3 +193,12 @@ test("Vercel Git deployments are disabled for every branch", () => {
 test("Vercel functions run next to the eu-central database", () => {
   assert.deepEqual(vercelConfiguration.regions, ["fra1"]);
 });
+
+
+test("PR130 review deployment requires its explicit isolated target and exact branch", () => {
+  assert.ok(preview.includes("github.ref != 'refs/heads/codex/event-type-permissions' || inputs.isolated_pr130"));
+  assert.ok(preview.includes("!inputs.isolated_pr130 || github.ref == 'refs/heads/codex/event-type-permissions'"));
+  assert.ok(preview.includes("inputs.isolated_pr130 && secrets.PR130_DATABASE_URL"));
+  assert.ok(preview.includes("inputs.isolated_pr130 && 'pr130_review_20261025'"));
+  assert.ok(preview.includes("inputs.isolated_pr130 && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech'"));
+});
