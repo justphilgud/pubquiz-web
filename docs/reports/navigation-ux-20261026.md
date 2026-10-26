@@ -48,9 +48,11 @@ A = Admin; M = Eventmanager der passenden freigeschalteten Quiz-Reihe; E = Reihe
 | Kategorien | `/admin/kategorien` | Quizkatalog / Vorschläge | Quiz | `requireAdmin` | Administration → Quiz-Redaktion |
 | Live-Textersetzungen | `/admin/live-text-replacements` | Bestehende Ersetzungsregeln öffentlicher Texte | Global gepflegt, Quiz/Live | Page `requireAdmin`; fehlt im neuen Adminmenü | Administration → Quiz-Redaktion |
 | Monitoring / Styleguide / Template-QA | `/admin/monitoring`, `/admin/styleguide`, `/templates/{presentation-quality,storybook-experience}` | Betrieb, UI-/Darstellungsprüfung | Betrieb bzw. Quiz-Designwerkzeug | Monitoring `requireAdmin`; Styleguide-Page ohne gleichartige explizite Prüfung, Route authentifiziert. Hier keine neue Sicherheitsbewertung behauptet | Administration → Betrieb & Werkzeuge |
-| Konto / Hilfe | Benutzermenü; `/settings`, `/profil/passwort`, `/hilfe` | Persönliche Einstellungen, Passwort, Hilfe | Gemeinsam | Eigenes angemeldetes Konto, jeweilige Actions | Feste Kontoposition |
+| Konto / Hilfe | Benutzermenü; `/profil/passwort`, `/hilfe`; zusätzlich Menülink `/settings` | Kontoanzeige, Passwort, Hilfe belegt. Für `/settings` fehlt eine Page/Weiterleitung im untersuchten Code: kein belegter Einstellungseditor | Gemeinsam | Eigenes angemeldetes Konto, jeweilige Actions; `/settings` nur als Codebefund erfasst, hier nicht im Browser geöffnet | Feste Kontoposition; keinen nicht vorhandenen Editor einplanen |
 | Kalender / Fragen einreichen | `/kalender`, Abo/Download, `/frage-einreichen` | Öffentliche Angebote | Kalender aktuell Quiztermine | `proxy.ts` Public Paths und eigene Route-/Actionregeln | Öffentliche Einstiege erhalten |
 | Bingo / Karaoke | Workspace `bingo/karaoke` | Nur „Noch nicht verfügbar“ | Reihenprodukt + Rolle, kein Spiel | `getWorkspaceChoices`, `hasEventTypeAccess`; Karaoke M/A | Feste Formatposition für Berechtigte, keine Spielaktionen |
+
+Ein zusätzlicher **Codebefund**: Das Benutzermenü verlinkt `/settings`, im untersuchten App-Routenbestand und den Next-Weiterleitungen existiert dafür kein Ziel. Das wird nicht als vorhandene gemeinsame Einstellungsfunktion gezählt und in diesem Analysepaket nicht korrigiert. Ein Browser-404-Test dieses Links wurde hier nicht durchgeführt.
 
 ### Belege
 
@@ -97,7 +99,7 @@ Quizveranstaltungen: Bestandsliste + Suche/Status + Reihenfilter + Quiz anlegen
 Quizdetails:         Quiz / Quizveranstaltungen / Quizname; Reihe als Objektmetadatum
 Eventreihen:         Liste → Stammdaten & Logo / Eventarten / Quiz-Vorgaben
 Administration:      Benutzer & Rechte / Quiz-Redaktion / Betrieb & Werkzeuge
-Konto:               persönliche Einstellungen / Passwort / Hilfe / Abmelden
+Konto:               Kontoanzeige / Passwort / Hilfe / Abmelden
 ```
 
 Die Quiz-Unterauswahl ist **eine** kompakte lokale Leiste oder ein Dropdown desselben Katalogs, nicht beides gleichzeitig dauerhaft. Die Entwürfe zeigen lokal die Leiste, mobil „Quizbereich“ mit denselben Zielen. Keine neue Hauptkategorie Content neben Quiz.
@@ -199,6 +201,6 @@ Heuristisches Ergebnis: Frage und Story liegen am gleichen erwartbaren Ort. Best
 
 Ausschließlich dieser Bericht, statische SVG-/HTML-Entwürfe und synthetische Beobachtungsscreenshots unter `docs/reports/navigation-ux-20261026/`. Keine Anwendung, Migration, Abhängigkeit, Einstellung, Benutzerberechtigung oder Quizsession verändert. Gehostete Anwendungs-Preview bleibt `62481160`.
 
-Asset-/Quelllinks und SVG/XML werden geprüft, Entwürfe im Browser gerendert und Anwendungsdiffs auf Unverändertheit kontrolliert. Typecheck/ESLint/Build werden für reine Dokumentation/SVG nicht unnötig wiederholt. Die erfolgreiche technische Prüfung des analysierten Heads bleibt erhalten, ersetzt aber **keine fachliche UX-Abnahme**.
+Prüfergebnis: **74 relative Asset-/Quelllinks gültig, 13 SVGs gültiges XML, alle 13 im Browser gerendert, keine Texte außerhalb der SVG-Zeichenflächen.** Die fünf Laptopansichten wurden zusätzlich visuell verglichen, die mobile Inhaltsansicht und der reale mobile Reihenwähler gesondert angesehen. Anwendungsdiff gegenüber `62481160`: unverändert. Typecheck/ESLint/Build werden für reine Dokumentation/SVG nicht unnötig wiederholt. Die erfolgreiche technische Prüfung des analysierten Heads bleibt erhalten, ersetzt aber **keine fachliche UX-Abnahme**.
 
 PR #131 bleibt offen, nicht gemergt und fachlich nicht abgenommen. Kein Production-Deployment. Der ältere technische Abnahmebericht bleibt historisch erhalten; dieser Bericht ergänzt die UX-Bewertung, ohne Beobachtungen rückwirkend umzudeuten. Historischer PRIVATE_READBACK_FAILED-Befund und echter Wochenlauf sind separate Betriebspunkte.
