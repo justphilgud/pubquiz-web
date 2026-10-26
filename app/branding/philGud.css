@@ -60,3 +60,6 @@
 
 /* Brand login remains an explicit high-contrast CTA on its black card. */
 [data-admin-ui="phil-gud"] [data-auth-appearance="brand"] [data-ui-variant="primary"] { background-color: #f0fc16; color: #171717; }
+
+/* A long one-line team heading must not enlarge the implicit grid column. */
+[data-admin-ui="phil-gud"] [aria-label="Teamliste"] > article { min-width: 0; }
