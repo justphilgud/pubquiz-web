@@ -20,6 +20,7 @@ type Tab = "verwaltung" | "schnellquiz";
 export default function QuizWorkspace({
   environmentPrefix,
   workspaceSeriesName,
+  workspaceSeriesId,
   quizze,
   kategorien,
   eventSeries,
@@ -31,6 +32,7 @@ export default function QuizWorkspace({
 }: {
   environmentPrefix: BlobEnvironmentPrefix;
   workspaceSeriesName?: string;
+  workspaceSeriesId?: number;
   quizze: QuizResult[];
   kategorien: Kategorie[];
   eventSeries: EventSeriesOption[];
@@ -53,11 +55,11 @@ export default function QuizWorkspace({
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
-              {workspaceSeriesName ? "Quizveranstaltungen" : "Alle Quizze"}
+              Quizze
             </h1>
 
             <p className="mt-2 text-slate-600">
-              {workspaceSeriesName ? `Quizveranstaltungen der Eventreihe ${workspaceSeriesName}.` : "Verwalte alle Quizze über sämtliche Eventreihen hinweg oder erstelle ein Schnellquiz."}
+              {workspaceSeriesName ? `Quizze der Eventreihe ${workspaceSeriesName}.` : "Verwalte alle Quizze über sämtliche Eventreihen hinweg oder erstelle ein Schnellquiz."}
             </p>
           </div>
 
@@ -89,6 +91,7 @@ export default function QuizWorkspace({
         <div className={activeTab === "verwaltung" ? "block" : "hidden"}>
           <QuizForm
             environmentPrefix={environmentPrefix}
+            workspaceSeriesId={workspaceSeriesId}
             quizze={quizze}
             eventSeries={eventSeries}
             initialEventSeriesId={initialEventSeriesId}

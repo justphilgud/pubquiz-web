@@ -1,4 +1,5 @@
 "use client";
+import EventSeriesPicker from "@/app/workspaces/EventSeriesPicker";
 
 import { useMemo, useState } from "react";
 import { getStoryElementTypeLabel, STORY_ELEMENT_TYPES } from "@/app/story-elemente/storyElement";
@@ -66,7 +67,7 @@ export default function ContentFilters({ filters, categories, eventSeries, templ
           {(filters.contentType === "STORY_ELEMENT" || filters.contentType === "ALL") && <label><span className="mb-1 block text-xs font-bold text-slate-600">Story-Typ</span><select value={filters.storyType} onChange={(event) => onChange({ ...filters, storyType: event.target.value })} className={inputClass}><option value="ALL">Alle Story-Typen</option>{STORY_ELEMENT_TYPES.map((type) => <option key={type} value={type}>{getStoryElementTypeLabel(type)}</option>)}</select></label>}
           <label><span className="mb-1 block text-xs font-bold text-slate-600">Medien</span><select value={filters.media} onChange={(event) => onChange({ ...filters, media: event.target.value as ContentFiltersState["media"] })} className={inputClass}><option value="ALL">Alle</option><option value="WITH">Mit Medien</option><option value="WITHOUT">Ohne Medien</option></select></label>
           <label><span className="mb-1 block text-xs font-bold text-slate-600">Quiz-Verwendung</span><select value={filters.usage} onChange={(event) => onChange({ ...filters, usage: event.target.value as ContentFiltersState["usage"] })} className={inputClass}><option value="ALL">Alle</option><option value="USED">Verwendet</option><option value="UNUSED">Unbenutzt</option></select></label>
-          {eventSeries.length > 1 && <label><span className="mb-1 block text-xs font-bold text-slate-600">Eventreihe</span><select value={filters.eventSeriesId ?? ""} onChange={(event) => onChange({ ...filters, eventSeriesId: Number(event.target.value) || null })} className={inputClass}><option value="">Alle Eventreihen</option>{eventSeries.map((series) => <option key={series.id} value={series.id}>{series.name}</option>)}</select></label>}
+          {eventSeries.length > 1 && <EventSeriesPicker options={eventSeries} value={filters.eventSeriesId} onChange={id => onChange({ ...filters, eventSeriesId: id })} />}
           <button type="button" onClick={onApply} className="min-h-11 self-end rounded-xl border border-slate-300 bg-white px-4 font-semibold xl:col-start-5">Filter anwenden</button>
         </div>
       </ContentSearchControls>

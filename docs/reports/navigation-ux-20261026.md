@@ -1,5 +1,7 @@
 # Navigation PR #131: UX-Analyse und Entscheidungsentwurf
 
+> **Historisch / fachlich überholt:** Die nachfolgende damalige Umsetzung bzw. Empfehlung wurde durch den neuen Auftrag vom 26.10.2026 ersetzt. Verbindlich sind die Hauptpunkte Quiz · Bingo · PowerPoint-Karaoke · Teams · Templates · Eventreihen · Administration. Teams und Templates stehen auf der Hauptebene. Siehe [aktuelle Architektur](../architecture/multi-event-navigation.md). Dieser Bericht ist keine Freigabe der früheren Navigation.
+
 Stand: 26.10.2026. **Analyse, keine erneute Implementierung. Fachliche Abnahme steht aus.** Analysierter Anwendungshead: `62481160f43c3f8bbaf40329795523bff39df3e7`; Main-Grundlage `669700e9d1668ce74345dfcc259d8aff37b2c644`. [PR #131](https://github.com/justphilgud/pubquiz-web/pull/131).
 
 ## Empfehlung

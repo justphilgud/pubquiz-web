@@ -203,3 +203,8 @@ export function serializeContentFilters(filters: ContentFiltersState) {
   if (filters.eventSeriesId !== null) params.set("eventSeriesId", String(filters.eventSeriesId));
   return params;
 }
+
+/** A completed page belongs to exactly one applied URL/refresh context. */
+export function visibleContentSearchResult(result: ContentSearchResult, completedContext: string, currentContext: string): ContentSearchResult {
+  return completedContext === currentContext ? result : { items: [], total: 0 };
+}

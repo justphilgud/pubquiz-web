@@ -1,3 +1,4 @@
+import { EventSeriesFormField } from "@/app/workspaces/EventSeriesPicker";
 import Link from "next/link";
 import { loadTeamManagementPage, requireTeamManagementActor, type TeamListStatus } from "@/app/teams/teamManagement.server";
 
@@ -22,15 +23,17 @@ export default async function TeamManagementPage({
   const status: TeamListStatus = rawStatus === "ARCHIVED" || rawStatus === "ALL" ? rawStatus : "ACTIVE";
   const rawSeriesId = workspaceSeriesId ?? Number(first(params.eventSeriesId));
   const eventSeriesId = Number.isInteger(rawSeriesId) && rawSeriesId > 0 ? rawSeriesId : null;
+  const listParams = new URLSearchParams({ ...(query ? { q: query } : {}), status, ...(eventSeriesId ? { eventSeriesId: String(eventSeriesId) } : {}) });
+  const returnTo = workspaceSeriesId === undefined ? `/admin/teams?${listParams}` : `/workspaces/${workspaceSeriesId}/quiz/teams?${listParams}`;
   const data = await loadTeamManagementPage({ actor, query, status, eventSeriesId });
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-900 sm:px-6">
       <div className="mx-auto max-w-6xl">
         <div>
-          <h1 className="text-3xl font-bold">Teamverwaltung</h1>
+          <h1 className="text-3xl font-bold">Teams</h1>
           <p className="mt-2 max-w-3xl text-slate-600">
-            Globale Teams schnell finden, Zugangswörter unterstützen und Teilnahmen im erlaubten Eventreihen-Scope einsehen.
+            Gemeinsame Teamidentitäten finden und erlaubte Quizteilnahmen einsehen. Profil und Zugangswort gelten unabhängig von Eventreihe und Eventart. Weitere Spielteilnahmen sind noch nicht implementiert.
           </p>
         </div>
 
@@ -58,15 +61,7 @@ export default async function TeamManagementPage({
               <option value="ALL">Alle</option>
             </select>
           </label>
-          <label>
-            <span className="mb-1 block text-xs font-semibold">Eventreihe</span>
-            <select name="eventSeriesId" defaultValue={eventSeriesId ?? ""} className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2">
-              {workspaceSeriesId === undefined && <option value="">Alle erlaubten Reihen</option>}
-              {data.eventSeries.filter(series => workspaceSeriesId === undefined || series.id === workspaceSeriesId).map((series) => (
-                <option key={series.id} value={series.id}>{series.name}{series.isArchived ? " (archiviert)" : ""}</option>
-              ))}
-            </select>
-          </label>
+          {workspaceSeriesId === undefined && <EventSeriesFormField key={eventSeriesId ?? "all"} options={data.eventSeries} initialValue={eventSeriesId} name="eventSeriesId" />}
           <button type="submit" className="min-h-11 self-end rounded-xl bg-slate-900 px-5 py-2 font-semibold text-white hover:bg-slate-800">Filtern</button>
         </form>
 
@@ -90,7 +85,7 @@ export default async function TeamManagementPage({
                     {team.eventSeries.length > 0 ? team.eventSeries.map((series) => series.name).join(" · ") : "Noch keiner Eventreihe zugeordnet"}
                   </p>
                 </div>
-                <Link href={`/admin/teams/${team.id}`} className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl border border-slate-300 px-4 py-2 font-semibold hover:bg-slate-50">
+                <Link href={`/admin/teams/${team.id}?returnTo=${encodeURIComponent(returnTo)}`} className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-xl border border-slate-300 px-4 py-2 font-semibold hover:bg-slate-50">
                   Team öffnen
                 </Link>
               </div>

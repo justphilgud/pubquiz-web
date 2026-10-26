@@ -1,48 +1,61 @@
-# Verwaltung nach Eventreihe und Eventart
+# Gemeinsame Verwaltung und stabile Navigation
 
-Stand: 25.10.2026. Navigationspaket auf Grundlage von Main/PR130, ohne Schemaänderung.
+Stand: 26.10.2026. Verbindliche fachliche Überarbeitung von PR #131. Die frühere Reihenhierarchie und die Empfehlungen „Teambestand/Präsentationstemplates unter Quiz“ sind durch die neue Entscheidung ersetzt. Kein neues Berechtigungsmodell, keine Migration, kein Merge oder Production-Deployment.
 
-## Verantwortung und Routen
+## Struktur und Verantwortung
 
-`app/workspaces/workspacePolicy.ts` bildet aus bestehenden Rollen- und Produktprüfungen den Navigationskatalog. `workspace.server.ts` liest ausschließlich aktuelle Zuordnungen des aktiven Benutzers und freigeschaltete Produkte. Die Navigation erteilt keine Objektberechtigung. Bestehende Actions und Objekt-Guards bleiben maßgeblich.
+Die feste Reihenfolge lautet **Quiz · Bingo · PowerPoint-Karaoke · Teams · Templates · Eventreihen · Administration**. Quiz hat genau ein Dropdown mit **Inhalte** und **Quizze**. Es gibt keine zweite dauerhafte Quiz-Unterleiste. Auf kleinen Bildschirmen enthält die kompakte Hauptnavigation dieselben berechtigten Einträge in derselben Reihenfolge. Konto bleibt separat.
 
-Der kanonische Reihenarbeitsbereich lautet `/workspaces/{id}/{quiz|bingo|karaoke}/{Bereich}`. Quizbereiche sind `content`, `questions`, `stories`, `polls`, `events` und `teams`. `/workspaces/{id}/settings` öffnet die erlaubte gemeinsame Reihenverwaltung. Die wiederverwendbaren Seitenkörper liegen außerhalb der Next-Seiteneinstiege; alte Routen rendern weiterhin dieselben Komponenten.
+- `workspacePolicy.ts:getNavigationCapabilities` bildet den Katalog aus bestehenden Policies und allen aktuell erlaubten Reihen. Der Seitenpfad bestimmt nur den Aktivmarker, keine zusätzlichen Rechte. Ein Reihenfilter verändert die Hauptpunkte nicht.
+- `workspace.server.ts:loadWorkspaceNavigation` liest den aktuellen Actor und Produktkatalog pro Request; keine gespeicherte letzte Auswahl überschreibt URLs. Der Header braucht keinen asynchronen Objektbesitz-Readback mehr. Tatsächlicher Besitz bleibt in den vorhandenen Objektseiten/Metadaten sichtbar.
+- `WorkspaceNavigation` und `NavigationDropdown` verantworten Reihenfolge, Aktivmarker, Dropdown-/Mobilzustand und Fokus. `AppHeader` behält Authentifizierung, Konto und vorhandene Abmeldung. Keine neue Sessionlogik.
+- `EventSeriesPicker` ist ein beschrifteter durchsuchbarer Auswahlbaustein mit begrenzter Ergebnisliste. Er verändert entweder einen lokalen Filterentwurf oder öffnet einen echten Sammlungslink. Er schreibt keine Objektzuordnungen und entscheidet keine Rechte.
+- Bestehende Sammlungen, Formulare, Actions, Repositories und Objektprüfungen bleiben für Datenzugriff und Fachregeln verantwortlich.
 
-Die Reihe kommt aus dem URL-Pfad, nicht aus lokalem Speicher. Ein Wechsel übernimmt nur einen ausdrücklich erlaubten Sammlungsbereich, niemals eine Objekt-ID, einen Entwurf oder Suchparameter der vorherigen Reihe. Ohne passenden Bereich wird eine gültige Startseite gewählt. Feste Inhalts-Unterbereiche binden auch den Inhaltstyp; Queryfilter können Reihe und Typ nicht überschreiben. Filter zurücksetzen erhält den Reihen-Kontext. Inhaltssuchen werden beim Reihen-/Bereichswechsel neu gemountet; bestehende Generation-Guards verwerfen verspätete Suchantworten.
+## Rechte und Verfügbarkeit
 
-Alte Objektlinks bleiben gültig. Ihr sichtbarer Kontext wird aus der tatsächlichen Datenbankzuordnung aufgelöst; weder `returnTo` noch Präferenzen sind dafür vertrauenswürdig. Nur tatsächliche Objektseiten starten diese Auflösung; Startseite, Sammlungen, Workspaces und öffentliche Liveansichten verursachen keine zusätzliche Hintergrund-Action. Die Auflösung zeigt nur Reihen aus dem aktuellen berechtigten Katalog. Globale und mehrfach zugeordnete Inhalte werden entsprechend beschriftet. Während der asynchronen Auflösung erscheint ein neutraler Prüfstatus, keine behauptete globale Zuordnung. Veraltete Antworten einer früheren URL werden ignoriert.
+Inhalte folgen der bestehenden Quiz-Redaktionspolicy; Quizze der bestehenden Manager-/Adminberechtigung. Globaler Quiz-Editor erhält seine bisherige Bibliothek, keine neuen Reihen-/Managerrechte. Bingo und Karaoke werden aus dem gesamten zulässigen Katalog angeboten, nicht nur aus der aktuellen Reihe. Admin erhält einen globalen Produkteinstieg; das aktiviert kein Reihenprodukt. Die konkrete Workspace-URL prüft weiterhin Freischaltung und Rolle. Karaoke bietet Editoren keine Funktion.
 
-## Menü und Rechte
+Teams verwendet ausdrücklich `canAccessTeamManagement` aus der bestehenden Team-Policy. Eine reine Bingo-Rolle gewährt dadurch **keinen** Zugriff auf vorhandene Quizteams. Templates bleibt Admin-only. Eventreihen ist für die nach heutigen Regeln sichtbaren Reihen erreichbar, Bearbeitung nur mit vorhandener eigener Verwaltungsfreigabe oder als Admin. Reine Reihenverwaltung braucht keine Spielrolle. Administration bleibt Admin-only; Produkte werden in der Reihe, Benutzerzuordnungen beim Benutzer gepflegt.
 
-- Suchbare Eventreihe, darunter beziehungsweise daneben deren freigeschaltete und berechtigte Eventarten. Bei einer einzigen Reihe gibt es einen direkten Link statt eines Auswahlmenüs.
-- Quiz: Inhalte mit Fragen, Story-Elementen und Umfragen; für Eventmanager zusätzlich Quizveranstaltungen und Teams.
-- Reiheneinstellungen sind an das eigenständige Verwaltungsrecht gebunden; allein dieses Recht genügt auch ohne Spielrolle oder Produktfreischaltung.
-- „Reihenübergreifend“ öffnet die bestehende erlaubte Inhaltsbibliothek. Dies ist keine künstliche Datenbankreihe und kein zusätzliches globales Schreibrecht. Freigegebene globale Fragen bleiben hier entsprechend bestehender Regeln erreichbar.
-- Administration ist globalen Administratoren vorbehalten und enthält Eventreihen, Benutzer, Quiz-Präsentationstemplates, globale Teams, Kategorien, Fragenvorlagen, externe Fragen und Monitoring.
-- Globale Quiz-Editoren erhalten ihre bisherige Bibliothek, aber keine Reihen-, Bingo-, Karaoke- oder Administrationsrechte ohne gesonderte bestehende Zuweisung.
-- Bingo und PowerPoint-Karaoke zeigen ausschließlich „Noch nicht verfügbar“. Für Karaoke-Editoren wird weder ein Menüeintrag noch eine Oberfläche angeboten.
+Entzogene Rechte/deaktivierte Produkte werden bei neuen Requests aus den vorhandenen serverseitigen Policies übernommen. Verbotene Direktlinks werden abgewiesen; sichtbare Links ersetzen keine Objektkontrolle. Keine stillen Ersatzrollen oder Freischaltungen.
 
-Die bestehenden Produkt- und Rollenprüfungen werden wiederverwendet. Eine Produktfreischaltung allein erteilt keinem Benutzer eine Rolle; eine Rolle allein schaltet kein Produkt frei. Ein nicht mehr berechtigter Direktaufruf oder ein deaktiviertes Produkt führt im Workspace zu 404. Auch Administratoren sehen dort nur tatsächlich freigeschaltete Produkte; ihre bestehenden globalen Verwaltungsrechte bleiben erhalten.
+## Lokaler Filter, Zuordnung und kompatible Routen
 
-## Formulare und Bedienung
+Die Haupteinstiege `/content`, `/quiz`, `/admin/teams`, `/templates`, `/admin/eventreihen` und bestehende Adminseiten bleiben erhalten. `/bingo` und `/karaoke` sind ausschließlich vorbereitete Übersichtsseiten. Dort stehen keine Spielaktionen bereit.
 
-Kontextziele sind echte Links, damit der bestehende Änderungswarnschutz des Frageneditors greift. Story-, Umfrage- und Quiz-Erstellungsformulare verwenden denselben Bestätigungsgrundsatz über einen kleinen gemeinsamen Navigationshook: Abbruch erhält den Entwurf; nur erfolgreiche Speicherung erlaubt die anschließende automatische Navigation. Mehrere gleichzeitig montierte Quizformulare lösen pro Klick höchstens eine gemeinsame Warnung aus. Es gibt keinen neuen Autosave und keine Änderung an Live-Drafts oder Teamformularen.
+Sammlungen öffnen den erlaubten Gesamtbestand. Die lokale Reihenauswahl ist durchsuchbar und unterstützt lange Namen sowie 100+ Einträge. Inhalte verwenden ihren bisherigen URL-/Anwenden-Vertrag, Teams den vorhandenen GET-Filter. Quizlisten verwenden `series` für den Listenfilter und `status` für den Status, getrennt vom alten `eventreiheId` zur Vorbelegung eines neuen Quiz. Eine Anlegezuordnung bleibt im Formular ausdrücklich erforderlich und wird wie bisher serverseitig validiert.
 
-Auswahlmenüs verwenden beschriftete Buttons, eine Suchbox und fokussierbare Links. Tab navigiert zu Treffern, Escape schließt und stellt den Triggerfokus wieder her; Außenklick schließt ebenfalls. Die Menühöhe ist begrenzt und scrollt intern. Es gibt keine persistierte letzte Auswahl, die einen Direktlink überschreiben könnte. Lokale Loopback-Testhosts sind ausschließlich für die sechs getrennten Browser-Testkonten als Development-Origins zugelassen.
+Workspace-Direktlinks bleiben kompatibel. Ihr Pfad bindet die Reihe und den festen Inhaltstyp serverseitig/bei der Suche. Der lokale Reihenwechsel führt wieder in denselben Sammlungsbereich. `workspaceCollectionHref` nimmt nur bekannte Suchfilter mit, keine alten Objekt-, Entwurfs- oder Rücksprung-IDs. „Alle erlaubten Reihen“ öffnet die entsprechende Gesamtbibliothek; Story-Auswahl bleibt Story-Auswahl, sie springt nicht zu Quizzen.
 
-## Gestaltung und künftige Erweiterung
+`quizCollectionReturnHref` erhält einen validierten Rückweg zur Quizliste samt Filtern. Ohne Herkunft wird die tatsächliche Quizreihe als Filter verwendet. Externe Ziele, fremde Workspace-Reihen und Objektziele werden verworfen. Teamprofile können über `teamCollectionReturnHref` zur Ausgangssammlung zurückkehren. Berechtigungen des Rückziels werden dort normal geprüft.
 
-Die bisherigen Präsentationstemplates sind global verwaltete Quiz-Darstellungswelten einschließlich ihrer bestehenden Renderingverträge. Sie werden ausdrücklich als Quiz-Präsentationstemplates eingeordnet. Das Reihenlogo und allgemeine Stammdaten gehören zur gemeinsamen Reihe; vorhandene Präsentations-/Antworttemplate-Standards gelten weiterhin für Quiz.
+Die Inhaltsliste bindet ein Suchergebnis an seinen abgeschlossenen URL-/Refresh-Kontext. Solange ein neuer Kontext noch lädt, werden die alten Treffer und Cursor nicht angezeigt/bedient. Eine Generation verhindert zusätzlich, dass verspätete Antworten einen neueren Suchstand überschreiben. Das behebt den in der Browserabnahme beobachteten kurzzeitigen alten Trefferstand.
 
-Gemeinsames Branding mehrerer Formate erfordert später einen ausdrücklich vereinbarten gemeinsamen Brandingvertrag, den formatspezifische Renderer konsumieren. Dieses Paket konvertiert keine Templates und erfindet keine Bingo-/Karaoke-Einstellungen. Der Workspace ist ein Arbeitskontext; er erweitert das Veranstaltungsdatenmodell nicht um eine dauerhafte Festlegung auf genau eine Eventart. Gemischte Veranstaltungen bleiben ein gesondertes Vorhaben.
+Es gibt keine neue Filterpräferenz in Storage. Vorhandenes Scroll-/Fokus-Resume bleibt an die konkrete URL gebunden. Haupt-/Kontextziele sind echte Links, damit die bestehenden Dirty-Guards greifen. Keine neuen Live-Drafts, kein Autosavevertrag. Escape schließt das nächste Dropdown und stellt dessen Fokus wieder her; außerhalb schließt die bestehende Popoverlogik.
 
-## Preview und Betrieb
+## Teams: gemeinsame Identität, getrennte Teilnahme
 
-Die Preview nutzt ausschließlich die vorhandene synthetische Datenbank `pr130_review_20261025` auf dem Development-Host `ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech`. Die neue Navigation verwendet einen eigenen eingeschränkten Runtime-Datenbanklogin ohne Schema-Erstellungsrecht. Der bestehende Migrationsschritt verwendet getrennt davon den bereits vorhandenen Schemaeigentümer derselben isolierten Datenbank; der Runtime-Zugang wird zusätzlich auf seine Datenbankidentität geprüft. Ein Leseversuch dieses Logins auf Development-Bestandsdaten wurde abgewiesen. Vorhandene synthetische PR130-Fixtures und alle 61 erfolgreich angewandten Migrationen sowie die zwei historischen zurückgerollten Fehlerläufe bleiben erhalten; keine Production-Daten werden kopiert.
+`teams` bleibt eine globale wiederverwendbare Identität ohne direkte Eventreihen-Fremdschlüssel: Name, Passwort, Foto/Avatar und Archivzustand. `quiz_team_sessions` und `quiz_teams` behalten konkrete Quizteilnahme, Antworten und Ergebnisse. Profil/Passwortänderungen wirken global und werden entsprechend beschriftet.
 
-`isolated_navigation` in `deploy-preview.yml` ist auf exakt `codex/multi-event-navigation` gebunden. Ohne diesen Schalter kann der Branch keine Preview auf dem geteilten Standardziel bereitstellen. Exakter erfolgreicher Push-CI-Head, menschlich freigegebene Branch-Allowlist und Environment-Policy sowie zentrale Medien- und Datenbankidentitätsprüfungen bleiben erforderlich. Die menschliche Freigabe dieses Branches wurde im Auftrag ausdrücklich erteilt. Secrets liegen ausschließlich geschützt bei GitHub/Vercel; der Quellcode enthält keine Zugangsdaten.
+Der Hauptpunkt **Teams** ist ein gemeinsamer Einstieg, kein neuer gemeinsamer Autorisierungsvertrag. Sichtbare Teilnahmehistorie, M-Scope und Admin-Lifecycle bleiben unverändert. Am konkreten Quiz bleiben Moderation und Auswertung mit Teilnahmeinformationen erreichbar. Dieses Paket baut keinen zusätzlichen Teilnehmermanager und keine Bingo-/Karaoke-Teilnahmelogik. Spätere Formate können die Identität weiterverwenden, benötigen dafür eigene ausdrücklich definierte Teilnahme-/Auswertungsverträge.
 
-Kein Merge und kein Production-Deployment sind Bestandteil dieses Auftrags. Bingo/Karaoke sind nicht spielbar. Historischer Backup-Readback-Fehler und echter Wochenlauf bleiben unveränderte separate Betriebspunkte.
+## Templates und gemeinsames Erscheinungsbild
 
+Drei Dinge bleiben fachlich getrennt:
 
-Der erste Navigation-Previewlauf wurde vor der Bereitstellung am Prisma-Migrationsschritt gestoppt: Der neue DML-Runtime-Login war versehentlich auch für `migrate deploy` eingesetzt. Leserechte auf die vorhandene Migrationstabelle genügen diesem Initialisierungsschritt nicht. Die Konfiguration verwendet deshalb den vorhandenen isolierten Migrationseigentümer, statt Runtime-Rechte zu erweitern, Migrationen zu überspringen oder bestehende Historie umzuschreiben. Lauf: https://github.com/justphilgud/pubquiz-web/actions/runs/40238354966. Der ursprüngliche Migrationsbestand umfasst 63 Zeilen (61 erfolgreich, zwei historisch zurückgerollt, kein offener Fehler).
+1. **Reihenbranding:** vorhandenes `eventreihen.logo_url`, Name/öffentlicher Name und Stammdaten. Das Logo ist ein gemeinsames Asset; heute konsumieren es die bestehenden Quizoberflächen.
+2. **Designvorlage:** vorhandene `PresentationTemplateConfig` enthält `BrandTokens`, semantische `design`-Bausteine und validierte Assets. Farben, Schriftdefinitionen, Logo-/Assetreferenzen, Abstände und Radien sind gemeinsame Gestaltungswerte und mögliche Grundlage eines künftigen gemeinsamen Grunddesigns. Bereits gemeinsam nutzbar heißt hier wiederverwendbare Daten/Assets; kein heute funktionierender Bingo-Renderer.
+3. **Formatspezifisches Layout/Verhalten:** `surfaces.presentation`, `moderation`, `answerForm`, Quiz-Templateauflösung und `ResolvedQuizTheme` sind derzeit Quizverträge. Varianten, Folien, Frage-/Lösungsdarstellung und Laufzeitlogik sind keine fertigen Bingo-/Karaokelayouts.
+
+Der Hauptpunkt **Templates** öffnet die bestehende Verwaltung mit ihren bisherigen Admin-, Versions-, Archiv- und Zuweisungsregeln. Keine neue Bingo-Designinsel, keine automatische Konvertierung, keine Rendereränderung. Die Reihenstandards bleiben vorhandene Quizvorgaben und werden nicht als universelles Mehrformat-Rendering verkauft.
+
+Das anschließende Renderingpaket muss einen versionierten gemeinsamen Grunddesignvertrag festlegen (Branding/Design-Tokens und Priorität Reihe → Designvorlage → konkretes Spiel), dazu formatbezogene Capability-/Layoutverträge und Adapter. Erst dann können Quiz und Bingo derselben Reihe denselben Grundentwurf konsumieren. Bestehende Quizvarianten müssen kompatibel bleiben, Validatoren und Tests jede tatsächlich unterstützte Oberfläche prüfen. Die neue Navigation nimmt keine Schema-/Rendererabkürzung vor, die eine Designvorlage dauerhaft auf genau eine Eventart festlegt.
+
+## Verifikation und Betrieb
+
+Gezielte Regressionen liegen in `workspacePolicy.test.ts` und `contentLibrary.test.ts`: Union der Berechtigungen, reine Verwaltung, Bingo-only ohne Quizteamzugriff, aktiver Bereich alter Objektlinks, aufgabengetreue Filterziele, sichere Rückwege und Zurückhalten alter Suchtreffer. Bestehende Team-/Content-/Header-/Mobiltests bleiben erhalten.
+
+Browserabnahme ausschließlich mit synthetischen Konten/Reihen in `pr130_review_20261025`. Die bestehende Preview-Branchfreigabe und alle CI-/Environment-/Medien-/Datenbankgates gelten unverändert. Runtime- und Migrationslogin bleiben getrennt. Keine neue Migration und keine Änderungen an Production, Antworten, Punkten oder laufenden Sessions. Die frühere Backup-Readback-Ursache und der echte Wochenlauf bleiben separate Betriebspunkte.
+
+Die ausführliche aktuelle Browser-/Deploymentabnahme wird im PR-Übergabebericht dokumentiert. Historische Berichte vom 25./26.10. sind ausdrücklich als überholt markiert, ihre damaligen Befunde werden nicht umgeschrieben.

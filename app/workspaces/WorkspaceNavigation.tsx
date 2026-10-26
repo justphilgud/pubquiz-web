@@ -1,64 +1,35 @@
 "use client";
-
-import GlobalAdministrationNavigation from "./GlobalAdministrationNavigation";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
-import { resolveWorkspaceObjectContext } from "./actions";
+import { useCallback, useState } from "react";
 import { useDismissiblePopover } from "@/app/components/useDismissiblePopover";
-import { EVENT_TYPES, type EventType } from "@/app/roles/eventTypes";
-import { needsWorkspaceObjectContext, searchWorkspaceChoices, workspaceHref, workspaceSwitchHref, workspaceTypePaths, type WorkspaceChoice } from "./workspacePolicy";
+import NavigationDropdown from "./NavigationDropdown";
+import { activeNavigationSection, type NavigationCapabilities } from "./workspacePolicy";
 
-export default function WorkspaceNavigation({ choices, canUseContent, admin }: { choices: WorkspaceChoice[]; canUseContent: boolean; admin: boolean }) {
+export default function WorkspaceNavigation({ capabilities }: { capabilities: NavigationCapabilities }) {
   const pathname = usePathname();
-  const needsObjectContext = needsWorkspaceObjectContext(pathname);
-  const [resolved, setResolved] = useState<Awaited<ReturnType<typeof resolveWorkspaceObjectContext>> | null>(null);
-  const legacyContext = resolved?.path === pathname ? resolved : null;
-  useEffect(() => {
-    let active = true;
-    if (needsObjectContext) resolveWorkspaceObjectContext(pathname).then(value => { if (active) setResolved(value); }).catch(() => { if (active) setResolved(null); });
-    return () => { active = false; };
-  }, [pathname, needsObjectContext]);
-  const match = /^\/workspaces\/(\d+)\/(quiz|bingo|karaoke|settings)(?:\/|$)/.exec(pathname);
-  const current = choices.find(choice => choice.id === (match ? Number(match[1]) : legacyContext?.seriesId));
-  const currentType = EVENT_TYPES.find(type => workspaceTypePaths[type.id] === match?.[2])?.id ?? (current && !match && !legacyContext?.settings && current.eventTypes.includes("QUIZ") ? "QUIZ" : undefined);
+  const active = activeNavigationSection(pathname);
   const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState("");
   const close = useCallback(() => setOpen(false), []);
   const { containerRef, triggerRef } = useDismissiblePopover({ open, onClose: close });
-  const linkClass = "flex min-h-11 min-w-0 items-center rounded-lg px-3 text-sm font-semibold hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600";
-  const waitingForObjectContext = needsObjectContext && !legacyContext;
-  const crossSeries = /^\/(content|fragen|story-elemente|quiz|admin\/teams)(\/|$)/.test(pathname);
-  function target(choice: WorkspaceChoice) {
-    const area = match?.[2] === "settings" || legacyContext?.settings ? "settings" : pathname.split("/")[4];
-    return workspaceSwitchHref(choice, currentType as EventType | undefined, area);
-  }
-  return <div className="space-y-1 text-slate-900">
-    <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-      <div ref={containerRef} className="relative min-w-0 max-w-full sm:max-w-80">
-        {choices.length > 1 ? <>
-          <button ref={triggerRef} type="button" aria-expanded={open} aria-controls="workspace-series-list" onClick={() => setOpen(value => !value)} className={`${linkClass} w-full border border-slate-300 text-left`}>
-            <span className="truncate">{current?.name ?? "Eventreihe auswählen"}</span><span className="ml-2 shrink-0" aria-hidden>▾</span>
-          </button>
-          {open && <div id="workspace-series-list" className="absolute left-0 top-full z-50 mt-1 w-80 max-w-[calc(100vw-2rem)] rounded-xl border border-slate-200 bg-white p-2 shadow-lg">
-            <label className="block text-xs font-semibold">Eventreihen durchsuchen<input autoFocus value={search} onChange={event => setSearch(event.target.value)} type="search" className="mt-1 min-h-11 w-full rounded-lg border border-slate-300 px-3 text-sm" /></label>
-            <ul className="mt-1 max-h-[min(18rem,45dvh)] overflow-y-auto" aria-label="Eventreihen">{searchWorkspaceChoices(choices, search).map(choice => <li key={choice.id}><Link href={target(choice)} onClick={close} aria-current={current?.id === choice.id ? "page" : undefined} className={`${linkClass} break-words`}>{choice.name}</Link></li>)}</ul>
-            {!searchWorkspaceChoices(choices, search).length && <p className="p-3 text-sm">Keine passende Eventreihe.</p>}
-          </div>}
-        </> : choices.length === 1 ? <Link className={`${linkClass} break-words`} href={target(choices[0])}>{choices[0].name}</Link> : null}
-      </div>
-      {current && <nav aria-label="Eventarten" className="flex min-w-0 flex-wrap">{current.eventTypes.map(type => <Link key={type} href={workspaceHref(current, type)} aria-current={currentType === type ? "page" : undefined} className={`${linkClass} ${currentType === type ? "bg-emerald-50 text-emerald-900" : ""}`}>{EVENT_TYPES.find(item => item.id === type)?.label}</Link>)}</nav>}
-
-    </div>
-    <div className="flex min-w-0 flex-wrap items-center gap-x-1">
-      {current && currentType === "QUIZ" && <nav aria-label="Arbeitsbereiche" className="flex flex-wrap text-sm">
-        <Link className={linkClass} href={`/workspaces/${current.id}/quiz/content`}>Inhalte</Link>
-        {current.canManageQuiz && <><Link className={linkClass} href={`/workspaces/${current.id}/quiz/events`}>Quizveranstaltungen</Link><Link className={linkClass} href={`/workspaces/${current.id}/quiz/teams`}>Teams</Link></>}
-      </nav>}
-      {current?.canManage && <Link href={`/workspaces/${current.id}/settings`} className={linkClass} aria-current={match?.[2] === "settings" ? "page" : undefined}>Reiheneinstellungen</Link>}
-      {canUseContent && <Link href="/content" className={linkClass} aria-label="Reihenübergreifende Inhalte" title="Reihenübergreifende Quiz-Inhalte">Reihenübergreifend</Link>}
-      {admin && <GlobalAdministrationNavigation className={linkClass} />}
-    </div>
-    {!current && <p className="px-3 text-xs text-slate-500">{waitingForObjectContext ? "Quiz · Kontext wird geprüft …" : legacyContext?.label ?? (crossSeries ? "Reihenübergreifend · Quiz" : pathname === "/" ? (choices.length ? "Arbeitsbereich auswählen" : canUseContent ? "Reihenübergreifend · Quiz" : "Keine freigeschalteten Arbeitsbereiche") : admin ? "Globale Verwaltung" : "Gemeinsame Verwaltung")}</p>}
+  const quizLinks = [...(capabilities.content ? [{ href: "/content", label: "Inhalte", active: active === "Quiz" && !/^\/(?:quiz|workspaces\/\d+\/quiz\/events)/.test(pathname) }] : []), ...(capabilities.quizzes ? [{ href: "/quiz", label: "Quizze", active: active === "Quiz" && /^\/(?:quiz|workspaces\/\d+\/quiz\/events)/.test(pathname) }] : [])];
+  const links = [
+    ...(capabilities.bingo ? [{ href: "/bingo", label: "Bingo" }] : []),
+    ...(capabilities.karaoke ? [{ href: "/karaoke", label: "PowerPoint-Karaoke" }] : []),
+    ...(capabilities.teams ? [{ href: "/admin/teams", label: "Teams" }] : []),
+    ...(capabilities.templates ? [{ href: "/templates", label: "Templates" }] : []),
+    ...(capabilities.series ? [{ href: "/admin/eventreihen", label: "Eventreihen" }] : []),
+  ];
+  const hasNavigation = quizLinks.length > 0 || links.length > 0 || capabilities.admin;
+  return <div ref={containerRef} className="min-w-0 text-slate-900">
+    {hasNavigation && <button ref={triggerRef} type="button" aria-label={open ? "Navigation schließen" : "Navigation öffnen"} aria-expanded={open} aria-controls="main-navigation" onClick={() => setOpen(value => !value)} className="flex min-h-11 w-full items-center justify-between rounded-lg border border-slate-300 px-3 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-emerald-600 md:hidden">{active ?? "Navigation"}<span aria-hidden>☰</span></button>}
+    <nav id="main-navigation" aria-label="Hauptnavigation" className={`${open ? "grid" : "hidden"} max-h-[65dvh] gap-1 overflow-y-auto py-1 md:flex md:max-h-none md:flex-wrap md:items-center md:overflow-visible md:py-0`}>
+      {quizLinks.length > 0 && <NavigationDropdown label="Quiz" links={quizLinks} active={active === "Quiz"} onNavigate={close} />}
+      {links.map(link => <Link key={link.href} href={link.href} onClick={close} aria-current={active === link.label ? "page" : undefined} className={`flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 ${active === link.label ? "bg-emerald-50 text-emerald-900" : "hover:bg-slate-100"}`}>{link.label}</Link>)}
+      {capabilities.admin && <NavigationDropdown label="Administration" active={active === "Administration"} onNavigate={close} links={[
+        { href: "/admin/users", label: "Benutzer und Rechte" }, { href: "/admin/kategorien", label: "Kategorien" }, { href: "/admin/fragenvorlagen", label: "Fragenvorlagen" }, { href: "/fragen/import", label: "Import und Export" }, { href: "/admin/question-import", label: "Externe Fragen" }, { href: "/admin/live-text-replacements", label: "Live-Textersetzungen" }, { href: "/admin/monitoring", label: "Monitoring" }, { href: "/admin/styleguide", label: "Styleguide" },
+      ]} />}
+    </nav>
+    {!quizLinks.length && !links.length && !capabilities.admin && <p className="mt-1 text-xs text-slate-600">Keine freigeschalteten Arbeitsbereiche</p>}
   </div>;
 }

@@ -7,7 +7,7 @@ import {
 import UserMenu from "@/app/components/UserMenu";
 import WorkspaceNavigation from "@/app/workspaces/WorkspaceNavigation";
 import { loadWorkspaceNavigation } from "@/app/workspaces/workspace.server";
-import { canAccessCrossSeriesContent } from "@/app/workspaces/workspacePolicy";
+import { getNavigationCapabilities } from "@/app/workspaces/workspacePolicy";
 
 import { getActorForSession } from "@/app/roles/roleAssignments.server";
 import { hasGlobalRole } from "@/app/roles/roleAssignmentPolicy";
@@ -37,7 +37,7 @@ export default async function AppHeader() {
 
   return (
     <header className="border-b border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm md:px-6">
-      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-x-12">
+      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-x-5">
         <Link
           href="/"
           className="flex min-h-11 min-w-0 items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
@@ -53,7 +53,7 @@ export default async function AppHeader() {
         </Link>
 
         <div className="col-span-2 min-w-0 md:col-span-1 md:col-start-2 md:row-start-1">
-          <WorkspaceNavigation choices={choices} canUseContent={canAccessCrossSeriesContent(actor)} admin={admin} />
+          <WorkspaceNavigation capabilities={getNavigationCapabilities(actor, choices)} />
         </div>
 
         <div className="col-start-2 row-start-1 shrink-0 md:col-start-3">

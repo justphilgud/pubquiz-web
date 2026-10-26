@@ -11,6 +11,7 @@ import { listAssignablePresentationTemplates } from "@/app/rendering/presentatio
 
 type Props = {
   workspaceSeriesId?: number;
+  hideHeader?: boolean;
   searchParams: Promise<{
     tab?: string;
     eventreiheId?: string;
@@ -18,7 +19,7 @@ type Props = {
   }>;
 };
 
-export default async function QuizPage({ searchParams, workspaceSeriesId }: Props) {
+export default async function QuizPage({ searchParams, workspaceSeriesId, hideHeader }: Props) {
   const { actor } = await requireActor();
 
   const resolvedSearchParams = await searchParams;
@@ -35,7 +36,7 @@ export default async function QuizPage({ searchParams, workspaceSeriesId }: Prop
   const renderingMessages = loadRenderingMessages(getDefaultLocale());
 
   return (
-    <><AppHeader /><QuizWorkspace key={workspaceSeriesId ?? "cross-series"}
+    <>{!hideHeader && <AppHeader />}<QuizWorkspace workspaceSeriesId={workspaceSeriesId} key={workspaceSeriesId ?? "cross-series"}
       workspaceSeriesName={workspaceSeriesId === undefined ? undefined : eventSeries.find(series => series.id === workspaceSeriesId)?.name}
       environmentPrefix={getBlobEnvironmentPrefix()}
       quizze={quizze.filter(quiz => workspaceSeriesId === undefined || quiz.eventreihe_id === workspaceSeriesId)}

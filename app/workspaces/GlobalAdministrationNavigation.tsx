@@ -3,8 +3,7 @@ import Link from "next/link";
 import { useCallback, useState } from "react";
 import { useDismissiblePopover } from "@/app/components/useDismissiblePopover";
 const links = [
-  ["/admin/eventreihen", "Eventreihen"], ["/admin/users", "Benutzer"],
-  ["/templates", "Quiz-Präsentationstemplates"], ["/admin/teams", "Globale Teams"],
+  ["/admin/users", "Benutzer und Rechte"],
   ["/admin/kategorien", "Kategorien"], ["/admin/fragenvorlagen", "Fragenvorlagen"],
   ["/admin/question-import", "Externe Fragen"], ["/admin/monitoring", "Monitoring"],
 ] as const;

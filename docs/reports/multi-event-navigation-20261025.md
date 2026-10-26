@@ -1,5 +1,7 @@
 # Abnahme: Navigation mehrerer Eventarten
 
+> **Historisch / fachlich überholt:** Die nachfolgende damalige Umsetzung bzw. Empfehlung wurde durch den neuen Auftrag vom 26.10.2026 ersetzt. Verbindlich sind die Hauptpunkte Quiz · Bingo · PowerPoint-Karaoke · Teams · Templates · Eventreihen · Administration. Teams und Templates stehen auf der Hauptebene. Siehe [aktuelle Architektur](../architecture/multi-event-navigation.md). Dieser Bericht ist keine Freigabe der früheren Navigation.
+
 Stand: 25.10.2026. Grundlage: Main `669700e9d1668ce74345dfcc259d8aff37b2c644`, PR https://github.com/justphilgud/pubquiz-web/pull/131.
 
 ## Umsetzung
