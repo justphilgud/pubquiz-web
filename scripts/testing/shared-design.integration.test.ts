@@ -108,10 +108,3 @@ test("shared design additive migration, real policies, inheritance and frozen ru
   assert.ok(cols.some(c=>c.column==='shared_design_snapshot'));
   console.info('AP3 empty/populated migration, real Actions, inheritance, runtime snapshot and access PASS:',name);
 });
-
-
-
-
-
-
-

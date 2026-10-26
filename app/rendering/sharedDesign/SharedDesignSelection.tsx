@@ -19,4 +19,3 @@ export default function SharedDesignSelection({target,initial,seriesId,templates
  <div className="flex flex-wrap gap-3">{canWrite&&<Button type="submit" disabled={pending}>{pending?'Wird gespeichert …':'Design speichern'}</Button>}<Link href={returnHref} className="inline-flex min-h-11 items-center underline">{canWrite?'Abbrechen':'Zurück'}</Link></div>
  </form>;
 }
-

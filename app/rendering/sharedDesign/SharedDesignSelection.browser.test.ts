@@ -61,5 +61,3 @@ test('shared design selection preserves dirty input on cancelled navigation and 
     rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });
   }
 });
-
-

@@ -20,4 +20,3 @@ export function BingoDisplayRenderer({design,data}:{design:SharedDesign;data:Bin
 export function KaraokeSlideRenderer({design,data}:{design:SharedDesign;data:KaraokeDisplay}){
  return <DesignFrame design={design} label="PowerPoint-Karaoke"><div className={styles.karaoke}><h2>{data.title}</h2>{data.body&&<p>{data.body}</p>}{data.image&&<SafeImage key={data.image} src={data.image} alt={data.imageAlt??'Folienbild'} className={styles.image}/>}</div></DesignFrame>;
 }
-

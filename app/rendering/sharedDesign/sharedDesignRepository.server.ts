@@ -114,10 +114,3 @@ export async function freezeQuizDesign(tx:Prisma.TransactionClient,quizId:number
   const {design}=await resolveSharedDesign(tx,quiz.shared_design_template_id,quiz.eventreihe);
   await tx.quiz.update({where:{quiz_id:quizId},data:{shared_design_snapshot:JSON.parse(JSON.stringify(design)) as Prisma.InputJsonValue}});
 }
-
-
-
-
-
-
-

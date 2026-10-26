@@ -13,5 +13,3 @@ export default function SharedDesignPreview({design,format,legacyConfig}:{design
  {karaoke&&<section aria-label="Karaoke-Designvorschau"><h2>PowerPoint-Karaoke</h2><div className="mt-4 grid gap-5 xl:grid-cols-2"><KaraokeSlideRenderer design={design} data={{title:'Große Ideen für übermorgen'}}/><KaraokeSlideRenderer design={design} data={{title:'Überraschend überzeugend',body:'Grüße aus der Zukunft: Äpfel, Öl und süße Grüße.\n2026 Gründe für einen mutigen Perspektivwechsel.',image:PHIL_GUD.gudi,imageAlt:'Synthetisches Folienbeispiel: Gudi'}}/></div></section>}
  </div>;
 }
-
-

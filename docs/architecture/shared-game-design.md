@@ -25,4 +25,3 @@ Zu prüfen: Legacy-Regression, getrennte Antwortauswahl, echte Vererbung/Overrid
 
 ## Bewusst aufgelöster Bestandswiderspruch
 Der bisherige Test quizLifecycle verlangt ausdrücklich nur eine gemeinsame Quiz-Vorlagenauswahl. AP3 fordert getrennte Auswahl. Legacyformulare und Legacyauflösung bleiben identisch; ausschließlich auf der neuen AP3-Designseite aktivierte Quizze nutzen das getrennte vorhandene Antwortformularfeld. Die Regression prüft beide Zweige statt den alten globalen Verbotsregex. Keine alte Zuweisung oder Reihenstandards werden umgeschrieben.
-

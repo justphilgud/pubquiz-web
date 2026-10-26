@@ -18,4 +18,3 @@ export function parseDesignSelection(value: unknown, quiz=false): string | null 
   if(typeof value!=="string" || !/^[a-z0-9-]{1,64}$/.test(value))throw new Error('Ungültige Designauswahl.');
   return value;
 }
-
