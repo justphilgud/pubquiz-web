@@ -1,6 +1,6 @@
 # AP3 – Prüfbericht und fachliche Preview
 
-Stand der funktionalen Abnahme: bf96f3a3d4893cdf888b39c336a7407bbc890ae1, 26.10.2026. Nachfolgende Dokumentationscommits ändern den geprüften Anwendungscode nicht. PR #136 bleibt ungemergt; keine Production-Aktion.
+Stand der funktionalen Abnahme: 0578dddacb73f6d75184c217d2a7451d8b0b1940, 26.10.2026. Nachfolgende Dokumentationscommits ändern den geprüften Anwendungscode nicht. PR #136 bleibt ungemergt; keine Production-Aktion.
 
 ## Architektur und geänderte Bereiche
 
@@ -35,15 +35,17 @@ Vorbereitet: Reihe 10 mit Phil Gud, alle drei Beispiele mit Reihenvererbung; Qui
 
 | Bereich | Nachweis |
 | --- | --- |
-| TypeScript, geänderte Dateien ESLint, Prisma, Tests, Build | Erfolgreiche Push-CI 40399825334 und PR-CI 40399833679 auf bf96f3a3; vollständiger lokaler Testlauf und Build ebenfalls erfolgreich. Bestehende Gesamt-ESLint-Schulden bleiben separat informativ. |
+| TypeScript, geänderte Dateien ESLint, Prisma, Tests, Build | Erfolgreiche Push-CI 40402600874 und PR-CI 40402610596 auf 0578ddda; vollständiger lokaler Testlauf und Build ebenfalls erfolgreich. Bestehende Gesamt-ESLint-Schulden bleiben separat informativ. |
 | PostgreSQL | AP1/AP2/AP3 und bestehende Eventarten-Integration erfolgreich; leeres und repräsentativ befülltes Main-Ausgangsschema, additive Migration, Erhalt alter Quiz-/Spiel-/Teamdaten. Tatsächliche Policies, Actions und starteQuiz; Rechteentzug, deaktivierte Produkte auch für Admin, fremde/manipulierte IDs, Karaoke-Editor abgewiesen, CAS, Vorlagenvalidierung/Archivierung einschließlich Parallelfall. |
 | Quizkompatibilität | Legacy- und Opt-in-Zweige regressionsgesichert; getrennte Antwortauswahl über alten Stammdaten-Schreibweg erhalten; tatsächlicher Start friert Präsentation und Antwortkonfiguration ein, spätere Reihen-/Vorlagenänderungen und wiederholter Start ändern den Snapshot nicht. Kein Start in der gehosteten Vergleichsreihe. |
-| Chromium | Tatsächliche Auswahlkomponente: speichern, remount, getrennte Antwortauswahl, Read-only, Abbruch erhält Auswahl. Reale Renderer mit App-/Template-CSS und lokaler Originalschrift: 390/1280/1920, Kontrast, Umlaute/ß, Ziffern, lange Inhalte, fehlende Bilder und Grenzen. Keine native Beamer-/Geräteprüfung. |
-| Gehosteter Browser | Frische Admin-/Manager-/Editoranmeldung; beide Marken in allen drei Formaten, Bingo-Override und Rückkehr, Quizauswahl mit separatem Minimal-Antwortformular, vollständige Reloads. Manager eigene Bingo-/Karaokeansichten erlaubt, fremde Reihe 404; Editor Bingo nur lesend, Karaoke-Direktlink 404. Finaler bf96-Stand zusätzlich mobile/ Laptop-/Großbildprüfung, unskalierte Quizvorschau, geladene Logos, sichtbarer Tastaturfokus, Rückkehr zu Stammdaten/13 Teamzuordnungen. |
+| Chromium | Tatsächliche Auswahlkomponente: speichern, remount, getrennte Antwortauswahl, Read-only, Abbruch erhält Auswahl. Reale Renderer mit App-/Template-CSS und lokaler Originalschrift: 343 Pixel tatsächliche mobile Inhaltsbreite sowie 390/1280/1920, Kontrast, Umlaute/ß, Ziffern, lange Inhalte, fehlende Bilder und Grenzen. Keine native Beamer-/Geräteprüfung. |
+| Gehosteter Browser | Frische Admin-/Manager-/Editoranmeldung; beide Marken in allen drei Formaten, Bingo-Override und Rückkehr, Quizauswahl mit separatem Minimal-Antwortformular, vollständige Reloads. Manager eigene Bingo-/Karaokeansichten erlaubt, fremde Reihe 404; Editor Bingo nur lesend, Karaoke-Direktlink 404. Finaler 0578-Stand zusätzlich mobile/ Laptop-/Großbildprüfung, unskalierte Quizvorschau, geladene Logos, sichtbarer Tastaturfokus, Rückkehr zu Stammdaten/13 Teamzuordnungen. |
 | Datenintegrität | Lesender Vorher-/Nachhervergleich von zwölf geschützten Tabellen und stabilen Spielstammdaten: PASS. 64 abgeschlossene Migrationen, keine offenen/gerollbackten Einträge. |
 | Backupvalidator | Optionales displayFamily nur aus vorhandener Schrift-Whitelist; unbekannte Felder bleiben Fehler. Neue Snapshotkonfiguration durch regulären Validator und enger Integritätsprüfung akzeptiert. Kein Backup/Restore ausgeführt; historisches PRIVATE_READBACK_FAILED weiterhin ungeklärt. |
 
-Preview-Workflow 40400438362: SUCCESS; Deployment dpl_5bcsbQbZJtEs3ccnWKL2kW5LiqMC READY; unveränderlicher Link https://pubquiz-qvr7ti8r6-just-phil-gud.vercel.app/ . Commit und stabiler Alias wurden unabhängig über Deployment-Metadaten geprüft. Dokumentationsbedingte Folgebereitstellungen werden im PR mit aktuellem Head nachgewiesen.
+Preview-Workflow 40403338000: SUCCESS; Deployment dpl_85TWXU5YJLpVPLEJY93K7ftbEM1o READY; unveränderlicher Link https://pubquiz-mfcr5z4oo-just-phil-gud.vercel.app/ . Commit und stabiler Alias wurden unabhängig über Deployment-Metadaten geprüft. Die abschließende Dokumentationsänderung enthält nur Bericht/Bilder; Anwendung, Schema, Tests und Workflow sind gegenüber dem ausgelieferten Funktionscommit unverändert.
+
+Zusätzlicher nachgewiesener Previewfehler: Bei 343 Pixel Inhaltsbreite konnte die lesbare Quizfrage über ihre Rasterzelle ragen. Ausschließlich der AP3-Vorschaucontainer erhält inhaltsabhängige Mindesthöhen. Der ergänzte echte Chromium-Test reproduziert ohne Korrektur die Überlappung und besteht mit ihr; bestehende Live-/Templateansichten besitzen das erforderliche AP3-Attribut nicht. Ein zunächst ungeeigneter CSS-Modulimport wurde nach CI-Fehler durch die eng attributgebundene Regel im vorhandenen Stylesheet ersetzt. Vollständiger lokaler Projekttest danach erfolgreich.
 
 ## Migration und verbleibende Prüfgrenzen
 
@@ -53,7 +55,7 @@ Bingo und Karaoke sind weiterhin nicht spielbar. Keine OCR, Ziehungen, Folienimp
 
 ## Vergleichsbilder
 
-Dieselbe jeweilige Designwelt über Quiz, Bingo und Karaoke, aufgenommen auf dem funktional geprüften bf96-Stand:
+Dieselbe jeweilige Designwelt über Quiz, Bingo und Karaoke, aufgenommen auf dem funktional geprüften 0578-Stand:
 
 ![Phil Gud: alle drei Eventarten](images/phil-gud-all-formats.jpg)
 

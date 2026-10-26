@@ -30,4 +30,3 @@ Der Quiz-Snapshot enthält getrennt die gemeinsame Designbasis und die aufgelös
 
 
 Die vorhandene Verwendungsanzeige und Archivierungssperre zählen gemeinsame Reihen-/Quiz-/Spielreferenzen mit. AP3-Zuordnung sperrt die Vorlagenzeile lesend, Archivierung dieselbe Zeile vor ihrer Referenzprüfung schreibend; eine parallele neue AP3-Zuordnung darf keine archivierte Vorlage hinterlassen. Alte Schutzregeln bleiben bestehen.
-
