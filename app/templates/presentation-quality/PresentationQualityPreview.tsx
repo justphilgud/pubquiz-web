@@ -10,7 +10,7 @@ import type { PresentationDesignStyle } from "@/app/rendering/templateRegistry";
 /** Internal read-only fixtures, rendered by the production component and shell. */
 export function PresentationQualityPreview() {
   const [scenario, setScenario] = useState<QualityScenario>("short");
-  const [style, setStyle] = useState<PresentationDesignStyle>("NEON");
+  const [style, setStyle] = useState<PresentationDesignStyle | "PHIL_GUD">("NEON");
   const [teams, setTeams] = useState<JoinedTeam[]>([]);
   const addTeams = (count: number) => setTeams(current => [...current, ...Array.from({ length: count }, (_, index) => {
     const id = current.length + index + 1;
@@ -25,7 +25,7 @@ export function PresentationQualityPreview() {
       <summary>Interne Präsentationsreferenz</summary>
       <div className="flex flex-wrap gap-3 p-2">
         <label>Inhalt <select aria-label="Referenzinhalt" value={scenario} onChange={(event) => setScenario(event.target.value as QualityScenario)}>{qualityScenarios.map((item) => <option key={item}>{item}</option>)}</select></label>
-        <label>Vorlage <select aria-label="Referenzvorlage" value={style} onChange={(event) => setStyle(event.target.value as PresentationDesignStyle)}><option value="NEON">ungegoogelt Neon</option><option value="EDITORIAL">LOVD × Phil Gud</option><option value="KOMM_ONE">Komm.ONE</option><option value="BIRTHDAY">Storybook</option></select></label>
+        <label>Vorlage <select aria-label="Referenzvorlage" value={style} onChange={(event) => setStyle(event.target.value as PresentationDesignStyle | "PHIL_GUD")}><option value="PHIL_GUD">Phil Gud</option><option value="NEON">ungegoogelt Neon</option><option value="EDITORIAL">LOVD × Phil Gud</option><option value="KOMM_ONE">Komm.ONE</option><option value="BIRTHDAY">Storybook</option></select></label>
         {scenario === "qr" && <><button onClick={() => addTeams(1)}>Ein Testbeitritt</button><button onClick={() => addTeams(3)}>Drei Testbeitritte</button><button onClick={() => addTeams(20)}>20 Testbeitritte</button></>}
         <p>Nur Referenzdaten · Vorschau bleibt stumm · keine Speicherung</p>
       </div>

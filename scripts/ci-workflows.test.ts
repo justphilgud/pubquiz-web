@@ -216,3 +216,12 @@ test("navigation preview requires its explicit isolated target and exact branch"
   assert.ok(preview.includes("inputs.isolated_navigation && secrets.PR130_DATABASE_URL"));
   assert.ok(preview.includes("inputs.isolated_navigation && 'pr130_review_20261025'"));
 });
+
+
+test("Phil Gud preview requires its explicit isolated target and exact branch", () => {
+  const source = readFileSync(".github/workflows/deploy-preview.yml", "utf8");
+  assert.ok(source.includes("(github.ref != 'refs/heads/codex/philgud-admin-design' || inputs.isolated_philgud)"));
+  assert.ok(source.includes("(!inputs.isolated_philgud || github.ref == 'refs/heads/codex/philgud-admin-design')"));
+  assert.ok(source.includes("inputs.isolated_philgud && secrets.PR130_DATABASE_URL"));
+  assert.ok(source.includes("'pr130_review_20261025'"));
+});

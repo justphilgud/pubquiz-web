@@ -22,7 +22,9 @@ import { buildPresentationQualityFixture } from "./presentationQualityFixtures";
 import type { PresentationDesignStyle } from "../templateRegistry";
 
 const execFileAsync = promisify(execFile);
-const styles: readonly PresentationDesignStyle[] = [
+type QualityStyle = PresentationDesignStyle | "PHIL_GUD";
+const styles: readonly QualityStyle[] = [
+  "PHIL_GUD",
   "NEON",
   "EDITORIAL",
   "KOMM_ONE",
@@ -54,10 +56,10 @@ async function compileApplicationCss() {
     .replace('@import "./rendering/presentation/presentationReadability.css";', readability)
     .replace('@import "./rendering/presentation/bookingSlide.css";', booking);
   const compiled = await postcss([tailwindcss()]).process(globals, { from: fileURLToPath(globalsUrl) });
-  return `${compiled.css}\n${kommOne}`;
+  return `${compiled.css}\n${kommOne}\n${readFileSync(new URL("../../branding/philGud.css", import.meta.url), "utf8")}`;
 }
 
-function renderCases(style: PresentationDesignStyle) {
+function renderCases(style: QualityStyle) {
   const meme = buildPresentationQualityFixture("normal", style);
   assert.equal(meme.slide.typ, "frage");
   if (meme.slide.typ !== "frage") return "";

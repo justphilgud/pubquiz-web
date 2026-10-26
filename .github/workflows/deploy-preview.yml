@@ -8,6 +8,10 @@ on:
       - completed
   workflow_dispatch:
     inputs:
+      isolated_philgud:
+        description: 'Use only the isolated synthetic Phil-Gud review database (Phil-Gud branch required)'
+        type: boolean
+        default: false
       isolated_navigation:
         description: 'Use only the isolated synthetic navigation review database (navigation branch required)'
         type: boolean
@@ -39,6 +43,8 @@ jobs:
     if: >-
       vars.ACTIONS_DEPLOYMENTS_ENABLED == 'true' &&
       !inputs.editorial_dry_run_only && !inputs.editorial_repair_test_questions &&
+      (github.ref != 'refs/heads/codex/philgud-admin-design' || inputs.isolated_philgud) &&
+      (!inputs.isolated_philgud || github.ref == 'refs/heads/codex/philgud-admin-design') &&
       (github.ref != 'refs/heads/codex/multi-event-navigation' || inputs.isolated_navigation) &&
       (!inputs.isolated_navigation || github.ref == 'refs/heads/codex/multi-event-navigation') &&
       (github.ref != 'refs/heads/codex/event-type-permissions' || inputs.isolated_pr130) &&
@@ -69,10 +75,10 @@ jobs:
       DEPLOYMENT_REPOSITORY: ${{ github.repository }}
       DEPLOYMENT_REPOSITORY_ID: ${{ github.repository_id }}
       DEPLOYMENT_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
-      DATABASE_URL: ${{ inputs.isolated_navigation && secrets.PR130_DATABASE_URL || inputs.isolated_pr130 && secrets.PR130_DATABASE_URL || secrets.DATABASE_URL }}
-      EXPECTED_DATABASE_HOST: ${{ inputs.isolated_navigation && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_pr130 && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || vars.EXPECTED_DATABASE_HOST }}
-      EXPECTED_DATABASE_NAME: ${{ inputs.isolated_navigation && 'pr130_review_20261025' || inputs.isolated_pr130 && 'pr130_review_20261025' || vars.EXPECTED_DATABASE_NAME }}
-      EXPECTED_DATABASE_BRANCH: ${{ inputs.isolated_navigation && 'dry-dust' || inputs.isolated_pr130 && 'dry-dust' || vars.EXPECTED_DATABASE_BRANCH }}
+      DATABASE_URL: ${{ inputs.isolated_philgud && secrets.PR130_DATABASE_URL || inputs.isolated_navigation && secrets.PR130_DATABASE_URL || inputs.isolated_pr130 && secrets.PR130_DATABASE_URL || secrets.DATABASE_URL }}
+      EXPECTED_DATABASE_HOST: ${{ inputs.isolated_philgud && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_navigation && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_pr130 && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || vars.EXPECTED_DATABASE_HOST }}
+      EXPECTED_DATABASE_NAME: ${{ inputs.isolated_philgud && 'pr130_review_20261025' || inputs.isolated_navigation && 'pr130_review_20261025' || inputs.isolated_pr130 && 'pr130_review_20261025' || vars.EXPECTED_DATABASE_NAME }}
+      EXPECTED_DATABASE_BRANCH: ${{ inputs.isolated_philgud && 'dry-dust' || inputs.isolated_navigation && 'dry-dust' || inputs.isolated_pr130 && 'dry-dust' || vars.EXPECTED_DATABASE_BRANCH }}
       VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -103,6 +109,12 @@ jobs:
         if: inputs.isolated_navigation
         env:
           DATABASE_URL: ${{ secrets.NAVIGATION_DATABASE_URL }}
+        run: npm run deployment:validate
+
+      - name: Validate isolated Phil Gud runtime database identity
+        if: inputs.isolated_philgud
+        env:
+          DATABASE_URL: ${{ secrets.PHIL_GUD_DATABASE_URL }}
         run: npm run deployment:validate
 
       - name: Validate GitHub Preview database identity

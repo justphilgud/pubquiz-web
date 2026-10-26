@@ -292,3 +292,8 @@ For every implementation:
 5. Run typecheck.
 6. Run lint.
 7. Summarize the changes.
+
+
+## Phil-Gud-Verwaltungsauftritt (26.10.2026)
+
+Die [Phil-Gud-Spezifikation](../design/phil-gud-management-and-template.md) ergänzt eine explizit auf Verwaltung begrenzte visuelle Hülle. Actions, Zustandsbesitz, Berechtigungen, URL-/Rückwegvertrag und Dirty-Guards bleiben in den bestehenden Komponenten. Die Display-Schrift dient der Orientierung; Formularwerte, Tabellen und Fehler bleiben funktional gesetzt. Eingebettete Spielvorschauen sind ausgenommen.

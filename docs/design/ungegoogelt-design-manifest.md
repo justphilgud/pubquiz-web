@@ -677,3 +677,8 @@ Wir glauben an Bilder, die etwas erzählen. An Sprache, die Menschen ernst nimmt
 
 Unsere Gestaltung muss nicht laut beweisen, dass sie besonders ist. Sie soll so präzise, menschlich und selbstverständlich sein, dass sie in Erinnerung bleibt, nachdem die Oberfläche längst verschwunden ist.
 
+
+
+## Explizite weitere Markenwelt: Phil Gud (26.10.2026)
+
+Der ausdrücklich beauftragte Verwaltungsauftritt und das zusätzliche Phil-Gud-Template verwenden die echte Phil-Gud-Display-Schrift statt der hier beschriebenen redaktionellen Serifenschrift. Diese bewusste, begründete Abweichung gilt nur für diese separate Markenwelt; bestehende ungegoogelt-/LOVD-/Storybook-/Komm.ONE-Welten bleiben erhalten. Verbindlich sind Referenz, Grenzen und Abnahme in [Phil-Gud-Spezifikation](phil-gud-management-and-template.md).

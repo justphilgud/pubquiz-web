@@ -23,6 +23,7 @@ function systemTemplates(): ManagedPresentationTemplate[] {
         id: template.id,
         name:
           ({
+            "phil-gud": "Phil Gud",
             "ungegoogelt-default": "ungegoogelt Neon",
             "birthday-reference": "Storybook",
             "lovd-ungegoogelt": "LOVD × Phil Gud",
@@ -30,6 +31,7 @@ function systemTemplates(): ManagedPresentationTemplate[] {
           } as Record<string, string>)[template.id] ?? template.id,
         description:
           ({
+            "phil-gud": "Originale Phil-Gud-Markenwelt der Website mit lokal geladener Markenschrift.",
             "ungegoogelt-default": "Mehrfarbige ungegoogelt-Neonbühne auf dunkler Fläche.",
             "birthday-reference":
               "Persönliches Referenzdesign für hochwertige, redaktionelle Erinnerungsquizze.",

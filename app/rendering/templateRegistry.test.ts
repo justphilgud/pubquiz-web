@@ -30,10 +30,10 @@ test("unknown IDs are rejected and only selectable templates are offered", () =>
   assert.equal(isSelectableAnswerFormTemplateId("komm-one-pubquiz"), true);
 });
 
-test("the selectable system inventory contains exactly the four approved templates", () => {
+test("the selectable system inventory contains exactly the five approved templates", () => {
   assert.deepEqual(
     templateRegistry.presentation.filter(({ selectable }) => selectable).map(({ id }) => id),
-    ["ungegoogelt-default", "birthday-reference", "lovd-ungegoogelt", "komm-one-pubquiz"],
+    ["ungegoogelt-default", "birthday-reference", "lovd-ungegoogelt", "komm-one-pubquiz", "phil-gud"],
   );
 });
 

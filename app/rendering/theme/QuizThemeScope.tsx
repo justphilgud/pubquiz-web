@@ -1,3 +1,4 @@
+import { PHIL_GUD } from "@/app/branding/philGud";
 import type { ElementType, ReactNode } from "react";
 
 import { quizThemeStyle, type ResolvedQuizTheme } from "./quizTheme";
@@ -26,6 +27,7 @@ export function QuizThemeScope<TElement extends ElementType = "div">({
     <Component
       {...dataAttributes}
       className={className}
+      data-phil-gud-template={theme.appearance.displayFontFamily === PHIL_GUD.displayFont ? "true" : undefined}
       data-quiz-theme-version={theme.version}
       data-theme-mode={theme.appearance.mode}
       data-presentation-variant={theme.presentation.variant}
