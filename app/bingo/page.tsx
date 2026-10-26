@@ -1,2 +1,2 @@
-import PreparedEventTypePage from "@/app/workspaces/PreparedEventTypePage";
-export default function Page() { return <PreparedEventTypePage type="BINGO" />; }
+import GameListPage, { type GameQuery } from "@/app/games/GameListPage";
+export default function Page({ searchParams }: { searchParams: Promise<GameQuery> }) { return <GameListPage type="BINGO" searchParams={searchParams} />; }

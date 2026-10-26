@@ -418,6 +418,7 @@ model meme_archive_entries {
 }
 
 model eventreihen {
+  game_drafts game_drafts[]
   reihenrollen benutzer_reihenrollen[]
   eventarten eventreihe_eventarten[]
   eventartrollen benutzer_eventartrollen[]
@@ -1564,5 +1565,22 @@ model benutzer_reihenrollen {
   eventreihe eventreihen @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Cascade)
   @@id([benutzer_id, eventreihe_id])
   @@index([eventreihe_id])
+  @@schema("pubquiz")
+}
+
+/// Standalone non-playable game instances. No Quiz identity or live state.
+model game_drafts {
+  id              String      @id @default(uuid()) @db.Uuid
+  eventart        String      @db.VarChar(64)
+  eventreihe_id   Int
+  titel           String      @db.VarChar(150)
+  datum           DateTime?   @db.Date
+  uhrzeit         String?     @db.VarChar(5)
+  status          String      @default("DRAFT") @db.VarChar(16)
+  created_at      DateTime    @default(now()) @db.Timestamptz(3)
+  updated_at      DateTime    @default(now()) @updatedAt @db.Timestamptz(3)
+  eventreihe      eventreihen @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Restrict)
+
+  @@index([eventart, eventreihe_id, updated_at], map: "idx_game_drafts_type_series_updated")
   @@schema("pubquiz")
 }

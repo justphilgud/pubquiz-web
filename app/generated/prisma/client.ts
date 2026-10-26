@@ -340,3 +340,8 @@ export type eventreihe_verwaltung = Prisma.eventreihe_verwaltungModel
  * One format-independent role per user and event series. Product activation is separate.
  */
 export type benutzer_reihenrollen = Prisma.benutzer_reihenrollenModel
+/**
+ * Model game_drafts
+ * Standalone non-playable game instances. No Quiz identity or live state.
+ */
+export type game_drafts = Prisma.game_draftsModel

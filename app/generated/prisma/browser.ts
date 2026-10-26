@@ -4,7 +4,7 @@
 // biome-ignore-all lint: generated file
 // @ts-nocheck
 /*
- * This file should be your main import to use Prisma-related types and utilities in a browser. 
+ * This file should be your main import to use Prisma-related types and utilities in a browser.
  * Use it to get access to models, enums, and input types.
  *
  * This file does not contain a `PrismaClient` class, nor several other helpers that are intended as server-side only.
@@ -316,3 +316,8 @@ export type eventreihe_verwaltung = Prisma.eventreihe_verwaltungModel
  * One format-independent role per user and event series. Product activation is separate.
  */
 export type benutzer_reihenrollen = Prisma.benutzer_reihenrollenModel
+/**
+ * Model game_drafts
+ * Standalone non-playable game instances. No Quiz identity or live state.
+ */
+export type game_drafts = Prisma.game_draftsModel

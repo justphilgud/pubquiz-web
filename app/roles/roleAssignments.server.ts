@@ -1,3 +1,4 @@
+import type { Prisma } from "@/app/generated/prisma/client";
 import { EVENT_TYPES } from "./eventTypes";
 import type { Session } from "next-auth";
 import { prisma } from "@/app/lib/prisma";
@@ -15,9 +16,11 @@ export function sessionUserId(session: Session) {
   return userId;
 }
 
-export async function getUserRoleAssignments(userId: number): Promise<RoleAssignmentSnapshot[]> {
+type RoleDatabase = Pick<Prisma.TransactionClient, "benutzer_rollenzuweisungen" | "benutzer_reihenrollen" | "eventreihe_verwaltung">;
+
+export async function getUserRoleAssignments(userId: number, database: RoleDatabase = prisma): Promise<RoleAssignmentSnapshot[]> {
   if (!Number.isInteger(userId) || userId <= 0) return [];
-  const rows = await prisma.benutzer_rollenzuweisungen.findMany({
+  const rows = await database.benutzer_rollenzuweisungen.findMany({
     where: { benutzer_id: userId, scope_typ: "GLOBAL", benutzer: { is_active: true } },
     select: {
       rollenzuweisung_id: true,
@@ -42,14 +45,14 @@ export async function getUserRoleAssignments(userId: number): Promise<RoleAssign
   return assignments;
 }
 
-export async function getActorPermissions(userId: number): Promise<AuthorizationActor> {
+export async function getActorPermissions(userId: number, database: RoleDatabase = prisma): Promise<AuthorizationActor> {
   const [globals, roles, management] = await Promise.all([
-    getUserRoleAssignments(userId),
-    prisma.benutzer_reihenrollen.findMany({
+    getUserRoleAssignments(userId, database),
+    database.benutzer_reihenrollen.findMany({
       where: { benutzer_id: userId, benutzer: { is_active: true } },
       include: { eventreihe: { select: { eventarten: true } } },
     }),
-    prisma.eventreihe_verwaltung.findMany({ where: { benutzer_id: userId, benutzer: { is_active: true } } }),
+    database.eventreihe_verwaltung.findMany({ where: { benutzer_id: userId, benutzer: { is_active: true } } }),
   ]);
   const eventTypeAssignments = roles.flatMap(row => EVENT_TYPES.map(product => ({
     eventSeriesId: row.eventreihe_id, eventType: product.id, role: row.rolle,

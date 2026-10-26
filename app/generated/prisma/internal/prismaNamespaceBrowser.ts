@@ -108,7 +108,8 @@ export const ModelName = {
   eventreihe_eventarten: 'eventreihe_eventarten',
   benutzer_eventartrollen: 'benutzer_eventartrollen',
   eventreihe_verwaltung: 'eventreihe_verwaltung',
-  benutzer_reihenrollen: 'benutzer_reihenrollen'
+  benutzer_reihenrollen: 'benutzer_reihenrollen',
+  game_drafts: 'game_drafts'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1098,6 +1099,21 @@ export const Benutzer_reihenrollenScalarFieldEnum = {
 } as const
 
 export type Benutzer_reihenrollenScalarFieldEnum = (typeof Benutzer_reihenrollenScalarFieldEnum)[keyof typeof Benutzer_reihenrollenScalarFieldEnum]
+
+
+export const Game_draftsScalarFieldEnum = {
+  id: 'id',
+  eventart: 'eventart',
+  eventreihe_id: 'eventreihe_id',
+  titel: 'titel',
+  datum: 'datum',
+  uhrzeit: 'uhrzeit',
+  status: 'status',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type Game_draftsScalarFieldEnum = (typeof Game_draftsScalarFieldEnum)[keyof typeof Game_draftsScalarFieldEnum]
 
 
 export const SortOrder = {
