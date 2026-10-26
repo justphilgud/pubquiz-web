@@ -6,7 +6,7 @@ import { changeGameTeamAction, gameTeamsAction } from "./teamActions";
 import type { GameType } from "./gameDraft";
 import type { GameTeamsView, GameTeamAssignment } from "./gameTeams";
 
-export default function GameTeamsPanel({ type, gameId, updatedAt, initial, blocked, onBusy }: { type: GameType; gameId: string; updatedAt: string; initial: GameTeamsView; blocked: boolean; onBusy: (busy: boolean) => void }) {
+export default function GameTeamsPanel({ type, gameId, seriesId, updatedAt, initial, blocked, onBusy }: { type: GameType; gameId: string; seriesId: number; updatedAt: string; initial: GameTeamsView; blocked: boolean; onBusy: (busy: boolean) => void }) {
   const [data,setData] = useState(initial);
   const [search,setSearch] = useState("");
   const [assignedSearch,setAssignedSearch] = useState("");
@@ -19,7 +19,7 @@ export default function GameTeamsPanel({ type, gameId, updatedAt, initial, block
     onBusy(true);
     startTransition(async () => {
       try {
-        const result = operation === "SEARCH" ? await gameTeamsAction(type,gameId,search) : await changeGameTeamAction(type,{gameId,updatedAt,operation,...(operation === "ADD" ? {teamId:id} : {assignmentId:id})});
+        const result = operation === "SEARCH" ? await gameTeamsAction(type,gameId,search) : await changeGameTeamAction(type,{gameId,seriesId,updatedAt,operation,...(operation === "ADD" ? {teamId:id} : {assignmentId:id})});
         if (!result.success) { setMessage({error:true,text:result.message}); return; }
         setData(result.data); setRemoval(null);
         if (operation !== "SEARCH") setSearch("");

@@ -74,6 +74,7 @@ test("additive game-team migration and real Actions with isolated PostgreSQL on 
     INSERT INTO pubquiz.eventreihe_eventarten(eventreihe_id,eventart,ist_freigeschaltet)VALUES(40,'BINGO',true),(40,'POWERPOINT_KARAOKE',true);
     INSERT INTO pubquiz.benutzer_reihenrollen(benutzer_id,eventreihe_id,rolle)VALUES(6,40,'EVENT_MANAGER');
   `);
+  assert.equal((await api.readGameTeams(1,'BINGO',(await api.writeGameDraft(1,'BINGO',{seriesId:10,title:'Search coverage',date:'',time:''})).id)).hasMore,true);
   const profileBefore=(await db.query('SELECT to_jsonb(t) data FROM pubquiz.teams t WHERE team_id=1001')).rows[0].data;
   const sessionsBefore=(await db.query('SELECT jsonb_agg(to_jsonb(t) ORDER BY quiz_team_session_id) data FROM pubquiz.quiz_team_sessions t')).rows[0].data;
   const quizTeamsBefore=(await db.query('SELECT jsonb_agg(to_jsonb(t)) data FROM pubquiz.quiz_teams t')).rows[0].data;
@@ -82,7 +83,7 @@ test("additive game-team migration and real Actions with isolated PostgreSQL on 
   const karaoke=await api.writeGameDraft(3,'POWERPOINT_KARAOKE',input);
   const other=await api.writeGameDraft(5,'BINGO',{...input,seriesId:20});
   const bingoOnly=await api.writeGameDraft(6,'BINGO',{...input,seriesId:40});
-  const command=(game:typeof bingo,operation:'ADD'|'REMOVE',id:number|string)=>({gameId:game.id,updatedAt:game.updatedAt,operation,...(operation==='ADD'?{teamId:id}:{assignmentId:id})});
+  const command=(game:typeof bingo,operation:'ADD'|'REMOVE',id:number|string)=>({gameId:game.id,seriesId:game.seriesId,updatedAt:game.updatedAt,operation,...(operation==='ADD'?{teamId:id}:{assignmentId:id})});
   assert.deepEqual((await api.readGameTeams(3,'BINGO',bingo.id)).candidates.map(t=>t.id),[1001]);
   assert.equal((await api.readGameTeams(6,'BINGO',bingoOnly.id)).hasTeamScope,false);
   assert.equal((await api.readGameTeams(6,'BINGO',bingoOnly.id)).candidates.length,0);
@@ -131,6 +132,14 @@ test("additive game-team migration and real Actions with isolated PostgreSQL on 
   assert.equal((await api.actions.gameTeamsAction('POWERPOINT_KARAOKE',karaoke.id,'')).success,false);
   assert.equal((await api.actions.changeGameTeamAction('POWERPOINT_KARAOKE',command(karaoke,'ADD',1001))).success,false);
   assert.equal((await api.readGameTeams(1,'POWERPOINT_KARAOKE',karaoke.id)).assigned.length,1,'revocation retains membership');
+  const race=await api.writeGameDraft(1,'BINGO',{...input,title:'Serialized series move'});
+  const raceResults=await Promise.allSettled([
+    api.changeGameTeam(1,'BINGO',command(race,'ADD',1003)),
+    api.writeGameDraft(1,'BINGO',{...input,id:race.id,updatedAt:race.updatedAt,seriesId:20})
+  ]);
+  assert.equal(raceResults.filter(r=>r.status==='fulfilled').length,1,'add and stale series move cannot both succeed');
+  const raceRow=await api.readGameDraft(1,'BINGO',race.id);
+  assert.equal((await api.readGameTeams(1,'BINGO',race.id)).assigned.length,raceRow.game.seriesId===10?1:0);
   const columns=(await db.query(COLUMN_SQL)).rows[0].coalesce as Column[]; auditColumns(columns);
   assert.equal(columns.filter(c=>c.table==='game_team_assignments'&&c.schema==='pubquiz').length,4);
   const catalog=(await db.query(CATALOG_SQL)).rows[0].json_build_object as {constraints:{table:string}[]};

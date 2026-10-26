@@ -46,7 +46,7 @@ export async function changeGameTeam(userId: number, type: GameType, input: unkn
     await tx.$queryRaw`SELECT rollenzuweisung_id FROM pubquiz.benutzer_rollenzuweisungen WHERE benutzer_id=${userId} FOR SHARE`;
     const { choice, actor } = await context(tx,userId,type,data.gameId);
     if (!choice.canWrite) throw denied();
-    if (game.updated_at.toISOString() !== data.updatedAt) throw new GameDraftError("Die Spielstammdaten wurden inzwischen geändert. Bitte neu laden.");
+    if (game.eventreihe_id !== data.seriesId || game.updated_at.toISOString() !== data.updatedAt) throw new GameDraftError("Die Spielstammdaten wurden inzwischen geändert. Bitte neu laden.");
     if (data.operation === "ADD") {
       if (!choice.canCreate || !canAccessTeamManagement(actor)) throw new GameDraftError("Keine auswählbaren Teams oder die Eventreihe ist archiviert.");
       await tx.$queryRaw`SELECT team_id FROM pubquiz.teams WHERE team_id=${data.teamId!} FOR SHARE`;
