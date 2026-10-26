@@ -35,6 +35,7 @@ export type Game_draftsSumAggregateOutputType = {
 }
 
 export type Game_draftsMinAggregateOutputType = {
+  shared_design_template_id: string | null
   id: string | null
   eventart: string | null
   eventreihe_id: number | null
@@ -47,6 +48,7 @@ export type Game_draftsMinAggregateOutputType = {
 }
 
 export type Game_draftsMaxAggregateOutputType = {
+  shared_design_template_id: string | null
   id: string | null
   eventart: string | null
   eventreihe_id: number | null
@@ -59,6 +61,7 @@ export type Game_draftsMaxAggregateOutputType = {
 }
 
 export type Game_draftsCountAggregateOutputType = {
+  shared_design_template_id: number
   id: number
   eventart: number
   eventreihe_id: number
@@ -81,6 +84,7 @@ export type Game_draftsSumAggregateInputType = {
 }
 
 export type Game_draftsMinAggregateInputType = {
+  shared_design_template_id?: true
   id?: true
   eventart?: true
   eventreihe_id?: true
@@ -93,6 +97,7 @@ export type Game_draftsMinAggregateInputType = {
 }
 
 export type Game_draftsMaxAggregateInputType = {
+  shared_design_template_id?: true
   id?: true
   eventart?: true
   eventreihe_id?: true
@@ -105,6 +110,7 @@ export type Game_draftsMaxAggregateInputType = {
 }
 
 export type Game_draftsCountAggregateInputType = {
+  shared_design_template_id?: true
   id?: true
   eventart?: true
   eventreihe_id?: true
@@ -204,6 +210,7 @@ export type game_draftsGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 }
 
 export type Game_draftsGroupByOutputType = {
+  shared_design_template_id: string | null
   id: string
   eventart: string
   eventreihe_id: number
@@ -239,6 +246,7 @@ export type game_draftsWhereInput = {
   AND?: Prisma.game_draftsWhereInput | Prisma.game_draftsWhereInput[]
   OR?: Prisma.game_draftsWhereInput[]
   NOT?: Prisma.game_draftsWhereInput | Prisma.game_draftsWhereInput[]
+  shared_design_template_id?: Prisma.StringNullableFilter<"game_drafts"> | string | null
   id?: Prisma.UuidFilter<"game_drafts"> | string
   eventart?: Prisma.StringFilter<"game_drafts"> | string
   eventreihe_id?: Prisma.IntFilter<"game_drafts"> | number
@@ -253,6 +261,7 @@ export type game_draftsWhereInput = {
 }
 
 export type game_draftsOrderByWithRelationInput = {
+  shared_design_template_id?: Prisma.SortOrderInput | Prisma.SortOrder
   id?: Prisma.SortOrder
   eventart?: Prisma.SortOrder
   eventreihe_id?: Prisma.SortOrder
@@ -271,6 +280,7 @@ export type game_draftsWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.game_draftsWhereInput | Prisma.game_draftsWhereInput[]
   OR?: Prisma.game_draftsWhereInput[]
   NOT?: Prisma.game_draftsWhereInput | Prisma.game_draftsWhereInput[]
+  shared_design_template_id?: Prisma.StringNullableFilter<"game_drafts"> | string | null
   eventart?: Prisma.StringFilter<"game_drafts"> | string
   eventreihe_id?: Prisma.IntFilter<"game_drafts"> | number
   titel?: Prisma.StringFilter<"game_drafts"> | string
@@ -284,6 +294,7 @@ export type game_draftsWhereUniqueInput = Prisma.AtLeast<{
 }, "id">
 
 export type game_draftsOrderByWithAggregationInput = {
+  shared_design_template_id?: Prisma.SortOrderInput | Prisma.SortOrder
   id?: Prisma.SortOrder
   eventart?: Prisma.SortOrder
   eventreihe_id?: Prisma.SortOrder
@@ -304,6 +315,7 @@ export type game_draftsScalarWhereWithAggregatesInput = {
   AND?: Prisma.game_draftsScalarWhereWithAggregatesInput | Prisma.game_draftsScalarWhereWithAggregatesInput[]
   OR?: Prisma.game_draftsScalarWhereWithAggregatesInput[]
   NOT?: Prisma.game_draftsScalarWhereWithAggregatesInput | Prisma.game_draftsScalarWhereWithAggregatesInput[]
+  shared_design_template_id?: Prisma.StringNullableWithAggregatesFilter<"game_drafts"> | string | null
   id?: Prisma.UuidWithAggregatesFilter<"game_drafts"> | string
   eventart?: Prisma.StringWithAggregatesFilter<"game_drafts"> | string
   eventreihe_id?: Prisma.IntWithAggregatesFilter<"game_drafts"> | number
@@ -316,6 +328,7 @@ export type game_draftsScalarWhereWithAggregatesInput = {
 }
 
 export type game_draftsCreateInput = {
+  shared_design_template_id?: string | null
   id?: string
   eventart: string
   titel: string
@@ -329,6 +342,7 @@ export type game_draftsCreateInput = {
 }
 
 export type game_draftsUncheckedCreateInput = {
+  shared_design_template_id?: string | null
   id?: string
   eventart: string
   eventreihe_id: number
@@ -342,6 +356,7 @@ export type game_draftsUncheckedCreateInput = {
 }
 
 export type game_draftsUpdateInput = {
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventart?: Prisma.StringFieldUpdateOperationsInput | string
   titel?: Prisma.StringFieldUpdateOperationsInput | string
@@ -355,6 +370,7 @@ export type game_draftsUpdateInput = {
 }
 
 export type game_draftsUncheckedUpdateInput = {
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventart?: Prisma.StringFieldUpdateOperationsInput | string
   eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -368,6 +384,7 @@ export type game_draftsUncheckedUpdateInput = {
 }
 
 export type game_draftsCreateManyInput = {
+  shared_design_template_id?: string | null
   id?: string
   eventart: string
   eventreihe_id: number
@@ -380,6 +397,7 @@ export type game_draftsCreateManyInput = {
 }
 
 export type game_draftsUpdateManyMutationInput = {
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventart?: Prisma.StringFieldUpdateOperationsInput | string
   titel?: Prisma.StringFieldUpdateOperationsInput | string
@@ -391,6 +409,7 @@ export type game_draftsUpdateManyMutationInput = {
 }
 
 export type game_draftsUncheckedUpdateManyInput = {
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventart?: Prisma.StringFieldUpdateOperationsInput | string
   eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -413,6 +432,7 @@ export type game_draftsOrderByRelationAggregateInput = {
 }
 
 export type game_draftsCountOrderByAggregateInput = {
+  shared_design_template_id?: Prisma.SortOrder
   id?: Prisma.SortOrder
   eventart?: Prisma.SortOrder
   eventreihe_id?: Prisma.SortOrder
@@ -429,6 +449,7 @@ export type game_draftsAvgOrderByAggregateInput = {
 }
 
 export type game_draftsMaxOrderByAggregateInput = {
+  shared_design_template_id?: Prisma.SortOrder
   id?: Prisma.SortOrder
   eventart?: Prisma.SortOrder
   eventreihe_id?: Prisma.SortOrder
@@ -441,6 +462,7 @@ export type game_draftsMaxOrderByAggregateInput = {
 }
 
 export type game_draftsMinOrderByAggregateInput = {
+  shared_design_template_id?: Prisma.SortOrder
   id?: Prisma.SortOrder
   eventart?: Prisma.SortOrder
   eventreihe_id?: Prisma.SortOrder
@@ -518,6 +540,7 @@ export type game_draftsUpdateOneRequiredWithoutTeam_assignmentsNestedInput = {
 }
 
 export type game_draftsCreateWithoutEventreiheInput = {
+  shared_design_template_id?: string | null
   id?: string
   eventart: string
   titel: string
@@ -530,6 +553,7 @@ export type game_draftsCreateWithoutEventreiheInput = {
 }
 
 export type game_draftsUncheckedCreateWithoutEventreiheInput = {
+  shared_design_template_id?: string | null
   id?: string
   eventart: string
   titel: string
@@ -571,6 +595,7 @@ export type game_draftsScalarWhereInput = {
   AND?: Prisma.game_draftsScalarWhereInput | Prisma.game_draftsScalarWhereInput[]
   OR?: Prisma.game_draftsScalarWhereInput[]
   NOT?: Prisma.game_draftsScalarWhereInput | Prisma.game_draftsScalarWhereInput[]
+  shared_design_template_id?: Prisma.StringNullableFilter<"game_drafts"> | string | null
   id?: Prisma.UuidFilter<"game_drafts"> | string
   eventart?: Prisma.StringFilter<"game_drafts"> | string
   eventreihe_id?: Prisma.IntFilter<"game_drafts"> | number
@@ -583,6 +608,7 @@ export type game_draftsScalarWhereInput = {
 }
 
 export type game_draftsCreateWithoutTeam_assignmentsInput = {
+  shared_design_template_id?: string | null
   id?: string
   eventart: string
   titel: string
@@ -595,6 +621,7 @@ export type game_draftsCreateWithoutTeam_assignmentsInput = {
 }
 
 export type game_draftsUncheckedCreateWithoutTeam_assignmentsInput = {
+  shared_design_template_id?: string | null
   id?: string
   eventart: string
   eventreihe_id: number
@@ -623,6 +650,7 @@ export type game_draftsUpdateToOneWithWhereWithoutTeam_assignmentsInput = {
 }
 
 export type game_draftsUpdateWithoutTeam_assignmentsInput = {
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventart?: Prisma.StringFieldUpdateOperationsInput | string
   titel?: Prisma.StringFieldUpdateOperationsInput | string
@@ -635,6 +663,7 @@ export type game_draftsUpdateWithoutTeam_assignmentsInput = {
 }
 
 export type game_draftsUncheckedUpdateWithoutTeam_assignmentsInput = {
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventart?: Prisma.StringFieldUpdateOperationsInput | string
   eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
@@ -647,6 +676,7 @@ export type game_draftsUncheckedUpdateWithoutTeam_assignmentsInput = {
 }
 
 export type game_draftsCreateManyEventreiheInput = {
+  shared_design_template_id?: string | null
   id?: string
   eventart: string
   titel: string
@@ -658,6 +688,7 @@ export type game_draftsCreateManyEventreiheInput = {
 }
 
 export type game_draftsUpdateWithoutEventreiheInput = {
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventart?: Prisma.StringFieldUpdateOperationsInput | string
   titel?: Prisma.StringFieldUpdateOperationsInput | string
@@ -670,6 +701,7 @@ export type game_draftsUpdateWithoutEventreiheInput = {
 }
 
 export type game_draftsUncheckedUpdateWithoutEventreiheInput = {
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventart?: Prisma.StringFieldUpdateOperationsInput | string
   titel?: Prisma.StringFieldUpdateOperationsInput | string
@@ -682,6 +714,7 @@ export type game_draftsUncheckedUpdateWithoutEventreiheInput = {
 }
 
 export type game_draftsUncheckedUpdateManyWithoutEventreiheInput = {
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventart?: Prisma.StringFieldUpdateOperationsInput | string
   titel?: Prisma.StringFieldUpdateOperationsInput | string
@@ -724,6 +757,7 @@ export type Game_draftsCountOutputTypeCountTeam_assignmentsArgs<ExtArgs extends 
 
 
 export type game_draftsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  shared_design_template_id?: boolean
   id?: boolean
   eventart?: boolean
   eventreihe_id?: boolean
@@ -739,6 +773,7 @@ export type game_draftsSelect<ExtArgs extends runtime.Types.Extensions.InternalA
 }, ExtArgs["result"]["game_drafts"]>
 
 export type game_draftsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  shared_design_template_id?: boolean
   id?: boolean
   eventart?: boolean
   eventreihe_id?: boolean
@@ -752,6 +787,7 @@ export type game_draftsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
 }, ExtArgs["result"]["game_drafts"]>
 
 export type game_draftsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  shared_design_template_id?: boolean
   id?: boolean
   eventart?: boolean
   eventreihe_id?: boolean
@@ -765,6 +801,7 @@ export type game_draftsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
 }, ExtArgs["result"]["game_drafts"]>
 
 export type game_draftsSelectScalar = {
+  shared_design_template_id?: boolean
   id?: boolean
   eventart?: boolean
   eventreihe_id?: boolean
@@ -776,7 +813,7 @@ export type game_draftsSelectScalar = {
   updated_at?: boolean
 }
 
-export type game_draftsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "eventart" | "eventreihe_id" | "titel" | "datum" | "uhrzeit" | "status" | "created_at" | "updated_at", ExtArgs["result"]["game_drafts"]>
+export type game_draftsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"shared_design_template_id" | "id" | "eventart" | "eventreihe_id" | "titel" | "datum" | "uhrzeit" | "status" | "created_at" | "updated_at", ExtArgs["result"]["game_drafts"]>
 export type game_draftsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   team_assignments?: boolean | Prisma.game_drafts$team_assignmentsArgs<ExtArgs>
   eventreihe?: boolean | Prisma.eventreihenDefaultArgs<ExtArgs>
@@ -796,6 +833,7 @@ export type $game_draftsPayload<ExtArgs extends runtime.Types.Extensions.Interna
     eventreihe: Prisma.$eventreihenPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    shared_design_template_id: string | null
     id: string
     eventart: string
     eventreihe_id: number
@@ -888,8 +926,8 @@ export interface game_draftsDelegate<ExtArgs extends runtime.Types.Extensions.In
    * // Get first 10 Game_drafts
    * const game_drafts = await prisma.game_drafts.findMany({ take: 10 })
    *
-   * // Only select the `id`
-   * const game_draftsWithIdOnly = await prisma.game_drafts.findMany({ select: { id: true } })
+   * // Only select the `shared_design_template_id`
+   * const game_draftsWithShared_design_template_idOnly = await prisma.game_drafts.findMany({ select: { shared_design_template_id: true } })
    *
    */
   findMany<T extends game_draftsFindManyArgs>(args?: Prisma.SelectSubset<T, game_draftsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$game_draftsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -933,9 +971,9 @@ export interface game_draftsDelegate<ExtArgs extends runtime.Types.Extensions.In
    *   ]
    * })
    *
-   * // Create many Game_drafts and only return the `id`
-   * const game_draftsWithIdOnly = await prisma.game_drafts.createManyAndReturn({
-   *   select: { id: true },
+   * // Create many Game_drafts and only return the `shared_design_template_id`
+   * const game_draftsWithShared_design_template_idOnly = await prisma.game_drafts.createManyAndReturn({
+   *   select: { shared_design_template_id: true },
    *   data: [
    *     // ... provide data here
    *   ]
@@ -1024,9 +1062,9 @@ export interface game_draftsDelegate<ExtArgs extends runtime.Types.Extensions.In
    *   ]
    * })
    *
-   * // Update zero or more Game_drafts and only return the `id`
-   * const game_draftsWithIdOnly = await prisma.game_drafts.updateManyAndReturn({
-   *   select: { id: true },
+   * // Update zero or more Game_drafts and only return the `shared_design_template_id`
+   * const game_draftsWithShared_design_template_idOnly = await prisma.game_drafts.updateManyAndReturn({
+   *   select: { shared_design_template_id: true },
    *   where: {
    *     // ... provide filter here
    *   },
@@ -1230,6 +1268,7 @@ export interface Prisma__game_draftsClient<T, Null = never, ExtArgs extends runt
  * Fields of the game_drafts model
  */
 export interface game_draftsFieldRefs {
+  readonly shared_design_template_id: Prisma.FieldRef<"game_drafts", 'String'>
   readonly id: Prisma.FieldRef<"game_drafts", 'String'>
   readonly eventart: Prisma.FieldRef<"game_drafts", 'String'>
   readonly eventreihe_id: Prisma.FieldRef<"game_drafts", 'Int'>

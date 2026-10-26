@@ -1,3 +1,4 @@
+import { sharedDesignTokens } from "../sharedDesign/sharedDesign";
 import type { CSSProperties } from "react";
 
 import {
@@ -146,7 +147,7 @@ export function resolveQuizTheme({
   presentation,
   answerForm,
 }: ResolveQuizThemeInput): ResolvedQuizTheme {
-  const identityTokens = presentation.template.tokens;
+  const identityTokens = sharedDesignTokens(presentation.template);
   const uiTokens = answerForm.template.tokens;
   const uiText = accessibleColor(
     uiTokens.colors.text,

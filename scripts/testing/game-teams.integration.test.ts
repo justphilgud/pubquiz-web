@@ -32,6 +32,7 @@ test("additive game-team migration and real Actions with isolated PostgreSQL on 
     await db.query("CREATE SCHEMA IF NOT EXISTS pubquiz; SET search_path TO pubquiz,public");
     await db.query(sql.slice(sql.indexOf("-- CreateSchema")));
   } finally {rmSync(directory,{recursive:true});}
+  await db.query(readFileSync("prisma/migrations/20261026210000_shared_game_design/migration.sql","utf8"));
   const migration = readFileSync("prisma/migrations/20261026180000_game_team_assignments/migration.sql","utf8");
   // Empty existing schema: exercise then roll back only this test transaction.
   await db.query("BEGIN"); await db.query(migration);

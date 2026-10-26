@@ -175,4 +175,4 @@ jobs:
       - name: PostgreSQL standalone game drafts, migration and authorization
         env:
           GAME_DRAFT_TEST_DATABASE_URL: ${{ env.EDITORIAL_IMPORT_TEST_DATABASE_URL }}
-        run: node --import tsx --test scripts/testing/game-drafts.integration.test.ts scripts/testing/game-teams.integration.test.ts
+        run: node --import tsx --test scripts/testing/game-drafts.integration.test.ts scripts/testing/game-teams.integration.test.ts scripts/testing/shared-design.integration.test.ts

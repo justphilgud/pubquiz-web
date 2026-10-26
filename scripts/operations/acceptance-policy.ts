@@ -1,3 +1,4 @@
+import { parseSharedDesign } from "../../app/rendering/sharedDesign/sharedDesign";
 import { assertRestoreTarget, requireCondition } from "./guards";
 import { brandFontOptions } from "../../app/rendering/templateRegistry";
 import { isSafeTemplateAssetReference } from "../../app/rendering/presentationTemplates/presentationTemplateAssets";
@@ -64,6 +65,15 @@ function exactKeys(value: unknown, keys: string): asserts value is Record<string
 // Only this persisted presentation field uses "tokens" for design, not authentication.
 // Check exact shape and bounded design values, then retain the ordinary recursive scan.
 export function inspectRow(value: Record<string, unknown>, media: Set<string>, schema: string, table: string) {
+  if (schema === "pubquiz" && table === "quiz" && value.shared_design_snapshot != null) {
+    const snapshot=parseSharedDesign(value.shared_design_snapshot);
+    requireCondition(snapshot !== null, "DESIGN_TOKEN_STRUCTURE_REVIEW_REQUIRED");
+    const { shared_design_snapshot: _snapshot, ...rest }=value;
+    void _snapshot;
+    inspectValue(rest,media);
+    inspectValue({version:snapshot.version,templateId:snapshot.templateId,name:snapshot.name},media);
+    return inspectRow({theme_config_json:snapshot.config},media,"pubquiz","presentation_templates");
+  }
   if (schema !== "pubquiz" || table !== "presentation_templates") return inspectValue(value, media);
   const { theme_config_json: config, ...rest } = value;
   requireCondition(record(config) && config.version === 1, "DESIGN_TOKEN_STRUCTURE_REVIEW_REQUIRED");
@@ -74,9 +84,10 @@ export function inspectRow(value: Record<string, unknown>, media: Set<string>, s
   const paletteKeys = "primary,secondary,accent,background,surface,surfaceStrong,text,textMuted,border,success,warning,danger";
   exactKeys(tokens.colors, paletteKeys + (record(tokens.colors) && Object.hasOwn(tokens.colors, "correct") ? ",correct" : ""));
   requireCondition(Object.values(tokens.colors).every(v => typeof v === "string" && /^#[0-9a-f]{6}$/i.test(v)), "DESIGN_TOKEN_VALUE_REVIEW_REQUIRED");
-  exactKeys(tokens.typography, "family,displayWeight,bodyWeight");
+  exactKeys(tokens.typography, "family,displayWeight,bodyWeight" + (record(tokens.typography) && Object.hasOwn(tokens.typography,"displayFamily") ? ",displayFamily" : ""));
   const typography = tokens.typography;
   requireCondition(brandFontOptions.some(f => f.value === typography.family) &&
+    (typography.displayFamily === undefined || brandFontOptions.some(f=>f.value===typography.displayFamily)) &&
     typeof typography.displayWeight === "number" && [400, 700, 800, 900].includes(typography.displayWeight) &&
     typeof typography.bodyWeight === "number" && [400, 500, 600].includes(typography.bodyWeight), "DESIGN_TOKEN_VALUE_REVIEW_REQUIRED");
   for (const group of ["radii", "spacing"] as const) {

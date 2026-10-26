@@ -401,6 +401,8 @@ export const QuizScalarFieldEnum = {
   manuelle_bewertungen: 'manuelle_bewertungen',
   aufloesungsstrategie: 'aufloesungsstrategie',
   presentation_template_id: 'presentation_template_id',
+  shared_design_template_id: 'shared_design_template_id',
+  shared_design_snapshot: 'shared_design_snapshot',
   answer_form_template_id: 'answer_form_template_id'
 } as const
 
@@ -459,6 +461,7 @@ export const EventreihenScalarFieldEnum = {
   archiviert_am: 'archiviert_am',
   created_at: 'created_at',
   updated_at: 'updated_at',
+  shared_design_template_id: 'shared_design_template_id',
   default_presentation_template_id: 'default_presentation_template_id',
   default_answer_form_template_id: 'default_answer_form_template_id'
 } as const
@@ -1103,6 +1106,7 @@ export type Benutzer_reihenrollenScalarFieldEnum = (typeof Benutzer_reihenrollen
 
 
 export const Game_draftsScalarFieldEnum = {
+  shared_design_template_id: 'shared_design_template_id',
   id: 'id',
   eventart: 'eventart',
   eventreihe_id: 'eventreihe_id',

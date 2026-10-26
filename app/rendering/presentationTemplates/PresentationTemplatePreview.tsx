@@ -120,6 +120,7 @@ type Props = {
   templateName: string;
   scenario: PresentationPreviewScenario;
   highlightedAssetRole?: PresentationTemplateAssetRole | null;
+  responsive?: boolean;
 };
 
 const PREVIEW_STAGE_WIDTH = 1600;
@@ -139,9 +140,11 @@ function ScaledPreviewStage({
   highlightedAssetRole,
   scenario,
   renderer,
+  responsive = false,
 }: {
   children: ReactNode;
   highlightedAssetRole?: PresentationTemplateAssetRole | null;
+  responsive?: boolean;
   scenario: PresentationPreviewScenario;
   renderer: PresentationPreviewRenderer;
 }) {
@@ -166,7 +169,8 @@ function ScaledPreviewStage({
       data-preview-scale-container
       data-preview-scenario={scenario}
       data-preview-renderer={renderer}
-      className="relative aspect-video min-h-0 w-full overflow-hidden rounded-2xl bg-black"
+      className={`relative ${responsive ? "" : "aspect-video"} min-h-0 w-full overflow-hidden rounded-2xl bg-black`}
+        style={responsive ? { height: Math.max(PREVIEW_STAGE_HEIGHT * scale, 720) } : undefined}
     >
       <div
         data-preview-fixed-stage
@@ -622,6 +626,7 @@ export function PresentationTemplatePreview({
   templateName,
   scenario,
   highlightedAssetRole,
+  responsive = false,
 }: Props) {
   const definition = getPreviewDefinition(scenario);
   const theme = useMemo(() => {
@@ -648,7 +653,7 @@ export function PresentationTemplatePreview({
   if (scenario === "ANSWER_FORM") {
     return (
       <ScaledPreviewStage
-        highlightedAssetRole={highlightedAssetRole}
+        highlightedAssetRole={highlightedAssetRole} responsive={responsive}
         scenario={scenario}
         renderer={definition.renderer}
       >
@@ -678,7 +683,7 @@ export function PresentationTemplatePreview({
       : displayState;
   return (
     <ScaledPreviewStage
-      highlightedAssetRole={highlightedAssetRole}
+      highlightedAssetRole={highlightedAssetRole} responsive={responsive}
       scenario={scenario}
       renderer={definition.renderer}
     >

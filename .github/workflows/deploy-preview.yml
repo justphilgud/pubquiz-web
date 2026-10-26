@@ -8,6 +8,10 @@ on:
       - completed
   workflow_dispatch:
     inputs:
+      isolated_shared_design:
+        description: 'Use only the synthetic shared-design review database (approved AP3 branch required)'
+        type: boolean
+        default: false
       isolated_game_teams:
         description: 'Use only the synthetic game-team assignment review database (approved AP2 branch required)'
         type: boolean
@@ -51,6 +55,8 @@ jobs:
     if: >-
       vars.ACTIONS_DEPLOYMENTS_ENABLED == 'true' &&
       !inputs.editorial_dry_run_only && !inputs.editorial_repair_test_questions &&
+      (github.ref != 'refs/heads/codex/shared-game-design' || inputs.isolated_shared_design) &&
+      (!inputs.isolated_shared_design || github.ref == 'refs/heads/codex/shared-game-design') &&
       (github.ref != 'refs/heads/codex/game-team-assignments' || inputs.isolated_game_teams) &&
       (!inputs.isolated_game_teams || github.ref == 'refs/heads/codex/game-team-assignments') &&
       (github.ref != 'refs/heads/codex/standalone-game-drafts' || inputs.isolated_games) &&
@@ -87,10 +93,10 @@ jobs:
       DEPLOYMENT_REPOSITORY: ${{ github.repository }}
       DEPLOYMENT_REPOSITORY_ID: ${{ github.repository_id }}
       DEPLOYMENT_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
-      DATABASE_URL: ${{ inputs.isolated_game_teams && secrets.GAME_TEAMS_MIGRATION_DATABASE_URL || inputs.isolated_games && secrets.GAMES_MIGRATION_DATABASE_URL || inputs.isolated_philgud && secrets.PR130_DATABASE_URL || inputs.isolated_navigation && secrets.PR130_DATABASE_URL || inputs.isolated_pr130 && secrets.PR130_DATABASE_URL || secrets.DATABASE_URL }}
-      EXPECTED_DATABASE_HOST: ${{ inputs.isolated_game_teams && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_games && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_philgud && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_navigation && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_pr130 && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || vars.EXPECTED_DATABASE_HOST }}
-      EXPECTED_DATABASE_NAME: ${{ inputs.isolated_game_teams && 'game_teams_review_20261026' || inputs.isolated_games && 'games_review_20261026c' || inputs.isolated_philgud && 'pr130_review_20261025' || inputs.isolated_navigation && 'pr130_review_20261025' || inputs.isolated_pr130 && 'pr130_review_20261025' || vars.EXPECTED_DATABASE_NAME }}
-      EXPECTED_DATABASE_BRANCH: ${{ inputs.isolated_game_teams && 'dry-dust' || inputs.isolated_games && 'dry-dust' || inputs.isolated_philgud && 'dry-dust' || inputs.isolated_navigation && 'dry-dust' || inputs.isolated_pr130 && 'dry-dust' || vars.EXPECTED_DATABASE_BRANCH }}
+      DATABASE_URL: ${{ inputs.isolated_shared_design && secrets.SHARED_DESIGN_MIGRATION_DATABASE_URL || inputs.isolated_game_teams && secrets.GAME_TEAMS_MIGRATION_DATABASE_URL || inputs.isolated_games && secrets.GAMES_MIGRATION_DATABASE_URL || inputs.isolated_philgud && secrets.PR130_DATABASE_URL || inputs.isolated_navigation && secrets.PR130_DATABASE_URL || inputs.isolated_pr130 && secrets.PR130_DATABASE_URL || secrets.DATABASE_URL }}
+      EXPECTED_DATABASE_HOST: ${{ inputs.isolated_shared_design && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_game_teams && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_games && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_philgud && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_navigation && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_pr130 && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || vars.EXPECTED_DATABASE_HOST }}
+      EXPECTED_DATABASE_NAME: ${{ inputs.isolated_shared_design && 'shared_design_review_20261026' || inputs.isolated_game_teams && 'game_teams_review_20261026' || inputs.isolated_games && 'games_review_20261026c' || inputs.isolated_philgud && 'pr130_review_20261025' || inputs.isolated_navigation && 'pr130_review_20261025' || inputs.isolated_pr130 && 'pr130_review_20261025' || vars.EXPECTED_DATABASE_NAME }}
+      EXPECTED_DATABASE_BRANCH: ${{ inputs.isolated_shared_design && 'dry-dust' || inputs.isolated_game_teams && 'dry-dust' || inputs.isolated_games && 'dry-dust' || inputs.isolated_philgud && 'dry-dust' || inputs.isolated_navigation && 'dry-dust' || inputs.isolated_pr130 && 'dry-dust' || vars.EXPECTED_DATABASE_BRANCH }}
       VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -116,6 +122,12 @@ jobs:
 
       - name: Validate Vercel Preview media metadata before migrations
         run: node --import tsx scripts/deploy-vercel-git-preview.ts --check-only
+
+      - name: Validate isolated shared design runtime database identity
+        if: inputs.isolated_shared_design
+        env:
+          DATABASE_URL: ${{ secrets.SHARED_DESIGN_DATABASE_URL }}
+        run: npm run deployment:validate
 
       - name: Validate isolated game team runtime database identity
         if: inputs.isolated_game_teams
