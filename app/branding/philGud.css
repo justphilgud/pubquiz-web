@@ -54,3 +54,6 @@
 .presentation-template[data-phil-gud-template="true"] .presentation-correct-answer { border-color: var(--brand-correct) !important; box-shadow: none !important; }
 
 .presentation-template[data-phil-gud-template="true"] .presentation-corporate-decoration { display: none; }
+
+[data-admin-ui="phil-gud"] [data-ui-variant="primary"]:not(:where([data-quiz-theme-version] *)) { background-color: #171717; color: #faf8f2; }
+[data-admin-ui="phil-gud"] [data-ui-variant="secondary"]:not(:where([data-quiz-theme-version] *)) { background-color: #f2eee5; color: #171717; }

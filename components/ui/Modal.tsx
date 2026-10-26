@@ -1,9 +1,8 @@
 "use client";
 
-import { ReactNode, useEffect, useId, useRef, useSyncExternalStore } from "react";
+import { ReactNode, useContext, useEffect, useId, useRef, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
-import { usePathname } from "next/navigation";
-import { isAdministrationPath } from "@/app/branding/adminAppearancePolicy";
+import { AdminAppearanceContext } from "@/app/branding/AdminAppearanceContext";
 
 const subscribeToClient = () => () => {};
 
@@ -23,7 +22,7 @@ export function Modal({
   className?: string;
 }) {
   const titleId = useId();
-  const adminAppearance = isAdministrationPath(usePathname());
+  const adminAppearance = useContext(AdminAppearanceContext);
   const isClient = useSyncExternalStore(subscribeToClient, () => true, () => false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
