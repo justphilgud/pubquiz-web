@@ -7,7 +7,8 @@ if (!process.env.VERCEL) {
 
 /** @type {import('next').NextConfig} */
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ["127.0.0.1"],
+  // Explicit loopback-only hosts keep role sessions separate during local browser QA.
+  allowedDevOrigins: ["127.0.0.1", "manager.navigation.localhost", "editor.navigation.localhost", "global.navigation.localhost", "settings.navigation.localhost", "none.navigation.localhost"],
   async redirects() {
     return [
       { source: "/fragen/editor", destination: "/content/questions/new", permanent: true },

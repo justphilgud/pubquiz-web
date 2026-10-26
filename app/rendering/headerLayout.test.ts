@@ -8,7 +8,7 @@ test("the root layout is neutral and management boundaries own AppHeader", () =>
   assert.doesNotMatch(read("app/layout.tsx"), /AppHeader/);
   assert.match(read("app/admin/layout.tsx"), /AppHeader/);
   assert.match(read("app/fragen/layout.tsx"), /AppHeader/);
-  assert.match(read("app/quiz/page.tsx"), /AppHeader/);
+  assert.match(read("app/quiz/QuizManagementPage.tsx"), /AppHeader/);
   assert.match(read("app/quiz/[quizId]/page.tsx"), /AppHeader/);
 });
 

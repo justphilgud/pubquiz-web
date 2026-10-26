@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useContentNavigationGuard } from "@/app/components/content/useContentNavigationGuard";
 import { contentReturnHref } from "@/app/components/content/contentNavigation";
 import { PresentationContentWarning } from "@/app/rendering/presentation/PresentationContentWarning";
 import ContentEditorActionBar from "@/app/components/content/ContentEditorActionBar";
@@ -74,6 +75,10 @@ export default function LivePollEditor({ options, initialPoll, canEdit, canArchi
     };
   }
 
+  const fingerprint = JSON.stringify(value(status));
+  const [savedFingerprint, setSavedFingerprint] = useState(fingerprint);
+  const allowSavedNavigation = useContentNavigationGuard(canEdit && fingerprint !== savedFingerprint);
+
   function save(targetStatus: "DRAFT" | "ACTIVE") {
     setMessage(null);
     startTransition(async () => {
@@ -81,6 +86,8 @@ export default function LivePollEditor({ options, initialPoll, canEdit, canArchi
         ? await updateLivePoll({ pollId: initialPoll.id, expectedUpdatedAt, value: value(targetStatus) })
         : await createLivePoll(value(targetStatus));
       if (!result.success) return setMessage({ tone: "error", text: result.message });
+      allowSavedNavigation();
+      setSavedFingerprint(JSON.stringify(value(targetStatus)));
       setStatus(targetStatus);
       setExpectedUpdatedAt(result.updatedAt);
       setMessage({ tone: "success", text: result.message });

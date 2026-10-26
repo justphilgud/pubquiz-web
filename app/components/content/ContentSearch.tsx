@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { bindWorkspaceContentParams } from "@/app/workspaces/workspacePolicy";
 import { searchContent } from "./actions";
 import { contentResumeKey, readContentResume, type ContentResume } from "./contentNavigation";
 import ContentFilters from "./ContentFilters";
 import ContentResultRow from "./ContentResultRow";
-import { parseContentFilters, resolveContentFilterDraft, serializeContentFilters, type ContentFilterDraft, type ContentFilterOption, type ContentInitialType, type ContentQuizOption, type ContentSearchResult, type ContentTemplateOption } from "./contentLibrary";
+import { visibleContentSearchResult, parseContentFilters, resolveContentFilterDraft, serializeContentFilters, type ContentFilterDraft, type ContentFilterOption, type ContentInitialType, type ContentQuizOption, type ContentSearchResult, type ContentTemplateOption } from "./contentLibrary";
 
-export function ContentSearchState({ initialType, quizzes, categories, eventSeries, templates, paramsKey }: { initialType: ContentInitialType; quizzes: ContentQuizOption[]; categories: ContentFilterOption[]; eventSeries: ContentFilterOption[]; templates: ContentTemplateOption[]; paramsKey: string }) {
+export function ContentSearchState({ initialType, quizzes, categories, eventSeries, templates, paramsKey, workspaceSeriesId }: { workspaceSeriesId?: number; initialType: ContentInitialType; quizzes: ContentQuizOption[]; categories: ContentFilterOption[]; eventSeries: ContentFilterOption[]; templates: ContentTemplateOption[]; paramsKey: string }) {
   const router = useRouter();
   const pathname = usePathname();
   const filterableTemplateIds = templates
@@ -22,6 +23,7 @@ export function ContentSearchState({ initialType, quizzes, categories, eventSeri
   const filters = resolveContentFilterDraft(draft, initialType, paramsKey, filterableTemplateIds);
   const appliedStatus = parseContentFilters(new URLSearchParams(paramsKey), initialType, filterableTemplateIds).status;
   const [result, setResult] = useState<ContentSearchResult>({ items: [], total: 0 });
+  const [resultContext, setResultContext] = useState("");
   const generation = useRef(0);
   const activeSearch = useRef("");
   const loadingPage = useRef<string | null>(null);
@@ -51,8 +53,8 @@ export function ContentSearchState({ initialType, quizzes, categories, eventSeri
         }
         if (request !== generation.current) return;
         resume.current = previous;
-        setResult(page); setError("");
-      } catch { if (request === generation.current) setError("Die Inhalte konnten nicht geladen werden."); }
+        setResult(page); setResultContext(searchContext); setError("");
+      } catch { if (request === generation.current) { setResult({ items: [], total: 0 }); setResultContext(searchContext); setError("Die Inhalte konnten nicht geladen werden."); } }
     });
     return () => { generation.current = request + 1; activeSearch.current = ""; };
     // The localized registry is stable; applied URL filters define the request.
@@ -100,6 +102,7 @@ export function ContentSearchState({ initialType, quizzes, categories, eventSeri
   }
   function updateFilters(next: typeof filters) { setDraft({ initialType, paramsKey, filters: next }); }
   function apply(next = filters) {
+    if (workspaceSeriesId !== undefined) next = { ...next, eventSeriesId: workspaceSeriesId, ...(initialType ? { contentType: initialType } : {}) };
     generation.current++; activeSearch.current = "";
     const params = serializeContentFilters(next);
     const nextKey = params.toString();
@@ -114,18 +117,22 @@ export function ContentSearchState({ initialType, quizzes, categories, eventSeri
   function reset() { const next = parseContentFilters(new URLSearchParams(), initialType, filterableTemplateIds); updateFilters(next); apply(next); }
   function changeTemplate(templateId: string | null) { const next = { ...filters, templateId }; updateFilters(next); apply(next); }
 
-  const heldCount = result.items.filter(item => item.justApproved && (appliedStatus === "NOT_APPROVED" || appliedStatus === "DRAFT")).length;
+  const searchReady = resultContext === searchContext;
+  const searching = pending || !searchReady;
+  const visibleResult = visibleContentSearchResult(result, resultContext, searchContext);
+  const heldCount = visibleResult.items.filter(item => item.justApproved && (appliedStatus === "NOT_APPROVED" || appliedStatus === "DRAFT")).length;
   return <div className="space-y-4">
-    <ContentFilters filters={filters} categories={categories} eventSeries={eventSeries} templates={templates} loading={pending} onChange={updateFilters} onTemplateChange={changeTemplate} onApply={() => apply()} onReset={reset} />
-    <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-slate-700"><span aria-live="polite">{pending ? "Inhalte werden geladen …" : `${result.items.length - heldCount} geladene Treffer · ${result.total} Suchtreffer${heldCount ? ` · ${heldCount} gerade freigegeben` : ""}`}</span><span>Neu angelegt zuerst</span><button type="button" disabled={pending} onClick={() => apply()} className="min-h-11 rounded-xl border px-3">Aktualisieren</button></div>
+    <ContentFilters hideContentType={workspaceSeriesId !== undefined && Boolean(initialType)} filters={filters} categories={categories} eventSeries={eventSeries} templates={templates} loading={searching} onChange={updateFilters} onTemplateChange={changeTemplate} onApply={() => apply()} onReset={reset} />
+    <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-slate-700"><span aria-live="polite">{searching ? "Inhalte werden geladen …" : `${visibleResult.items.length - heldCount} geladene Treffer · ${visibleResult.total} Suchtreffer${heldCount ? ` · ${heldCount} gerade freigegeben` : ""}`}</span><span>Neu angelegt zuerst</span><button type="button" disabled={searching} onClick={() => apply()} className="min-h-11 rounded-xl border px-3">Aktualisieren</button></div>
     {error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-800">{error}</p>}
-    <div className="space-y-3" aria-busy={pending} inert={pending}>{result.items.map((item) => <ContentResultRow key={item.key} item={item} quizzes={quizzes} templates={templates} returnTo={`${pathname}${paramsKey ? `?${paramsKey}` : ""}`} onNavigate={() => remember(item.key)} onUpdated={(updated) => { if (activeSearch.current !== searchContext) return; setResult(current => ({ ...current, total: Math.max(0, current.total - (appliedStatus === "NOT_APPROVED" || appliedStatus === "DRAFT" ? 1 : 0)), items: current.items.map(row => row.key === updated.key ? { ...updated, justApproved: true } : row) })); }} />)}</div>
-    {result.nextCursor && <button type="button" disabled={pending} onClick={more} className="min-h-11 rounded-xl bg-slate-950 px-5 text-sm font-semibold text-white disabled:opacity-50">Weitere Treffer laden</button>}
-    {!pending && !error && result.items.length === 0 && <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-600">Keine passenden Inhalte gefunden.</div>}
+    <div className="space-y-3" aria-busy={searching} inert={searching}>{visibleResult.items.map((item) => <ContentResultRow key={item.key} item={item} quizzes={quizzes} templates={templates} returnTo={`${pathname}${paramsKey ? `?${paramsKey}` : ""}`} onNavigate={() => remember(item.key)} onUpdated={(updated) => { if (activeSearch.current !== searchContext) return; setResult(current => ({ ...current, total: Math.max(0, current.total - (appliedStatus === "NOT_APPROVED" || appliedStatus === "DRAFT" ? 1 : 0)), items: current.items.map(row => row.key === updated.key ? { ...updated, justApproved: true } : row) })); }} />)}</div>
+    {searchReady && result.nextCursor && <button type="button" disabled={searching} onClick={more} className="min-h-11 rounded-xl bg-slate-950 px-5 text-sm font-semibold text-white disabled:opacity-50">Weitere Treffer laden</button>}
+    {!searching && !error && visibleResult.items.length === 0 && <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-600">Keine passenden Inhalte gefunden.</div>}
   </div>;
 }
 
-export default function ContentSearch({ initialType, quizzes, categories, eventSeries, templates }: { initialType?: ContentInitialType; quizzes: ContentQuizOption[]; categories: ContentFilterOption[]; eventSeries: ContentFilterOption[]; templates: ContentTemplateOption[] }) {
-  const paramsKey = useSearchParams().toString();
-  return <ContentSearchState initialType={initialType} quizzes={quizzes} categories={categories} eventSeries={eventSeries} templates={templates} paramsKey={paramsKey} />;
+export default function ContentSearch({ initialType, quizzes, categories, eventSeries, templates, workspaceSeriesId }: { workspaceSeriesId?: number; initialType?: ContentInitialType; quizzes: ContentQuizOption[]; categories: ContentFilterOption[]; eventSeries: ContentFilterOption[]; templates: ContentTemplateOption[] }) {
+  const params = bindWorkspaceContentParams(useSearchParams().toString(), workspaceSeriesId, initialType);
+  const paramsKey = params.toString();
+  return <ContentSearchState workspaceSeriesId={workspaceSeriesId} initialType={initialType} quizzes={quizzes} categories={categories} eventSeries={eventSeries} templates={templates} paramsKey={paramsKey} />;
 }

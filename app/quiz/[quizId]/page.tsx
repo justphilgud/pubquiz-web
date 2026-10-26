@@ -1,3 +1,4 @@
+import { quizCollectionReturnHref } from "@/app/workspaces/workspacePolicy";
 import {
   archiveQuiz,
   getQuizDetails,
@@ -48,6 +49,7 @@ const productActionAppearance: Record<QuizProductActionId, {
 };
 
 type Props = {
+  searchParams: Promise<{ returnTo?: string }>;
   params: Promise<{
     quizId: string;
   }>;
@@ -55,6 +57,7 @@ type Props = {
 
 export default async function QuizDetailPage({
   params,
+  searchParams,
 }: Props) {
   const { quizId } = await params;
   await requireQuizViewer(Number(quizId));
@@ -82,6 +85,7 @@ export default async function QuizDetailPage({
     );
   }
 
+  const returnHref = quizCollectionReturnHref((await searchParams).returnTo, quiz.eventreihe_id);
   const quizIdValue = quiz.quiz_id;
   const quizTitelValue = quiz.titel;
   const canManageTemplates = isAdmin(actorContext.actor);
@@ -151,7 +155,7 @@ export default async function QuizDetailPage({
 
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/quiz"
+              href={returnHref}
               title="Zur Übersicht"
               className="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white p-3 text-slate-700 shadow-sm transition hover:bg-slate-50"
             >

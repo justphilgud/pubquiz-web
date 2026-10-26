@@ -1,3 +1,4 @@
+import { teamCollectionReturnHref } from "@/app/workspaces/workspacePolicy";
 import Link from "next/link";
 import { isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 import { loadTeamDetail, requireTeamManagementActor } from "@/app/teams/teamManagement.server";
@@ -8,16 +9,17 @@ import { getMediaUploadEnvironmentPrefix } from "@/app/fragen/editor/mediaUpload
 
 const dateFormatter = new Intl.DateTimeFormat("de-DE", { dateStyle: "long", timeZone: "Europe/Berlin" });
 
-export default async function TeamDetailPage({ params }: { params: Promise<{ teamId: string }> }) {
+export default async function TeamDetailPage({ params, searchParams }: { params: Promise<{ teamId: string }>; searchParams: Promise<{ returnTo?: string }> }) {
   const { actor } = await requireTeamManagementActor();
   const teamId = Number((await params).teamId);
   const team = await loadTeamDetail(actor, teamId);
   const admin = isAdministrator(actor);
+  const returnHref = teamCollectionReturnHref((await searchParams).returnTo);
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-8 text-slate-900 sm:px-6">
       <div className="mx-auto max-w-4xl space-y-5">
-        <Link href="/admin/teams" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:text-slate-950">← Zur Teamübersicht</Link>
+        <Link href={returnHref} className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600 hover:text-slate-950">← Zur Teamübersicht</Link>
         <header className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-3xl font-bold">{team.name}</h1>

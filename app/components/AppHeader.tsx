@@ -2,22 +2,15 @@ import Image from "next/image";
 import Link from "next/link";
 import { auth, signOut } from "@/auth";
 import {
-  canManageEventSeries,
-  canManageCategories,
-  canManageQuizzes,
-  canManageUsers,
-  canManageTeams,
-  canCreateQuestions,
   isAdmin,
 } from "@/app/lib/permissions";
 import UserMenu from "@/app/components/UserMenu";
-import AppNav from "@/app/components/AppNav";
-import { getAppNavigationItems } from "@/app/components/appNavigation";
-import { getEventSeriesIdsForCapability } from "@/app/eventreihen/eventSeriesAccess.server";
+import WorkspaceNavigation from "@/app/workspaces/WorkspaceNavigation";
+import { loadWorkspaceNavigation } from "@/app/workspaces/workspace.server";
+import { getNavigationCapabilities } from "@/app/workspaces/workspacePolicy";
+
 import { getActorForSession } from "@/app/roles/roleAssignments.server";
 import { hasGlobalRole } from "@/app/roles/roleAssignmentPolicy";
-import { getPresentationTemplateCapabilities } from "@/app/rendering/presentationTemplates/presentationTemplatePermissions";
-import { canAccessStoryElementLibrary } from "@/app/story-elemente/storyElementPolicy";
 import { APP_BRAND } from "@/app/branding/appBrand";
 
 export default async function AppHeader() {
@@ -32,12 +25,6 @@ export default async function AppHeader() {
     ...(hasGlobalRole(actor, "EDITOR") ? ["Globaler Editor"] : []),
   ].join(", ") || "Keine globale Rolle";
 
-  const [questionSeriesIds, quizSeriesIds, editableSeriesIds] = await Promise.all([
-    getEventSeriesIdsForCapability("CREATE_QUESTION", session),
-    getEventSeriesIdsForCapability("MANAGE_QUIZZES", session),
-    getEventSeriesIdsForCapability("EDIT", session),
-  ]);
-
   async function logoutAction() {
     "use server";
 
@@ -46,22 +33,11 @@ export default async function AppHeader() {
     });
   }
 
-  const navItems = getAppNavigationItems({
-    canAccessQuestions:
-      canCreateQuestions(actor) || (questionSeriesIds?.length ?? 0) > 0,
-    canAccessStoryElements: canAccessStoryElementLibrary(actor),
-    canManageQuizzes: canManageQuizzes(actor) || (quizSeriesIds?.length ?? 0) > 0,
-    canManageEventSeries: canManageEventSeries(actor) || (editableSeriesIds?.length ?? 0) > 0,
-    canViewPresentationTemplates:
-      getPresentationTemplateCapabilities(actor).canView,
-    canManageCategories: canManageCategories(actor),
-    canManageUsers: canManageUsers(actor),
-    canManageTeams: canManageTeams(actor),
-  });
+  const { choices } = await loadWorkspaceNavigation();
 
   return (
     <header className="border-b border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm md:px-6">
-      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-x-12">
+      <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-x-5">
         <Link
           href="/"
           className="flex min-h-11 min-w-0 items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
@@ -77,7 +53,7 @@ export default async function AppHeader() {
         </Link>
 
         <div className="col-span-2 min-w-0 md:col-span-1 md:col-start-2 md:row-start-1">
-          <AppNav items={navItems} />
+          <WorkspaceNavigation capabilities={getNavigationCapabilities(actor, choices)} />
         </div>
 
         <div className="col-start-2 row-start-1 shrink-0 md:col-start-3">

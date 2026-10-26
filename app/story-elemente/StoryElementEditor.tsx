@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useContentNavigationGuard } from "@/app/components/content/useContentNavigationGuard";
 import { contentReturnHref } from "@/app/components/content/contentNavigation";
 import {
   createStoryElement,
@@ -165,6 +166,8 @@ export default function StoryElementEditor({
   const [savedFingerprint, setSavedFingerprint] = useState(() => JSON.stringify(initialSavedState));
   const currentFingerprint = JSON.stringify({ type, title, description, moderatorNote, status, scope, eventSeriesId, quizId, config });
 
+  const allowSavedNavigation = useContentNavigationGuard(canEdit && currentFingerprint !== savedFingerprint);
+
   function submit(targetStatus: "DRAFT" | "ACTIVE") {
     setMessage(null);
     const value = {
@@ -194,6 +197,7 @@ export default function StoryElementEditor({
         setMessage({ tone: "error", text: result.message });
         return;
       }
+      allowSavedNavigation();
       setExpectedUpdatedAt(result.updatedAt);
       setStatus(targetStatus);
       const savedState = { type, title, description, moderatorNote, status: targetStatus, scope, eventSeriesId, quizId, config: structuredClone(config) };
@@ -272,6 +276,7 @@ export default function StoryElementEditor({
         setMessage({ tone: "error", text: result.message });
         return;
       }
+      allowSavedNavigation();
       setExpectedUpdatedAt(result.updatedAt);
       if (redirectToList) router.push("/story-elemente");
       else if (result.storyElementId && result.storyElementId !== initialStory?.id) {

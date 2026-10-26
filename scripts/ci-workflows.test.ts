@@ -207,3 +207,12 @@ test("PR130 review deployment requires its explicit isolated target and exact br
 test("Prisma schema is strict UTF-8 for the native migration engine", () => {
   assert.doesNotThrow(() => new TextDecoder("utf-8", { fatal: true }).decode(readFileSync("prisma/schema.prisma")));
 });
+
+test("navigation preview requires its explicit isolated target and exact branch", () => {
+  assert.ok(preview.includes("name: Validate isolated navigation runtime database identity"));
+  assert.ok(preview.includes("DATABASE_URL: ${{ secrets.NAVIGATION_DATABASE_URL }}"));
+  assert.ok(preview.includes("github.ref != 'refs/heads/codex/multi-event-navigation' || inputs.isolated_navigation"));
+  assert.ok(preview.includes("!inputs.isolated_navigation || github.ref == 'refs/heads/codex/multi-event-navigation'"));
+  assert.ok(preview.includes("inputs.isolated_navigation && secrets.PR130_DATABASE_URL"));
+  assert.ok(preview.includes("inputs.isolated_navigation && 'pr130_review_20261025'"));
+});

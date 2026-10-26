@@ -1,8 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useContentNavigationGuard } from "@/app/components/content/useContentNavigationGuard";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import EventSeriesPicker from "@/app/workspaces/EventSeriesPicker";
+import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import {
   archiveQuiz,
   createQuiz,
@@ -107,6 +109,7 @@ function formFromQuiz(quiz: QuizResult): FormState {
 
 export default function QuizForm({
   quizze,
+  workspaceSeriesId,
   eventSeries,
   initialEventSeriesId,
   messages,
@@ -116,6 +119,7 @@ export default function QuizForm({
   environmentPrefix,
 }: {
   quizze: QuizResult[];
+  workspaceSeriesId?: number;
   eventSeries: EventSeriesOption[];
   initialEventSeriesId?: number;
   messages: RenderingMessages;
@@ -125,15 +129,31 @@ export default function QuizForm({
   environmentPrefix: BlobEnvironmentPrefix;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const returnTo = pathname + (searchParams.size ? `?${searchParams}` : "");
+  function filterHref(seriesId: number | null) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("editQuizId");
+    if (seriesId === null) params.delete("series"); else params.set("series", String(seriesId));
+    return pathname + (params.size ? `?${params}` : "");
+  }
+  function setStatusFilter(value: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) params.set("status", value); else params.delete("status");
+    router.push(pathname + (params.size ? `?${params}` : ""), { scroll: false });
+  }
   const initialEditingQuiz = quizze.find((quiz) => quiz.quiz_id === initialEditingQuizId);
   const [editingQuizId, setEditingQuizId] = useState<number | null>(initialEditingQuiz?.quiz_id ?? null);
   const [form, setForm] = useState(() =>
     initialEditingQuiz ? formFromQuiz(initialEditingQuiz) : emptyForm(initialEventSeriesId),
   );
+  const [savedForm, setSavedForm] = useState(() => JSON.stringify(form));
+  const allowSavedNavigation = useContentNavigationGuard(JSON.stringify(form) !== savedForm);
   const [message, setMessage] = useState("");
   const [formOpen, setFormOpen] = useState(Boolean(initialEditingQuiz || initialEventSeriesId));
-  const [eventSeriesFilter, setEventSeriesFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const eventSeriesFilter = workspaceSeriesId ? String(workspaceSeriesId) : searchParams.get("series") ?? "";
+  const statusFilter = searchParams.get("status") ?? "";
   const customPresentationTemplates = presentationTemplates
     .filter((template) => !templateRegistry.presentation.some(({ id }) => id === template.id))
     .map(toRuntimePresentationTemplate);
@@ -160,12 +180,14 @@ export default function QuizForm({
   function resetForm() {
     setEditingQuizId(null);
     setForm(emptyForm(initialEventSeriesId));
+    setSavedForm(JSON.stringify(emptyForm(initialEventSeriesId)));
     setFormOpen(false);
   }
 
   function startEdit(quiz: QuizResult) {
     setEditingQuizId(quiz.quiz_id);
     setForm(formFromQuiz(quiz));
+    setSavedForm(JSON.stringify(formFromQuiz(quiz)));
     setFormOpen(true);
     setMessage(
       quiz.quiz_datum
@@ -197,6 +219,7 @@ export default function QuizForm({
       : await updateQuiz({ quizId: editingQuizId, ...data });
     setMessage(result.message);
     if (!result.success) return;
+    allowSavedNavigation();
     if ("quizId" in result && result.quizId) {
       router.push(`/quiz/${result.quizId}`);
       return;
@@ -344,7 +367,7 @@ export default function QuizForm({
       <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
         <h2 className="text-xl font-semibold">Bestehende Quizze</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <label className="block"><span className="mb-1 block text-sm font-semibold">Eventreihe filtern</span><select value={eventSeriesFilter} onChange={(event) => setEventSeriesFilter(event.target.value)} className={inputClass}><option value="">Alle Eventreihen</option>{eventSeries.map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}</select></label>
+          {workspaceSeriesId === undefined && <EventSeriesPicker options={eventSeries} value={eventSeriesFilter ? Number(eventSeriesFilter) : null} hrefForValue={filterHref} />}
           <label className="block"><span className="mb-1 block text-sm font-semibold">Status filtern</span><select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} className={inputClass}><option value="">Alle Status</option>{Object.entries(statusLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label>
         </div>
 
@@ -354,7 +377,7 @@ export default function QuizForm({
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="break-words text-xs font-semibold uppercase tracking-wide text-slate-500">{quiz.eventreihe_name}</p>
-                  <Link href={`/quiz/${quiz.quiz_id}`} className="mt-1 block break-words text-lg font-bold underline decoration-slate-300 underline-offset-4">{quiz.titel ?? `Quiz ${quiz.quiz_id}`}</Link>
+                  <Link href={`/quiz/${quiz.quiz_id}?returnTo=${encodeURIComponent(returnTo)}`} className="mt-1 block break-words text-lg font-bold underline decoration-slate-300 underline-offset-4">{quiz.titel ?? `Quiz ${quiz.quiz_id}`}</Link>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700 ring-1 ring-slate-200">{statusLabels[quiz.temporal_status]}</span>
@@ -369,7 +392,7 @@ export default function QuizForm({
               </dl>
               {quiz.temporal_status === "MISSING_DATE" && <p className="mt-3 text-sm font-semibold text-amber-900">Bestandsdatensatz: Vor dem nächsten Speichern muss ein Datum ergänzt werden.</p>}
               <div className="mt-4 flex flex-wrap gap-2">
-                <Link href={`/quiz/${quiz.quiz_id}`} title="Quizinhalt bearbeiten" aria-label={`Inhalt von ${quiz.titel ?? `Quiz ${quiz.quiz_id}`} bearbeiten`} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl bg-slate-900 p-2 text-white"><PencilSquareIcon className="h-5 w-5" /></Link>
+                <Link href={`/quiz/${quiz.quiz_id}?returnTo=${encodeURIComponent(returnTo)}`} title="Quizinhalt bearbeiten" aria-label={`Inhalt von ${quiz.titel ?? `Quiz ${quiz.quiz_id}`} bearbeiten`} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl bg-slate-900 p-2 text-white"><PencilSquareIcon className="h-5 w-5" /></Link>
                 <QuizCopyDialog quizId={quiz.quiz_id} quizTitle={quiz.titel ?? `Quiz ${quiz.quiz_id}`} />
                 {quiz.ist_archiviert ? (
                   <button type="button" title="Wiederherstellen" onClick={async () => { await restoreQuiz(quiz.quiz_id); router.refresh(); }} className="min-h-11 min-w-11 rounded-xl border border-green-300 bg-green-50 p-2 text-green-700"><LockOpenIcon className="mx-auto h-5 w-5" /></button>

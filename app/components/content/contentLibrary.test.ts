@@ -1,3 +1,4 @@
+import { visibleContentSearchResult, type ContentSearchResult } from "./contentLibrary";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
@@ -161,7 +162,7 @@ test("search exposes the current result total and permission-derived event serie
   const search = readFileSync(new URL("./ContentSearch.tsx", import.meta.url), "utf8");
   const actions = readFileSync(new URL("./actions.ts", import.meta.url), "utf8");
   const page = readFileSync(new URL("./ContentLibraryPage.tsx", import.meta.url), "utf8");
-  assert.match(search, /result\.items\.length.*result\.total/);
+  assert.match(search, /visibleResult\.items\.length.*visibleResult\.total/);
   assert.match(actions, /total: questionResult\.total \+ stories\.total \+ polls\.total/);
   assert.match(page, /getAssignableQuestionEventSeries/);
 });
@@ -274,4 +275,12 @@ test("legacy editor routes permanently redirect to canonical content routes", ()
   const config = readFileSync(new URL("../../../next.config.ts", import.meta.url), "utf8");
   for (const route of ["/fragen/editor", "/fragen/editor/:questionId", "/story-elemente/new", "/story-elemente/:storyElementId"]) assert.match(config, new RegExp(route.replace(/[/:]/g, "\\$&")));
   assert.match(config, /permanent: true/);
+});
+
+
+test("a page from the previous series is hidden until the new URL search completes", () => {
+  const page: ContentSearchResult = { total: 1, nextCursor: "old-cursor", items: [{ key: "QUESTION:1", id: 1, contentType: "QUESTION", subtype: "Standardfrage", title: "Nur Reihe A", status: "Entwurf", archived: false, scope: "Reihe A", mediaCount: 0, quizUsages: [], assignableQuizIds: [], editHref: "/content/questions/1", canClone: false, canArchive: false }] };
+  assert.deepEqual(visibleContentSearchResult(page, "series=1", "series=2"), { items: [], total: 0 });
+  assert.deepEqual(visibleContentSearchResult(page, "series=1:refresh0", "series=1:refresh1"), { items: [], total: 0 });
+  assert.equal(visibleContentSearchResult(page, "series=1", "series=1"), page);
 });
