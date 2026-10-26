@@ -264,6 +264,7 @@ export type teamsWhereInput = {
   foto_upload_gesperrt?: Prisma.BoolFilter<"teams"> | boolean
   created_at?: Prisma.DateTimeFilter<"teams"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"teams"> | Date | string
+  game_team_assignments?: Prisma.Game_team_assignmentsListRelationFilter
   quiz_teams?: Prisma.Quiz_teamsListRelationFilter
   quiz_team_sessions?: Prisma.Quiz_team_sessionsListRelationFilter
 }
@@ -280,6 +281,7 @@ export type teamsOrderByWithRelationInput = {
   foto_upload_gesperrt?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  game_team_assignments?: Prisma.game_team_assignmentsOrderByRelationAggregateInput
   quiz_teams?: Prisma.quiz_teamsOrderByRelationAggregateInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsOrderByRelationAggregateInput
 }
@@ -299,6 +301,7 @@ export type teamsWhereUniqueInput = Prisma.AtLeast<{
   foto_upload_gesperrt?: Prisma.BoolFilter<"teams"> | boolean
   created_at?: Prisma.DateTimeFilter<"teams"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"teams"> | Date | string
+  game_team_assignments?: Prisma.Game_team_assignmentsListRelationFilter
   quiz_teams?: Prisma.Quiz_teamsListRelationFilter
   quiz_team_sessions?: Prisma.Quiz_team_sessionsListRelationFilter
 }, "team_id" | "teamname" | "teamname_normalisiert">
@@ -350,6 +353,7 @@ export type teamsCreateInput = {
   foto_upload_gesperrt?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  game_team_assignments?: Prisma.game_team_assignmentsCreateNestedManyWithoutTeamInput
   quiz_teams?: Prisma.quiz_teamsCreateNestedManyWithoutTeamsInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsCreateNestedManyWithoutTeamInput
 }
@@ -366,6 +370,7 @@ export type teamsUncheckedCreateInput = {
   foto_upload_gesperrt?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  game_team_assignments?: Prisma.game_team_assignmentsUncheckedCreateNestedManyWithoutTeamInput
   quiz_teams?: Prisma.quiz_teamsUncheckedCreateNestedManyWithoutTeamsInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsUncheckedCreateNestedManyWithoutTeamInput
 }
@@ -381,6 +386,7 @@ export type teamsUpdateInput = {
   foto_upload_gesperrt?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  game_team_assignments?: Prisma.game_team_assignmentsUpdateManyWithoutTeamNestedInput
   quiz_teams?: Prisma.quiz_teamsUpdateManyWithoutTeamsNestedInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsUpdateManyWithoutTeamNestedInput
 }
@@ -397,6 +403,7 @@ export type teamsUncheckedUpdateInput = {
   foto_upload_gesperrt?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  game_team_assignments?: Prisma.game_team_assignmentsUncheckedUpdateManyWithoutTeamNestedInput
   quiz_teams?: Prisma.quiz_teamsUncheckedUpdateManyWithoutTeamsNestedInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsUncheckedUpdateManyWithoutTeamNestedInput
 }
@@ -525,6 +532,20 @@ export type teamsUpdateOneRequiredWithoutQuiz_team_sessionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.teamsUpdateToOneWithWhereWithoutQuiz_team_sessionsInput, Prisma.teamsUpdateWithoutQuiz_team_sessionsInput>, Prisma.teamsUncheckedUpdateWithoutQuiz_team_sessionsInput>
 }
 
+export type teamsCreateNestedOneWithoutGame_team_assignmentsInput = {
+  create?: Prisma.XOR<Prisma.teamsCreateWithoutGame_team_assignmentsInput, Prisma.teamsUncheckedCreateWithoutGame_team_assignmentsInput>
+  connectOrCreate?: Prisma.teamsCreateOrConnectWithoutGame_team_assignmentsInput
+  connect?: Prisma.teamsWhereUniqueInput
+}
+
+export type teamsUpdateOneRequiredWithoutGame_team_assignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.teamsCreateWithoutGame_team_assignmentsInput, Prisma.teamsUncheckedCreateWithoutGame_team_assignmentsInput>
+  connectOrCreate?: Prisma.teamsCreateOrConnectWithoutGame_team_assignmentsInput
+  upsert?: Prisma.teamsUpsertWithoutGame_team_assignmentsInput
+  connect?: Prisma.teamsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.teamsUpdateToOneWithWhereWithoutGame_team_assignmentsInput, Prisma.teamsUpdateWithoutGame_team_assignmentsInput>, Prisma.teamsUncheckedUpdateWithoutGame_team_assignmentsInput>
+}
+
 export type teamsCreateWithoutQuiz_teamsInput = {
   teamname: string
   teamname_normalisiert: string
@@ -536,6 +557,7 @@ export type teamsCreateWithoutQuiz_teamsInput = {
   foto_upload_gesperrt?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  game_team_assignments?: Prisma.game_team_assignmentsCreateNestedManyWithoutTeamInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsCreateNestedManyWithoutTeamInput
 }
 
@@ -551,6 +573,7 @@ export type teamsUncheckedCreateWithoutQuiz_teamsInput = {
   foto_upload_gesperrt?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  game_team_assignments?: Prisma.game_team_assignmentsUncheckedCreateNestedManyWithoutTeamInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsUncheckedCreateNestedManyWithoutTeamInput
 }
 
@@ -581,6 +604,7 @@ export type teamsUpdateWithoutQuiz_teamsInput = {
   foto_upload_gesperrt?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  game_team_assignments?: Prisma.game_team_assignmentsUpdateManyWithoutTeamNestedInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsUpdateManyWithoutTeamNestedInput
 }
 
@@ -596,6 +620,7 @@ export type teamsUncheckedUpdateWithoutQuiz_teamsInput = {
   foto_upload_gesperrt?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  game_team_assignments?: Prisma.game_team_assignmentsUncheckedUpdateManyWithoutTeamNestedInput
   quiz_team_sessions?: Prisma.quiz_team_sessionsUncheckedUpdateManyWithoutTeamNestedInput
 }
 
@@ -610,6 +635,7 @@ export type teamsCreateWithoutQuiz_team_sessionsInput = {
   foto_upload_gesperrt?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  game_team_assignments?: Prisma.game_team_assignmentsCreateNestedManyWithoutTeamInput
   quiz_teams?: Prisma.quiz_teamsCreateNestedManyWithoutTeamsInput
 }
 
@@ -625,6 +651,7 @@ export type teamsUncheckedCreateWithoutQuiz_team_sessionsInput = {
   foto_upload_gesperrt?: boolean
   created_at?: Date | string
   updated_at?: Date | string
+  game_team_assignments?: Prisma.game_team_assignmentsUncheckedCreateNestedManyWithoutTeamInput
   quiz_teams?: Prisma.quiz_teamsUncheckedCreateNestedManyWithoutTeamsInput
 }
 
@@ -655,6 +682,7 @@ export type teamsUpdateWithoutQuiz_team_sessionsInput = {
   foto_upload_gesperrt?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  game_team_assignments?: Prisma.game_team_assignmentsUpdateManyWithoutTeamNestedInput
   quiz_teams?: Prisma.quiz_teamsUpdateManyWithoutTeamsNestedInput
 }
 
@@ -670,7 +698,86 @@ export type teamsUncheckedUpdateWithoutQuiz_team_sessionsInput = {
   foto_upload_gesperrt?: Prisma.BoolFieldUpdateOperationsInput | boolean
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  game_team_assignments?: Prisma.game_team_assignmentsUncheckedUpdateManyWithoutTeamNestedInput
   quiz_teams?: Prisma.quiz_teamsUncheckedUpdateManyWithoutTeamsNestedInput
+}
+
+export type teamsCreateWithoutGame_team_assignmentsInput = {
+  teamname: string
+  teamname_normalisiert: string
+  team_passwort?: string | null
+  ist_archiviert?: boolean
+  archiviert_am?: Date | string | null
+  avatar_code?: string | null
+  foto_url?: string | null
+  foto_upload_gesperrt?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  quiz_teams?: Prisma.quiz_teamsCreateNestedManyWithoutTeamsInput
+  quiz_team_sessions?: Prisma.quiz_team_sessionsCreateNestedManyWithoutTeamInput
+}
+
+export type teamsUncheckedCreateWithoutGame_team_assignmentsInput = {
+  team_id?: number
+  teamname: string
+  teamname_normalisiert: string
+  team_passwort?: string | null
+  ist_archiviert?: boolean
+  archiviert_am?: Date | string | null
+  avatar_code?: string | null
+  foto_url?: string | null
+  foto_upload_gesperrt?: boolean
+  created_at?: Date | string
+  updated_at?: Date | string
+  quiz_teams?: Prisma.quiz_teamsUncheckedCreateNestedManyWithoutTeamsInput
+  quiz_team_sessions?: Prisma.quiz_team_sessionsUncheckedCreateNestedManyWithoutTeamInput
+}
+
+export type teamsCreateOrConnectWithoutGame_team_assignmentsInput = {
+  where: Prisma.teamsWhereUniqueInput
+  create: Prisma.XOR<Prisma.teamsCreateWithoutGame_team_assignmentsInput, Prisma.teamsUncheckedCreateWithoutGame_team_assignmentsInput>
+}
+
+export type teamsUpsertWithoutGame_team_assignmentsInput = {
+  update: Prisma.XOR<Prisma.teamsUpdateWithoutGame_team_assignmentsInput, Prisma.teamsUncheckedUpdateWithoutGame_team_assignmentsInput>
+  create: Prisma.XOR<Prisma.teamsCreateWithoutGame_team_assignmentsInput, Prisma.teamsUncheckedCreateWithoutGame_team_assignmentsInput>
+  where?: Prisma.teamsWhereInput
+}
+
+export type teamsUpdateToOneWithWhereWithoutGame_team_assignmentsInput = {
+  where?: Prisma.teamsWhereInput
+  data: Prisma.XOR<Prisma.teamsUpdateWithoutGame_team_assignmentsInput, Prisma.teamsUncheckedUpdateWithoutGame_team_assignmentsInput>
+}
+
+export type teamsUpdateWithoutGame_team_assignmentsInput = {
+  teamname?: Prisma.StringFieldUpdateOperationsInput | string
+  teamname_normalisiert?: Prisma.StringFieldUpdateOperationsInput | string
+  team_passwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_upload_gesperrt?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  quiz_teams?: Prisma.quiz_teamsUpdateManyWithoutTeamsNestedInput
+  quiz_team_sessions?: Prisma.quiz_team_sessionsUpdateManyWithoutTeamNestedInput
+}
+
+export type teamsUncheckedUpdateWithoutGame_team_assignmentsInput = {
+  team_id?: Prisma.IntFieldUpdateOperationsInput | number
+  teamname?: Prisma.StringFieldUpdateOperationsInput | string
+  teamname_normalisiert?: Prisma.StringFieldUpdateOperationsInput | string
+  team_passwort?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  avatar_code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  foto_upload_gesperrt?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  quiz_teams?: Prisma.quiz_teamsUncheckedUpdateManyWithoutTeamsNestedInput
+  quiz_team_sessions?: Prisma.quiz_team_sessionsUncheckedUpdateManyWithoutTeamNestedInput
 }
 
 
@@ -679,11 +786,13 @@ export type teamsUncheckedUpdateWithoutQuiz_team_sessionsInput = {
  */
 
 export type TeamsCountOutputType = {
+  game_team_assignments: number
   quiz_teams: number
   quiz_team_sessions: number
 }
 
 export type TeamsCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  game_team_assignments?: boolean | TeamsCountOutputTypeCountGame_team_assignmentsArgs
   quiz_teams?: boolean | TeamsCountOutputTypeCountQuiz_teamsArgs
   quiz_team_sessions?: boolean | TeamsCountOutputTypeCountQuiz_team_sessionsArgs
 }
@@ -696,6 +805,13 @@ export type TeamsCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extens
    * Select specific fields to fetch from the TeamsCountOutputType
    */
   select?: Prisma.TeamsCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * TeamsCountOutputType without action
+ */
+export type TeamsCountOutputTypeCountGame_team_assignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.game_team_assignmentsWhereInput
 }
 
 /**
@@ -725,6 +841,7 @@ export type teamsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   foto_upload_gesperrt?: boolean
   created_at?: boolean
   updated_at?: boolean
+  game_team_assignments?: boolean | Prisma.teams$game_team_assignmentsArgs<ExtArgs>
   quiz_teams?: boolean | Prisma.teams$quiz_teamsArgs<ExtArgs>
   quiz_team_sessions?: boolean | Prisma.teams$quiz_team_sessionsArgs<ExtArgs>
   _count?: boolean | Prisma.TeamsCountOutputTypeDefaultArgs<ExtArgs>
@@ -774,6 +891,7 @@ export type teamsSelectScalar = {
 
 export type teamsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"team_id" | "teamname" | "teamname_normalisiert" | "team_passwort" | "ist_archiviert" | "archiviert_am" | "avatar_code" | "foto_url" | "foto_upload_gesperrt" | "created_at" | "updated_at", ExtArgs["result"]["teams"]>
 export type teamsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  game_team_assignments?: boolean | Prisma.teams$game_team_assignmentsArgs<ExtArgs>
   quiz_teams?: boolean | Prisma.teams$quiz_teamsArgs<ExtArgs>
   quiz_team_sessions?: boolean | Prisma.teams$quiz_team_sessionsArgs<ExtArgs>
   _count?: boolean | Prisma.TeamsCountOutputTypeDefaultArgs<ExtArgs>
@@ -784,6 +902,7 @@ export type teamsIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
 export type $teamsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "teams"
   objects: {
+    game_team_assignments: Prisma.$game_team_assignmentsPayload<ExtArgs>[]
     quiz_teams: Prisma.$quiz_teamsPayload<ExtArgs>[]
     quiz_team_sessions: Prisma.$quiz_team_sessionsPayload<ExtArgs>[]
   }
@@ -1193,6 +1312,7 @@ readonly fields: teamsFieldRefs;
  */
 export interface Prisma__teamsClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  game_team_assignments<T extends Prisma.teams$game_team_assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.teams$game_team_assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$game_team_assignmentsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   quiz_teams<T extends Prisma.teams$quiz_teamsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.teams$quiz_teamsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$quiz_teamsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   quiz_team_sessions<T extends Prisma.teams$quiz_team_sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.teams$quiz_team_sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$quiz_team_sessionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1625,6 +1745,30 @@ export type teamsDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Limit how many teams to delete.
    */
   limit?: number
+}
+
+/**
+ * teams.game_team_assignments
+ */
+export type teams$game_team_assignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the game_team_assignments
+   */
+  select?: Prisma.game_team_assignmentsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the game_team_assignments
+   */
+  omit?: Prisma.game_team_assignmentsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.game_team_assignmentsInclude<ExtArgs> | null
+  where?: Prisma.game_team_assignmentsWhereInput
+  orderBy?: Prisma.game_team_assignmentsOrderByWithRelationInput | Prisma.game_team_assignmentsOrderByWithRelationInput[]
+  cursor?: Prisma.game_team_assignmentsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Game_team_assignmentsScalarFieldEnum | Prisma.Game_team_assignmentsScalarFieldEnum[]
 }
 
 /**

@@ -51,6 +51,7 @@ test("additive draft migration and real repository authorization on isolated Pos
   const before = (await db.query("SELECT to_jsonb(q) data FROM pubquiz.quiz q WHERE quiz_id=11")).rows[0].data;
   const rolesBefore = (await db.query("SELECT * FROM pubquiz.benutzer_reihenrollen ORDER BY benutzer_id")).rows;
   await db.query(migration);
+  await db.query(readFileSync('prisma/migrations/20261026180000_game_team_assignments/migration.sql','utf8'));
   assert.deepEqual((await db.query("SELECT to_jsonb(q) data FROM pubquiz.quiz q WHERE quiz_id=11")).rows[0].data,before);
   assert.deepEqual((await db.query("SELECT * FROM pubquiz.benutzer_reihenrollen ORDER BY benutzer_id")).rows,rolesBefore);
   const prisma = new PrismaClient({adapter:new PrismaPg({connectionString:target.toString()})});
