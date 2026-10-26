@@ -260,3 +260,16 @@
   .presentation-template.presentation-readable[data-design-style] [data-presentation-layout="MEDIA_FOCUS"] { grid-template-rows: auto minmax(14rem, 1fr); }
   .presentation-template.presentation-readable[data-design-style] .presentation-question-card { justify-content: safe center; }
 }
+
+/* Only the explicitly responsive AP3 preview; published/live renderers retain their layout. */
+[data-preview-responsive="true"] .presentation-content-inner > [data-presentation-layout] {
+  height: auto !important;
+  min-height: 100%;
+  grid-auto-rows: minmax(min-content, auto);
+}
+[data-preview-responsive="true"] .presentation-question-card,
+[data-preview-responsive="true"] .presentation-solution-question,
+[data-preview-responsive="true"] .presentation-answer-panel,
+[data-preview-responsive="true"] .presentation-solution-result {
+  min-height: min-content !important;
+}
