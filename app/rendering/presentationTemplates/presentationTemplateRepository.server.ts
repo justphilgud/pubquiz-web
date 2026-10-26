@@ -91,7 +91,7 @@ export async function listAssignablePresentationTemplates(): Promise<
 
 export async function listManagedPresentationTemplates(): Promise<PresentationTemplateRepositoryResult> {
   try {
-    const [stored, eventSeries, quizzes] = await Promise.all([
+    const [stored, eventSeries, quizzes, games] = await Promise.all([
       prisma.presentation_templates.findMany({
         include: { created_by: { select: { name: true, email: true } } },
         orderBy: [{ status: "asc" }, { updated_at: "desc" }],
@@ -100,32 +100,39 @@ export async function listManagedPresentationTemplates(): Promise<PresentationTe
         select: {
           default_presentation_template_id: true,
           default_answer_form_template_id: true,
+          shared_design_template_id:true,
         },
       }),
       prisma.quiz.findMany({
         select: {
           presentation_template_id: true,
           answer_form_template_id: true,
+          shared_design_template_id:true,
         },
       }),
+      prisma.game_drafts.findMany({select:{shared_design_template_id:true}}),
     ]);
 
     const usage = new Map<string, number>();
     const count = (id: string | null) => {
-      if (id) usage.set(id, (usage.get(id) ?? 0) + 1);
+      if (id && id!=="INHERIT") usage.set(id, (usage.get(id) ?? 0) + 1);
     };
     for (const series of eventSeries) {
+      if(series.shared_design_template_id!==series.default_presentation_template_id&&series.shared_design_template_id!==series.default_answer_form_template_id)count(series.shared_design_template_id);
       count(series.default_presentation_template_id);
       if (series.default_answer_form_template_id !== series.default_presentation_template_id) {
         count(series.default_answer_form_template_id);
       }
     }
     for (const quiz of quizzes) {
+      if(quiz.shared_design_template_id!==quiz.presentation_template_id&&quiz.shared_design_template_id!==quiz.answer_form_template_id)count(quiz.shared_design_template_id);
       count(quiz.presentation_template_id);
       if (quiz.answer_form_template_id !== quiz.presentation_template_id) {
         count(quiz.answer_form_template_id);
       }
     }
+
+    for(const game of games)count(game.shared_design_template_id);
 
     const userTemplates = stored.flatMap((template) => {
       const config = parsePresentationTemplateConfig(template.theme_config_json);

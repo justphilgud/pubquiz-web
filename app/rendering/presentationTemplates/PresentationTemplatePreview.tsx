@@ -176,9 +176,9 @@ function ScaledPreviewStage({
         data-preview-fixed-stage
         className="absolute left-0 top-0"
         style={{
-          width: PREVIEW_STAGE_WIDTH,
-          height: PREVIEW_STAGE_HEIGHT,
-          transform: `scale(${scale})`,
+          width: responsive ? "100%" : PREVIEW_STAGE_WIDTH,
+          height: responsive ? "100%" : PREVIEW_STAGE_HEIGHT,
+          transform: responsive ? undefined : `scale(${scale})`,
           transformOrigin: "top left",
         }}
       >

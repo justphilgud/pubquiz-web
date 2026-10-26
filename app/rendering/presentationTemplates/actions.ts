@@ -229,31 +229,19 @@ export async function duplicatePresentationTemplate(sourceId: string) {
 export async function setPresentationTemplateArchived(id: string, archived: boolean) {
   await requireAdmin();
   if (isSystemId(id)) return;
-  if (archived) {
-    const [eventSeriesUsage, quizUsage] = await Promise.all([
-      prisma.eventreihen.count({
-        where: {
-          OR: [
-            { default_presentation_template_id: id },
-            { default_answer_form_template_id: id },
-          ],
-        },
-      }),
-      prisma.quiz.count({
-        where: {
-          OR: [
-            { presentation_template_id: id },
-            { answer_form_template_id: id },
-          ],
-        },
-      }),
-    ]);
-    if (eventSeriesUsage + quizUsage > 0) return;
-  }
-  await prisma.presentation_templates.update({
-    where: { presentation_template_id: id, ist_systemtemplate: false },
-    data: { status: archived ? "ARCHIVED" : "DRAFT" },
+  await prisma.$transaction(async tx=>{
+    // Shared-design assignment takes FOR SHARE on this same template before writing.
+    await tx.$queryRaw`SELECT presentation_template_id FROM pubquiz.presentation_templates WHERE presentation_template_id=${id} FOR UPDATE`;
+    if(archived){
+      const [series,quizzes,games]=await Promise.all([
+        tx.eventreihen.count({where:{OR:[{default_presentation_template_id:id},{default_answer_form_template_id:id},{shared_design_template_id:id}]}}),
+        tx.quiz.count({where:{OR:[{presentation_template_id:id},{answer_form_template_id:id},{shared_design_template_id:id}]}}),
+        tx.game_drafts.count({where:{shared_design_template_id:id}}),
+      ]);
+      if(series+quizzes+games>0)return;
+    }
+    await tx.presentation_templates.update({where:{presentation_template_id:id,ist_systemtemplate:false},data:{status:archived?'ARCHIVED':'DRAFT'}});
   });
-  revalidatePath("/templates");
+  revalidatePath('/templates');
   revalidatePath(`/templates/${id}`);
 }

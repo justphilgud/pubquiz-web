@@ -24,6 +24,7 @@ export function validateTarget(value: unknown): DesignTarget {
 async function templateConfig(tx: Prisma.TransactionClient,id:string) {
   const system:PresentationTemplate|undefined=getPresentationTemplate(id);
   if(system?.selectable)return {id,name:system.displayName ?? (id==='phil-gud'?'Phil Gud':id==='lovd-ungegoogelt'?'LOVD × Phil Gud':id),config:{version:1 as const,tokens:system.tokens,design:structuredClone(system.design),surfaces:{presentation:system.variant,moderation:system.moderationVariant??'BRANDED' as const,answerForm:getAnswerFormTemplate(id)?.variant??'BRANDED' as const}}};
+  await tx.$queryRaw`SELECT presentation_template_id FROM pubquiz.presentation_templates WHERE presentation_template_id=${id} FOR SHARE`;
   const row=await tx.presentation_templates.findUnique({where:{presentation_template_id:id},select:{name:true,status:true,theme_config_json:true}});
   if(!row || row.status!=='ACTIVE')throw new DesignError('Die Designvorlage ist nicht verfügbar. Bitte eine unterstützte aktive Vorlage wählen.');
   const config=parsePresentationTemplateConfig(row.theme_config_json);
@@ -72,7 +73,7 @@ export async function readDesign(userId:number,input:unknown) {
   },{isolationLevel:'RepeatableRead'});
   const managed=(await listManagedPresentationTemplates()).templates;
   const templates=managed.filter(t=>(t.status==='SYSTEM'||t.status==='ACTIVE')&&supportsSharedDesign(t.config)).map(t=>({id:t.id,name:t.name}));
-  return {...data,templates,answerTemplates:[...templateRegistry.answerForm.filter(t=>t.selectable).map(t=>({id:t.id,name:('displayName'in t?t.displayName:t.id)})),...managed.filter(t=>t.source==='USER'&&t.status==='ACTIVE').map(t=>({id:t.id,name:t.name}))]};
+  return {...data,templates,answerTemplates:[...templateRegistry.answerForm.filter(t=>t.selectable).map(t=>({id:t.id,name:managed.find(m=>m.id===t.id)?.name??('displayName'in t?t.displayName:t.id)})),...managed.filter(t=>t.source==='USER'&&t.status==='ACTIVE').map(t=>({id:t.id,name:t.name}))]};
 }
 export async function writeDesign(userId:number,input:unknown) {
   if(!input||typeof input!=='object'||Array.isArray(input))return deny();

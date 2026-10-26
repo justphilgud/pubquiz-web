@@ -28,3 +28,6 @@ Der bisherige Test quizLifecycle verlangt ausdrücklich nur eine gemeinsame Quiz
 
 Der Quiz-Snapshot enthält getrennt die gemeinsame Designbasis und die aufgelöste Antwortformularvorlage. Beide bleiben nach Start stabil, auch bei Vorlagen-/Reihenänderung und Reload. Der bestehende Stammdaten-Schreibweg synchronisiert Antwortvorlagen nur im Legacyzweig; AP3-Auswahlen werden erhalten. Kopien übernehmen die ausdrückliche Auswahl, aber keinen Laufzeit-Snapshot.
 
+
+Die vorhandene Verwendungsanzeige und Archivierungssperre zählen gemeinsame Reihen-/Quiz-/Spielreferenzen mit. AP3-Zuordnung sperrt die Vorlagenzeile lesend, Archivierung dieselbe Zeile vor ihrer Referenzprüfung schreibend; eine parallele neue AP3-Zuordnung darf keine archivierte Vorlage hinterlassen. Alte Schutzregeln bleiben bestehen.
+
