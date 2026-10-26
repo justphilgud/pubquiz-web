@@ -47,13 +47,19 @@ test("additive game-team migration and real Actions with isolated PostgreSQL on 
     INSERT INTO pubquiz.benutzer_reihenrollen(benutzer_id,eventreihe_id,rolle) VALUES(3,10,'EVENT_MANAGER'),(4,10,'EDITOR'),(5,20,'EVENT_MANAGER');
     INSERT INTO pubquiz.eventreihe_verwaltung(benutzer_id,eventreihe_id)VALUES(6,10);
     INSERT INTO pubquiz.quiz(quiz_id,eventreihe_id,titel,quiz_datum,intro_begruessungstext)VALUES(11,10,'Existing synthetic quiz','2026-10-26','Preserve me');
+    INSERT INTO pubquiz.game_drafts(id,eventart,eventreihe_id,titel,datum,uhrzeit)VALUES('99000000-0000-4000-8000-000000000001','BINGO',10,'Existing game before AP2','2026-11-20','19:30');
+    INSERT INTO pubquiz.teams(team_id,teamname,teamname_normalisiert,avatar_code)VALUES(9000,'Existing team before AP2','existing team before ap2','toaster');
   `);
   const before = (await db.query("SELECT to_jsonb(q) data FROM pubquiz.quiz q WHERE quiz_id=11")).rows[0].data;
+  const draftBefore=(await db.query("SELECT to_jsonb(g) data FROM pubquiz.game_drafts g WHERE id='99000000-0000-4000-8000-000000000001'")).rows[0].data;
+  const teamBefore=(await db.query('SELECT to_jsonb(t) data FROM pubquiz.teams t WHERE team_id=9000')).rows[0].data;
   const rolesBefore = (await db.query("SELECT * FROM pubquiz.benutzer_reihenrollen ORDER BY benutzer_id")).rows;
   await db.query(migration);
 
   assert.deepEqual((await db.query("SELECT to_jsonb(q) data FROM pubquiz.quiz q WHERE quiz_id=11")).rows[0].data,before);
   assert.deepEqual((await db.query("SELECT * FROM pubquiz.benutzer_reihenrollen ORDER BY benutzer_id")).rows,rolesBefore);
+  assert.deepEqual((await db.query("SELECT to_jsonb(g) data FROM pubquiz.game_drafts g WHERE id='99000000-0000-4000-8000-000000000001'")).rows[0].data,draftBefore);
+  assert.deepEqual((await db.query('SELECT to_jsonb(t) data FROM pubquiz.teams t WHERE team_id=9000')).rows[0].data,teamBefore);
   const prisma = new PrismaClient({adapter:new PrismaPg({connectionString:target.toString()})});
   context.after(async()=>{await prisma.$disconnect();});
   let currentUser: number | null = 3;

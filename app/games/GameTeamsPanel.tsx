@@ -39,7 +39,7 @@ export default function GameTeamsPanel({ type, gameId, seriesId, updatedAt, init
     {data.assigned.length>0 && !visible.length && <p>Keine passende Zuordnung. Die übrigen Zuordnungen bleiben erhalten.</p>}
     <ul className="max-h-96 space-y-2 overflow-y-auto">{visible.map(a=><li key={a.id} className="flex min-w-0 flex-wrap items-center gap-3 border-b py-2">
       <TeamAvatar code={a.team.avatar} className="h-10 w-10 shrink-0" /><span className="min-w-0 flex-1 break-words [overflow-wrap:anywhere]">{a.team.name}{a.team.archived && <span className="block text-xs">Archiviert</span>}</span>
-      {data.canWrite && <Button type="button" variant="secondary" disabled={disabled} onClick={()=>setRemoval(a)} aria-label={`Zuordnung entfernen: ${a.team.name}`}>Zuordnung entfernen</Button>}
+      {data.canWrite && <Button type="button" variant="secondary" className="w-full sm:w-auto" disabled={disabled} onClick={()=>setRemoval(a)} aria-label={`Zuordnung entfernen: ${a.team.name}`}>Zuordnung entfernen</Button>}
     </li>)}</ul>
     {data.canWrite && <div className="space-y-3">
       {!data.canAdd ? <p>In archivierten Eventreihen können keine neuen Teams zugeordnet werden.</p> : !data.hasTeamScope ? <p>Deine bestehende Teamverwaltung enthält keinen auswählbaren Teambestand. Eine Spielberechtigung allein erlaubt keine globale Teamsuche.</p> : <>
