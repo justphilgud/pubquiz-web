@@ -47,7 +47,8 @@ test("presentation selection is the only template choice in event series and qui
 test("quiz overview and editor expose compact, distinct settings and content actions", () => {
   assert.match(quizForm, /title="Quiz-Einstellungen"/);
   assert.match(quizForm, /title="Quizinhalt bearbeiten"/);
-  assert.match(quizForm, /href=\{`\/quiz\/\$\{quiz\.quiz_id\}`\}/);
+  assert.match(quizForm, /href=\{`\/quiz\/\$\{quiz\.quiz_id\}\?returnTo=\$\{encodeURIComponent\(returnTo\)\}`\}/);
+  assert.match(quizDetail, /quizCollectionReturnHref\(\(await searchParams\)\.returnTo, quiz\.eventreihe_id\)/);
   assert.match(quizDetail, /aria-label="Quiz-Einstellungen öffnen"/);
   assert.doesNotMatch(quizDetail, />Produktive Oberflächen</);
   assert.doesNotMatch(quizDetail, />Effektives Präsentationstemplate</);
