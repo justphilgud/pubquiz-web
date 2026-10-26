@@ -24,7 +24,7 @@ Die Website ist eine Marketingfläche mit großen Überschriften. Verwaltung ver
 
 `AdminAppearance` ist ausschließlich eine visuelle Grenze im Rootlayout. Die reine `isAdministrationPath`-Policy markiert bekannte Verwaltungs-/Login-/Kontorouten. Live-Präsentation, Moderation, Teamformular, interne Quiztestansicht, öffentliche Einreichung und Präsentationsreferenz erhalten keinen Wrapper. Die Komponenten behalten ihre Actions, Berechtigungen, Formzustände, Filter, Rückwege und Dirty-Guards; PR-131-Navigation und Bezeichnungen bleiben unverändert.
 
-Styles gelten nur unter `[data-admin-ui="phil-gud"]`. Eingebettete `[data-quiz-theme-version]`-Flächen und deren Nachfahren sind explizit ausgenommen. Keine globalen Tailwind-Farbtokenänderungen, keine allgemeine Umfärbung von Spielen. Header/Anmeldekarte bekommen das echte Logo mit korrekten intrinsischen Dimensionen. Bestehendes `APP_BRAND` wird nicht als neues Runtime-Theme global umdefiniert.
+Styles gelten nur unter `[data-admin-ui="phil-gud"]`. Eingebettete `[data-quiz-theme-version]`-Flächen und deren Nachfahren sind explizit ausgenommen. Portal-Dialoge erhalten dieselbe ausdrückliche Routengrenze am Dialoginhalt, ohne Overlay-, Fokus-, Escape- oder Schließlogik zu ändern. Keine globalen Tailwind-Farbtokenänderungen, keine allgemeine Umfärbung von Spielen. Header/Anmeldekarte bekommen das echte Logo mit korrekten intrinsischen Dimensionen. Bestehendes `APP_BRAND` wird nicht als neues Runtime-Theme global umdefiniert.
 
 ## Zusätzliches Template „Phil Gud“
 

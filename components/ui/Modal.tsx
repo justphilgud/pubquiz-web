@@ -2,6 +2,8 @@
 
 import { ReactNode, useEffect, useId, useRef, useSyncExternalStore } from "react";
 import { createPortal } from "react-dom";
+import { usePathname } from "next/navigation";
+import { isAdministrationPath } from "@/app/branding/adminAppearancePolicy";
 
 const subscribeToClient = () => () => {};
 
@@ -21,6 +23,7 @@ export function Modal({
   className?: string;
 }) {
   const titleId = useId();
+  const adminAppearance = isAdministrationPath(usePathname());
   const isClient = useSyncExternalStore(subscribeToClient, () => true, () => false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
@@ -75,7 +78,7 @@ export function Modal({
         }
       }}
     >
-      <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1} className="flex max-h-[calc(100dvh-2rem)] w-full min-h-0 max-w-lg flex-col rounded-xl bg-white shadow-xl">
+      <div data-admin-ui={adminAppearance ? "phil-gud" : undefined} ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1} className="flex max-h-[calc(100dvh-2rem)] w-full min-h-0 max-w-lg flex-col rounded-xl bg-white shadow-xl">
         <div className="flex shrink-0 items-center justify-between gap-3 border-b p-4">
           <h2 id={titleId} className="text-lg font-semibold">{title}</h2>
           <button
