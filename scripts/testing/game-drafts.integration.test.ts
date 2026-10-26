@@ -10,6 +10,8 @@ import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { runInNewContext } from "node:vm";
 import { build } from "esbuild";
+import { COLUMN_SQL, CATALOG_SQL } from "../operations/snapshot";
+import { auditColumns, inspectRow, type Column } from "../operations/acceptance-policy";
 
 const base = process.env.GAME_DRAFT_TEST_DATABASE_URL;
 test("additive draft migration and real repository authorization on isolated PostgreSQL", {skip:!base,timeout:180000}, async context => {
@@ -76,6 +78,13 @@ test("additive draft migration and real repository authorization on isolated Pos
   const karaoke = await api.writeGameDraft(3,"POWERPOINT_KARAOKE",{...input,title:"Karaoke draft"});
   assert.notEqual(bingo.id,karaoke.id);
   assert.equal(bingo.status,"DRAFT");
+  const columns = (await db.query(COLUMN_SQL)).rows[0].coalesce as Column[];
+  auditColumns(columns);
+  assert.equal(columns.filter(c=>c.schema==="pubquiz"&&c.table==="game_drafts").length,9,"backup column inventory must include every new column");
+  const catalog = (await db.query(CATALOG_SQL)).rows[0].json_build_object as {constraints:{table:string}[]};
+  assert.equal(catalog.constraints.filter(c=>c.table==="game_drafts").length,6,"backup catalog must cover new constraints");
+  const storedRow=(await db.query("SELECT to_jsonb(g) data FROM pubquiz.game_drafts g WHERE id=$1",[bingo.id])).rows[0].data;
+  assert.doesNotThrow(()=>inspectRow(storedRow,new Set(),"pubquiz","game_drafts"));
   assert.equal((await api.readGameDraft(3,"BINGO",bingo.id)).game.date,"2028-02-29");
   assert.equal((await api.listGameDrafts(3,"BINGO")).games.length,2);
   assert.equal((await api.readGameDraft(4,"BINGO",bingo.id)).canWrite,false);

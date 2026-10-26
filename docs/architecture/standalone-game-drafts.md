@@ -27,3 +27,5 @@ Siehe den zugehörigen PR-Prüfbericht für tatsächlich ausgeführte Unit-, Pos
 ### Isolierte Preview-Baseline
 
 Die eigene Datenbank `games_review_20261026c` wurde neu aus dem Main-Schema `6828d50e` aufgebaut. Ausschließlich dort wurden vorhandene Migrationen mit dem regulären Prisma-Baselineverfahren als angewendet registriert; anschließend wurde die neue Migration mit `migrate deploy` ausgeführt. Keine bestehende Datenbankhistorie wurde umgeschrieben. Grund: Die historische vollständige Leerdatenbank-Replaykette scheitert bereits an BOM beziehungsweise doppelter Spalte nach `0_init`. Das ist ein bestehendes Bootstrapproblem, kein Fehler der neuen Migration. Eine Schema-Baseline ersetzt nicht die Prüfung historischer datenabhängiger Migrationen oder Trigger; diese Preview beansprucht diesen Nachweis nicht.
+
+Die Anzeige technischer Erstellungs-/Änderungszeitpunkte verwendet ausdrücklich `Europe/Berlin`, damit Server- und Browserrendering auch bei unterschiedlichen Systemzeitzonen identisch sind. Das optionale Veranstaltungsdatum und die Ortsuhrzeit bleiben davon unabhängige zivile Werte.
