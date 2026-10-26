@@ -18,3 +18,15 @@ export function parseDesignSelection(value: unknown, quiz=false): string | null 
   if(typeof value!=="string" || !/^[a-z0-9-]{1,64}$/.test(value))throw new Error('Ungültige Designauswahl.');
   return value;
 }
+export type QuizDesignSnapshot = { version:1; design:SharedDesign; answerForm:{id:string;name:string;config:PresentationTemplateConfig} };
+export function parseQuizDesignSnapshot(value:unknown):QuizDesignSnapshot|null {
+ if(!value||typeof value!=='object'||Array.isArray(value))return null;
+ const r=value as Record<string,unknown>;
+ if(Object.keys(r).sort().join(',')!=='answerForm,design,version'||r.version!==1)return null;
+ const design=parseSharedDesign(r.design),answer=r.answerForm;
+ if(!design||!answer||typeof answer!=='object'||Array.isArray(answer))return null;
+ const a=answer as Record<string,unknown>;
+ if(Object.keys(a).sort().join(',')!=='config,id,name'||typeof a.id!=='string'||!/^[a-z0-9-]{1,64}$/.test(a.id)||typeof a.name!=='string'||a.name.length>200)return null;
+ const config=parsePresentationTemplateConfig(a.config);
+ return config?{version:1,design,answerForm:{id:a.id,name:a.name,config}}:null;
+}

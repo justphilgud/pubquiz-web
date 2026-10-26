@@ -1,5 +1,5 @@
 import { resolveSharedDesign } from "./sharedDesign/sharedDesignRepository.server";
-import { parseSharedDesign } from "./sharedDesign/sharedDesign";
+import { parseQuizDesignSnapshot } from "./sharedDesign/sharedDesign";
 import "server-only";
 
 import { prisma } from "@/app/lib/prisma";
@@ -63,16 +63,17 @@ export async function resolveQuizTemplates(quizId: number) {
         quiz.eventreihe.default_presentation_template_id,
       additionalPresentationTemplates,
     });
-  const answerForm = resolveAnswerFormTemplate({
+  let answerForm = resolveAnswerFormTemplate({
       quizTemplateId: quiz.shared_design_template_id ? quiz.answer_form_template_id : quiz.presentation_template_id,
       eventSeriesTemplateId: quiz.shared_design_template_id ? quiz.eventreihe.default_answer_form_template_id : quiz.eventreihe.default_presentation_template_id,
       additionalAnswerFormTemplates,
     });
   if (quiz.shared_design_template_id) {
     const started=Boolean(quiz.praesentation_status?.quiz_started_at||quiz.praesentation_status?.quiz_stopped_at);
-    const snapshot=parseSharedDesign(quiz.shared_design_snapshot);
+    const snapshot=parseQuizDesignSnapshot(quiz.shared_design_snapshot);
     if(started&&!snapshot)throw new Error("Gemeinsamer Design-Snapshot fehlt oder ist ungültig.");
-    const resolved=started?{design:snapshot!,source:"Spielauswahl"}:await prisma.$transaction(tx=>resolveSharedDesign(tx,quiz.shared_design_template_id,quiz.eventreihe));
+    const resolved=started?{design:snapshot!.design,source:"Spielauswahl"}:await prisma.$transaction(tx=>resolveSharedDesign(tx,quiz.shared_design_template_id,quiz.eventreihe));
+    if(started&&snapshot)answerForm={template:toRuntimeAnswerFormTemplate(snapshot.answerForm),source:'QUIZ',requestedId:snapshot.answerForm.id,usedFallback:false};
     presentation={template:toRuntimePresentationTemplate({id:resolved.design.templateId,name:resolved.design.name,config:resolved.design.config}),source:resolved.source==='Reihenstandard'?'EVENT_SERIES':resolved.source==='Systemstandard'?'SYSTEM':'QUIZ',requestedId:quiz.shared_design_template_id,usedFallback:false};
   }
   const managedPresentation = await getManagedPresentationTemplate(

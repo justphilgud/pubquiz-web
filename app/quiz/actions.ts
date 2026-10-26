@@ -588,7 +588,7 @@ export async function updateQuiz(data: {
   if (!eventSeries.ok) return { success: false, message: eventSeries.message };
 
   const saved = await withSerializableTransaction(async (tx) => {
-    const current = await tx.quiz.findUnique({ where: { quiz_id: data.quizId }, select: { eventreihe_id: true } });
+    const current = await tx.quiz.findUnique({ where: { quiz_id: data.quizId }, select: { eventreihe_id: true, shared_design_template_id:true } });
     if (!current || current.eventreihe_id !== existing.eventreihe_id) {
       return { success: false, message: "Die Quizzuordnung wurde zwischenzeitlich geändert. Bitte neu laden." };
     }
@@ -615,7 +615,7 @@ export async function updateQuiz(data: {
         oeffentliche_beschreibung_modus: data.publicDescriptionMode === undefined ? undefined : validated.value.publicDescriptionMode,
         bemerkung: validated.value.internalNote,
         presentation_template_id: validated.value.presentationTemplateId,
-        answer_form_template_id: validated.value.presentationTemplateId,
+        ...(current.shared_design_template_id ? {} : { answer_form_template_id: validated.value.presentationTemplateId }),
         aufloesungsstrategie:
           data.solutionStrategy ??
           (isQuizSolutionStrategy(existing.aufloesungsstrategie)
@@ -778,7 +778,8 @@ export async function copyQuiz(data: {
         teilnehmer_anzahl: 0,
         bemerkung: validated.value.internalNote,
         presentation_template_id: validated.value.presentationTemplateId,
-        answer_form_template_id: validated.value.presentationTemplateId,
+        shared_design_template_id:original.shared_design_template_id,
+        answer_form_template_id: original.shared_design_template_id ? original.answer_form_template_id : validated.value.presentationTemplateId,
         aufloesungsstrategie: original.aufloesungsstrategie,
 
         intro_logo_url: original.intro_logo_url,

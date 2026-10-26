@@ -1,4 +1,4 @@
-import { parseSharedDesign } from "../../app/rendering/sharedDesign/sharedDesign";
+import { parseQuizDesignSnapshot } from "../../app/rendering/sharedDesign/sharedDesign";
 import { assertRestoreTarget, requireCondition } from "./guards";
 import { brandFontOptions } from "../../app/rendering/templateRegistry";
 import { isSafeTemplateAssetReference } from "../../app/rendering/presentationTemplates/presentationTemplateAssets";
@@ -66,13 +66,14 @@ function exactKeys(value: unknown, keys: string): asserts value is Record<string
 // Check exact shape and bounded design values, then retain the ordinary recursive scan.
 export function inspectRow(value: Record<string, unknown>, media: Set<string>, schema: string, table: string) {
   if (schema === "pubquiz" && table === "quiz" && value.shared_design_snapshot != null) {
-    const snapshot=parseSharedDesign(value.shared_design_snapshot);
+    const snapshot=parseQuizDesignSnapshot(value.shared_design_snapshot);
     requireCondition(snapshot !== null, "DESIGN_TOKEN_STRUCTURE_REVIEW_REQUIRED");
     const { shared_design_snapshot: _snapshot, ...rest }=value;
     void _snapshot;
     inspectValue(rest,media);
-    inspectValue({version:snapshot.version,templateId:snapshot.templateId,name:snapshot.name},media);
-    return inspectRow({theme_config_json:snapshot.config},media,"pubquiz","presentation_templates");
+    inspectValue({version:snapshot.version,templateId:snapshot.design.templateId,name:snapshot.design.name,answerId:snapshot.answerForm.id,answerName:snapshot.answerForm.name},media);
+    inspectRow({theme_config_json:snapshot.answerForm.config},media,"pubquiz","presentation_templates");
+    return inspectRow({theme_config_json:snapshot.design.config},media,"pubquiz","presentation_templates");
   }
   if (schema !== "pubquiz" || table !== "presentation_templates") return inspectValue(value, media);
   const { theme_config_json: config, ...rest } = value;

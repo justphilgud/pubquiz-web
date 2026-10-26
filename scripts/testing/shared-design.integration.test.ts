@@ -58,12 +58,12 @@ test("shared design additive migration, real policies, inheritance and frozen ru
   assert.deepEqual((await db.query("SELECT to_jsonb(t)-'shared_design_template_id' data FROM pubquiz.game_drafts t ORDER BY id")).rows.map(r=>r.data),gameBefore);
   const prisma=new PrismaClient({adapter:new PrismaPg({connectionString:target.toString()})});context.after(()=>prisma.$disconnect());
   let currentUser:number|null=1;
-  const bundle=await build({stdin:{contents:"export * from './app/rendering/sharedDesign/sharedDesignRepository.server'; export * as actions from './app/rendering/sharedDesign/actions'; export * from './app/rendering/resolveQuizTemplates.server'; export {starteQuiz} from './app/quiz/[quizId]/praesentation/statusActions';",resolveDir:process.cwd()},bundle:true,write:false,platform:'node',format:'cjs',packages:'external',plugins:[{name:'real-database',setup(b){
+  const bundle=await build({stdin:{contents:"export * from './app/rendering/sharedDesign/sharedDesignRepository.server'; export * as actions from './app/rendering/sharedDesign/actions'; export * from './app/rendering/resolveQuizTemplates.server'; export {starteQuiz} from './app/quiz/[quizId]/praesentation/statusActions'; export {updateQuiz} from './app/quiz/actions';",resolveDir:process.cwd()},bundle:true,write:false,platform:'node',format:'cjs',packages:'external',plugins:[{name:'real-database',setup(b){
     b.onResolve({filter:/^(server-only|@\/auth|next\/cache|next\/navigation|@\/app\/generated\/prisma\/client|@\/app\/lib\/prisma)$/},a=>({path:a.path,namespace:'fixture'}));
     b.onLoad({filter:/.*/,namespace:'fixture'},a=>({contents:a.path==='@/app/generated/prisma/client'?'export const Prisma=globalThis.prismaValue;':a.path==='server-only'?'':a.path==='@/auth'?'export const auth=async()=>globalThis.session();':a.path==='next/cache'?'export function revalidatePath(){}':a.path==='next/navigation'?'export function redirect(path){throw new Error("REDIRECT:"+path)}':'export const prisma=globalThis.fixture;'}));
   }}]});
   const runtime={exports:{}};runInNewContext(bundle.outputFiles[0].text,{module:runtime,exports:runtime.exports,require:createRequire(import.meta.url),fixture:prisma,prismaValue:Prisma,session:()=>currentUser?{user:{id:String(currentUser)}}:null,console,process,Date,Buffer,setTimeout,clearTimeout,structuredClone});
-  const api=runtime.exports as typeof import('@/app/rendering/sharedDesign/sharedDesignRepository.server') & typeof import('@/app/rendering/resolveQuizTemplates.server') & Pick<typeof import('@/app/quiz/[quizId]/praesentation/statusActions'),'starteQuiz'> & {actions:typeof import('@/app/rendering/sharedDesign/actions')};
+  const api=runtime.exports as typeof import('@/app/rendering/sharedDesign/sharedDesignRepository.server') & typeof import('@/app/rendering/resolveQuizTemplates.server') & Pick<typeof import('@/app/quiz/actions'),'updateQuiz'> & Pick<typeof import('@/app/quiz/[quizId]/praesentation/statusActions'),'starteQuiz'> & {actions:typeof import('@/app/rendering/sharedDesign/actions')};
   const series={kind:'SERIES' as const,id:'10'},quiz={kind:'QUIZ' as const,id:'11'},bingo={kind:'BINGO' as const,id:gameBefore[0].id as string},karaoke={kind:'POWERPOINT_KARAOKE' as const,id:gameBefore[1].id as string};
   async function save(t:typeof series|typeof quiz|typeof bingo|typeof karaoke,selection:string|null,user=1){currentUser=user;const old=await api.readDesign(user,t);const result=await api.actions.saveSharedDesign({target:t,selection,expectedSelection:old.selection,expectedSeriesId:old.seriesId});assert.equal(result.success,true,JSON.stringify(result));}
   const legacy=await api.resolveQuizTemplates(11);assert.equal(legacy?.presentation.template.id,'lovd-ungegoogelt');
@@ -97,9 +97,16 @@ test("shared design additive migration, real policies, inheritance and frozen ru
   assert.equal((await api.actions.saveSharedDesign({target:bingo,selection:'phil-gud',expectedSelection:'wrong',expectedSeriesId:10})).success,false);
   await db.query("UPDATE pubquiz.eventreihe_eventarten SET ist_freigeschaltet=false WHERE eventreihe_id=10 AND eventart='BINGO'");await assert.rejects(api.readDesign(1,bingo));assert.equal((await api.actions.saveSharedDesign({target:bingo,selection:'phil-gud',expectedSelection:old.selection,expectedSeriesId:10})).success,false);await db.query("UPDATE pubquiz.eventreihe_eventarten SET ist_freigeschaltet=true WHERE eventreihe_id=10 AND eventart='BINGO'");
   await db.query('DELETE FROM pubquiz.benutzer_reihenrollen WHERE benutzer_id=3');await assert.rejects(api.readDesign(3,bingo));await db.query("INSERT INTO pubquiz.benutzer_reihenrollen(benutzer_id,eventreihe_id,rolle)VALUES(3,10,'EVENT_MANAGER')");
-  currentUser=3;await api.starteQuiz(11,0);
+  currentUser=3;
+  assert.equal((await api.updateQuiz({quizId:11,eventSeriesId:10,titel:'Preserved Quiz',quizDatum:'2026-10-26',bemerkung:'',presentationTemplateId:'phil-gud'})).success,true);
+  assert.equal((await prisma.quiz.findUniqueOrThrow({where:{quiz_id:11}})).answer_form_template_id,'minimal','old master form must preserve separate AP3 choice');
+  await api.starteQuiz(11,0);
+  const firstSnapshot=JSON.stringify((await prisma.quiz.findUniqueOrThrow({where:{quiz_id:11}})).shared_design_snapshot);
   const frozen=(await api.resolveQuizTemplates(11))?.presentation.template.tokens;
+  await db.query("UPDATE pubquiz.quiz SET answer_form_template_id='phil-gud' WHERE quiz_id=11");
+  assert.equal((await api.resolveQuizTemplates(11))?.answerForm.template.id,'minimal','running answer design must stay frozen');
   await save(series,'phil-gud',6);assert.deepEqual((await api.resolveQuizTemplates(11))?.presentation.template.tokens,frozen);
+  currentUser=3;await api.starteQuiz(11,0);assert.equal(JSON.stringify((await prisma.quiz.findUniqueOrThrow({where:{quiz_id:11}})).shared_design_snapshot),firstSnapshot,'idempotent start must not refresh design');
   assert.equal((await api.readDesign(3,quiz)).canWrite,false);currentUser=3;assert.equal((await api.actions.saveSharedDesign({target:quiz,selection:'phil-gud',expectedSelection:'INHERIT',expectedSeriesId:10})).success,false);
   const snapshot=(await db.query('SELECT to_jsonb(t) data FROM pubquiz.quiz t')).rows[0].data;assert.doesNotThrow(()=>inspectRow(snapshot,new Set(),'pubquiz','quiz'));
   assert.deepEqual((await db.query('SELECT to_jsonb(t) data FROM pubquiz.game_team_assignments t')).rows,linksBefore);

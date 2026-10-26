@@ -1,3 +1,5 @@
+import { resolveAnswerFormTemplate } from "../templateResolver";
+import { toRuntimeAnswerFormTemplate } from "../presentationTemplates/presentationTemplate";
 import "server-only";
 import type { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
@@ -8,7 +10,7 @@ import { getPresentationTemplate, getAnswerFormTemplate, templateRegistry, type 
 import { listManagedPresentationTemplates, loadStoredPresentationTemplateConfigs } from "../presentationTemplates/presentationTemplateRepository.server";
 import { parsePresentationTemplateConfig, type PresentationTemplateConfig } from "../presentationTemplates/presentationTemplate";
 import { isSafeTemplateAssetReference } from "../presentationTemplates/presentationTemplateAssets";
-import { parseDesignSelection, supportsSharedDesign, parseSharedDesign, type SharedDesign } from "./sharedDesign";
+import { parseDesignSelection, supportsSharedDesign, parseQuizDesignSnapshot, type SharedDesign } from "./sharedDesign";
 export type DesignTarget = { kind: "SERIES" | "QUIZ" | "BINGO" | "POWERPOINT_KARAOKE"; id: string };
 export class DesignError extends Error {}
 function deny(): never { throw new DesignError("Design nicht gefunden oder kein Zugriff."); }
@@ -56,7 +58,7 @@ export async function readDesign(userId:number,input:unknown) {
   const target=validateTarget(input);
   const data=await prisma.$transaction(async tx=>{
     const c=await context(tx,userId,target);
-    const snapshot=c.game&&'shared_design_snapshot'in c.game?parseSharedDesign(c.game.shared_design_snapshot):null;
+    const snapshot=c.game&&'shared_design_snapshot'in c.game?parseQuizDesignSnapshot(c.game.shared_design_snapshot)?.design:null;
     const resolved=snapshot&&!c.canWrite?{design:snapshot,source:'Eingefroren beim Quizstart'}:await resolveSharedDesign(tx,c.selection,c.series);
     let legacyConfig=null;
     if(target.kind==='QUIZ'&&c.selection===null&&c.game&&'presentation_template_id'in c.game){
@@ -66,7 +68,7 @@ export async function readDesign(userId:number,input:unknown) {
       const system:PresentationTemplate|undefined=getPresentationTemplate(id);
       legacyConfig=system?{version:1 as const,tokens:system.tokens,design:system.design,surfaces:{presentation:system.variant,moderation:system.moderationVariant??'BRANDED' as const,answerForm:'BRANDED' as const}}:stored.get(id)!;
     }
-    return {answerSelection:c.game&&'answer_form_template_id'in c.game?c.game.answer_form_template_id:null,selection:c.selection,seriesId:c.seriesId,canWrite:c.canWrite,seriesName:c.series.name,...resolved,...(snapshot&&!c.canWrite?{design:snapshot,source:'Eingefroren beim Quizstart'}:{}),legacyConfig};
+    return {answerSelection:c.game&&'answer_form_template_id'in c.game?c.game.answer_form_template_id:null,selection:c.selection,seriesId:c.seriesId,canWrite:c.canWrite,seriesName:c.series.name,...resolved,source:target.kind==='SERIES'?(c.selection?'Reihenstandard':'Systemstandard'):resolved.source,...(snapshot&&!c.canWrite?{design:snapshot,source:'Eingefroren beim Quizstart'}:{}),legacyConfig};
   },{isolationLevel:'RepeatableRead'});
   const managed=(await listManagedPresentationTemplates()).templates;
   const templates=managed.filter(t=>(t.status==='SYSTEM'||t.status==='ACTIVE')&&supportsSharedDesign(t.config)).map(t=>({id:t.id,name:t.name}));
@@ -112,5 +114,10 @@ export async function freezeQuizDesign(tx:Prisma.TransactionClient,quizId:number
   const quiz=await tx.quiz.findUnique({where:{quiz_id:quizId},include:{eventreihe:true}});
   if(!quiz?.shared_design_template_id)return;
   const {design}=await resolveSharedDesign(tx,quiz.shared_design_template_id,quiz.eventreihe);
-  await tx.quiz.update({where:{quiz_id:quizId},data:{shared_design_snapshot:JSON.parse(JSON.stringify(design)) as Prisma.InputJsonValue}});
+  const ids=[quiz.answer_form_template_id,quiz.eventreihe.default_answer_form_template_id].filter((v):v is string=>!!v);
+  const stored=await tx.presentation_templates.findMany({where:{presentation_template_id:{in:ids}},select:{presentation_template_id:true,name:true,theme_config_json:true}});
+  const additionalAnswerFormTemplates=stored.flatMap(t=>{const config=parsePresentationTemplateConfig(t.theme_config_json);return config?[toRuntimeAnswerFormTemplate({id:t.presentation_template_id,name:t.name,config})]:[];});
+  const answer=resolveAnswerFormTemplate({quizTemplateId:quiz.answer_form_template_id,eventSeriesTemplateId:quiz.eventreihe.default_answer_form_template_id,additionalAnswerFormTemplates}).template;
+  const snapshot={version:1,design,answerForm:{id:answer.id,name:answer.displayName??answer.id,config:{version:1,tokens:answer.tokens,design:answer.design,surfaces:{presentation:'DARK',moderation:'BRANDED',answerForm:answer.variant}}}};
+  await tx.quiz.update({where:{quiz_id:quizId},data:{shared_design_snapshot:JSON.parse(JSON.stringify(snapshot)) as Prisma.InputJsonValue}});
 }

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { getPresentationTemplate } from '../templateRegistry';
-import { parseSharedDesign, parseDesignSelection, sharedDesignTokens, supportsSharedDesign } from './sharedDesign';
+import { parseSharedDesign, parseQuizDesignSnapshot, parseDesignSelection, sharedDesignTokens, supportsSharedDesign } from './sharedDesign';
 import { parsePresentationTemplateConfig, type PresentationTemplateConfig } from '../presentationTemplates/presentationTemplate';
 import { inspectRow } from '@/scripts/operations/acceptance-policy';
 function config(id:string):PresentationTemplateConfig {const t=getPresentationTemplate(id)!;return {version:1,tokens:structuredClone(t.tokens),design:structuredClone(t.design),surfaces:{presentation:t.variant,answerForm:'BRANDED',moderation:'BRANDED'}};}
@@ -11,7 +11,9 @@ for(const id of ['phil-gud','lovd-ungegoogelt'])test(id+' shares validated ident
  const c=config(id);assert.ok(supportsSharedDesign(c));assert.ok(parsePresentationTemplateConfig(c));
  const design={version:1,templateId:id,name:id,config:c};assert.ok(parseSharedDesign(design));
  assert.doesNotThrow(()=>inspectRow({theme_config_json:c},new Set(),'pubquiz','presentation_templates'));
- assert.doesNotThrow(()=>inspectRow({shared_design_snapshot:design},new Set(),'pubquiz','quiz'));
+ const snapshot={version:1,design,answerForm:{id,name:id,config:c}};
+ assert.ok(parseQuizDesignSnapshot(snapshot));assert.equal(parseQuizDesignSnapshot({...snapshot,extra:true}),null);assert.equal(parseQuizDesignSnapshot({...snapshot,version:2}),null);
+ assert.doesNotThrow(()=>inspectRow({shared_design_snapshot:snapshot},new Set(),'pubquiz','quiz'));
  assert.throws(()=>inspectRow({shared_design_snapshot:design},new Set(),'pubquiz','game_drafts'));
  for(const bad of [{...design,version:2},{...design,extra:true},{...design,config:{...c,tokens:{...c.tokens,typography:{...c.tokens.typography,displayFamily:'evil-font'}}}}])assert.equal(parseSharedDesign(bad),null);
  const invalid=structuredClone(c) as unknown as {tokens:{typography:Record<string,unknown>}};
