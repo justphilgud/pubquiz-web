@@ -1,3 +1,4 @@
+import GameListPage from "@/app/games/GameListPage";
 import WorkspaceSeriesFilter from "@/app/workspaces/WorkspaceSeriesFilter";
 import { notFound, redirect } from "next/navigation";
 import AppHeader from "@/app/components/AppHeader";
@@ -29,9 +30,9 @@ export default async function WorkspacePage({ params, searchParams }: {
   }
   const type = EVENT_TYPES.find(item => workspaceTypePaths[item.id] === route.eventType);
   if (!type || !series.eventTypes.includes(type.id)) notFound();
-  if (!type.implemented) {
+  if (type.id !== "QUIZ") {
     if (area) notFound();
-    return <><AppHeader /><WorkspaceSeriesFilter options={choices.filter(choice => choice.eventTypes.includes(type.id))} seriesId={series.id} type={route.eventType as "bingo" | "karaoke"} /><main className="mx-auto max-w-6xl px-4 py-8"><p className="text-sm text-slate-600">{series.name}</p><h1 className="mt-1 text-2xl font-bold">{type.label}</h1><p className="mt-3 font-semibold">Noch nicht verfügbar</p><p className="mt-2 text-sm text-slate-600">Für diese Eventart stehen noch keine Spielfunktionen bereit.</p></main></>;
+    return <GameListPage type={type.id} seriesId={series.id} />;
   }
   if (!area) redirect(`/workspaces/${series.id}/quiz/${series.canManageQuiz ? "events" : "content"}`);
   const query = await searchParams;

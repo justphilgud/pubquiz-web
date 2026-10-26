@@ -225,3 +225,11 @@ test("Phil Gud preview requires its explicit isolated target and exact branch", 
   assert.ok(source.includes("inputs.isolated_philgud && secrets.PR130_DATABASE_URL"));
   assert.ok(source.includes("'pr130_review_20261025'"));
 });
+
+test("standalone game preview requires its explicit isolated target and approved exact branch", () => {
+  assert.match(preview, /github.ref != 'refs\/heads\/codex\/standalone-game-drafts' \|\| inputs.isolated_games/);
+  assert.match(preview, /!inputs.isolated_games \|\| github.ref == 'refs\/heads\/codex\/standalone-game-drafts'/);
+  assert.match(preview, /inputs.isolated_games && secrets.GAMES_MIGRATION_DATABASE_URL/);
+  assert.match(preview, /inputs.isolated_games && 'games_review_20261026c'/);
+  assert.match(preview, /DATABASE_URL: \$\{\{ secrets.GAMES_DATABASE_URL \}\}/);
+});

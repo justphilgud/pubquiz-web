@@ -1,0 +1,95 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { Client } from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "@/app/generated/prisma/client";
+import { readFileSync, writeFileSync, mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { execFileSync } from "node:child_process";
+import { createRequire } from "node:module";
+import { runInNewContext } from "node:vm";
+import { build } from "esbuild";
+
+const base = process.env.GAME_DRAFT_TEST_DATABASE_URL;
+test("additive draft migration and real repository authorization on isolated PostgreSQL", {skip:!base,timeout:180000}, async context => {
+  const target = new URL(base!);
+  assert.ok(["127.0.0.1","localhost","ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech"].includes(target.hostname));
+  assert.match(target.pathname, /^\/(neondb|editorial_import_ci|game_draft_test_base)$/);
+  const control = new Client({connectionString:target.toString()}); await control.connect();
+  const name = `game_draft_qa_${Date.now()}`;
+  try {await control.query(`CREATE DATABASE ${name}`);} finally {await control.end();}
+  target.pathname = `/${name}`;
+  const db = new Client({connectionString:target.toString()}); await db.connect();
+  context.after(async()=>{await db.end();});
+  const directory = mkdtempSync(join(tmpdir(),"game-draft-baseline-"));
+  try {
+    const schema = join(directory,"schema.prisma");
+    writeFileSync(schema,execFileSync("git",["show","6828d50eabfa94518dabe084f0d798c68cfce18a:prisma/schema.prisma"],{encoding:"utf8"}));
+    const sql = execFileSync(process.execPath,["node_modules/prisma/build/index.js","migrate","diff","--from-empty","--to-schema",schema,"--script"],{encoding:"utf8",env:{...process.env,DATABASE_URL:target.toString()},maxBuffer:10000000});
+    await db.query("CREATE SCHEMA IF NOT EXISTS pubquiz; SET search_path TO pubquiz,public");
+    await db.query(sql.slice(sql.indexOf("-- CreateSchema")));
+  } finally {rmSync(directory,{recursive:true});}
+  const migration = readFileSync("prisma/migrations/20261026160000_standalone_game_drafts/migration.sql","utf8");
+  // Empty existing schema: exercise then roll back only this test transaction.
+  await db.query("BEGIN"); await db.query(migration);
+  assert.equal((await db.query("SELECT count(*)::int n FROM pubquiz.game_drafts")).rows[0].n,0);
+  await db.query("ROLLBACK");
+  assert.equal((await db.query("SELECT to_regclass('pubquiz.game_drafts') t")).rows[0].t,null);
+  await db.query(`
+    INSERT INTO pubquiz.users(id,name,email,password_hash,role,updated_at) SELECT n,'Draft QA '||n,'draft-qa-'||n||'@example.invalid','not-a-login-hash','USER',NOW() FROM generate_series(1,6) n;
+    INSERT INTO pubquiz.eventreihen(eventreihe_id,name,slug) VALUES(10,'Draft A','draft-a'),(20,'Draft B','draft-b'),(30,'Disabled','draft-disabled');
+    INSERT INTO pubquiz.eventarten(kennung,name) VALUES('QUIZ','Quiz'),('BINGO','Bingo'),('POWERPOINT_KARAOKE','PowerPoint-Karaoke') ON CONFLICT DO NOTHING;
+    INSERT INTO pubquiz.eventreihe_eventarten(eventreihe_id,eventart,ist_freigeschaltet) SELECT id,t,id<>30 FROM unnest(ARRAY[10,20,30]) id CROSS JOIN unnest(ARRAY['QUIZ','BINGO','POWERPOINT_KARAOKE']) t;
+    INSERT INTO pubquiz.benutzer_rollenzuweisungen(benutzer_id,rolle,scope_typ,eventreihe_id) VALUES(1,'ADMIN','GLOBAL',NULL),(2,'EDITOR','GLOBAL',NULL);
+    INSERT INTO pubquiz.benutzer_reihenrollen(benutzer_id,eventreihe_id,rolle) VALUES(3,10,'EVENT_MANAGER'),(4,10,'EDITOR'),(5,20,'EVENT_MANAGER');
+    INSERT INTO pubquiz.eventreihe_verwaltung(benutzer_id,eventreihe_id)VALUES(6,10);
+    INSERT INTO pubquiz.quiz(quiz_id,eventreihe_id,titel,quiz_datum,intro_begruessungstext)VALUES(11,10,'Existing synthetic quiz','2026-10-26','Preserve me');
+  `);
+  const before = (await db.query("SELECT to_jsonb(q) data FROM pubquiz.quiz q WHERE quiz_id=11")).rows[0].data;
+  const rolesBefore = (await db.query("SELECT * FROM pubquiz.benutzer_reihenrollen ORDER BY benutzer_id")).rows;
+  await db.query(migration);
+  assert.deepEqual((await db.query("SELECT to_jsonb(q) data FROM pubquiz.quiz q WHERE quiz_id=11")).rows[0].data,before);
+  assert.deepEqual((await db.query("SELECT * FROM pubquiz.benutzer_reihenrollen ORDER BY benutzer_id")).rows,rolesBefore);
+  const prisma = new PrismaClient({adapter:new PrismaPg({connectionString:target.toString()})});
+  context.after(async()=>{await prisma.$disconnect();});
+  const bundle = await build({stdin:{contents:"export * from './app/games/gameDraftRepository.server';",resolveDir:process.cwd()},bundle:true,write:false,platform:"node",format:"cjs",packages:"external",plugins:[{name:"database",setup(b){
+    b.onResolve({filter:/^(server-only|@\/app\/lib\/prisma)$/},a=>({path:a.path,namespace:"fixture"}));
+    b.onLoad({filter:/.*/,namespace:"fixture"},a=>({contents:a.path==="server-only"?"":"export const prisma = globalThis.fixture;"}));
+  }}]});
+  const runtime = {exports:{}};
+  runInNewContext(bundle.outputFiles[0].text,{module:runtime,exports:runtime.exports,require:createRequire(import.meta.url),fixture:prisma,console,process,Date,Buffer,setTimeout,clearTimeout});
+  const api = runtime.exports as typeof import("@/app/games/gameDraftRepository.server");
+  const input = {seriesId:10,title:"Bingo draft",date:"2028-02-29",time:"19:30"};
+  const bingo = await api.writeGameDraft(3,"BINGO",input);
+  const karaoke = await api.writeGameDraft(3,"POWERPOINT_KARAOKE",{...input,title:"Karaoke draft"});
+  assert.notEqual(bingo.id,karaoke.id);
+  assert.equal(bingo.status,"DRAFT");
+  assert.equal((await api.readGameDraft(3,"BINGO",bingo.id)).game.date,"2028-02-29");
+  assert.equal((await api.listGameDrafts(3,"BINGO")).games.length,1);
+  assert.equal((await api.readGameDraft(4,"BINGO",bingo.id)).canWrite,false);
+  for(const user of [2,4,5,6]) await assert.rejects(api.writeGameDraft(user,"BINGO",input));
+  for(const user of [2,5,6]) await assert.rejects(api.readGameDraft(user,"BINGO",bingo.id));
+  await assert.rejects(api.readGameDraft(4,"POWERPOINT_KARAOKE",karaoke.id));
+  await assert.rejects(api.readGameDraft(3,"BINGO",karaoke.id));
+  await assert.rejects(api.readGameDraft(3,"BINGO","../11"));
+  await assert.rejects(api.listGameDrafts(3,"BINGO",20));
+  await assert.rejects(api.writeGameDraft(3,"BINGO",{...input,seriesId:20}));
+  await assert.rejects(api.writeGameDraft(1,"BINGO",{...input,seriesId:30}));
+  const edited = await api.writeGameDraft(3,"BINGO",{...input,id:bingo.id,updatedAt:bingo.updatedAt,title:"Edited",date:"",time:""});
+  assert.equal((await api.readGameDraft(3,"BINGO",bingo.id)).game.title,"Edited");
+  await assert.rejects(api.writeGameDraft(3,"BINGO",{...input,id:bingo.id,updatedAt:bingo.updatedAt}));
+  await assert.rejects(api.writeGameDraft(5,"BINGO",{...input,id:bingo.id,updatedAt:edited.updatedAt,seriesId:20}));
+  await db.query("UPDATE pubquiz.eventreihe_eventarten SET ist_freigeschaltet=false WHERE eventreihe_id=10 AND eventart='BINGO'");
+  await assert.rejects(api.readGameDraft(1,"BINGO",bingo.id));
+  await assert.rejects(api.writeGameDraft(3,"BINGO",input));
+  await db.query("UPDATE pubquiz.eventreihe_eventarten SET ist_freigeschaltet=true WHERE eventreihe_id=10 AND eventart='BINGO'");
+  await db.query("DELETE FROM pubquiz.benutzer_reihenrollen WHERE benutzer_id=3");
+  await assert.rejects(api.readGameDraft(3,"BINGO",bingo.id));
+  await assert.rejects(api.writeGameDraft(3,"POWERPOINT_KARAOKE",{...input,id:karaoke.id,updatedAt:karaoke.updatedAt}));
+  assert.equal((await api.readGameDraft(1,"BINGO",bingo.id)).game.title,"Edited");
+  await assert.rejects(db.query("UPDATE pubquiz.game_drafts SET status='LIVE' WHERE id=$1",[bingo.id]),{code:"23514"});
+  await assert.rejects(db.query("UPDATE pubquiz.game_drafts SET eventart='QUIZ' WHERE id=$1",[bingo.id]),{code:"23514"});
+  assert.deepEqual((await db.query("SELECT to_jsonb(q) data FROM pubquiz.quiz q WHERE quiz_id=11")).rows[0].data,before);
+  console.info("Isolated empty/populated migration and repository checks passed:",name);
+});
