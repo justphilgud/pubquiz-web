@@ -11,8 +11,8 @@ function view(row: game_drafts): GameDraftView {
 }
 async function gameContext(tx: Prisma.TransactionClient, userId: number, type: GameType) {
   const actor = await getActorPermissions(userId, tx);
-  const rows = await tx.eventreihen.findMany({ where: { eventarten: { some: { eventart: type, ist_freigeschaltet: true } } }, select: { eventreihe_id: true, name: true }, orderBy: [{ name: "asc" }, { eventreihe_id: "asc" }] });
-  const choices: GameSeries[] = rows.filter(row => canAccessGame(actor, row.eventreihe_id, type, true)).map(row => ({ id: row.eventreihe_id, name: row.name, canWrite: canAccessGame(actor, row.eventreihe_id, type, true, true) }));
+  const rows = await tx.eventreihen.findMany({ where: { eventarten: { some: { eventart: type, ist_freigeschaltet: true } } }, select: { eventreihe_id: true, name: true, ist_archiviert: true }, orderBy: [{ name: "asc" }, { eventreihe_id: "asc" }] });
+  const choices: GameSeries[] = rows.filter(row => canAccessGame(actor, row.eventreihe_id, type, true)).map(row => ({ id: row.eventreihe_id, name: row.name, canWrite: canAccessGame(actor, row.eventreihe_id, type, true, true), canCreate: !row.ist_archiviert && canAccessGame(actor, row.eventreihe_id, type, true, true) }));
   return { actor, choices };
 }
 export async function gameSeriesForActor(tx: Prisma.TransactionClient, userId: number, type: GameType): Promise<GameSeries[]> { return (await gameContext(tx, userId, type)).choices; }
@@ -41,7 +41,10 @@ export async function writeGameDraft(userId: number, type: GameType, input: unkn
     const old = data.id ? await tx.game_drafts.findUnique({ where: { id: data.id } }) : null;
     if (data.id && (!old || old.eventart !== type)) throw denied();
     // Same product gate as existing toggles, deterministic order for reassignment.
-    for (const id of [...new Set([data.seriesId, ...(old ? [old.eventreihe_id] : [])])].sort((a,b) => a-b)) await tx.$queryRaw`SELECT pg_advisory_xact_lock(860012, ${id})::text`;
+    for (const id of [...new Set([data.seriesId, ...(old ? [old.eventreihe_id] : [])])].sort((a,b) => a-b)) {
+      await tx.$queryRaw`SELECT pg_advisory_xact_lock(860012, ${id})::text`;
+      await tx.$queryRaw`SELECT eventreihe_id FROM pubquiz.eventreihen WHERE eventreihe_id = ${id} FOR SHARE`;
+    }
     // Keep active user and current role rows stable until this write commits.
     await tx.$queryRaw`SELECT id FROM pubquiz.users WHERE id = ${userId} FOR SHARE`;
     await tx.$queryRaw`SELECT benutzer_id FROM pubquiz.benutzer_reihenrollen WHERE benutzer_id = ${userId} FOR SHARE`;
@@ -49,6 +52,7 @@ export async function writeGameDraft(userId: number, type: GameType, input: unkn
     const choices = await gameSeriesForActor(tx, userId, type);
     const canWrite = (id: number) => choices.some(c => c.id === id && c.canWrite);
     if (!canWrite(data.seriesId) || (old && !canWrite(old.eventreihe_id))) throw denied();
+    if ((!old || old.eventreihe_id !== data.seriesId) && !choices.some(c => c.id === data.seriesId && c.canCreate)) throw new GameDraftError("Archivierte Eventreihen können nicht ausgewählt werden.");
     if (old && old.updated_at.toISOString() !== data.updatedAt) throw new GameDraftError("Dieses Spiel wurde inzwischen geändert. Bitte neu laden; deine Eingaben bleiben bis dahin erhalten.");
     const fields = { eventreihe_id: data.seriesId, titel: data.title, datum: data.date ? new Date(`${data.date}T00:00:00.000Z`) : null, uhrzeit: data.time || null };
     const row = old ? await tx.game_drafts.update({ where: { id: old.id }, data: fields }) : await tx.game_drafts.create({ data: { ...fields, eventart: type } });

@@ -7,7 +7,7 @@ export function isGameId(value: unknown): value is string { return typeof value 
 export class GameDraftError extends Error {}
 export type GameDraftFields = { seriesId: number; title: string; date: string; time: string };
 export type GameDraftView = GameDraftFields & { id: string; type: GameType; status: "DRAFT"; createdAt: string; updatedAt: string };
-export type GameSeries = { id: number; name: string; canWrite: boolean };
+export type GameSeries = { id: number; name: string; canWrite: boolean; canCreate: boolean };
 export function canAccessGame(actor: AuthorizationActor, seriesId: number, type: GameType, enabled: boolean, write = false) {
   return enabled && hasEventTypeAccess(actor, seriesId, type, write ? "EVENT_MANAGER" : "EDITOR");
 }

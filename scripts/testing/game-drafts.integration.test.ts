@@ -100,6 +100,12 @@ test("additive draft migration and real repository authorization on isolated Pos
   assert.equal((await api.readGameDraft(3,"BINGO",bingo.id)).game.title,"Edited");
   await assert.rejects(api.writeGameDraft(3,"BINGO",{...input,id:bingo.id,updatedAt:bingo.updatedAt}));
   await assert.rejects(api.writeGameDraft(5,"BINGO",{...input,id:bingo.id,updatedAt:edited.updatedAt,seriesId:20}));
+  await db.query("UPDATE pubquiz.eventreihen SET ist_archiviert=true WHERE eventreihe_id IN (10,20)");
+  assert.equal((await api.listGameDrafts(1,"BINGO")).choices.find(c=>c.id===10)?.canCreate,false);
+  await assert.rejects(api.writeGameDraft(1,"BINGO",input),/Archivierte/);
+  await assert.rejects(api.writeGameDraft(1,"BINGO",{...input,id:bingo.id,updatedAt:edited.updatedAt,seriesId:20}),/Archivierte/);
+  await api.writeGameDraft(3,"BINGO",{seriesId:10,title:"Edited",date:"",time:"",id:bingo.id,updatedAt:edited.updatedAt});
+  await db.query("UPDATE pubquiz.eventreihen SET ist_archiviert=false WHERE eventreihe_id IN (10,20)");
   await db.query("UPDATE pubquiz.eventreihe_eventarten SET ist_freigeschaltet=false WHERE eventreihe_id=10 AND eventart='BINGO'");
   await assert.rejects(api.readGameDraft(1,"BINGO",bingo.id));
   await assert.rejects(api.writeGameDraft(3,"BINGO",input));
