@@ -308,3 +308,8 @@ Die bestehenden Pixel-/Meme-/Ordering-/Medien-Browsertests bleiben Teil von `npm
 und damit der CI. Diese Tests belegen definierte Fälle, keine vollständige visuelle
 Fehlerfreiheit aller Inhalt-/Viewportkombinationen. Die interaktive Abnahme wird
 separat im Änderungsbericht mit tatsächlich getesteten Ansichten geführt.
+
+
+## Phil Gud als zusätzliche ausdrückliche Markenwelt (26.10.2026)
+
+`phil-gud` verwendet dieselbe vollständige Template-/Phasenmatrix und denselben Renderer. Optionales validiertes `tokens.typography.displayFamily` trennt echte Markenschrift für kurze Titel von der funktionalen Textschrift. Keine automatische Zuweisung, keine Migration, kein pauschales Styling bisheriger Liveflächen. Bestehende Templates ohne dieses Feld behalten ihren Vertrag. [Spezifikation und Referenz](../design/phil-gud-management-and-template.md).

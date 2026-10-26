@@ -14,6 +14,8 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import PresentationSlideRenderer from "./PresentationSlideRenderer";
+import { AuthCard } from "@/components/ui/AuthCard";
+import { Button } from "@/components/ui/Button";
 import { FaceMorphSolutionSlide } from "./FaceMorphSolutionSlide";
 import { MemeRenderer } from "../meme/MemeRenderer";
 import { QuizThemeScope } from "../theme/QuizThemeScope";
@@ -22,7 +24,9 @@ import { buildPresentationQualityFixture } from "./presentationQualityFixtures";
 import type { PresentationDesignStyle } from "../templateRegistry";
 
 const execFileAsync = promisify(execFile);
-const styles: readonly PresentationDesignStyle[] = [
+type QualityStyle = PresentationDesignStyle | "PHIL_GUD";
+const styles: readonly QualityStyle[] = [
+  "PHIL_GUD",
   "NEON",
   "EDITORIAL",
   "KOMM_ONE",
@@ -54,10 +58,10 @@ async function compileApplicationCss() {
     .replace('@import "./rendering/presentation/presentationReadability.css";', readability)
     .replace('@import "./rendering/presentation/bookingSlide.css";', booking);
   const compiled = await postcss([tailwindcss()]).process(globals, { from: fileURLToPath(globalsUrl) });
-  return `${compiled.css}\n${kommOne}`;
+  return `${compiled.css}\n${kommOne}\n${readFileSync(new URL("../../branding/philGud.css", import.meta.url), "utf8")}`;
 }
 
-function renderCases(style: PresentationDesignStyle) {
+function renderCases(style: QualityStyle) {
   const meme = buildPresentationQualityFixture("normal", style);
   assert.equal(meme.slide.typ, "frage");
   if (meme.slide.typ !== "frage") return "";
@@ -106,6 +110,7 @@ function renderCases(style: PresentationDesignStyle) {
 
 function renderPage(css: string) {
   const markup = styles.map(renderCases).join("");
+  const login = `<section data-admin-ui="phil-gud" data-login-case>${renderToStaticMarkup(createElement(AuthCard, { title: "Quizverwaltung", appearance: "brand", children: createElement(Button, { type: "submit" }, "Einloggen") }))}</section>`;
   // Use the production grid/column classes, whose automatic minimum width can
   // otherwise force even a correctly scaled triptych beyond a mobile screen.
   const moderation = readFileSync(new URL("../../quiz/[quizId]/moderation/ModerationClient.tsx", import.meta.url), "utf8");
@@ -147,6 +152,10 @@ function renderPage(css: string) {
       return { caseName, label, foreground, background, minimum, ratio: ratio(foreground, background) };
     };
     const results = [];
+    const login = document.querySelector('[data-login-case]');
+    const cta = login.querySelector('button');
+    results.push(check('brand-login', 'CTA text', cta, cta, 4.5));
+    results.push({ caseName: 'brand-login', label: 'CTA against dark card', foreground: effectiveBackground(cta), background: 'rgb(0, 0, 0)', minimum: 3, ratio: ratio(effectiveBackground(cta), 'rgb(0, 0, 0)') });
     for (const root of document.querySelectorAll('[data-case]')) {
       const name = root.dataset.case;
       if (name.endsWith('-facemorph')) {
@@ -193,7 +202,7 @@ function renderPage(css: string) {
       document.querySelector('#contrast-result').textContent = JSON.stringify({ error: String(error?.stack || error) });
     }
   `;
-  return `<!doctype html><html><head><meta charset="utf-8"><style>${css}.case{width:1280px;height:720px;overflow:hidden;background:#000;padding:16px}</style></head><body>${narrowModeration}${markup}<pre id="contrast-result"></pre><script>${script}</script></body></html>`;
+  return `<!doctype html><html><head><meta charset="utf-8"><style>${css}.case{width:1280px;height:720px;overflow:hidden;background:#000;padding:16px}</style></head><body>${login}${narrowModeration}${markup}<pre id="contrast-result"></pre><script>${script}</script></body></html>`;
 }
 
 function decodeHtml(value: string) {
@@ -296,7 +305,7 @@ test("meme, open result and neutral true/false text meet contrast targets in a r
     }>;
     assert.ok(Array.isArray(parsed), "error" in parsed ? parsed.error : "Unexpected contrast result");
     const results = parsed;
-    assert.equal(results.length, styles.length * 8);
+    assert.equal(results.length, styles.length * 8 + 2);
     for (const result of results) {
       assert.ok(
         result.ratio >= result.minimum,

@@ -16,6 +16,8 @@ export const enRenderingMessages: WidenMessageCatalog<
     presentationCorporate: { label: "Corporate", description: "Calm professional design with a clear hierarchy." },
     presentationBirthday: { label: "Storybook", description: "Personal photo-book design with an editorial visual language." },
     presentationEditorial: { label: "LOVD × Phil Gud", description: "Warm, minimal venue design with spacious editorial hierarchy." },
+    presentationPhilGud: { label: "Phil Gud", description: "Phil Gud stage using the original display font, black, lime yellow and pink." },
+    answerPhilGud: { label: "Phil Gud", description: "Readable Phil Gud answer form, applied only through explicit template selection." },
     presentationKommOne: { label: "Komm.ONE PubQuiz", description: "Modern quiz stage using Midnight, Lagoon, and focused Amarillo accents." },
     answerDefault: {
       label: "ungegoogelt Neon",

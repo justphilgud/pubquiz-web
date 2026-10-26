@@ -943,8 +943,9 @@ test("AP2 branding has two reset semantics and curated self-hosted font choices"
   assert.match(generator, /Änderungen zurücksetzen/);
   assert.match(generator, /Auf Stil-Standard zurücksetzen/);
   assert.match(generator, /window\.confirm\("Branding wirklich/);
-  assert.ok(presentationTemplateOptions.fonts.length >= 8 && presentationTemplateOptions.fonts.length <= 13);
+  assert.ok(presentationTemplateOptions.fonts.length >= 8 && presentationTemplateOptions.fonts.length <= 14);
   assert.ok(presentationTemplateOptions.fonts.some(({ label }) => label === "Plus Jakarta Sans"));
+  assert.ok(presentationTemplateOptions.fonts.some(({ label }) => label === "Phil Gud Display"));
   assert.match(layout, /Source_Sans_3/);
   assert.match(layout, /Playfair_Display/);
 });

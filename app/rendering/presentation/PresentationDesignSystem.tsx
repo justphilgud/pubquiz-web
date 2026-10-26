@@ -1,3 +1,4 @@
+import { PHIL_GUD } from "@/app/branding/philGud";
 /* eslint-disable @next/next/no-img-element -- Template assets have dynamic repository or managed Blob URLs and render inside a fixed presentation canvas. */
 import type { ReactNode } from "react";
 import { QuestionSponsorMark } from "./QuestionSponsorMark";
@@ -366,7 +367,7 @@ export function PresentationDesignFooter({
     return (
       <footer className="presentation-corporate-footer relative z-20 mt-3 flex h-9 shrink-0 items-center justify-between border-t px-2 text-xs font-semibold uppercase tracking-[0.12em]">
         <span>{theme.design.occasion.eventTitle || theme.identity.displayName}</span>
-        <span>Knowledge · People · Progress</span>
+        <span>{theme.appearance.displayFontFamily === PHIL_GUD.displayFont ? theme.design.occasion.extraText : "Knowledge · People · Progress"}</span>
       </footer>
     );
   }

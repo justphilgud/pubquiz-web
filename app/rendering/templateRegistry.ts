@@ -1,3 +1,4 @@
+import { PHIL_GUD } from "@/app/branding/philGud";
 import type { AppLocale } from "@/app/i18n/locale";
 
 export type TemplateSource = "QUIZ" | "EVENT_SERIES" | "SYSTEM";
@@ -19,6 +20,7 @@ export type BrandColorTokens = {
 };
 
 export const brandFontOptions = [
+  { value: PHIL_GUD.displayFont, label: "Phil Gud Display", character: "Originale Phil-Gud-Markenschrift für kurze Titel" },
   { value: "var(--font-geist-sans), Arial, sans-serif", label: "Geist", character: "Neutral und modern" },
   { value: "var(--font-source-sans-3), Arial, sans-serif", label: "Source Sans 3", character: "Offen und funktional" },
   { value: "var(--font-plus-jakarta-sans), Arial, sans-serif", label: "Plus Jakarta Sans", character: "Modern und menschlich" },
@@ -38,6 +40,7 @@ export type BrandFontFamily = (typeof brandFontOptions)[number]["value"];
 
 export type BrandTypographyTokens = {
   family: BrandFontFamily;
+  displayFamily?: BrandFontFamily;
   displayWeight: 400 | 700 | 800 | 900;
   bodyWeight: 400 | 500 | 600;
 };
@@ -157,6 +160,8 @@ export type TemplateMessageKey =
   | "presentationCorporate"
   | "presentationBirthday"
   | "presentationEditorial"
+  | "presentationPhilGud"
+  | "answerPhilGud"
   | "presentationKommOne"
   | "answerDefault"
   | "answerMinimal"
@@ -392,6 +397,20 @@ const presentation = [
       colors: { primary: "#00B2A9", secondary: "#008481", accent: "#F1C400", background: "#003A40", surface: "#F7F8F5", surfaceStrong: "#003A40", text: "#FFFFFF", textMuted: "#99E0DC", border: "#33C1BA", correct: "#00965E", success: "#00965E", warning: "#F0AD00", danger: "#DE3400" },
     },
   },
+  {
+    id: "phil-gud", kind: "PRESENTATION", variant: "DARK",
+    labelKey: "presentationPhilGud", category: "BRANDED", selectable: true,
+    displayName: "Phil Gud", moderationVariant: "BRANDED",
+    preview: { exampleButtonKey: "previewButton" },
+    design: { ...presentationDesigns.CORPORATE, composition: { ...presentationDesigns.CORPORATE.composition, decoration: "NONE" }, occasion: { ...presentationDesigns.CORPORATE.occasion, subtitle: "", eventTitle: "Phil Gud", extraText: "Gute Leute. Gute Fragen. Guter Abend." } },
+    tokens: {
+      ...sharedSizing,
+      typography: { family: PHIL_GUD.bodyFont, displayFamily: PHIL_GUD.displayFont, displayWeight: 400, bodyWeight: 400 },
+      radii: { small: "0.5rem", medium: "0.75rem", large: "1rem" },
+      assets: { logo: PHIL_GUD.logo, backgroundImage: null },
+      colors: { primary: PHIL_GUD.colors.yellow, secondary: PHIL_GUD.colors.pink, accent: PHIL_GUD.colors.pink, background: PHIL_GUD.colors.black, surface: "#171717", surfaceStrong: "#242424", text: PHIL_GUD.colors.paper, textMuted: "#D3D3CA", border: "#827B70", correct: "#A3E635", success: "#A3E635", warning: "#FACC15", danger: "#FDA4AF" },
+    },
+  },
 ] as const satisfies readonly PresentationTemplate[];
 
 const answerForm = [
@@ -495,6 +514,17 @@ const answerForm = [
       spacing: { small: "0.75rem", medium: "1.5rem", large: "2.5rem" },
       assets: { logo: "/branding/komm-one/komm-one-on-light.svg", backgroundImage: null },
       colors: { primary: "#008481", secondary: "#003A40", accent: "#F0AD00", background: "#F7F8F5", surface: "#FFFFFF", surfaceStrong: "#E5F5F4", text: "#003A40", textMuted: "#336166", border: "#66898C", correct: "#00965E", success: "#00965E", warning: "#F0AD00", danger: "#DE3400" },
+    },
+  },
+  {
+    id: "phil-gud", kind: "ANSWER_FORM", variant: "MINIMAL",
+    labelKey: "answerPhilGud", category: "BRANDED", selectable: true,
+    displayName: "Phil Gud", preview: { exampleButtonKey: "previewButton" }, design: presentationDesigns.CORPORATE,
+    tokens: {
+      ...sharedSizing,
+      typography: { family: PHIL_GUD.bodyFont, displayFamily: PHIL_GUD.displayFont, displayWeight: 400, bodyWeight: 400 },
+      assets: { logo: PHIL_GUD.logo, backgroundImage: null },
+      colors: { primary: "#171717", secondary: "#625D55", accent: PHIL_GUD.colors.yellow, background: PHIL_GUD.colors.paper, surface: "#FFFFFF", surfaceStrong: "#F2EEE5", text: "#171717", textMuted: "#625D55", border: "#827B70", correct: "#166534", success: "#166534", warning: "#854D0E", danger: "#B91C1C" },
     },
   },
 ] as const satisfies readonly AnswerFormTemplate[];

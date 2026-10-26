@@ -348,10 +348,11 @@ function validateConfig(value: unknown) {
     }
   }
   const typography = tokens.typography;
-  if (isRecord(typography)) rejectUnknownFields(typography, ["family", "displayWeight", "bodyWeight"], "config.tokens.typography", errors);
+  if (isRecord(typography)) rejectUnknownFields(typography, ["family", "displayFamily", "displayWeight", "bodyWeight"], "config.tokens.typography", errors);
   if (
     !isRecord(typography) ||
     !allowedFonts.includes(typography.family as (typeof allowedFonts)[number]) ||
+    (typography.displayFamily !== undefined && !allowedFonts.includes(typography.displayFamily as (typeof allowedFonts)[number])) ||
     !displayWeights.includes(typography.displayWeight as (typeof displayWeights)[number]) ||
     !bodyWeights.includes(typography.bodyWeight as (typeof bodyWeights)[number])
   ) {

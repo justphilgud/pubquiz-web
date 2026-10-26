@@ -11,6 +11,8 @@ export const deRenderingMessages = {
     presentationCorporate: { label: "Corporate", description: "Ruhiges, professionelles Design mit klarer Hierarchie." },
     presentationBirthday: { label: "Storybook", description: "Persönliches Fotobuch-Design mit redaktioneller Bildsprache." },
     presentationEditorial: { label: "LOVD × Phil Gud", description: "Warm-reduziertes Venue-Design mit großzügiger editorialer Hierarchie." },
+    presentationPhilGud: { label: "Phil Gud", description: "Phil-Gud-Markenbühne mit Originalschrift, Schwarz, Gelbgrün und Rosa." },
+    answerPhilGud: { label: "Phil Gud", description: "Lesbares Phil-Gud-Antwortformular mit bewusster Templateauswahl." },
     presentationKommOne: { label: "Komm.ONE PubQuiz", description: "Moderne Quizbühne mit Midnight, Lagoon und gezielten Amarillo-Akzenten." },
     answerDefault: {
       label: "ungegoogelt Neon",

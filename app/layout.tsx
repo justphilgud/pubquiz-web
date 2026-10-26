@@ -13,6 +13,8 @@ import {
   Space_Grotesk,
 } from "next/font/google";
 import "./globals.css";
+import "./branding/philGud.css";
+import AdminAppearance from "./branding/AdminAppearance";
 import "./rendering/presentation/kommOnePresentation.css";
 import { APP_BRAND } from "@/app/branding/appBrand";
 
@@ -67,7 +69,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${sourceSans.variable} ${spaceGrotesk.variable} ${montserrat.variable} ${nunito.variable} ${oswald.variable} ${robotoSlab.variable} ${lora.variable} ${playfairDisplay.variable} ${plusJakartaSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {children}
+        <AdminAppearance>{children}</AdminAppearance>
       </body>
     </html>
   );

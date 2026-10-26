@@ -68,6 +68,7 @@ export type ResolvedQuizTheme = {
     mode: "LIGHT" | "DARK";
     typographyPreset: "BRAND_DISPLAY" | "SYSTEM";
     fontFamily: string;
+    displayFontFamily?: string;
     displayWeight: number;
     bodyWeight: number;
     radiusPreset: "ROUNDED" | "COMPACT";
@@ -240,6 +241,7 @@ export function resolveQuizTheme({
           ? "SYSTEM"
           : "BRAND_DISPLAY",
       fontFamily: identityTokens.typography.family,
+      ...(identityTokens.typography.displayFamily ? { displayFontFamily: identityTokens.typography.displayFamily } : {}),
       displayWeight: identityTokens.typography.displayWeight,
       bodyWeight: identityTokens.typography.bodyWeight,
       radiusPreset:

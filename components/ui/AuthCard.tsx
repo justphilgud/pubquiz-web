@@ -60,6 +60,7 @@ export function AuthCard({
 
   return (
     <main
+      data-auth-appearance={appearance}
       className="flex min-h-screen items-center justify-center bg-gray-50 p-6"
       style={brandProperties}
     >
@@ -77,17 +78,17 @@ export function AuthCard({
       >
         <div className="mb-2 flex justify-center">
           <Image
-            src={APP_BRAND.assets.fullLogo}
+            src="/branding/phil-gud/website-logo.jpg"
             alt={APP_BRAND.name}
-            width={862}
-            height={1061}
+            width={1536}
+            height={1536}
             priority
-            className="h-52 w-auto object-contain sm:h-56"
+            className="h-28 w-auto object-contain sm:h-32"
           />
         </div>
 
         <p
-          className={`mb-8 text-center text-2xl font-normal ${
+          className={`admin-brand-title mb-6 text-center text-2xl font-normal ${
             isBrandAppearance ? "text-slate-50" : "text-gray-700"
           }`}
         >

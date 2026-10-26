@@ -36,19 +36,19 @@ export default async function AppHeader() {
   const { choices } = await loadWorkspaceNavigation();
 
   return (
-    <header className="border-b border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm md:px-6">
+    <header className="admin-brand-header border-b border-slate-200 bg-white px-4 py-3 text-slate-900 shadow-sm md:px-6">
       <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 md:grid-cols-[auto_minmax(0,1fr)_auto] md:gap-x-5">
         <Link
           href="/"
           className="flex min-h-11 min-w-0 items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600 focus-visible:ring-offset-2"
         >
           <Image
-            src={APP_BRAND.assets.mark}
+            src="/branding/phil-gud/website-logo.jpg"
             alt={APP_BRAND.name}
-            width={660}
-            height={720}
+            width={1536}
+            height={1536}
             priority
-            className="h-10 w-auto sm:h-11"
+            className="h-12 w-auto sm:h-14"
           />
         </Link>
 

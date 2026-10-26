@@ -1,0 +1,62 @@
+/* Actual website file, no installed-font dependency; only named scopes apply it. */
+@font-face {
+  font-family: "Phil Gud Display";
+  src: url("/branding/phil-gud/phil-gud.woff") format("woff");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+/* QuizThemeScope is an explicit exclusion, including embedded live previews. */
+[data-admin-ui="phil-gud"] {
+  background: #faf8f2;
+  color: #171717;
+  font-family: Arial, Helvetica, sans-serif;
+}
+[data-admin-ui="phil-gud"] :is(h1,h2,h3,[aria-label="Hauptnavigation"] a,[aria-label="Hauptnavigation"] button):not(:where([data-quiz-theme-version], [data-quiz-theme-version] *)) {
+  font-family: "Phil Gud Display", Arial, sans-serif;
+  font-weight: 400;
+  letter-spacing: .015em;
+  overflow-wrap: anywhere;
+}
+[data-admin-ui="phil-gud"] h1:not(:where([data-quiz-theme-version] *)) { font-size: clamp(1.6rem, 2.4vw, 2rem); line-height: 1.2; }
+[data-admin-ui="phil-gud"] h2:not(:where([data-quiz-theme-version] *)) { line-height: 1.25; }
+[data-admin-ui="phil-gud"] :is(input,select,textarea,table,[role="alert"]):not(:where([data-quiz-theme-version] *)) { font-family: Arial, Helvetica, sans-serif; }
+[data-admin-ui="phil-gud"] :focus-visible:not(:where([data-quiz-theme-version], [data-quiz-theme-version] *)) { outline: 3px solid #a32661; outline-offset: 3px; }
+[data-admin-ui="phil-gud"] :is(input,select,textarea):not(:where([data-quiz-theme-version] *)) { border-color: #827b70; border-radius: .375rem; }
+[data-admin-ui="phil-gud"] :is(button,[role="button"]):not(:where([data-quiz-theme-version] *)) { border-radius: .375rem; }
+[data-admin-ui="phil-gud"] :is(.bg-slate-50,.bg-slate-100):not(:where([data-quiz-theme-version], [data-quiz-theme-version] *)) { background-color: #f2eee5; }
+[data-admin-ui="phil-gud"] :is(.bg-slate-900,.bg-slate-950):not(:where([data-quiz-theme-version], [data-quiz-theme-version] *)) { background-color: #171717; }
+[data-admin-ui="phil-gud"] :is(.rounded-3xl,.rounded-2xl):not(:where([data-quiz-theme-version], [data-quiz-theme-version] *)) { border-radius: .5rem; }
+[data-admin-ui="phil-gud"] :is(.border-slate-200,.border-slate-300):not(:where([data-quiz-theme-version], [data-quiz-theme-version] *)) { border-color: #c9c2b5; }
+[data-admin-ui="phil-gud"] :is(.text-slate-500,.text-slate-600):not(:where([data-quiz-theme-version], [data-quiz-theme-version] *)) { color: #625d55; }
+[data-admin-ui="phil-gud"] [aria-current="page"]:not(:where([data-quiz-theme-version], [data-quiz-theme-version] *)) { background: #f0fc16; color: #171717; }
+[data-admin-ui="phil-gud"] .admin-brand-header { background: #000; color: #faf8f2; border-bottom: 3px solid #f0fc16; box-shadow: none; }
+[data-admin-ui="phil-gud"] .admin-brand-header nav :is(a,button) { color: #faf8f2; }
+[data-admin-ui="phil-gud"] .admin-brand-header nav :is(a,button):hover { background: #292929; }
+[data-admin-ui="phil-gud"] .admin-brand-header nav :is(a[aria-current],button[aria-current]) { background: #f0fc16; color: #171717; }
+[data-admin-ui="phil-gud"] .admin-brand-header nav nav { background: #171717; border-color: #625d55; }
+[data-admin-ui="phil-gud"] .admin-brand-header nav nav a[aria-current] { background: #f0fc16; color: #171717; }
+[data-admin-ui="phil-gud"] .admin-brand-header [aria-controls="main-navigation"] { border-color: #827b70; color: #faf8f2; }
+/* New template only: existing templates retain their typography and composition. */
+[data-phil-gud-template="true"] :is(h1,h2,h3,.presentation-corporate-title,.presentation-flow-title) { font-family: "Phil Gud Display", Arial, sans-serif; font-weight: 400; }
+.presentation-template[data-phil-gud-template="true"] .presentation-corporate-stage { background-image: none !important; }
+.presentation-template[data-phil-gud-template="true"] .presentation-corporate-progress { color: #171717 !important; }
+.presentation-template[data-phil-gud-template="true"] .presentation-corporate-title { letter-spacing: .015em; }
+
+[data-admin-ui="phil-gud"] [aria-label="Hauptnavigation"] { font-size: 1rem; }
+
+[data-admin-ui="phil-gud"] .admin-brand-title { font-family: "Phil Gud Display", Arial, sans-serif; }
+
+[data-phil-gud-template="true"][data-question-density="compact"] .presentation-question-card h2,
+[data-phil-gud-template="true"][data-question-density="extended"] .presentation-question-card h2 { font-family: Arial, Helvetica, sans-serif; }
+
+.presentation-template[data-phil-gud-template="true"] .presentation-solution-label { background: var(--brand-correct) !important; color: #171717 !important; }
+.presentation-template[data-phil-gud-template="true"] .presentation-correct-answer { border-color: var(--brand-correct) !important; box-shadow: none !important; }
+
+.presentation-template[data-phil-gud-template="true"] .presentation-corporate-decoration { display: none; }
+
+[data-admin-ui="phil-gud"] [data-ui-variant="primary"]:not(:where([data-quiz-theme-version] *)) { background-color: #171717; color: #faf8f2; }
+[data-admin-ui="phil-gud"] [data-ui-variant="secondary"]:not(:where([data-quiz-theme-version] *)) { background-color: #f2eee5; color: #171717; }
+
+/* Brand login remains an explicit high-contrast CTA on its black card. */
+[data-admin-ui="phil-gud"] [data-auth-appearance="brand"] [data-ui-variant="primary"] { background-color: #f0fc16; color: #171717; }

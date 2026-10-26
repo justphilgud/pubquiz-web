@@ -3,7 +3,7 @@ import type { QuizFlowItemType } from "@/app/quiz/flow/quizFlow";
 import { DEFAULT_BOOKING } from "@/app/quiz/bookingSlide";
 import { questionTemplateIds } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import type { Slide } from "@/app/quiz/[quizId]/praesentation/buildPraesentationSlides";
-import type { PresentationDesignStyle } from "@/app/rendering/templateRegistry";
+import { getPresentationTemplate, getAnswerFormTemplate, type PresentationDesignStyle } from "@/app/rendering/templateRegistry";
 import { resolveQuizTheme } from "@/app/rendering/theme/quizTheme";
 import { buildStorybookExperienceRuntime } from "../presentationTemplates/storybookExperienceFixture";
 import { createPresentationStylePreset } from "../presentationTemplates/presentationTemplatePresets";
@@ -11,7 +11,7 @@ import { toRuntimeAnswerFormTemplate, toRuntimePresentationTemplate } from "../p
 import { resolvePresentationLayout } from "./presentationLayoutResolver";
 import type { PresentationSlideDisplayState } from "./PresentationSlideRenderer";
 
-export const qualityScenarios = ["short", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "true-false", "estimate", "image-long", "image-choice", "image-choice-solution", "artwork", "artwork-long", "structured-audio", "structured-empty", "ordering", "ordering-long", "ordering-long-solution", "story", "story-legacy", "poll", "solution-long", "pixel", "qr", "rules", "rules-legacy", "intro", "lovd-intro", "lovd-countdown", "lovd-ranking", "lovd-final", "lovd-outro", "booking", "sponsor-open", "sponsor-choice", "sponsor-intro", "facts2", "facts7", "facts7-long", "facts-choice"] as const;
+export const qualityScenarios = ["short", "solution", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "true-false", "estimate", "image-long", "image-choice", "image-choice-solution", "artwork", "artwork-long", "structured-audio", "structured-empty", "ordering", "ordering-long", "ordering-long-solution", "story", "story-legacy", "poll", "solution-long", "pixel", "qr", "rules", "rules-legacy", "intro", "lovd-intro", "lovd-countdown", "lovd-ranking", "lovd-final", "lovd-outro", "booking", "sponsor-open", "sponsor-choice", "sponsor-intro", "facts2", "facts7", "facts7-long", "facts-choice"] as const;
 export const qualityRules = ["Teamname wählen", "Antworten rechtzeitig absenden", "Keine Suchmaschinen verwenden", "Die Entscheidung der Moderation gilt"];
 export type QualityScenario = typeof qualityScenarios[number];
 export const longQuestion = "Welche europäische Hauptstadt wird gesucht? Sie liegt an einem Fluss, war über viele Jahrzehnte politisch geteilt und wurde nach der Wiedervereinigung erneut zum Regierungssitz. Nennt die Stadt, in der heute auch das Brandenburger Tor und der Deutsche Bundestag zu finden sind.";
@@ -23,7 +23,7 @@ export const longOptions = [
 ];
 export const storyText = "Als wir am frühen Morgen am Bahnhof ankamen, war der Bahnsteig noch fast leer. Nur der kleine Kiosk hatte bereits geöffnet. Wir kauften Kaffee, verglichen unsere Fahrkarten und bemerkten erst dann, dass wir auf unterschiedlichen Seiten des Flusses übernachten würden. Aus dem kleinen Planungsfehler wurde ein gemeinsamer Spaziergang durch die Stadt. Am Abend saßen alle wieder an einem Tisch und erzählten von den Orten, die sie unterwegs entdeckt hatten. Die ungeplanten Umwege blieben uns länger in Erinnerung als das eigentliche Ziel der Reise.";
 
-export function buildPresentationQualityFixture(scenario: QualityScenario, style: PresentationDesignStyle = "NEON") {
+export function buildPresentationQualityFixture(scenario: QualityScenario, style: PresentationDesignStyle | "PHIL_GUD" = "NEON") {
   const base = buildStorybookExperienceRuntime({ questionCount: 30, personCount: 1 });
   const original = scenario.startsWith("structured") ? base.quiz.fragen.find((q) => q.antwortfelder.length > 0)! : scenario === "pixel" ? base.quiz.fragen.find((q) => q.templateId === "pixelbild")! : scenario.startsWith("ordering") ? base.quiz.fragen.find((q) => q.templateId === "reihenfolge")! : base.quiz.fragen[0];
   const question: QuizPraesentationResult["fragen"][number] = structuredClone(original);
@@ -133,11 +133,11 @@ export function buildPresentationQualityFixture(scenario: QualityScenario, style
   }
   const layoutInput = { templateId: question.templateId, questionText: question.frage, answerOptionCount: question.effektiver_antwortmodus === "CLOSED" ? question.antworten.length : 0, structuredFieldCount: question.antwortfelder.length, media: question.medien.map((m) => ({ fileName: m.datei, mediaType: m.medientyp, scope: "QUESTION" as const })), templateData: question.templateConfig?.templateData };
   question.presentationLayouts = { question: resolvePresentationLayout({ ...layoutInput, phase: "QUESTION" }), solution: resolvePresentationLayout({ ...layoutInput, phase: "SOLUTION" }) };
-  let slide: Slide = { typ: scenario === "image-choice-solution" || scenario === "solution-long" || scenario === "ordering-long-solution" ? "aufloesung" : "frage", abschnitt: null, frage: question, frageIndexImBlock: 1, fragenAnzahlImBlock: 1 };
+  let slide: Slide = { typ: scenario === "solution" || scenario === "image-choice-solution" || scenario === "solution-long" || scenario === "ordering-long-solution" ? "aufloesung" : "frage", abschnitt: null, frage: question, frageIndexImBlock: 1, fragenAnzahlImBlock: 1 };
   if (scenario.startsWith("story") || scenario === "poll") slide = {
     typ: "ablauf", abschnitt: null, element: { id: "quality-story", persistentId: null, type: scenario === "poll" ? "LIVE_POLL" : "TEXT", anchorType: "BEFORE_QUIZ", anchorKey: "global", sectionId: null, order: 1, enabled: true, label: "AP5 Referenz", config: { version: 1, title: "Ein unerwarteter Umweg", body: scenario === "story-legacy" ? `${storyText}\n\n${storyText}\n\n${storyText}` : storyText }, configVersion: 1, questionAssignmentId: null, isStandard: false },
   };
-  const managed = { id: "internal-presentation-quality", name: "AP5 Präsentationsreferenz", config: createPresentationStylePreset(style) };
+  const managed = { id: "internal-presentation-quality", name: "AP5 Präsentationsreferenz", config: style === "PHIL_GUD" ? { version: 1 as const, tokens: structuredClone(getPresentationTemplate("phil-gud")!.tokens), design: structuredClone(getPresentationTemplate("phil-gud")!.design), surfaces: { presentation: getPresentationTemplate("phil-gud")!.variant, moderation: "BRANDED" as const, answerForm: getAnswerFormTemplate("phil-gud")!.variant } } : createPresentationStylePreset(style) };
   if (scenario === "qr") slide = {
     typ: "ablauf", abschnitt: null, element: { id: "quality-qr", persistentId: null, type: "QR_CODE", anchorType: "BEFORE_QUIZ", anchorKey: "QUIZ", sectionId: null, order: 1, enabled: true, label: "Teambeitritt", config: { version: 1, title: "Jetzt mitspielen", body: "QR-Code scannen und Team anmelden." }, configVersion: 1, questionAssignmentId: null, isStandard: true },
   };
