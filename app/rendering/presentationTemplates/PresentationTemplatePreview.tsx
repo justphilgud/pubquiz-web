@@ -2,6 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- Generator previews render dynamic repository or managed Blob template assets. */
 
+import previewStyles from "./responsivePreview.module.css";
 import { useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import type { QuizPraesentationResult } from "@/app/quiz/actions";
@@ -169,7 +170,7 @@ function ScaledPreviewStage({
       data-preview-scale-container
       data-preview-scenario={scenario}
       data-preview-renderer={renderer}
-      className={`relative ${responsive ? "" : "aspect-video"} min-h-0 w-full overflow-hidden rounded-2xl bg-black`}
+      className={`relative ${responsive ? previewStyles.responsive : "aspect-video"} min-h-0 w-full overflow-hidden rounded-2xl bg-black`}
         style={responsive ? { height: Math.max(PREVIEW_STAGE_HEIGHT * scale, 720) } : undefined}
     >
       <div
