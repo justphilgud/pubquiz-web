@@ -455,7 +455,8 @@ export const ModelName = {
   benutzer_eventartrollen: 'benutzer_eventartrollen',
   eventreihe_verwaltung: 'eventreihe_verwaltung',
   benutzer_reihenrollen: 'benutzer_reihenrollen',
-  game_drafts: 'game_drafts'
+  game_drafts: 'game_drafts',
+  game_team_assignments: 'game_team_assignments'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -471,7 +472,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "external_question_import_batches" | "external_question_import_items" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "meme_archive_sources" | "meme_archive_entries" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "live_polls" | "live_poll_revisions" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "live_poll_responses" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "meme_moderation_selections" | "meme_moderation_candidates" | "meme_presentations" | "meme_result_entries" | "meme_votes" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen" | "eventarten" | "eventreihe_eventarten" | "benutzer_eventartrollen" | "eventreihe_verwaltung" | "benutzer_reihenrollen" | "game_drafts"
+    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "external_question_import_batches" | "external_question_import_items" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "meme_archive_sources" | "meme_archive_entries" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "live_polls" | "live_poll_revisions" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "live_poll_responses" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "meme_moderation_selections" | "meme_moderation_candidates" | "meme_presentations" | "meme_result_entries" | "meme_votes" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen" | "eventarten" | "eventreihe_eventarten" | "benutzer_eventartrollen" | "eventreihe_verwaltung" | "benutzer_reihenrollen" | "game_drafts" | "game_team_assignments"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4841,6 +4842,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    game_team_assignments: {
+      payload: Prisma.$game_team_assignmentsPayload<ExtArgs>
+      fields: Prisma.game_team_assignmentsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.game_team_assignmentsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$game_team_assignmentsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.game_team_assignmentsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$game_team_assignmentsPayload>
+        }
+        findFirst: {
+          args: Prisma.game_team_assignmentsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$game_team_assignmentsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.game_team_assignmentsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$game_team_assignmentsPayload>
+        }
+        findMany: {
+          args: Prisma.game_team_assignmentsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$game_team_assignmentsPayload>[]
+        }
+        create: {
+          args: Prisma.game_team_assignmentsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$game_team_assignmentsPayload>
+        }
+        createMany: {
+          args: Prisma.game_team_assignmentsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.game_team_assignmentsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$game_team_assignmentsPayload>[]
+        }
+        delete: {
+          args: Prisma.game_team_assignmentsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$game_team_assignmentsPayload>
+        }
+        update: {
+          args: Prisma.game_team_assignmentsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$game_team_assignmentsPayload>
+        }
+        deleteMany: {
+          args: Prisma.game_team_assignmentsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.game_team_assignmentsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.game_team_assignmentsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$game_team_assignmentsPayload>[]
+        }
+        upsert: {
+          args: Prisma.game_team_assignmentsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$game_team_assignmentsPayload>
+        }
+        aggregate: {
+          args: Prisma.Game_team_assignmentsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateGame_team_assignments>
+        }
+        groupBy: {
+          args: Prisma.game_team_assignmentsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Game_team_assignmentsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.game_team_assignmentsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Game_team_assignmentsCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -5868,6 +5943,16 @@ export const Game_draftsScalarFieldEnum = {
 export type Game_draftsScalarFieldEnum = (typeof Game_draftsScalarFieldEnum)[keyof typeof Game_draftsScalarFieldEnum]
 
 
+export const Game_team_assignmentsScalarFieldEnum = {
+  id: 'id',
+  game_id: 'game_id',
+  team_id: 'team_id',
+  created_at: 'created_at'
+} as const
+
+export type Game_team_assignmentsScalarFieldEnum = (typeof Game_team_assignmentsScalarFieldEnum)[keyof typeof Game_team_assignmentsScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -6628,6 +6713,7 @@ export type GlobalOmitConfig = {
   eventreihe_verwaltung?: Prisma.eventreihe_verwaltungOmit
   benutzer_reihenrollen?: Prisma.benutzer_reihenrollenOmit
   game_drafts?: Prisma.game_draftsOmit
+  game_team_assignments?: Prisma.game_team_assignmentsOmit
 }
 
 /* Types for Logging */

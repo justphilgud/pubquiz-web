@@ -5,6 +5,7 @@ import { deleteTeamInTransaction } from "./teamDeletion";
 
 type TeamSnapshot = {
   teamname: string;
+  game_team_assignments?: Array<{id:string}>;
   quiz_teams: Array<{ quiz_id: number }>;
   quiz_team_sessions: Array<{
     quiz_team_session_id: number;
@@ -23,7 +24,7 @@ function createTransaction(team: TeamSnapshot | null) {
     teams: {
       findUnique: async (args: unknown) => {
         calls.push({ operation: "teams.findUnique", args });
-        return team;
+        return team ? {...team,game_team_assignments:team.game_team_assignments??[]} : null;
       },
       delete: mutation("teams.delete"),
     },
@@ -205,4 +206,11 @@ test("missing teams return an expected domain result without mutations", async (
 
   assert.equal(result.status, "not_found");
   assert.deepEqual(calls.map(({ operation }) => operation), ["teams.findUnique"]);
+});
+
+test("global deletion preserves game draft assignments even with force", async()=>{
+  const {transaction,calls}=createTransaction({teamname:"Shared",quiz_teams:[],quiz_team_sessions:[],game_team_assignments:[{id:"assignment"}]});
+  const result=await deleteTeamInTransaction(transaction,{teamId:17,force:true,confirmation:"Shared"});
+  assert.equal(result.status,"blocked");
+  assert.deepEqual(calls.map(c=>c.operation),["teams.findUnique"]);
 });

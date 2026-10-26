@@ -23,6 +23,7 @@ export async function deleteTeamInTransaction(
     where: { team_id: input.teamId },
     select: {
       teamname: true,
+      game_team_assignments: { select: { id: true }, take: 1 },
       quiz_teams: { select: { quiz_id: true } },
       quiz_team_sessions: {
         select: {
@@ -39,6 +40,8 @@ export async function deleteTeamInTransaction(
       message: "Team nicht gefunden oder Zugriff nicht erlaubt.",
     };
   }
+
+  if (team.game_team_assignments.length > 0) return { status: 'blocked', message: 'Dieses Team ist einem Spielentwurf zugeordnet. Bitte zuerst ausdrücklich die Zuordnungen entfernen oder das Team archivieren.' };
 
   const hasHistory = team.quiz_team_sessions.length > 0 || team.quiz_teams.length > 0;
   if (hasHistory && !input.force) {

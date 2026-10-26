@@ -321,3 +321,8 @@ export type benutzer_reihenrollen = Prisma.benutzer_reihenrollenModel
  * Standalone non-playable game instances. No Quiz identity or live state.
  */
 export type game_drafts = Prisma.game_draftsModel
+/**
+ * Model game_team_assignments
+ *
+ */
+export type game_team_assignments = Prisma.game_team_assignmentsModel

@@ -248,6 +248,7 @@ export type game_draftsWhereInput = {
   status?: Prisma.StringFilter<"game_drafts"> | string
   created_at?: Prisma.DateTimeFilter<"game_drafts"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"game_drafts"> | Date | string
+  team_assignments?: Prisma.Game_team_assignmentsListRelationFilter
   eventreihe?: Prisma.XOR<Prisma.EventreihenScalarRelationFilter, Prisma.eventreihenWhereInput>
 }
 
@@ -261,6 +262,7 @@ export type game_draftsOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  team_assignments?: Prisma.game_team_assignmentsOrderByRelationAggregateInput
   eventreihe?: Prisma.eventreihenOrderByWithRelationInput
 }
 
@@ -277,6 +279,7 @@ export type game_draftsWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.StringFilter<"game_drafts"> | string
   created_at?: Prisma.DateTimeFilter<"game_drafts"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"game_drafts"> | Date | string
+  team_assignments?: Prisma.Game_team_assignmentsListRelationFilter
   eventreihe?: Prisma.XOR<Prisma.EventreihenScalarRelationFilter, Prisma.eventreihenWhereInput>
 }, "id">
 
@@ -321,6 +324,7 @@ export type game_draftsCreateInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  team_assignments?: Prisma.game_team_assignmentsCreateNestedManyWithoutGameInput
   eventreihe: Prisma.eventreihenCreateNestedOneWithoutGame_draftsInput
 }
 
@@ -334,6 +338,7 @@ export type game_draftsUncheckedCreateInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  team_assignments?: Prisma.game_team_assignmentsUncheckedCreateNestedManyWithoutGameInput
 }
 
 export type game_draftsUpdateInput = {
@@ -345,6 +350,7 @@ export type game_draftsUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  team_assignments?: Prisma.game_team_assignmentsUpdateManyWithoutGameNestedInput
   eventreihe?: Prisma.eventreihenUpdateOneRequiredWithoutGame_draftsNestedInput
 }
 
@@ -358,6 +364,7 @@ export type game_draftsUncheckedUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  team_assignments?: Prisma.game_team_assignmentsUncheckedUpdateManyWithoutGameNestedInput
 }
 
 export type game_draftsCreateManyInput = {
@@ -449,6 +456,11 @@ export type game_draftsSumOrderByAggregateInput = {
   eventreihe_id?: Prisma.SortOrder
 }
 
+export type Game_draftsScalarRelationFilter = {
+  is?: Prisma.game_draftsWhereInput
+  isNot?: Prisma.game_draftsWhereInput
+}
+
 export type game_draftsCreateNestedManyWithoutEventreiheInput = {
   create?: Prisma.XOR<Prisma.game_draftsCreateWithoutEventreiheInput, Prisma.game_draftsUncheckedCreateWithoutEventreiheInput> | Prisma.game_draftsCreateWithoutEventreiheInput[] | Prisma.game_draftsUncheckedCreateWithoutEventreiheInput[]
   connectOrCreate?: Prisma.game_draftsCreateOrConnectWithoutEventreiheInput | Prisma.game_draftsCreateOrConnectWithoutEventreiheInput[]
@@ -491,6 +503,20 @@ export type game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput = {
   deleteMany?: Prisma.game_draftsScalarWhereInput | Prisma.game_draftsScalarWhereInput[]
 }
 
+export type game_draftsCreateNestedOneWithoutTeam_assignmentsInput = {
+  create?: Prisma.XOR<Prisma.game_draftsCreateWithoutTeam_assignmentsInput, Prisma.game_draftsUncheckedCreateWithoutTeam_assignmentsInput>
+  connectOrCreate?: Prisma.game_draftsCreateOrConnectWithoutTeam_assignmentsInput
+  connect?: Prisma.game_draftsWhereUniqueInput
+}
+
+export type game_draftsUpdateOneRequiredWithoutTeam_assignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.game_draftsCreateWithoutTeam_assignmentsInput, Prisma.game_draftsUncheckedCreateWithoutTeam_assignmentsInput>
+  connectOrCreate?: Prisma.game_draftsCreateOrConnectWithoutTeam_assignmentsInput
+  upsert?: Prisma.game_draftsUpsertWithoutTeam_assignmentsInput
+  connect?: Prisma.game_draftsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.game_draftsUpdateToOneWithWhereWithoutTeam_assignmentsInput, Prisma.game_draftsUpdateWithoutTeam_assignmentsInput>, Prisma.game_draftsUncheckedUpdateWithoutTeam_assignmentsInput>
+}
+
 export type game_draftsCreateWithoutEventreiheInput = {
   id?: string
   eventart: string
@@ -500,6 +526,7 @@ export type game_draftsCreateWithoutEventreiheInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  team_assignments?: Prisma.game_team_assignmentsCreateNestedManyWithoutGameInput
 }
 
 export type game_draftsUncheckedCreateWithoutEventreiheInput = {
@@ -511,6 +538,7 @@ export type game_draftsUncheckedCreateWithoutEventreiheInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  team_assignments?: Prisma.game_team_assignmentsUncheckedCreateNestedManyWithoutGameInput
 }
 
 export type game_draftsCreateOrConnectWithoutEventreiheInput = {
@@ -554,6 +582,70 @@ export type game_draftsScalarWhereInput = {
   updated_at?: Prisma.DateTimeFilter<"game_drafts"> | Date | string
 }
 
+export type game_draftsCreateWithoutTeam_assignmentsInput = {
+  id?: string
+  eventart: string
+  titel: string
+  datum?: Date | string | null
+  uhrzeit?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  eventreihe: Prisma.eventreihenCreateNestedOneWithoutGame_draftsInput
+}
+
+export type game_draftsUncheckedCreateWithoutTeam_assignmentsInput = {
+  id?: string
+  eventart: string
+  eventreihe_id: number
+  titel: string
+  datum?: Date | string | null
+  uhrzeit?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+}
+
+export type game_draftsCreateOrConnectWithoutTeam_assignmentsInput = {
+  where: Prisma.game_draftsWhereUniqueInput
+  create: Prisma.XOR<Prisma.game_draftsCreateWithoutTeam_assignmentsInput, Prisma.game_draftsUncheckedCreateWithoutTeam_assignmentsInput>
+}
+
+export type game_draftsUpsertWithoutTeam_assignmentsInput = {
+  update: Prisma.XOR<Prisma.game_draftsUpdateWithoutTeam_assignmentsInput, Prisma.game_draftsUncheckedUpdateWithoutTeam_assignmentsInput>
+  create: Prisma.XOR<Prisma.game_draftsCreateWithoutTeam_assignmentsInput, Prisma.game_draftsUncheckedCreateWithoutTeam_assignmentsInput>
+  where?: Prisma.game_draftsWhereInput
+}
+
+export type game_draftsUpdateToOneWithWhereWithoutTeam_assignmentsInput = {
+  where?: Prisma.game_draftsWhereInput
+  data: Prisma.XOR<Prisma.game_draftsUpdateWithoutTeam_assignmentsInput, Prisma.game_draftsUncheckedUpdateWithoutTeam_assignmentsInput>
+}
+
+export type game_draftsUpdateWithoutTeam_assignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  eventart?: Prisma.StringFieldUpdateOperationsInput | string
+  titel?: Prisma.StringFieldUpdateOperationsInput | string
+  datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uhrzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  eventreihe?: Prisma.eventreihenUpdateOneRequiredWithoutGame_draftsNestedInput
+}
+
+export type game_draftsUncheckedUpdateWithoutTeam_assignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  eventart?: Prisma.StringFieldUpdateOperationsInput | string
+  eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
+  titel?: Prisma.StringFieldUpdateOperationsInput | string
+  datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uhrzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type game_draftsCreateManyEventreiheInput = {
   id?: string
   eventart: string
@@ -574,6 +666,7 @@ export type game_draftsUpdateWithoutEventreiheInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  team_assignments?: Prisma.game_team_assignmentsUpdateManyWithoutGameNestedInput
 }
 
 export type game_draftsUncheckedUpdateWithoutEventreiheInput = {
@@ -585,6 +678,7 @@ export type game_draftsUncheckedUpdateWithoutEventreiheInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  team_assignments?: Prisma.game_team_assignmentsUncheckedUpdateManyWithoutGameNestedInput
 }
 
 export type game_draftsUncheckedUpdateManyWithoutEventreiheInput = {
@@ -599,6 +693,35 @@ export type game_draftsUncheckedUpdateManyWithoutEventreiheInput = {
 }
 
 
+/**
+ * Count Type Game_draftsCountOutputType
+ */
+
+export type Game_draftsCountOutputType = {
+  team_assignments: number
+}
+
+export type Game_draftsCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  team_assignments?: boolean | Game_draftsCountOutputTypeCountTeam_assignmentsArgs
+}
+
+/**
+ * Game_draftsCountOutputType without action
+ */
+export type Game_draftsCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Game_draftsCountOutputType
+   */
+  select?: Prisma.Game_draftsCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * Game_draftsCountOutputType without action
+ */
+export type Game_draftsCountOutputTypeCountTeam_assignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.game_team_assignmentsWhereInput
+}
+
 
 export type game_draftsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -610,7 +733,9 @@ export type game_draftsSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   status?: boolean
   created_at?: boolean
   updated_at?: boolean
+  team_assignments?: boolean | Prisma.game_drafts$team_assignmentsArgs<ExtArgs>
   eventreihe?: boolean | Prisma.eventreihenDefaultArgs<ExtArgs>
+  _count?: boolean | Prisma.Game_draftsCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["game_drafts"]>
 
 export type game_draftsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -653,7 +778,9 @@ export type game_draftsSelectScalar = {
 
 export type game_draftsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "eventart" | "eventreihe_id" | "titel" | "datum" | "uhrzeit" | "status" | "created_at" | "updated_at", ExtArgs["result"]["game_drafts"]>
 export type game_draftsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  team_assignments?: boolean | Prisma.game_drafts$team_assignmentsArgs<ExtArgs>
   eventreihe?: boolean | Prisma.eventreihenDefaultArgs<ExtArgs>
+  _count?: boolean | Prisma.Game_draftsCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type game_draftsIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   eventreihe?: boolean | Prisma.eventreihenDefaultArgs<ExtArgs>
@@ -665,6 +792,7 @@ export type game_draftsIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.
 export type $game_draftsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "game_drafts"
   objects: {
+    team_assignments: Prisma.$game_team_assignmentsPayload<ExtArgs>[]
     eventreihe: Prisma.$eventreihenPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -1071,6 +1199,7 @@ readonly fields: game_draftsFieldRefs;
  */
 export interface Prisma__game_draftsClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  team_assignments<T extends Prisma.game_drafts$team_assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.game_drafts$team_assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$game_team_assignmentsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   eventreihe<T extends Prisma.eventreihenDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.eventreihenDefaultArgs<ExtArgs>>): Prisma.Prisma__eventreihenClient<runtime.Types.Result.GetResult<Prisma.$eventreihenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1508,6 +1637,30 @@ export type game_draftsDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many game_drafts to delete.
    */
   limit?: number
+}
+
+/**
+ * game_drafts.team_assignments
+ */
+export type game_drafts$team_assignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the game_team_assignments
+   */
+  select?: Prisma.game_team_assignmentsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the game_team_assignments
+   */
+  omit?: Prisma.game_team_assignmentsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.game_team_assignmentsInclude<ExtArgs> | null
+  where?: Prisma.game_team_assignmentsWhereInput
+  orderBy?: Prisma.game_team_assignmentsOrderByWithRelationInput | Prisma.game_team_assignmentsOrderByWithRelationInput[]
+  cursor?: Prisma.game_team_assignmentsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Game_team_assignmentsScalarFieldEnum | Prisma.Game_team_assignmentsScalarFieldEnum[]
 }
 
 /**

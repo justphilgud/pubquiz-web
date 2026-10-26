@@ -233,3 +233,11 @@ test("standalone game preview requires its explicit isolated target and approved
   assert.match(preview, /inputs.isolated_games && 'games_review_20261026c'/);
   assert.match(preview, /DATABASE_URL: \$\{\{ secrets.GAMES_DATABASE_URL \}\}/);
 });
+
+test("AP2 preview requires exact trusted branch and own synthetic runtime and migration identities",()=>{
+  assert.ok(preview.includes("github.ref != 'refs/heads/codex/game-team-assignments' || inputs.isolated_game_teams"));
+  assert.ok(preview.includes("!inputs.isolated_game_teams || github.ref == 'refs/heads/codex/game-team-assignments'"));
+  assert.ok(preview.includes("inputs.isolated_game_teams && secrets.GAME_TEAMS_MIGRATION_DATABASE_URL"));
+  assert.ok(preview.includes("inputs.isolated_game_teams && 'game_teams_review_20261026'"));
+  assert.ok(preview.includes("DATABASE_URL: ${{ secrets.GAME_TEAMS_DATABASE_URL }}"));
+});

@@ -656,6 +656,7 @@ model teams {
   foto_upload_gesperrt  Boolean              @default(false)
   created_at            DateTime             @default(now())
   updated_at            DateTime             @default(now()) @updatedAt
+  game_team_assignments game_team_assignments[]
   quiz_teams            quiz_teams[]
   quiz_team_sessions    quiz_team_sessions[]
 
@@ -1579,8 +1580,21 @@ model game_drafts {
   status          String      @default("DRAFT") @db.VarChar(16)
   created_at      DateTime    @default(now()) @db.Timestamptz(3)
   updated_at      DateTime    @default(now()) @updatedAt @db.Timestamptz(3)
+  team_assignments game_team_assignments[]
   eventreihe      eventreihen @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Restrict)
 
   @@index([eventart, eventreihe_id, updated_at], map: "idx_game_drafts_type_series_updated")
+  @@schema("pubquiz")
+}
+model game_team_assignments {
+  id         String      @id @default(uuid()) @db.Uuid
+  game_id    String      @db.Uuid
+  team_id    Int
+  created_at DateTime    @default(now()) @db.Timestamptz(3)
+  game       game_drafts @relation(fields: [game_id], references: [id], onDelete: Restrict)
+  team       teams       @relation(fields: [team_id], references: [team_id], onDelete: Restrict)
+
+  @@unique([game_id, team_id], map: "uq_game_team_assignments")
+  @@index([team_id], map: "idx_game_team_assignments_team")
   @@schema("pubquiz")
 }
