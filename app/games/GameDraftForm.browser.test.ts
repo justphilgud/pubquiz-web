@@ -10,14 +10,16 @@ import { tmpdir } from "node:os";
 test("draft form: real Chromium editing, rejected writes, cancel guard and reload for both formats", async () => {
  const chrome=[process.env.CHROME_BIN,"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe","/usr/bin/google-chrome","/usr/bin/chromium"].find(p=>p&&existsSync(p));assert.ok(chrome,"Chrome required");
  const source=String.raw`
- import React from 'react';import{createRoot}from'react-dom/client';import{flushSync}from'react-dom';import GameDraftForm from './app/games/GameDraftForm';
+ import React from 'react';import{renderToString}from'react-dom/server';import{createRoot}from'react-dom/client';import{flushSync}from'react-dom';import GameDraftForm from './app/games/GameDraftForm';
  window.qa={calls:[],stored:null,reject:false};let confirms=0;window.confirm=()=>{confirms++;return false;};const root=createRoot(document.getElementById('app'));
  const wait=async f=>{for(let i=0;i<200;i++){if(f())return;await new Promise(r=>setTimeout(r,10));}throw Error('timeout '+document.body.innerText)};
  const check=(v,m)=>{if(!v)throw Error(m)};const field=n=>document.querySelector('[name="'+n+'"]');
  const set=(n,v)=>{const e=field(n),p=e.tagName==='SELECT'?HTMLSelectElement.prototype:HTMLInputElement.prototype;flushSync(()=>{Object.getOwnPropertyDescriptor(p,'value').set.call(e,v);e.dispatchEvent(new Event(e.tagName==='SELECT'?'change':'input',{bubbles:true}));});};
  const render=(type,initial,canWrite=true)=>flushSync(()=>root.render(<GameDraftForm key={type+(initial?.id??'new')+canWrite} type={type} initial={initial} choices={[{id:10,name:'A',canWrite:true},{id:20,name:'B',canWrite:true}]} canWrite={canWrite} returnHref={type==='BINGO'?'/bingo':'/karaoke'}/>));
  const save=async()=>{document.querySelector('button[type=submit]').click();await wait(()=>document.querySelector('button[type=submit]').disabled);await wait(()=>!document.querySelector('button[type=submit]').disabled);await wait(()=>document.querySelector('[role=status],[role=alert]'));};
- async function run(){for(const type of ['BINGO','POWERPOINT_KARAOKE']){
+ async function run(){
+ const html=renderToString(<GameDraftForm type="BINGO" choices={[{id:10,name:'A',canWrite:true}]} canWrite returnHref="/bingo"/>);const serverDoc=new DOMParser().parseFromString(html,'text/html');check(serverDoc.querySelector('fieldset').disabled&&serverDoc.querySelector('button[type=submit]').disabled,'pre-hydration form must prevent native submission');
+ for(const type of ['BINGO','POWERPOINT_KARAOKE']){
   window.qa.stored=null;render(type);check(field('seriesId').value==='','series must be explicit');set('title','Original');set('seriesId','10');set('date','2028-02-29');set('time','19:30');await save();
   check(window.qa.stored.date==='2028-02-29'&&window.qa.stored.time==='19:30','civil date/time lost');flushSync(()=>root.render(null));render(type,window.qa.stored);check(field('title').value==='Original','reload title');check(field('date').value==='2028-02-29','reload date');
   set('title','Unsaved');const anchor=document.querySelector('a');const click=new MouseEvent('click',{bubbles:true,cancelable:true});check(!anchor.dispatchEvent(click),'cancelled navigation not prevented');check(confirms>0&&field('title').value==='Unsaved','cancel lost input');check(window.qa.stored.title==='Original','cancel saved input');
