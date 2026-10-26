@@ -57,3 +57,6 @@
 
 [data-admin-ui="phil-gud"] [data-ui-variant="primary"]:not(:where([data-quiz-theme-version] *)) { background-color: #171717; color: #faf8f2; }
 [data-admin-ui="phil-gud"] [data-ui-variant="secondary"]:not(:where([data-quiz-theme-version] *)) { background-color: #f2eee5; color: #171717; }
+
+/* Brand login remains an explicit high-contrast CTA on its black card. */
+[data-admin-ui="phil-gud"] [data-auth-appearance="brand"] [data-ui-variant="primary"] { background-color: #f0fc16; color: #171717; }

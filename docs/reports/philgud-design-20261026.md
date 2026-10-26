@@ -31,7 +31,11 @@ Ausschließlich synthetische Daten in `pr130_review_20261025`, nie Production. D
 
 ## Verbleibende Grenzen
 
-**Gehostete Preview noch nicht bereitgestellt.** Die bestehende Vorgabe `docs/architecture/media-upload-environments.md`, „Neue Namen werden erst nach menschlicher Vertrauensprüfung separat aufgenommen“, verlangt eine ausdrückliche Freigabe des neuen Branches `codex/philgud-admin-design`. Diese ist angefragt und bislang nicht eingegangen. Keine Allowlist-/Branchpolicy umgangen; kein Ersatz durch eine ungeprüfte Datenbank.
+**Branch-Vertrauensfreigabe erteilt und umgesetzt.** Ausschließlich `codex/philgud-admin-design` wurde nach ausdrücklicher menschlicher Bestätigung zur bestehenden Allowlist und Branchpolicy hinzugefügt. Separater eingeschränkter Preview-DB-Login; reguläre Development-Datenbank damit nachweislich nicht lesbar. Keine vorhandenen Credentials rotiert, keine Production-Konfiguration geändert.
+
+Erste gehostete Preview `effdd63fec65590d9d2e86960bc2b39a8fd2ff8a`: beide CI-Läufe 40318579666/40318586139 SUCCESS, Deploymentlauf 40319096206 SUCCESS, Vercel `dpl_2iRqh3KE4hPN9xpYgXw9RBsUr2jY` READY/Preview, Immutable-URL https://pubquiz-kl5i0ghq4-just-phil-gud.vercel.app . Branch-Alias wurde als `pubquiz-web-git-codex-philgud-admin-design-just-phil-gud.vercel.app` zurückgelesen. Synthetischer Admin erfolgreich angemeldet.
+
+Die gehostete Loginprüfung zeigte einen zu dunklen Primärbutton auf der schwarzen Anmeldekarte. Korrektur ausdrücklich nur für die markierte Brand-Anmeldekarte; eine echte Browserregression rendert AuthCard und Button und verlangt mindestens 4,5:1 für den Text und 3:1 für den Button gegenüber der dunklen Karte. Keine Grenzwerte gelockert. Für diese abschließende Korrektur sind neue CI und ein abschließendes Preview-Deployment erforderlich. Deren exakte SHA-/Laufbelege und weitere gehostete Prüfungen werden im PR-Übergabebericht ergänzt.
 
 **Dirty-Abbruch am neuen Designstand nicht erfolgreich manuell verifiziert.** Bestehende Guards unverändert. Der Nutzer hat den Basistest für PR #131 bestätigt; das ist keine nachträgliche Bestätigung der neuen Oberfläche. Der native Browserdialog ist über die verfügbare Steuerung weiterhin nicht zuverlässig bedienbar. Kein Eingabeerhalt-Test behauptet; diese konkrete manuelle Prüfung bleibt offen. Das Abbrechen des unveränderten Benutzerformulars und das Schließen des Portal-Dialogs sind davon getrennte erfolgreiche Prüfungen.
 
