@@ -53,20 +53,31 @@ test("additive draft migration and real repository authorization on isolated Pos
   assert.deepEqual((await db.query("SELECT * FROM pubquiz.benutzer_reihenrollen ORDER BY benutzer_id")).rows,rolesBefore);
   const prisma = new PrismaClient({adapter:new PrismaPg({connectionString:target.toString()})});
   context.after(async()=>{await prisma.$disconnect();});
-  const bundle = await build({stdin:{contents:"export * from './app/games/gameDraftRepository.server';",resolveDir:process.cwd()},bundle:true,write:false,platform:"node",format:"cjs",packages:"external",plugins:[{name:"database",setup(b){
-    b.onResolve({filter:/^(server-only|@\/app\/lib\/prisma)$/},a=>({path:a.path,namespace:"fixture"}));
-    b.onLoad({filter:/.*/,namespace:"fixture"},a=>({contents:a.path==="server-only"?"":"export const prisma = globalThis.fixture;"}));
+  let currentUser: number | null = 3;
+  const bundle = await build({stdin:{contents:"export * from './app/games/gameDraftRepository.server'; export * as actions from './app/games/actions';",resolveDir:process.cwd()},bundle:true,write:false,platform:"node",format:"cjs",packages:"external",plugins:[{name:"database",setup(b){
+    b.onResolve({filter:/^(server-only|@\/auth|next\/cache|next\/navigation|@\/app\/lib\/prisma)$/},a=>({path:a.path,namespace:"fixture"}));
+    b.onLoad({filter:/.*/,namespace:"fixture"},a=>({contents:a.path==="server-only"?"":a.path==="@/auth"?"export const auth = async () => globalThis.session();":a.path==="next/cache"?"export function revalidatePath(){}":a.path==="next/navigation"?'export function redirect(path){throw new Error("REDIRECT:"+path)}':"export const prisma = globalThis.fixture;"}));
   }}]});
   const runtime = {exports:{}};
-  runInNewContext(bundle.outputFiles[0].text,{module:runtime,exports:runtime.exports,require:createRequire(import.meta.url),fixture:prisma,console,process,Date,Buffer,setTimeout,clearTimeout});
-  const api = runtime.exports as typeof import("@/app/games/gameDraftRepository.server");
+  runInNewContext(bundle.outputFiles[0].text,{module:runtime,exports:runtime.exports,require:createRequire(import.meta.url),fixture:prisma,session:()=>currentUser?{user:{id:String(currentUser)}}:null,console,process,Date,Buffer,setTimeout,clearTimeout});
+  const api = runtime.exports as typeof import("@/app/games/gameDraftRepository.server") & {actions:typeof import("@/app/games/actions")};
   const input = {seriesId:10,title:"Bingo draft",date:"2028-02-29",time:"19:30"};
+  assert.equal((await api.actions.saveGameDraft("QUIZ",input)).success,false);
+  assert.equal((await api.actions.saveGameDraft("BINGO",{...input,status:"LIVE"})).success,false);
+  assert.equal((await api.actions.saveGameDraft("BINGO",{...input,seriesId:20})).success,false);
+  currentUser=4;
+  assert.equal((await api.actions.saveGameDraft("POWERPOINT_KARAOKE",input)).success,false);
+  currentUser=null;
+  await assert.rejects(api.actions.saveGameDraft("BINGO",input),/REDIRECT:\/login/);
+  currentUser=3;
+  const actionResult=await api.actions.saveGameDraft("BINGO",{...input,title:"Actual Action"});
+  assert.equal(actionResult.success,true);
   const bingo = await api.writeGameDraft(3,"BINGO",input);
   const karaoke = await api.writeGameDraft(3,"POWERPOINT_KARAOKE",{...input,title:"Karaoke draft"});
   assert.notEqual(bingo.id,karaoke.id);
   assert.equal(bingo.status,"DRAFT");
   assert.equal((await api.readGameDraft(3,"BINGO",bingo.id)).game.date,"2028-02-29");
-  assert.equal((await api.listGameDrafts(3,"BINGO")).games.length,1);
+  assert.equal((await api.listGameDrafts(3,"BINGO")).games.length,2);
   assert.equal((await api.readGameDraft(4,"BINGO",bingo.id)).canWrite,false);
   for(const user of [2,4,5,6]) await assert.rejects(api.writeGameDraft(user,"BINGO",input));
   for(const user of [2,5,6]) await assert.rejects(api.readGameDraft(user,"BINGO",bingo.id));
