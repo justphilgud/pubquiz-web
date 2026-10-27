@@ -26,6 +26,7 @@ test("actual Phil Gud and LOVD PDF export embeds original frozen fonts/logo, pag
     const snapshot = await api.capturePrintSnapshot(design, "Bingo – gemeinsam spielen", "Runde 1");
     assert.ok(snapshot.body.bytes.length > 1000); assert.ok(snapshot.display.bytes.length > 1000); assert.ok(snapshot.logo);
     assert.doesNotThrow(() => parsePrintSnapshot(JSON.parse(JSON.stringify(snapshot))));
+    assert.throws(() => parsePrintSnapshot({ ...snapshot, logo: null }), "a configured logo must have its actual frozen bytes");
     const corrupt = structuredClone(snapshot); corrupt.body.bytes = corrupt.body.bytes.slice(4);
     assert.throws(() => parsePrintSnapshot(corrupt));
     const cards = Array.from({ length: 9 }, (_, i) => ({ ...generateCard(`card-${i}`, () => (i + 1) / 11), ordinal: i + 1, code: `BG-0123456789AB-${String(i + 1).padStart(4, "0")}` }));

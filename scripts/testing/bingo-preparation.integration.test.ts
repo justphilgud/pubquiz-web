@@ -13,6 +13,7 @@ import { runInNewContext } from "node:vm";
 import { build } from "esbuild";
 import { COLUMN_SQL, CATALOG_SQL } from "../operations/snapshot";
 import { auditColumns, inspectRow, type Column } from "../operations/acceptance-policy";
+import { designHash } from "@/app/bingo/preparation/printSnapshot";
 
 const base = process.env.BINGO_PREPARATION_TEST_DATABASE_URL;
 test("AP2 additive empty/populated migration and actual PostgreSQL policies, concurrency and immutable cards", { skip: !base, timeout: 240000 }, async t => {
@@ -149,6 +150,15 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   assert.throws(() => inspectRow({ ...stored, print_snapshot: { ...stored.print_snapshot, secret: "blocked" } }, new Set(), "pubquiz", "bingo_card_series"));
   const corrupt = structuredClone(stored); corrupt.print_snapshot.body.sha256 = "0".repeat(64);
   assert.throws(() => inspectRow(corrupt, new Set(), "pubquiz", "bingo_card_series"));
+  const oldSource = structuredClone(stored);
+  oldSource.print_snapshot.design.config.tokens.assets.logo = "https://bix6h2j23vjzi240.public.blob.vercel-storage.com/retired-bingo-logo.png";
+  oldSource.print_snapshot.designHash = designHash(oldSource.print_snapshot.design);
+  const media = new Set<string>();
+  assert.doesNotThrow(() => inspectRow(oldSource, media, "pubquiz", "bingo_card_series"));
+  assert.equal(media.size, 0, "frozen print bytes must not require redownloading an old source asset");
+  oldSource.print_snapshot.design.config.tokens.assets.logo = "https://unexpected.public.blob.vercel-storage.com/retired-bingo-logo.png";
+  oldSource.print_snapshot.designHash = designHash(oldSource.print_snapshot.design);
+  assert.throws(() => inspectRow(oldSource, new Set(), "pubquiz", "bingo_card_series"), "source ownership rules still apply");
   assert.deepEqual((await db.query("SELECT to_jsonb(q) data FROM pubquiz.quiz q WHERE quiz_id=11")).rows[0].data, before);
   console.info("AP2 isolated PostgreSQL acceptance passed:", name);
 });

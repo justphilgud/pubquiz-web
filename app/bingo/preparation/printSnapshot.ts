@@ -31,6 +31,7 @@ export function parsePrintSnapshot(value: unknown): PrintSnapshot {
     if (!keys(value, "version,title,roundLabel,design,designHash,display,body,logo") || value.version !== 1 || typeof value.title !== "string" || !value.title || value.title.length > 150 || typeof value.roundLabel !== "string" || !value.roundLabel || value.roundLabel.length > 80) throw new Error("PRINT_STRUCTURE");
     const design = parseSharedDesign(value.design);
     if (!design || value.designHash !== designHash(design)) throw new Error("PRINT_DESIGN");
+    if ((design.config.tokens.assets.logo === null) !== (value.logo === null)) throw new Error("PRINT_LOGO_REQUIRED");
     return { version: 1, title: value.title, roundLabel: value.roundLabel, design, designHash: designHash(design), display: decodeAsset(value.display, "font"), body: decodeAsset(value.body, "font"), logo: value.logo === null ? null : decodeAsset(value.logo, "logo") };
   } catch { throw new BingoPreparationError("Das gespeicherte Druckdesign ist ungültig. Bitte die Administration informieren."); }
 }

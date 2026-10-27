@@ -124,7 +124,10 @@ ordinary tables, constraints, indexes, functions and triggers. The narrow
 `inspectRow` case validates print-snapshot shape, checksums and existing design
 token/media rules; it does not exempt other JSON or secret-bearing fields. Cards
 are decoded with AP1 validation. Embedded frozen assets travel inside the database
-dump, independently of mutable source URLs. Restore must preserve schema objects,
+dump, independently of mutable source URLs. Snapshot source references are still
+strictly validated but are not added as additional media downloads: the used bytes
+are already frozen in the row, and print v1 does not use scene backgrounds.
+Restore must preserve schema objects,
 card identities/cells, relation scope and issue history; the existing restore
 workflow remains responsible for its transactional ordering and integrity checks.
 No manual backup or restore is required or executed for AP2 acceptance.
