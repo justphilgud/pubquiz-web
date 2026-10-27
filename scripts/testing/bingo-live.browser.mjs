@@ -101,7 +101,15 @@ async function screenshot(s, name, width, height) {
   await write(mod, "Pause");
   assert.equal(await evaluate(mod, '[...document.querySelectorAll("button")].find(b=>b.textContent==="Zahl prüfen").disabled'), true);
   await set(mod, "Ziehungsziel", 50); await write(mod, "Ziehungsziel ändern");
-  const pausedRevision = await revision(mod); await goto(mod, `/bingo/${fixture.gameId}/moderation`);
+  const pausedRevision = await revision(mod);
+  const probe = process.env.BINGO_LIVE_RESTART_PROBE_FILE;
+  if (probe) {
+    assert.ok(path.resolve(probe).startsWith(path.resolve(".artifacts/bingo-ap3") + path.sep));
+    assert.equal(fs.existsSync(probe), false, "restart probe must be fresh");
+    fs.writeFileSync(probe, JSON.stringify({ gameId: fixture.gameId, pausedRevision, audiencePath }));
+    await until(() => fs.existsSync(probe + ".done"), "own local server restart handshake", 60000);
+  }
+  await goto(mod, `/bingo/${fixture.gameId}/moderation`);
   await until(async () => await revision(mod) === pausedRevision, "reload preserves paused state and history");
   await write(mod, "Fortsetzen");
   await until(async () => await revision(audience) === await revision(mod), "synchronized screenshot state");
@@ -133,7 +141,7 @@ async function screenshot(s, name, width, height) {
   await login(editor, accounts.find(a => a.id === 3)); await goto(editor, `/bingo/${acceptance.gameId}/moderation`);
   await until(async () => /404|not be found|nicht gefunden/i.test(await text(editor)), "editor denied");
   await goto(mod, "/quiz"); await until(async () => /AP3 synthetische Quiz-Regression/.test(await text(mod)), "existing quiz administration");
-  fs.writeFileSync(path.join(output, "results.json"), JSON.stringify({ origin, gameId: fixture.gameId, acceptanceGameId: acceptance.gameId, audiencePath, passed: ["fresh admin/manager/editor login", "cancel start without write", "native unsaved navigation cancellation", "manual preview/publish", "invalid call and 1/2/3 lines using all card identifiers", "last correction/review/revoke", "pause/target/resume/reload", "real network interruption and catchup", "explicit end and reload", "manager foreign-series and editor denial", "quiz regression", "1366x768/390x844 moderation and 1280x600/1366x768/1920x1080 audience"], productionChanged: false }, null, 2));
+  fs.writeFileSync(path.join(output, "results.json"), JSON.stringify({ origin, gameId: fixture.gameId, acceptanceGameId: acceptance.gameId, audiencePath, localServerRestartVerified: !!process.env.BINGO_LIVE_RESTART_PROBE_FILE, passed: ["fresh admin/manager/editor login", "cancel start without write", "native unsaved navigation cancellation", "manual preview/publish", "invalid call and 1/2/3 lines using all card identifiers", "last correction/review/revoke", "pause/target/resume/reload", "real network interruption and catchup", "explicit end and reload", "manager foreign-series and editor denial", "quiz regression", "1366x768/390x844 moderation and 1280x600/1366x768/1920x1080 audience"], productionChanged: false }, null, 2));
   console.info("AP3 actual local browser lifecycle, separated presentation, roles, native cancellation, reload and responsive checks: PASS");
 })().catch(error => { console.error(error.stack); process.exitCode = 1; }).finally(async () => {
   if (ws?.readyState === 1) { await call("Browser.close").catch(() => {}); ws.close(); }
