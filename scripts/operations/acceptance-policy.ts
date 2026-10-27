@@ -2,6 +2,8 @@ import { parseQuizDesignSnapshot } from "../../app/rendering/sharedDesign/shared
 import { assertRestoreTarget, requireCondition } from "./guards";
 import { brandFontOptions } from "../../app/rendering/templateRegistry";
 import { isSafeTemplateAssetReference } from "../../app/rendering/presentationTemplates/presentationTemplateAssets";
+import { parsePrintSnapshot } from "../../app/bingo/preparation/printSnapshot";
+import { decodeCard } from "../../app/bingo/preparation/policy";
 
 export const RESTORE_TARGET = {
   project: "icy-leaf-46256271", branch: "br-bitter-paper-b20sx4lu",
@@ -65,6 +67,18 @@ function exactKeys(value: unknown, keys: string): asserts value is Record<string
 // Only this persisted presentation field uses "tokens" for design, not authentication.
 // Check exact shape and bounded design values, then retain the ordinary recursive scan.
 export function inspectRow(value: Record<string, unknown>, media: Set<string>, schema: string, table: string) {
+  if (schema === "pubquiz" && table === "bingo_card_series") {
+    const snapshot = parsePrintSnapshot(value.print_snapshot);
+    const { print_snapshot: _snapshot, ...rest } = value;
+    void _snapshot;
+    inspectValue(rest, media);
+    inspectValue({ title: snapshot.title, roundLabel: snapshot.roundLabel, name: snapshot.design.name, templateId: snapshot.design.templateId, displayName: snapshot.display.name, bodyName: snapshot.body.name, logoName: snapshot.logo?.name ?? null }, media);
+    // Exact version/shape, canonical base64 and checksums have been checked above.
+    // Frozen binary assets are carried in the dump itself; design references retain
+    // the existing media inventory rules rather than granting arbitrary URL access.
+    return inspectRow({ theme_config_json: snapshot.design.config }, media, "pubquiz", "presentation_templates");
+  }
+  if (schema === "pubquiz" && table === "bingo_cards") decodeCard(value.cells);
   if (schema === "pubquiz" && table === "quiz" && value.shared_design_snapshot != null) {
     const snapshot=parseQuizDesignSnapshot(value.shared_design_snapshot);
     requireCondition(snapshot !== null, "DESIGN_TOKEN_STRUCTURE_REVIEW_REQUIRED");

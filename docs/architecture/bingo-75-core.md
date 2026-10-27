@@ -156,3 +156,8 @@ Die manuell erfasste Ausgabemenge bleibt spätere Anforderung; konkrete ausgegeb
 Karten-IDs sind **keine beschlossene Pflicht**. Dauerhaft bytegleiche Aufbewahrung
 aller PDF-Exporte ist ebenfalls **nicht beschlossen**. Verbindlich ist die stabile
 Belegung derselben Karte. Frühere weitergehende Vorschläge gelten nicht als Auftrag.
+
+AP2 ergänzt jetzt die isolierte Vorbereitung, Kartenpersistenz, manuelle
+Ausgabegesamtmenge und Druck-PDFs gemäß [Bingo preparation](bingo-preparation.md).
+Der AP1-Regelkern bleibt unverändert; dies integriert noch keinen Live-Ruf-,
+Ziehungs- oder Gewinnablauf.

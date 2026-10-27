@@ -26,6 +26,7 @@ const nextConfig: NextConfig = {
   },
   outputFileTracingIncludes: {
     "/*": ["./assets/fonts/arimo/Arimo.ttf"],
+    "/bingo/**": ["./assets/fonts/bingo/*.ttf", "./public/branding/phil-gud/phil-gud.woff"],
     "/hilfe": ["./docs/user-guide/**/*", "./docs/admin-guide/**/*.md"],
     "/hilfe/screenshots/[name]": ["./docs/user-guide/screenshots/*.jpg"],
     "/api/question-generator": [

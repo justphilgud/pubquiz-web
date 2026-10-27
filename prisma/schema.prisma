@@ -1403,6 +1403,8 @@ enum LivePollPublicationMode {
 }
 
 model users {
+  bingo_series_created bingo_card_series[]
+  bingo_issuance_changes bingo_issuance_changes[]
   reihenrollen benutzer_reihenrollen[] @relation("SeriesRoleUser")
   eventartrollen benutzer_eventartrollen[] @relation("EventTypeRoleUser")
   verwaltete_eventreihen eventreihe_verwaltung[] @relation("SeriesManagementUser")
@@ -1574,6 +1576,9 @@ model benutzer_reihenrollen {
 
 /// Standalone non-playable game instances. No Quiz identity or live state.
 model game_drafts {
+  bingo_preparation bingo_preparations?
+  bingo_rounds bingo_rounds[]
+  bingo_card_series bingo_card_series[]
   shared_design_template_id String? @db.VarChar(64)
   id              String      @id @default(uuid()) @db.Uuid
   eventart        String      @db.VarChar(64)
@@ -1588,6 +1593,85 @@ model game_drafts {
   eventreihe      eventreihen @relation(fields: [eventreihe_id], references: [eventreihe_id], onDelete: Restrict)
 
   @@index([eventart, eventreihe_id, updated_at], map: "idx_game_drafts_type_series_updated")
+  @@schema("pubquiz")
+}
+
+model bingo_preparations {
+  game_id String @id @db.Uuid
+  revision Int @default(0)
+  game game_drafts @relation(fields:[game_id],references:[id],onDelete:Restrict)
+  @@schema("pubquiz")
+}
+model bingo_rounds {
+  id String @id @default(uuid()) @db.Uuid
+  game_id String @db.Uuid
+  position Int
+  label String @db.VarChar(80)
+  planned_draws Int @default(30)
+  strategy String @default("NEW") @db.VarChar(16)
+  issued_count Int?
+  created_at DateTime @default(now()) @db.Timestamptz(3)
+  game game_drafts @relation(fields:[game_id],references:[id],onDelete:Restrict)
+  original_series bingo_card_series[] @relation("BingoOriginRound")
+  series bingo_round_series[]
+  issuance_changes bingo_issuance_changes[]
+  @@unique([id,game_id])
+  @@unique([game_id,position])
+  @@schema("pubquiz")
+}
+model bingo_card_series {
+  id String @id @default(uuid()) @db.Uuid
+  game_id String @db.Uuid
+  origin_round_id String @db.Uuid
+  code String @unique @db.VarChar(16)
+  card_count Int
+  request_id String @db.Uuid
+  request_hash String @db.Char(64)
+  print_snapshot Json
+  created_by Int
+  created_at DateTime @default(now()) @db.Timestamptz(3)
+  game game_drafts @relation(fields:[game_id],references:[id],onDelete:Restrict)
+  origin_round bingo_rounds @relation("BingoOriginRound",fields:[origin_round_id,game_id],references:[id,game_id],onDelete:Restrict)
+  actor users @relation(fields:[created_by],references:[id],onDelete:Restrict)
+  cards bingo_cards[]
+  rounds bingo_round_series[]
+  @@unique([id,game_id])
+  @@unique([game_id,request_id])
+  @@index([game_id,created_at,id])
+  @@schema("pubquiz")
+}
+model bingo_cards {
+  id String @id @default(uuid()) @db.Uuid
+  series_id String @db.Uuid
+  ordinal Int
+  printed_code String @unique @db.VarChar(24)
+  cells Json
+  layout_hash String @db.Char(64)
+  series bingo_card_series @relation(fields:[series_id],references:[id],onDelete:Restrict)
+  @@unique([series_id,ordinal])
+  @@unique([series_id,layout_hash])
+  @@schema("pubquiz")
+}
+model bingo_round_series {
+  round_id String @db.Uuid
+  series_id String @db.Uuid
+  game_id String @db.Uuid
+  round bingo_rounds @relation(fields:[round_id,game_id],references:[id,game_id],onDelete:Restrict)
+  series bingo_card_series @relation(fields:[series_id,game_id],references:[id,game_id],onDelete:Restrict)
+  @@id([round_id,series_id])
+  @@index([series_id])
+  @@schema("pubquiz")
+}
+model bingo_issuance_changes {
+  id String @id @default(uuid()) @db.Uuid
+  round_id String @db.Uuid
+  actor_id Int
+  previous_count Int?
+  new_count Int?
+  created_at DateTime @default(now()) @db.Timestamptz(3)
+  round bingo_rounds @relation(fields:[round_id],references:[id],onDelete:Restrict)
+  actor users @relation(fields:[actor_id],references:[id],onDelete:Restrict)
+  @@index([round_id,created_at,id])
   @@schema("pubquiz")
 }
 model game_team_assignments {

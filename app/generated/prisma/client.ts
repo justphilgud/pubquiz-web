@@ -346,6 +346,36 @@ export type benutzer_reihenrollen = Prisma.benutzer_reihenrollenModel
  */
 export type game_drafts = Prisma.game_draftsModel
 /**
+ * Model bingo_preparations
+ *
+ */
+export type bingo_preparations = Prisma.bingo_preparationsModel
+/**
+ * Model bingo_rounds
+ *
+ */
+export type bingo_rounds = Prisma.bingo_roundsModel
+/**
+ * Model bingo_card_series
+ *
+ */
+export type bingo_card_series = Prisma.bingo_card_seriesModel
+/**
+ * Model bingo_cards
+ *
+ */
+export type bingo_cards = Prisma.bingo_cardsModel
+/**
+ * Model bingo_round_series
+ *
+ */
+export type bingo_round_series = Prisma.bingo_round_seriesModel
+/**
+ * Model bingo_issuance_changes
+ *
+ */
+export type bingo_issuance_changes = Prisma.bingo_issuance_changesModel
+/**
  * Model game_team_assignments
  *
  */
