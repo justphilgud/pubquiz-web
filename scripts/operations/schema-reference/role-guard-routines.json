@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "approvedCommit": "669700e9d1668ce74345dfcc259d8aff37b2c644",
+  "migrations": [
+    {
+      "name": "20261025140000_event_type_permissions",
+      "sha256": "1fdaa5a88a92a1ec9ed4da0df84881075bac7c354f8fa84d6d84f0c740b454d1"
+    },
+    {
+      "name": "20261025160000_series_roles",
+      "sha256": "7f9a5a54078f86eb46d9446d57d627b2a8b9b06afa75c3ffdd61312b70b6e577"
+    }
+  ],
+  "tables": [
+    "benutzer_eventartrollen",
+    "benutzer_reihenrollen",
+    "eventarten",
+    "eventreihe_eventarten",
+    "eventreihe_verwaltung"
+  ],
+  "routines": [
+    {
+      "schema": "pubquiz",
+      "name": "guard_legacy_event_roles",
+      "argumentTypes": [],
+      "argumentNames": null,
+      "result": "trigger",
+      "language": "plpgsql",
+      "kind": "f",
+      "securityDefiner": false,
+      "leakproof": false,
+      "strict": false,
+      "volatility": "v",
+      "parallel": "u",
+      "configuration": null,
+      "cost": 100,
+      "rows": 0,
+      "argumentModes": null,
+      "allArgumentTypes": null,
+      "defaultArguments": 0,
+      "variadic": false,
+      "support": false,
+      "binary": null,
+      "sourceSha256": "fae68cfcb78c3a2f6e1b5b22450a583c92c275046bb5ce41d1cbb3e9de02a381"
+    },
+    {
+      "schema": "pubquiz",
+      "name": "reject_obsolete_format_role_write",
+      "argumentTypes": [],
+      "argumentNames": null,
+      "result": "trigger",
+      "language": "plpgsql",
+      "kind": "f",
+      "securityDefiner": false,
+      "leakproof": false,
+      "strict": false,
+      "volatility": "v",
+      "parallel": "u",
+      "configuration": null,
+      "cost": 100,
+      "rows": 0,
+      "argumentModes": null,
+      "allArgumentTypes": null,
+      "defaultArguments": 0,
+      "variadic": false,
+      "support": false,
+      "binary": null,
+      "sourceSha256": "e3d5702df58c6cc3f11b07ac90b952c462719bdc2a067115c9b8a5f981d980b7"
+    }
+  ],
+  "triggers": [
+    {
+      "schema": "pubquiz",
+      "name": "guard_legacy_memberships",
+      "table": "eventreihe_benutzerrollen",
+      "functionSchema": "pubquiz",
+      "functionName": "guard_legacy_event_roles",
+      "type": 31,
+      "enabled": "O",
+      "deferrable": false,
+      "deferred": false,
+      "constraint": false,
+      "columns": "",
+      "arguments": "",
+      "condition": null
+    },
+    {
+      "schema": "pubquiz",
+      "name": "guard_legacy_scope_roles",
+      "table": "benutzer_rollenzuweisungen",
+      "functionSchema": "pubquiz",
+      "functionName": "guard_legacy_event_roles",
+      "type": 31,
+      "enabled": "O",
+      "deferrable": false,
+      "deferred": false,
+      "constraint": false,
+      "columns": "",
+      "arguments": "",
+      "condition": null
+    },
+    {
+      "schema": "pubquiz",
+      "name": "reject_obsolete_format_roles",
+      "table": "benutzer_eventartrollen",
+      "functionSchema": "pubquiz",
+      "functionName": "reject_obsolete_format_role_write",
+      "type": 31,
+      "enabled": "O",
+      "deferrable": false,
+      "deferred": false,
+      "constraint": false,
+      "columns": "",
+      "arguments": "",
+      "condition": null
+    }
+  ]
+}

@@ -346,3 +346,14 @@ aktiv. Bei Wiederauftreten feste Stufe (`GRANT`/`GET`/`BODY`), HTTP-Status und
 Laufkennung auswerten; keine signierten URLs oder Geheimnisse protokollieren.
 Kein Ursachenfix behauptet. Keine weiteren manuellen Backups als Ersatz für den
 erst nach Integration möglichen echten Wochenplanlauf.
+
+## Wochenlauf vom 26.10.2026
+
+Der erste integrierte Wochenlauf 40289563849 ist fehlgeschlagen: `SOURCE_CAPTURE` /
+`DB_SNAPSHOT_FAILED`, vor Dump und Readback. Die veröffentlichte PR130-Rechtearchitektur
+enthält zwei zusätzliche Schutzfunktionen und drei Trigger, die im bisherigen exakten
+Executable-Audit noch nicht referenziert waren. Isoliert mit unveränderten Migrationen
+reproduziert und eng über vollständige Körper-/Attribut-/Triggerreferenzen korrigiert;
+keine pauschale Lockerung. [Befund, Tests und verbleibender Wochenlaufnachweis](weekly-backup-20261026.md).
+Der historische PRIVATE_READBACK_FAILED bleibt ungeklärt. Ein manueller Lauf ersetzt
+weiterhin keinen erfolgreichen echten Wochenlauf nach Integration.

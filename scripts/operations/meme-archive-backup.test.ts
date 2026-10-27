@@ -82,3 +82,45 @@ test("restore cannot omit or substitute registered executable evidence", () => {
   assert.throws(() => compareSnapshots(archive, base), /RESTORE_ARCHIVESCHEMA_MISMATCH/);
   assert.throws(() => compareSnapshots(base, archive), /RESTORE_ARCHIVESCHEMA_MISMATCH/);
 });
+import roleGuards from "./schema-reference/role-guard-routines.json";
+function roleGuardFixture() {
+  const fixture = executableFixture();
+  const source = new Map<string, string>();
+  for (const migration of roleGuards.migrations) {
+    const text = readFileSync(new URL(`../../prisma/migrations/${migration.name}/migration.sql`, import.meta.url), "utf8").replaceAll("\r\n", "\n");
+    assert.equal(hash(text), migration.sha256, "reference is bound to immutable reviewed migration");
+    for (const [, name, body] of text.matchAll(/CREATE FUNCTION pubquiz\.(\w+)\([^)]*\) RETURNS \w+ LANGUAGE plpgsql AS \$\$([\s\S]*?)\$\$;/g)) source.set(name, body);
+  }
+  for (const routine of roleGuards.routines) assert.equal(hash(source.get(routine.name)!), routine.sourceSha256);
+  return {...fixture, roleTables: [...roleGuards.tables],
+    routines: [...fixture.routines, ...roleGuards.routines.map(({sourceSha256: _hash, ...attributes}) => {void _hash; return {...attributes, source: source.get(attributes.name)!};})],
+    triggers: [...fixture.triggers, ...structuredClone(roleGuards.triggers)]};
+}
+
+test("weekly snapshot accepts exactly the immutable PR130 role guards and retains legacy archive evidence", () => {
+  const fixture = roleGuardFixture();
+  const before = JSON.stringify(fixture);
+  const proof = reviewMemeArchiveExecutables(fixture)!;
+  assert.deepEqual(proof.roleGuardMigrations, roleGuards.migrations);
+  assert.equal(JSON.stringify(fixture), before);
+  assert.equal(reviewMemeArchiveExecutables(executableFixture())!.roleGuardMigrations, undefined);
+  const base: Snapshot = {columns: [], catalog: {}, tables: [], media: [], authRows: {}, resultRows: []};
+  assert.throws(() => compareSnapshots({...base, archiveSchema:proof}, {...base, archiveSchema:reviewMemeArchiveExecutables(executableFixture())}), /RESTORE_ARCHIVESCHEMA_MISMATCH/);
+});
+
+test("role guard review rejects missing, changed, additional and security-sensitive executable differences", () => {
+  const changes = [
+    (f: ReturnType<typeof roleGuardFixture>) => { f.roleTables.pop(); },
+    (f: ReturnType<typeof roleGuardFixture>) => { f.roleTables.push("unreviewed_table"); },
+    (f: ReturnType<typeof roleGuardFixture>) => { f.routines.pop(); },
+    (f: ReturnType<typeof roleGuardFixture>) => { f.routines.at(-1)!.source += " "; },
+    (f: ReturnType<typeof roleGuardFixture>) => { f.routines.at(-1)!.securityDefiner = true; },
+    (f: ReturnType<typeof roleGuardFixture>) => { f.routines.at(-1)!.configuration = ["search_path=public"] as never; },
+    (f: ReturnType<typeof roleGuardFixture>) => { f.routines.push({...f.routines.at(-1)!, name:"unreviewed"}); },
+    (f: ReturnType<typeof roleGuardFixture>) => { f.triggers.pop(); },
+    (f: ReturnType<typeof roleGuardFixture>) => { f.triggers.at(-1)!.enabled = "D"; },
+    (f: ReturnType<typeof roleGuardFixture>) => { f.triggers.at(-1)!.table = "quiz"; },
+    (f: ReturnType<typeof roleGuardFixture>) => { f.triggers.at(-1)!.functionName = "capture_confirmed_meme"; },
+  ];
+  for (const change of changes) {const fixture=roleGuardFixture();change(fixture);assert.throws(()=>reviewMemeArchiveExecutables(fixture), /SCHEMA_SECURITY_REVIEW_REQUIRED/);}
+});
