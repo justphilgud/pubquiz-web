@@ -20,6 +20,7 @@ test("classical choices: real text geometry, shared type, resizing and long-shor
     import{buildPresentationQualityFixture}from'./app/rendering/presentation/presentationQualityFixtures';
     const root=createRoot(document.getElementById('app'));
     window.show=(scenario,style)=>{const f=buildPresentationQualityFixture(scenario,style);if(scenario.startsWith('image-choice'))f.slide.frage.medien.forEach(m=>m.datei='artwork-layout-test.svg');window.expected=f.slide.frage.antwort_reihenfolge.map((id,i)=>{const a=f.slide.frage.antworten.find(a=>a.antwort_id===id);return String.fromCharCode(65+i)+'.'+a.antwort+(f.slide.typ==='aufloesung'&&a.zusatzinformation?.trim()?a.zusatzinformation:'')});window.expectedQuestion=f.slide.frage.frage;flushSync(()=>root.render(<Renderer {...f}/>));};
+    window.showScaled=scale=>{const f=buildPresentationQualityFixture('choice-short-solution','EDITORIAL');flushSync(()=>root.render(<div key={scale} style={{width:1600,height:900,transform:'scale('+scale+')',transformOrigin:'top left'}}><Renderer {...f}/></div>));};
     window.measure=()=>{
       const box=e=>{const r=e.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom}};
       const region=document.querySelector('.presentation-content-viewport');
@@ -100,6 +101,12 @@ test("classical choices: real text geometry, shared type, resizing and long-shor
     const extreme=await evaluate('window.measure()');
     if(artifact)writeFileSync(join(artifact,'extreme.json'),JSON.stringify(extreme,null,2));
     assert.equal((extreme as {fit:string}).fit,'unreadable','must not claim unreadable extreme fits');
+    await evaluate('window.showScaled(.4)');await new Promise(r=>setTimeout(r,100));
+    const scaled=await evaluate('window.measure()') as {issues:string[];answerSizes:string[]};
+    assert.deepEqual(scaled.issues,[]);
+    await evaluate('window.showScaled(1)');await new Promise(r=>setTimeout(r,100));
+    const unscaled=await evaluate('window.measure()') as {answerSizes:string[]};
+    assert.deepEqual(scaled.answerSizes,unscaled.answerSizes,'fixed template/moderation canvas must not shrink twice');
     assert.deepEqual(await evaluate('window.errors'),[],'no browser/ResizeObserver errors');
     if(artifact)writeFileSync(join(artifact,'after.json'),JSON.stringify(results,null,2));
     for(const entry of results.filter(r=>r.scenario==='choice-short-solution')){const long=results.find(r=>r.style===entry.style&&r.scenario==='choice-tunnel-solution'&&JSON.stringify(r.viewport)===JSON.stringify(entry.viewport));assert.ok(parseFloat((entry.answerSizes as string[])[0])>parseFloat((long!.answerSizes as string[])[0])*1.2,'short options must grow '+JSON.stringify({style:entry.style,viewport:entry.viewport}));}

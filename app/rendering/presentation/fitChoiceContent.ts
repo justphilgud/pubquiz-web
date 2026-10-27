@@ -1,6 +1,9 @@
 /** Bounded DOM fit, run only on content/size/assets events. Never changes data or media. */
 export function fitChoiceContent(root: HTMLElement) {
-  const { width, height } = root.getBoundingClientRect();
+  // Existing moderation/template previews scale a fixed CSS canvas. Measure its
+  // layout pixels, not transformed screen pixels, so fitting does not shrink twice.
+  const width = root.clientWidth;
+  const height = root.clientHeight;
   if (width <= 0 || height <= 0) return;
   const hasMedia = root.dataset.choiceMedia === "true";
   const layouts = hasMedia ? ["side-grid", "side-list"] : ["top-grid", "side-list", "side-grid", "top-list"];
