@@ -1,0 +1,37 @@
+import {execFileSync} from 'node:child_process';
+import {BINGO_AP2_PLAN as plan} from './production-preflight-bingo-plan';
+import {compareFullSchema,DIAGNOSTIC_COLUMNS_SQL,DIAGNOSTIC_CATALOG_SQL,SCHEMA_OBJECTS_SQL,type SchemaEvidence} from './production-preflight-schema';
+type Row=Record<string,unknown>;
+const tables=['bingo_preparations','bingo_rounds','bingo_card_series','bingo_cards','bingo_round_series','bingo_issuance_changes','bingo_series_labels','bingo_print_versions'];
+const functions=['bingo_allocate_label','bingo_assignment_rules','bingo_card_identity','bingo_game_identity','bingo_immutable_record','bingo_only_game','bingo_round_rules','bingo_series_complete','bingo_valid_card'];
+const triggers=['bingo_allocate_label','bingo_assignment_rules','bingo_card_identity','bingo_cards_complete','bingo_cards_immutable','bingo_game_identity','bingo_issuance_immutable','bingo_labels_immutable','bingo_preparations_game','bingo_print_versions_immutable','bingo_round_rules','bingo_rounds_game','bingo_series_complete','bingo_series_game','bingo_series_immutable'];
+export function testBingoDelta(sql:(v:string|Buffer)=>string,query:(v:string)=>unknown,baselineSha:string,candidateSha:string,manifest:SchemaEvidence['manifest'],columns:unknown,catalog:unknown,objects:unknown){
+ const migration=(index:number)=>execFileSync('git',['show',`${candidateSha}:prisma/migrations/${plan.migrations[index].name}/migration.sql`],{encoding:'utf8'});
+ const identifier=(v:string)=>{if(!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(v))throw Error('IDENTIFIER');return `"${v}"`;};
+ const oldTables=(objects as {relations:{schema:string;name:string;kind:string}[]}).relations.filter(r=>r.kind==='r'&&r.name!=='_prisma_migrations');
+ const rows=()=>sql(oldTables.map(t=>`SELECT '${t.schema}.${t.name}' AS name,coalesce(jsonb_agg(v ORDER BY v::text),'[]')::text AS rows FROM (SELECT to_jsonb(t)${['eventreihen','game_drafts'].includes(t.name)?"-'bingo_print_config'":''} v FROM ${identifier(t.schema)}.${identifier(t.name)} t) s`).join(' UNION ALL ')+' ORDER BY name');
+ sql("INSERT INTO pubquiz.users(id,name,email,password_hash,role,updated_at) VALUES(97000,'Isolated AP2','ap2@example.invalid','not-a-login-hash','USER',NOW()); INSERT INTO pubquiz.eventreihen(eventreihe_id,name,slug) VALUES(97000,'Isolated AP2','isolated-ap2'); INSERT INTO pubquiz.game_drafts(id,eventart,eventreihe_id,titel,updated_at) VALUES('97000000-0000-4000-8000-000000000001','BINGO',97000,'Isolated AP2',NOW());");
+ const before=rows();sql(migration(0).replace(/COMMIT;\s*$/,'ROLLBACK;'));
+ if(sql("SELECT to_regclass('pubquiz.bingo_cards') IS NULL").trim()!=='t'||rows()!==before)throw Error('MIGRATION_ROLLBACK_CHANGED_BASELINE');
+ sql("SET lock_timeout='2s'; SET statement_timeout='30s';");const started=Date.now();sql(migration(0));
+ const cells=JSON.stringify(Array.from({length:5},(_,r)=>Array.from({length:5},(_,c)=>r===2&&c===2?null:c*15+r+1)));
+ sql(`BEGIN;INSERT INTO pubquiz.bingo_preparations(game_id) VALUES('97000000-0000-4000-8000-000000000001');INSERT INTO pubquiz.bingo_rounds(id,game_id,position,label) VALUES('97000000-0000-4000-8000-000000000002','97000000-0000-4000-8000-000000000001',1,'Isolated');INSERT INTO pubquiz.bingo_card_series(id,game_id,origin_round_id,code,card_count,request_id,request_hash,print_snapshot,created_by) VALUES('97000000-0000-4000-8000-000000000003','97000000-0000-4000-8000-000000000001','97000000-0000-4000-8000-000000000002','BG-AAAAAAAAAAAA',1,'97000000-0000-4000-8000-000000000004','${'a'.repeat(64)}','{"version":1}',97000);INSERT INTO pubquiz.bingo_cards(id,series_id,ordinal,printed_code,cells,layout_hash) VALUES('97000000-0000-4000-8000-000000000005','97000000-0000-4000-8000-000000000003',1,'BG-AAAAAAAAAAAA-0001','${cells}','${'b'.repeat(64)}');COMMIT;`);
+ const frozen=sql('SELECT to_jsonb(t) FROM pubquiz.bingo_card_series t; SELECT to_jsonb(t) FROM pubquiz.bingo_cards t;');
+ sql(migration(1));sql(migration(2));
+ if(rows()!==before||sql('SELECT to_jsonb(t) FROM pubquiz.bingo_card_series t; SELECT to_jsonb(t) FROM pubquiz.bingo_cards t;')!==frozen)throw Error('EXISTING_ROWS_CHANGED');
+ if(sql('SELECT prefix FROM pubquiz.bingo_series_labels').trim()!=='1')throw Error('LABEL_BACKFILL');
+ const rejected=(statement:string)=>{let failed=false;try{sql(statement)}catch{failed=true;}if(!failed)throw Error('CONSTRAINT_NOT_ENFORCED');};
+ rejected("UPDATE pubquiz.bingo_cards SET ordinal=2");rejected("DELETE FROM pubquiz.bingo_card_series");
+ rejected("INSERT INTO pubquiz.bingo_rounds(id,game_id,position,label,planned_draws) VALUES('97000000-0000-4000-8000-000000000006','97000000-0000-4000-8000-000000000001',2,'Invalid',76)");
+ rejected("UPDATE pubquiz.game_drafts SET eventart='POWERPOINT_KARAOKE' WHERE id='97000000-0000-4000-8000-000000000001'");
+ const actualColumns=query(DIAGNOSTIC_COLUMNS_SQL) as Row[],actualCatalog=query(DIAGNOSTIC_CATALOG_SQL) as Record<string,Row[]>,actualObjects=query(SCHEMA_OBJECTS_SQL) as Record<string,Row[]>;
+ const addedColumns=actualColumns.filter(r=>r.column==='bingo_print_config');if(addedColumns.length!==2||addedColumns.some(r=>r.schema!=='pubquiz'||!['eventreihen','game_drafts'].includes(String(r.table))||r.nullable!==true))throw Error('DELTA_COLUMNS');
+ if(actualObjects.relations.filter(r=>r.schema==='pubquiz'&&tables.includes(String(r.name))).length!==8||actualObjects.routines.filter(r=>r.schema==='pubquiz'&&functions.includes(String(r.name))).length!==9||actualObjects.triggers.filter(r=>r.schema==='pubquiz'&&triggers.includes(String(r.name))).length!==15)throw Error('DELTA_OBJECT_SET');
+ const isNew=(r:Row)=>(r.schema??r.schemaname)==='pubquiz'&&tables.includes(String(r.table??r.tablename??r.name));
+ const projectedCatalog=Object.fromEntries(Object.entries(actualCatalog).map(([key,values])=>[key,values.filter(r=>!isNew(r)&&!(key==='constraints'&&['bingo_series_print_config','bingo_game_print_config'].includes(String(r.name))))]));
+ const projectedObjects={relations:actualObjects.relations.filter(r=>!isNew(r)),routines:actualObjects.routines.filter(r=>!(r.schema==='pubquiz'&&functions.includes(String(r.name)))),triggers:actualObjects.triggers.filter(r=>!(r.schema==='pubquiz'&&triggers.includes(String(r.name))))};
+ const expected={baselineSha,manifest,major:17,columns,catalog,objects};
+ const check=compareFullSchema(expected,{major:17,columns:actualColumns.filter(r=>!isNew(r)&&r.column!=='bingo_print_config'),catalog:projectedCatalog,objects:projectedObjects},baselineSha,manifest);
+ if(check.status!=='PASS')throw Error('UNEXPECTED_AP2_SCHEMA_DELTA');
+ return {status:'PASS',baselineSha,candidateSha,migrations:plan.migrations,elapsedMs:Date.now()-started,rowsUnchanged:true,onlyExpectedSchemaChanges:true,oldColumnProjectionCompatible:true,constraintsEnforced:true,stableLabels:true,rollbackProbe:true,lockTimeoutMs:2000,statementTimeoutMs:30000,applicationRollbackRequiresReview:true};
+}

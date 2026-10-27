@@ -1,3 +1,4 @@
+import {approvedBingoPlan,assertBingoManifest} from "./production-preflight-bingo-plan";
 import { execFileSync } from "node:child_process";
 import { appendFileSync, writeFileSync, readFileSync } from "node:fs";
 import { initRepositoryEvidence, inventoryFromGit } from "./production-preflight-diagnostics";
@@ -7,7 +8,7 @@ import { approvedPreflightPlan, approvedNoDeltaPreflightPlan, assertNoDeltaManif
 async function main() {
   assertPreflightContext(process.env);
   if (!/^[a-f0-9]{40}$/.test(process.env.RELEASE_CANDIDATE_SHA ?? "") || !/^[a-f0-9]{40}$/.test(process.env.EXPECTED_PRODUCTION_SHA ?? "")) throw new Error("INVALID_SHA");
-  if (!approvedPreflightPlan(process.env.EXPECTED_PRODUCTION_SHA!, process.env.RELEASE_CANDIDATE_SHA!) &&
+  if (!approvedBingoPlan(process.env.EXPECTED_PRODUCTION_SHA!,process.env.RELEASE_CANDIDATE_SHA!) && !approvedPreflightPlan(process.env.EXPECTED_PRODUCTION_SHA!, process.env.RELEASE_CANDIDATE_SHA!) &&
       !approvedNoDeltaPreflightPlan(process.env.EXPECTED_PRODUCTION_SHA!, process.env.RELEASE_CANDIDATE_SHA!)) throw new Error("RELEASE_PLAN_UNAPPROVED");
   const mode = process.argv[2];
   let result;
@@ -18,6 +19,10 @@ async function main() {
     const candidate = process.env.RELEASE_CANDIDATE_SHA ?? "";
     const baseline = process.env.EXPECTED_PRODUCTION_SHA ?? "";
     migrationFiles(candidate); migrationFiles(baseline);
+    if(approvedBingoPlan(baseline,candidate)){
+      const schema=(revision:string)=>execFileSync("git",["show",`${revision}:prisma/schema.prisma`],{encoding:"utf8"});
+      assertBingoManifest(baseline,candidate,migrationFiles(baseline),migrationFiles(candidate),schema(baseline),schema(candidate));
+    }
     try { execFileSync("git", ["merge-base", "--is-ancestor", baseline, candidate]); }
     catch { result = { gate: gate("BLOCKED", "RELEASE_ANCESTRY_UNVERIFIED") }; }
     if (!result && approvedNoDeltaPreflightPlan(baseline,candidate)) {

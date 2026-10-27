@@ -21,6 +21,8 @@ jobs:
             candidate: c50e56a0308276d16bc19681f3e6a7600c41682f
           - baseline: 3ade18d276d7ead2cc43008a3d887e3d8feaae48
             candidate: 0c23f07ecb263805482ef9bd75277d94f0eac718
+          - baseline: 8d2af14f959c920869a3375bc1236a46d2247533
+            candidate: 834242e51f8d9819aaf05d3e006f50a5694b6345
     services:
       postgres:
         image: postgres:17
@@ -32,12 +34,14 @@ jobs:
         options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: node --import tsx --test --test-concurrency=1 scripts/operations/production-preflight.test.ts scripts/operations/production-preflight-plan.test.ts scripts/operations/production-preflight.integration.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/production-preflight-schema.integration.test.ts
+      - run: node --import tsx --test --test-concurrency=1 scripts/operations/production-preflight.test.ts scripts/operations/production-preflight-plan.test.ts scripts/operations/production-preflight-bingo.test.ts scripts/operations/production-preflight.integration.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/production-preflight-schema.integration.test.ts
         env:
           CI: 'true'
           PREFLIGHT_TEST_DATABASE_URL: postgresql://preflight_ci:isolated-only@127.0.0.1:5432/preflight_ci
