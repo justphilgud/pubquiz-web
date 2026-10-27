@@ -30,3 +30,26 @@ Der Quiz-Snapshot enthält getrennt die gemeinsame Designbasis und die aufgelös
 
 
 Die vorhandene Verwendungsanzeige und Archivierungssperre zählen gemeinsame Reihen-/Quiz-/Spielreferenzen mit. AP3-Zuordnung sperrt die Vorlagenzeile lesend, Archivierung dieselbe Zeile vor ihrer Referenzprüfung schreibend; eine parallele neue AP3-Zuordnung darf keine archivierte Vorlage hinterlassen. Alte Schutzregeln bleiben bestehen.
+
+## Synchronisation der Bildfehler-Regression
+
+`scripts/testing/shared-design.visual.browser.test.ts` prüft weiterhin beide Marken
+bei 343, 390, 1280 und 1920 Pixeln mit echten Formatrenderern. Ein Bildfehler ist
+asynchron: HTTP-Fehler, Browser-Fehlerereignis und React-Commit müssen abgeschlossen
+sein, bevor der sichtbare Ersatztext geprüft werden kann. Eine feste Wartezeit von
+60 ms war dafür kein verlässlicher Bereitschaftsnachweis und verursachte den
+CI-Fehler `missing image fallback`.
+
+Die Fixture liefert für jede Marke/Breite eine eigene, nicht zwischengespeicherte
+404-Antwort nach 250 ms. Der Test wartet höchstens fünf Sekunden auf den konkreten
+Ersatztext im Karaoke-Renderer. Danach gelten alle bisherigen Layout-, Kontrast-,
+Schrift- und Inhaltsassertionen unverändert. Zusätzlich müssen alle acht eigenen
+Bildfehler tatsächlich angefragt und beantwortet worden sein. Der globale
+Testablauf bleibt auf 30 Sekunden begrenzt; ein ausbleibender Fallback bleibt ein
+Fehler, kein übersprungener Fall.
+
+Nachweis der Testkorrektur: verzögerte Fixture mit alter Synchronisation schlägt
+fehl, mit zustandsbasierter Synchronisation erfolgreich. Eine temporäre
+Negativkontrolle mit deaktiviertem Bildfehler-Handler schlägt weiterhin gezielt
+fehl; der Renderer wurde anschließend bytegleich wiederhergestellt. Die
+Korrektur ändert ausschließlich Test und Spezifikation, kein Anwendungsverhalten.
