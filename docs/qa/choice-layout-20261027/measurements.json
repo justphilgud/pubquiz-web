@@ -1,0 +1,1053 @@
+{
+  "before": [
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-tunnel-solution",
+      "viewport": {
+        "width": 1280,
+        "height": 600
+      },
+      "questionText": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedQuestion": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedText": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "questionSize": "41.44px",
+      "answerSizes": [
+        "30.784px",
+        "30.784px",
+        "30.784px",
+        "30.784px"
+      ],
+      "infoSizes": [
+        "18px",
+        "18px"
+      ],
+      "text": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "issues": [
+        "text outside stage 3",
+        "text overlap 0:1",
+        "text overlap 0:1",
+        "text overlap 0:1",
+        "text overlap 1:2",
+        "text overlap 1:2",
+        "text overlap 1:2",
+        "text overlap 2:3",
+        "text overlap 2:3",
+        "text overlap 2:3",
+        "scroll presentation-content-viewport"
+      ],
+      "scrollHeight": 388,
+      "clientHeight": 349,
+      "image": null
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-freud-solution",
+      "viewport": {
+        "width": 1280,
+        "height": 600
+      },
+      "questionText": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedQuestion": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedText": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "questionSize": "41.44px",
+      "answerSizes": [
+        "30.784px",
+        "30.784px",
+        "30.784px",
+        "30.784px"
+      ],
+      "infoSizes": [
+        "18px",
+        "18px",
+        "18px"
+      ],
+      "text": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "issues": [
+        "text outside stage 3",
+        "text outside stage 3",
+        "text outside stage 3",
+        "text overlap 1:2",
+        "text overlap 1:2",
+        "text overlap 1:2",
+        "scroll presentation-content-viewport"
+      ],
+      "scrollHeight": 407,
+      "clientHeight": 349,
+      "image": null
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-tunnel-solution",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "questionText": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedQuestion": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedText": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "questionSize": "41.44px",
+      "answerSizes": [
+        "30.784px",
+        "30.784px",
+        "30.784px",
+        "30.784px"
+      ],
+      "infoSizes": [
+        "18px",
+        "18px"
+      ],
+      "text": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "issues": [
+        "scroll presentation-content-viewport"
+      ],
+      "scrollHeight": 468,
+      "clientHeight": 455,
+      "image": null
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-freud-solution",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "questionText": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedQuestion": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedText": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "questionSize": "41.44px",
+      "answerSizes": [
+        "30.784px",
+        "30.784px",
+        "30.784px",
+        "30.784px"
+      ],
+      "infoSizes": [
+        "18px",
+        "18px",
+        "18px"
+      ],
+      "text": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "issues": [
+        "text outside stage 3",
+        "scroll presentation-content-viewport"
+      ],
+      "scrollHeight": 484,
+      "clientHeight": 455,
+      "image": null
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-tunnel-solution",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "questionText": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedQuestion": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedText": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "questionSize": "44.45px",
+      "answerSizes": [
+        "33.02px",
+        "33.02px",
+        "33.02px",
+        "33.02px"
+      ],
+      "infoSizes": [
+        "18.415px",
+        "18.415px"
+      ],
+      "text": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "issues": [
+        "scroll presentation-content-viewport"
+      ],
+      "scrollHeight": 504,
+      "clientHeight": 497,
+      "image": null
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-freud-solution",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "questionText": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedQuestion": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedText": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "questionSize": "44.45px",
+      "answerSizes": [
+        "33.02px",
+        "33.02px",
+        "33.02px",
+        "33.02px"
+      ],
+      "infoSizes": [
+        "18.415px",
+        "18.415px",
+        "18.415px"
+      ],
+      "text": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "issues": [
+        "scroll presentation-content-viewport"
+      ],
+      "scrollHeight": 516,
+      "clientHeight": 497,
+      "image": null
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-tunnel-solution",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "questionText": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedQuestion": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedText": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "questionSize": "63.84px",
+      "answerSizes": [
+        "47.424px",
+        "47.424px",
+        "47.424px",
+        "47.424px"
+      ],
+      "infoSizes": [
+        "26px",
+        "26px"
+      ],
+      "text": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "issues": [],
+      "scrollHeight": 752,
+      "clientHeight": 752,
+      "image": null
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-freud-solution",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "questionText": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedQuestion": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedText": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "questionSize": "63.84px",
+      "answerSizes": [
+        "47.424px",
+        "47.424px",
+        "47.424px",
+        "47.424px"
+      ],
+      "infoSizes": [
+        "26px",
+        "26px",
+        "26px"
+      ],
+      "text": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "issues": [],
+      "scrollHeight": 752,
+      "clientHeight": 752,
+      "image": null
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-tunnel-solution",
+      "viewport": {
+        "width": 2560,
+        "height": 1440
+      },
+      "questionText": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedQuestion": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedText": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "questionSize": "64px",
+      "answerSizes": [
+        "48px",
+        "48px",
+        "48px",
+        "48px"
+      ],
+      "infoSizes": [
+        "26px",
+        "26px"
+      ],
+      "text": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "issues": [],
+      "scrollHeight": 1061,
+      "clientHeight": 1061,
+      "image": null
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-freud-solution",
+      "viewport": {
+        "width": 2560,
+        "height": 1440
+      },
+      "questionText": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedQuestion": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedText": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "questionSize": "64px",
+      "answerSizes": [
+        "48px",
+        "48px",
+        "48px",
+        "48px"
+      ],
+      "infoSizes": [
+        "26px",
+        "26px",
+        "26px"
+      ],
+      "text": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "issues": [],
+      "scrollHeight": 1061,
+      "clientHeight": 1061,
+      "image": null
+    }
+  ],
+  "after": [
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-tunnel-solution",
+      "viewport": {
+        "width": 1280,
+        "height": 600
+      },
+      "questionText": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedQuestion": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedText": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "layout": "side-list",
+      "questionSize": "41.2648px",
+      "answerSizes": [
+        "34.4292px",
+        "34.4292px",
+        "34.4292px",
+        "34.4292px"
+      ],
+      "infoSizes": [
+        "17.9032px",
+        "17.9032px"
+      ],
+      "text": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "issues": [],
+      "scrollHeight": 375,
+      "clientHeight": 375,
+      "image": null,
+      "fit": "fitted"
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-short-solution",
+      "viewport": {
+        "width": 1280,
+        "height": 600
+      },
+      "questionText": "Welche Stadt wird gesucht?",
+      "expectedQuestion": "Welche Stadt wird gesucht?",
+      "expectedText": [
+        "A.Rom",
+        "B.Bern",
+        "C.Wien",
+        "D.Prag"
+      ],
+      "layout": "side-grid",
+      "questionSize": "60.788px",
+      "answerSizes": [
+        "85.6167px",
+        "85.6167px",
+        "85.6167px",
+        "85.6167px"
+      ],
+      "infoSizes": [],
+      "text": [
+        "A.Rom",
+        "B.Bern",
+        "C.Wien",
+        "D.Prag"
+      ],
+      "issues": [],
+      "scrollHeight": 375,
+      "clientHeight": 375,
+      "image": null,
+      "fit": "fitted"
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-freud-solution",
+      "viewport": {
+        "width": 1280,
+        "height": 600
+      },
+      "questionText": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedQuestion": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedText": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "layout": "side-list",
+      "questionSize": "38.4322px",
+      "answerSizes": [
+        "31.0967px",
+        "31.0967px",
+        "31.0967px",
+        "31.0967px"
+      ],
+      "infoSizes": [
+        "16.1703px",
+        "16.1703px",
+        "16.1703px"
+      ],
+      "text": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "issues": [],
+      "scrollHeight": 375,
+      "clientHeight": 375,
+      "image": null,
+      "fit": "fitted"
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-tunnel-solution",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "questionText": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedQuestion": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedText": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "layout": "side-list",
+      "questionSize": "43.3003px",
+      "answerSizes": [
+        "36.8239px",
+        "36.8239px",
+        "36.8239px",
+        "36.8239px"
+      ],
+      "infoSizes": [
+        "19.1484px",
+        "19.1484px"
+      ],
+      "text": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "issues": [],
+      "scrollHeight": 480,
+      "clientHeight": 480,
+      "image": null,
+      "fit": "fitted"
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-short-solution",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "questionText": "Welche Stadt wird gesucht?",
+      "expectedQuestion": "Welche Stadt wird gesucht?",
+      "expectedText": [
+        "A.Rom",
+        "B.Bern",
+        "C.Wien",
+        "D.Prag"
+      ],
+      "layout": "side-grid",
+      "questionSize": "60.788px",
+      "answerSizes": [
+        "87.0389px",
+        "87.0389px",
+        "87.0389px",
+        "87.0389px"
+      ],
+      "infoSizes": [],
+      "text": [
+        "A.Rom",
+        "B.Bern",
+        "C.Wien",
+        "D.Prag"
+      ],
+      "issues": [],
+      "scrollHeight": 480,
+      "clientHeight": 480,
+      "image": null,
+      "fit": "fitted"
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-freud-solution",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "questionText": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedQuestion": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedText": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "layout": "top-grid",
+      "questionSize": "45.8451px",
+      "answerSizes": [
+        "39.8178px",
+        "39.8178px",
+        "39.8178px",
+        "39.8178px"
+      ],
+      "infoSizes": [
+        "20.7052px",
+        "20.7052px",
+        "20.7052px"
+      ],
+      "text": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "issues": [],
+      "scrollHeight": 480,
+      "clientHeight": 480,
+      "image": null,
+      "fit": "fitted"
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-tunnel-solution",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "questionText": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedQuestion": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedText": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "layout": "side-list",
+      "questionSize": "45.7055px",
+      "answerSizes": [
+        "39.6536px",
+        "39.6536px",
+        "39.6536px",
+        "39.6536px"
+      ],
+      "infoSizes": [
+        "20.6199px",
+        "20.6199px"
+      ],
+      "text": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "issues": [],
+      "scrollHeight": 523,
+      "clientHeight": 523,
+      "image": null,
+      "fit": "fitted"
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-short-solution",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "questionText": "Welche Stadt wird gesucht?",
+      "expectedQuestion": "Welche Stadt wird gesucht?",
+      "expectedText": [
+        "A.Rom",
+        "B.Bern",
+        "C.Wien",
+        "D.Prag"
+      ],
+      "layout": "side-grid",
+      "questionSize": "64px",
+      "answerSizes": [
+        "93.4763px",
+        "93.4763px",
+        "93.4763px",
+        "93.4763px"
+      ],
+      "infoSizes": [],
+      "text": [
+        "A.Rom",
+        "B.Bern",
+        "C.Wien",
+        "D.Prag"
+      ],
+      "issues": [],
+      "scrollHeight": 523,
+      "clientHeight": 523,
+      "image": null,
+      "fit": "fitted"
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-freud-solution",
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "questionText": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedQuestion": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedText": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "layout": "side-grid",
+      "questionSize": "50.0024px",
+      "answerSizes": [
+        "44.7087px",
+        "44.7087px",
+        "44.7087px",
+        "44.7087px"
+      ],
+      "infoSizes": [
+        "23.2485px",
+        "23.2485px",
+        "23.2485px"
+      ],
+      "text": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "issues": [],
+      "scrollHeight": 523,
+      "clientHeight": 523,
+      "image": null,
+      "fit": "fitted"
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-tunnel-solution",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "questionText": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedQuestion": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedText": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "layout": "side-grid",
+      "questionSize": "61.0628px",
+      "answerSizes": [
+        "57.7209px",
+        "57.7209px",
+        "57.7209px",
+        "57.7209px"
+      ],
+      "infoSizes": [
+        "30.0149px",
+        "30.0149px"
+      ],
+      "text": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "issues": [],
+      "scrollHeight": 778,
+      "clientHeight": 778,
+      "image": null,
+      "fit": "fitted"
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-short-solution",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "questionText": "Welche Stadt wird gesucht?",
+      "expectedQuestion": "Welche Stadt wird gesucht?",
+      "expectedText": [
+        "A.Rom",
+        "B.Bern",
+        "C.Wien",
+        "D.Prag"
+      ],
+      "layout": "top-grid",
+      "questionSize": "64px",
+      "answerSizes": [
+        "134.945px",
+        "134.945px",
+        "134.945px",
+        "134.945px"
+      ],
+      "infoSizes": [],
+      "text": [
+        "A.Rom",
+        "B.Bern",
+        "C.Wien",
+        "D.Prag"
+      ],
+      "issues": [],
+      "scrollHeight": 778,
+      "clientHeight": 778,
+      "image": null,
+      "fit": "fitted"
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-freud-solution",
+      "viewport": {
+        "width": 1920,
+        "height": 1080
+      },
+      "questionText": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedQuestion": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedText": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "layout": "side-grid",
+      "questionSize": "64px",
+      "answerSizes": [
+        "66.6845px",
+        "66.6845px",
+        "66.6845px",
+        "66.6845px"
+      ],
+      "infoSizes": [
+        "34.6759px",
+        "34.6759px",
+        "34.6759px"
+      ],
+      "text": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "issues": [],
+      "scrollHeight": 778,
+      "clientHeight": 778,
+      "image": null,
+      "fit": "fitted"
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-tunnel-solution",
+      "viewport": {
+        "width": 2560,
+        "height": 1440
+      },
+      "questionText": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedQuestion": "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?",
+      "expectedText": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "layout": "top-list",
+      "questionSize": "64px",
+      "answerSizes": [
+        "83.4531px",
+        "83.4531px",
+        "83.4531px",
+        "83.4531px"
+      ],
+      "infoSizes": [
+        "43.3956px",
+        "43.3956px"
+      ],
+      "text": [
+        "A.Erster Tunnel mit AutoverkehrIm Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein.",
+        "B.Erster Tunnel mit elektrischer Beleuchtung",
+        "C.Erster Tunnel mit StraßenbahnverkehrSpreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902.",
+        "D.Erster Tunnel mit mechanischer Belüftung"
+      ],
+      "issues": [],
+      "scrollHeight": 1086,
+      "clientHeight": 1086,
+      "image": null,
+      "fit": "fitted"
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-short-solution",
+      "viewport": {
+        "width": 2560,
+        "height": 1440
+      },
+      "questionText": "Welche Stadt wird gesucht?",
+      "expectedQuestion": "Welche Stadt wird gesucht?",
+      "expectedText": [
+        "A.Rom",
+        "B.Bern",
+        "C.Wien",
+        "D.Prag"
+      ],
+      "layout": "top-grid",
+      "questionSize": "64px",
+      "answerSizes": [
+        "143.254px",
+        "143.254px",
+        "143.254px",
+        "143.254px"
+      ],
+      "infoSizes": [],
+      "text": [
+        "A.Rom",
+        "B.Bern",
+        "C.Wien",
+        "D.Prag"
+      ],
+      "issues": [],
+      "scrollHeight": 1086,
+      "clientHeight": 1086,
+      "image": null,
+      "fit": "fitted"
+    },
+    {
+      "style": "EDITORIAL",
+      "scenario": "choice-freud-solution",
+      "viewport": {
+        "width": 2560,
+        "height": 1440
+      },
+      "questionText": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedQuestion": "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?",
+      "expectedText": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "layout": "top-grid",
+      "questionSize": "64px",
+      "answerSizes": [
+        "102.156px",
+        "102.156px",
+        "102.156px",
+        "102.156px"
+      ],
+      "infoSizes": [
+        "53.1213px",
+        "53.1213px",
+        "53.1213px"
+      ],
+      "text": [
+        "A.Galileo Galilei",
+        "B.Charles DarwinDer Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab.",
+        "C.Nikolaus KopernikusDie Erde ist nicht der Mittelpunkt des Universums.",
+        "D.Sigmund FreudUnser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."
+      ],
+      "issues": [],
+      "scrollHeight": 1086,
+      "clientHeight": 1086,
+      "image": null,
+      "fit": "fitted"
+    }
+  ],
+  "extreme": {
+    "viewport": {
+      "width": 1280,
+      "height": 600
+    },
+    "questionText": "Welche europäische Hauptstadt wird gesucht? Sie liegt an einem Fluss, war über viele Jahrzehnte politisch geteilt und wurde nach der Wiedervereinigung erneut zum Regierungssitz. Nennt die Stadt, in der heute auch das Brandenburger Tor und der Deutsche Bundestag zu finden sind.",
+    "expectedQuestion": "Welche europäische Hauptstadt wird gesucht? Sie liegt an einem Fluss, war über viele Jahrzehnte politisch geteilt und wurde nach der Wiedervereinigung erneut zum Regierungssitz. Nennt die Stadt, in der heute auch das Brandenburger Tor und der Deutsche Bundestag zu finden sind.",
+    "expectedText": [
+      "A.Berlin: Die Stadt an der Spree war jahrzehntelang geteilt und ist heute Sitz des Deutschen Bundestages sowie der Bundesregierung.Berlin: Die Stadt an der Spree war jahrzehntelang geteilt und ist heuteAls wir am frühen Morgen am Bahnhof ankamen, war der Bahnsteig noch fast leer. Nur der kleine Kiosk hatte bereits geöffnet. Wir kauften Kaffee, verglichen unsere Fahrkarten und bemerkten erst dann, dass wir auf unterschiedlichen Seiten des Flusses übernachten würden. Aus dem kleinen Planungsfehler wurde ein gemeinsamer Spaziergang durch die Stadt. Am Abend saßen alle wieder an einem Tisch und erzählten von den Orten, die sie unterwegs entdeckt hatten. Die ungeplanten Umwege blieben uns länger in",
+      "B.Wien: Die österreichische Hauptstadt an der Donau ist bekannt für ihre Kaffeehauskultur und die historischen Residenzen der Habsburger.Wien: Die österreichische Hauptstadt an der Donau ist bekannt fürAls wir am frühen Morgen am Bahnhof ankamen, war der Bahnsteig noch fast leer. Nur der kleine Kiosk hatte bereits geöffnet. Wir kauften Kaffee, verglichen unsere Fahrkarten und bemerkten erst dann, dass wir auf unterschiedlichen Seiten des Flusses übernachten würden. Aus dem kleinen Planungsfehler wurde ein gemeinsamer Spaziergang durch die Stadt. Am Abend saßen alle wieder an einem Tisch und erzählten von den Orten, die sie unterwegs entdeckt hatten. Die ungeplanten Umwege blieben uns länger in",
+      "C.Prag: Die tschechische Hauptstadt an der Moldau verbindet ihre mittelalterliche Altstadt mit der berühmten Karlsbrücke und der Burg.Prag: Die tschechische Hauptstadt an der Moldau verbindet ihre mitteAls wir am frühen Morgen am Bahnhof ankamen, war der Bahnsteig noch fast leer. Nur der kleine Kiosk hatte bereits geöffnet. Wir kauften Kaffee, verglichen unsere Fahrkarten und bemerkten erst dann, dass wir auf unterschiedlichen Seiten des Flusses übernachten würden. Aus dem kleinen Planungsfehler wurde ein gemeinsamer Spaziergang durch die Stadt. Am Abend saßen alle wieder an einem Tisch und erzählten von den Orten, die sie unterwegs entdeckt hatten. Die ungeplanten Umwege blieben uns länger in",
+      "D.Budapest: Die ungarische Hauptstadt entstand aus mehreren Städten und liegt mit ihren historischen Stadtteilen an beiden Ufern der Donau.Budapest: Die ungarische Hauptstadt entstand aus mehreren StädtAls wir am frühen Morgen am Bahnhof ankamen, war der Bahnsteig noch fast leer. Nur der kleine Kiosk hatte bereits geöffnet. Wir kauften Kaffee, verglichen unsere Fahrkarten und bemerkten erst dann, dass wir auf unterschiedlichen Seiten des Flusses übernachten würden. Aus dem kleinen Planungsfehler wurde ein gemeinsamer Spaziergang durch die Stadt. Am Abend saßen alle wieder an einem Tisch und erzählten von den Orten, die sie unterwegs entdeckt hatten. Die ungeplanten Umwege blieben uns länger in"
+    ],
+    "layout": "top-grid",
+    "questionSize": "27.3px",
+    "answerSizes": [
+      "18px",
+      "18px",
+      "18px",
+      "18px"
+    ],
+    "infoSizes": [
+      "14px",
+      "14px",
+      "14px",
+      "14px"
+    ],
+    "text": [
+      "A.Berlin: Die Stadt an der Spree war jahrzehntelang geteilt und ist heute Sitz des Deutschen Bundestages sowie der Bundesregierung.Berlin: Die Stadt an der Spree war jahrzehntelang geteilt und ist heuteAls wir am frühen Morgen am Bahnhof ankamen, war der Bahnsteig noch fast leer. Nur der kleine Kiosk hatte bereits geöffnet. Wir kauften Kaffee, verglichen unsere Fahrkarten und bemerkten erst dann, dass wir auf unterschiedlichen Seiten des Flusses übernachten würden. Aus dem kleinen Planungsfehler wurde ein gemeinsamer Spaziergang durch die Stadt. Am Abend saßen alle wieder an einem Tisch und erzählten von den Orten, die sie unterwegs entdeckt hatten. Die ungeplanten Umwege blieben uns länger in",
+      "B.Wien: Die österreichische Hauptstadt an der Donau ist bekannt für ihre Kaffeehauskultur und die historischen Residenzen der Habsburger.Wien: Die österreichische Hauptstadt an der Donau ist bekannt fürAls wir am frühen Morgen am Bahnhof ankamen, war der Bahnsteig noch fast leer. Nur der kleine Kiosk hatte bereits geöffnet. Wir kauften Kaffee, verglichen unsere Fahrkarten und bemerkten erst dann, dass wir auf unterschiedlichen Seiten des Flusses übernachten würden. Aus dem kleinen Planungsfehler wurde ein gemeinsamer Spaziergang durch die Stadt. Am Abend saßen alle wieder an einem Tisch und erzählten von den Orten, die sie unterwegs entdeckt hatten. Die ungeplanten Umwege blieben uns länger in",
+      "C.Prag: Die tschechische Hauptstadt an der Moldau verbindet ihre mittelalterliche Altstadt mit der berühmten Karlsbrücke und der Burg.Prag: Die tschechische Hauptstadt an der Moldau verbindet ihre mitteAls wir am frühen Morgen am Bahnhof ankamen, war der Bahnsteig noch fast leer. Nur der kleine Kiosk hatte bereits geöffnet. Wir kauften Kaffee, verglichen unsere Fahrkarten und bemerkten erst dann, dass wir auf unterschiedlichen Seiten des Flusses übernachten würden. Aus dem kleinen Planungsfehler wurde ein gemeinsamer Spaziergang durch die Stadt. Am Abend saßen alle wieder an einem Tisch und erzählten von den Orten, die sie unterwegs entdeckt hatten. Die ungeplanten Umwege blieben uns länger in",
+      "D.Budapest: Die ungarische Hauptstadt entstand aus mehreren Städten und liegt mit ihren historischen Stadtteilen an beiden Ufern der Donau.Budapest: Die ungarische Hauptstadt entstand aus mehreren StädtAls wir am frühen Morgen am Bahnhof ankamen, war der Bahnsteig noch fast leer. Nur der kleine Kiosk hatte bereits geöffnet. Wir kauften Kaffee, verglichen unsere Fahrkarten und bemerkten erst dann, dass wir auf unterschiedlichen Seiten des Flusses übernachten würden. Aus dem kleinen Planungsfehler wurde ein gemeinsamer Spaziergang durch die Stadt. Am Abend saßen alle wieder an einem Tisch und erzählten von den Orten, die sie unterwegs entdeckt hatten. Die ungeplanten Umwege blieben uns länger in"
+    ],
+    "issues": [
+      "text outside stage 2",
+      "text outside stage 2",
+      "text outside stage 2",
+      "text outside stage 2",
+      "text outside stage 2",
+      "text outside stage 2",
+      "text outside stage 2",
+      "text outside stage 2",
+      "text outside stage 2",
+      "text outside stage 2",
+      "text outside stage 2",
+      "text outside stage 2",
+      "text outside stage 2",
+      "text outside stage 3",
+      "text outside stage 3",
+      "text outside stage 3",
+      "text outside stage 3",
+      "text outside stage 3",
+      "text outside stage 3",
+      "text outside stage 3",
+      "text outside stage 3",
+      "text outside stage 3",
+      "text outside stage 3",
+      "text outside stage 3",
+      "text outside stage 3",
+      "text outside stage 3",
+      "scroll presentation-content-viewport",
+      "scroll presentation-classical-choice"
+    ],
+    "scrollHeight": 513,
+    "clientHeight": 349,
+    "image": null,
+    "fit": "unreadable"
+  }
+}

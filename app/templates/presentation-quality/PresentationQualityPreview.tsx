@@ -8,9 +8,9 @@ import type { JoinedTeam } from "@/app/rendering/presentation/teamJoinQueue";
 import type { PresentationDesignStyle } from "@/app/rendering/templateRegistry";
 
 /** Internal read-only fixtures, rendered by the production component and shell. */
-export function PresentationQualityPreview() {
-  const [scenario, setScenario] = useState<QualityScenario>("short");
-  const [style, setStyle] = useState<PresentationDesignStyle | "PHIL_GUD">("NEON");
+export function PresentationQualityPreview({ initialScenario = "short", initialStyle = "NEON" }: { initialScenario?: QualityScenario; initialStyle?: PresentationDesignStyle | "PHIL_GUD" }) {
+  const [scenario, setScenario] = useState<QualityScenario>(initialScenario);
+  const [style, setStyle] = useState<PresentationDesignStyle | "PHIL_GUD">(initialStyle);
   const [teams, setTeams] = useState<JoinedTeam[]>([]);
   const addTeams = (count: number) => setTeams(current => [...current, ...Array.from({ length: count }, (_, index) => {
     const id = current.length + index + 1;
@@ -18,14 +18,14 @@ export function PresentationQualityPreview() {
   })]);
   const fixture = useMemo(() => buildPresentationQualityFixture(scenario, style), [scenario, style]);
   return <main className="h-dvh overflow-hidden bg-black p-4">
-    <PresentationSlideRenderer key={`${scenario}:${style}`} {...fixture} displayState={{ ...fixture.displayState,
+    <PresentationSlideRenderer {...fixture} displayState={{ ...fixture.displayState,
       teamJoinState: scenario === "qr" ? { teams: teams.slice(0, 12), totalTeams: teams.length, remainingTeams: Math.max(0, teams.length - 12), joinObservation: { lifecycle: "PREPARATION", lifecycleRevision: 0, teams } } : null,
     }} />
     <details className="fixed bottom-1 left-2 z-[80] max-w-[95vw] rounded-lg bg-white p-2 text-sm text-slate-950 shadow-lg">
       <summary>Interne Präsentationsreferenz</summary>
       <div className="flex flex-wrap gap-3 p-2">
         <label>Inhalt <select aria-label="Referenzinhalt" value={scenario} onChange={(event) => setScenario(event.target.value as QualityScenario)}>{qualityScenarios.map((item) => <option key={item}>{item}</option>)}</select></label>
-        <label>Vorlage <select aria-label="Referenzvorlage" value={style} onChange={(event) => setStyle(event.target.value as PresentationDesignStyle | "PHIL_GUD")}><option value="PHIL_GUD">Phil Gud</option><option value="NEON">ungegoogelt Neon</option><option value="EDITORIAL">LOVD × Phil Gud</option><option value="KOMM_ONE">Komm.ONE</option><option value="BIRTHDAY">Storybook</option></select></label>
+        <label>Vorlage <select aria-label="Referenzvorlage" value={style} onChange={(event) => setStyle(event.target.value as PresentationDesignStyle | "PHIL_GUD")}><option value="PHIL_GUD">Phil Gud</option><option value="NEON">ungegoogelt Neon</option><option value="EDITORIAL">LOVD × Phil Gud</option><option value="KOMM_ONE">Komm.ONE</option><option value="CORPORATE">Corporate</option><option value="BIRTHDAY">Storybook</option></select></label>
         {scenario === "qr" && <><button onClick={() => addTeams(1)}>Ein Testbeitritt</button><button onClick={() => addTeams(3)}>Drei Testbeitritte</button><button onClick={() => addTeams(20)}>20 Testbeitritte</button></>}
         <p>Nur Referenzdaten · Vorschau bleibt stumm · keine Speicherung</p>
       </div>

@@ -11,7 +11,7 @@ import { toRuntimeAnswerFormTemplate, toRuntimePresentationTemplate } from "../p
 import { resolvePresentationLayout } from "./presentationLayoutResolver";
 import type { PresentationSlideDisplayState } from "./PresentationSlideRenderer";
 
-export const qualityScenarios = ["short", "solution", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "true-false", "estimate", "image-long", "image-choice", "image-choice-solution", "artwork", "artwork-long", "structured-audio", "structured-empty", "ordering", "ordering-long", "ordering-long-solution", "story", "story-legacy", "poll", "solution-long", "pixel", "qr", "rules", "rules-legacy", "intro", "lovd-intro", "lovd-countdown", "lovd-ranking", "lovd-final", "lovd-outro", "booking", "sponsor-open", "sponsor-choice", "sponsor-intro", "facts2", "facts7", "facts7-long", "facts-choice"] as const;
+export const qualityScenarios = ["choice-extreme-solution", "choice-wrap-solution", "choice-long-question", "choice-tunnel-solution", "choice-freud-solution", "choice-short-solution", "short", "solution", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "true-false", "estimate", "image-long", "image-choice", "image-choice-solution", "artwork", "artwork-long", "structured-audio", "structured-empty", "ordering", "ordering-long", "ordering-long-solution", "story", "story-legacy", "poll", "solution-long", "pixel", "qr", "rules", "rules-legacy", "intro", "lovd-intro", "lovd-countdown", "lovd-ranking", "lovd-final", "lovd-outro", "booking", "sponsor-open", "sponsor-choice", "sponsor-intro", "facts2", "facts7", "facts7-long", "facts-choice"] as const;
 export const qualityRules = ["Teamname wählen", "Antworten rechtzeitig absenden", "Keine Suchmaschinen verwenden", "Die Entscheidung der Moderation gilt"];
 export type QualityScenario = typeof qualityScenarios[number];
 export const longQuestion = "Welche europäische Hauptstadt wird gesucht? Sie liegt an einem Fluss, war über viele Jahrzehnte politisch geteilt und wurde nach der Wiedervereinigung erneut zum Regierungssitz. Nennt die Stadt, in der heute auch das Brandenburger Tor und der Deutsche Bundestag zu finden sind.";
@@ -52,7 +52,7 @@ export function buildPresentationQualityFixture(scenario: QualityScenario, style
   if (scenario.startsWith("choice")) {
     question.templateId = "multiple_choice";
     question.effektiver_antwortmodus = "CLOSED";
-    const labels = scenario === "choice-long" ? longOptions : scenario === "choice-mixed" ? ["Berlin", longOptions[1], "Prag", longOptions[3]] : ["Berlin", "Wien", "Prag", "Budapest", "Paris", "Rom"].slice(0, Number(scenario.at(-1)));
+    const labels = ["choice-long", "choice-wrap-solution"].includes(scenario) ? longOptions : scenario === "choice-mixed" ? ["Berlin", longOptions[1], "Prag", longOptions[3]] : ["Berlin", "Wien", "Prag", "Budapest", "Paris", "Rom"].slice(0, Number(scenario.at(-1)) || 4);
     question.antworten = labels.map((antwort, index) => ({ antwort_id: index + 1, antwort, ist_richtig: index === 0, antworttyp: "Text", medien: [] }));
   }
   if (scenario === "true-false") {
@@ -131,9 +131,36 @@ export function buildPresentationQualityFixture(scenario: QualityScenario, style
     question.antwort_reihenfolge = [3, 1, 4, 2];
     question.medien = [{ medien_id: 77, datei: "https://bix6h2j23vjzi240.public.blob.vercel-storage.com/prod/question-media/question_image/image/580efcbe-042a-42ea-9e6d-8fc2896d400c-147090-AB1dPx4JumbKJbWJJXzy4QVYNga6Uu.jpg", medientyp: "Bild", sortierung: 1, bemerkung: null }];
   }
+
+  // Complete texts read from the question editor on 2026-10-27; no runtime/data writes.
+  if (scenario === "choice-tunnel-solution" || scenario === "choice-freud-solution" || scenario === "choice-short-solution") {
+    question.quelle = null;
+    const tunnel = scenario === "choice-tunnel-solution";
+    question.frage = tunnel ? "Welche Weltpremiere wird dem Stuttgarter Schwabtunnel zugeschrieben?" : scenario === "choice-freud-solution" ? "Wer hat die narzisstische Menschheit mit seiner wissenschaftlichen Erkenntnis nicht gekränkt?" : "Welche Stadt wird gesucht?";
+    const entries = tunnel ? [
+      ["Erster Tunnel mit Autoverkehr", "Im Jahr 1900 soll hier weltweit erstmals ein Auto durch einen Tunnel gefahren sein."],
+      ["Erster Tunnel mit elektrischer Beleuchtung", ""],
+      ["Erster Tunnel mit Straßenbahnverkehr", "Spreetunnel Stralau–Treptow in Berlin: Straßenbahnverkehr bereits 1899.\nSchwabtunnel: Straßenbahnverkehr erst ab 4. Dezember 1902."],
+      ["Erster Tunnel mit mechanischer Belüftung", ""],
+    ] : scenario === "choice-freud-solution" ? [
+      ["Galileo Galilei", ""],
+      ["Charles Darwin", "Der Mensch ist Teil der Evolution und stammt von gemeinsamen Vorfahren mit anderen Tieren ab."],
+      ["Nikolaus Kopernikus", "Die Erde ist nicht der Mittelpunkt des Universums."],
+      ["Sigmund Freud", "Unser Denken und Handeln wird auch von unbewussten Prozessen beeinflusst, die wir nicht vollständig kontrollieren."],
+    ] : [["Rom", ""], ["Bern", ""], ["Wien", ""], ["Prag", ""]];
+    question.effektiver_antwortmodus = "CLOSED";
+    question.antworten = entries.map(([antwort, zusatzinformation], index) => ({ antwort_id: index + 1, antwort, zusatzinformation, ist_richtig: index === 0, antworttyp: "Text", medien: [] }));
+    question.antwort_reihenfolge = [1, 2, 3, 4];
+  }
+  if (scenario === "choice-long-question") question.frage = longQuestion;
+  if (scenario === "choice-extreme-solution") {
+    question.frage = longQuestion.slice(0, 300);
+    question.antworten = Array.from({length: 4}, (_, index) => ({ antwort_id: index + 1, antwort: longOptions[index].repeat(3).slice(0,200), zusatzinformation: storyText.slice(0,500), ist_richtig: index === 0, antworttyp: "Text", medien: [] }));
+    question.antwort_reihenfolge = [1,2,3,4];
+  }
   const layoutInput = { templateId: question.templateId, questionText: question.frage, answerOptionCount: question.effektiver_antwortmodus === "CLOSED" ? question.antworten.length : 0, structuredFieldCount: question.antwortfelder.length, media: question.medien.map((m) => ({ fileName: m.datei, mediaType: m.medientyp, scope: "QUESTION" as const })), templateData: question.templateConfig?.templateData };
   question.presentationLayouts = { question: resolvePresentationLayout({ ...layoutInput, phase: "QUESTION" }), solution: resolvePresentationLayout({ ...layoutInput, phase: "SOLUTION" }) };
-  let slide: Slide = { typ: scenario === "solution" || scenario === "image-choice-solution" || scenario === "solution-long" || scenario === "ordering-long-solution" ? "aufloesung" : "frage", abschnitt: null, frage: question, frageIndexImBlock: 1, fragenAnzahlImBlock: 1 };
+  let slide: Slide = { typ: scenario.endsWith("-solution") || scenario === "solution" || scenario === "image-choice-solution" || scenario === "solution-long" || scenario === "ordering-long-solution" ? "aufloesung" : "frage", abschnitt: null, frage: question, frageIndexImBlock: 1, fragenAnzahlImBlock: 1 };
   if (scenario.startsWith("story") || scenario === "poll") slide = {
     typ: "ablauf", abschnitt: null, element: { id: "quality-story", persistentId: null, type: scenario === "poll" ? "LIVE_POLL" : "TEXT", anchorType: "BEFORE_QUIZ", anchorKey: "global", sectionId: null, order: 1, enabled: true, label: "AP5 Referenz", config: { version: 1, title: "Ein unerwarteter Umweg", body: scenario === "story-legacy" ? `${storyText}\n\n${storyText}\n\n${storyText}` : storyText }, configVersion: 1, questionAssignmentId: null, isStandard: false },
   };
