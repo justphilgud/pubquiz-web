@@ -21,9 +21,16 @@ export const NO_DELTA_PREFLIGHT_PLAN = Object.freeze({
   lastMigration: "20261026210000_shared_game_design",
 });
 
+// Separately approved AP1 release; retain the original layout pair unchanged.
+export const BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN = Object.freeze({
+  ...NO_DELTA_PREFLIGHT_PLAN,
+  baselineSha: "3ade18d276d7ead2cc43008a3d887e3d8feaae48",
+  candidateSha: "0c23f07ecb263805482ef9bd75277d94f0eac718",
+});
+
 export function approvedNoDeltaPreflightPlan(baseline: string, candidate: string) {
-  return baseline === NO_DELTA_PREFLIGHT_PLAN.baselineSha && candidate === NO_DELTA_PREFLIGHT_PLAN.candidateSha
-    ? NO_DELTA_PREFLIGHT_PLAN : undefined;
+  return [NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN]
+    .find(plan => baseline === plan.baselineSha && candidate === plan.candidateSha);
 }
 
 export function assertNoDeltaManifest(baseline: string, candidate: string,
