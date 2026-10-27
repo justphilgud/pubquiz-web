@@ -171,7 +171,15 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   assert.notEqual(historical.snapshot.body.sha256,'');assert.deepEqual(newPrint.cards,historical.cards);
   assert.equal(newPrint.snapshot.version,2);assert.notDeepEqual(newPrint.snapshot,historical.snapshot);
   assert.equal(newPrint.cards[0].shortCode,'A-001');assert.equal((await api.readCards(3,game.id,sid,1,'A-001')).count,1);
-  assert.equal((await api.readCards(3,game.id,large.seriesId!,1,'B-001')).count,1);
+  // AP2 deliberately searches substrings in both codes. B-001 also matches
+  // full codes for ordinals 10..19 when the random series prefix ends in B.
+  const shortOnly = await api.readCards(3,game.id,large.seriesId!,1,'B-500');
+  assert.equal(shortOnly.count,1); assert.deepEqual(shortOnly.cards.map(c=>c.id),[packages[499].id]);
+  const suffix = packages[0].code.split('-')[1].at(-1)!;
+  const collision = await api.readCards(3,game.id,large.seriesId!,1,suffix+'-001');
+  const expectedCollision = [...(suffix==='B'?[packages[0].id]:[]),...packages.slice(9,19).map(c=>c.id)];
+  assert.equal(collision.count,expectedCollision.length);
+  assert.deepEqual(collision.cards.map(c=>c.id),expectedCollision);
   await assert.rejects(db.query('UPDATE pubquiz.bingo_print_versions SET version=3 WHERE series_id=$1',[sid]),{code:'23514'});
   await assert.rejects(db.query('UPDATE pubquiz.bingo_series_labels SET prefix=99 WHERE series_id=$1',[sid]),{code:'23514'});
   await assert.rejects(api.readExport(3,game.id,sid,1,8,999));
