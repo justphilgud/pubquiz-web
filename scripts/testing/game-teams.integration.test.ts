@@ -57,6 +57,11 @@ test("additive game-team migration and real Actions with isolated PostgreSQL on 
   const rolesBefore = (await db.query("SELECT * FROM pubquiz.benutzer_reihenrollen ORDER BY benutzer_id")).rows;
   await db.query(migration);
 
+  // Current game master-data writes also enforce the Bingo card-series move
+  // guard. Keep this isolated repository fixture at the current additive schema;
+  // all existing team/migration preservation assertions below remain unchanged.
+  await db.query(readFileSync("prisma/migrations/20261027180000_bingo_preparation/migration.sql", "utf8"));
+
   assert.deepEqual((await db.query("SELECT to_jsonb(q) data FROM pubquiz.quiz q WHERE quiz_id=11")).rows[0].data,before);
   assert.deepEqual((await db.query("SELECT * FROM pubquiz.benutzer_reihenrollen ORDER BY benutzer_id")).rows,rolesBefore);
   assert.deepEqual((await db.query("SELECT to_jsonb(g) data FROM pubquiz.game_drafts g WHERE id='99000000-0000-4000-8000-000000000001'")).rows[0].data,draftBefore);

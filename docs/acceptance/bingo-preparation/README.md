@@ -33,8 +33,8 @@ Schriftverarbeitungsabhängigkeit wurde installiert.
 - Echter PostgreSQL-Test: Migration auf leerem und repräsentativ befülltem
   isoliertem AP1-Schema; vorhandene Quizdaten und Rollen unverändert. Alle sechs
   neuen Tabellen sind im bestehenden Backup-Katalog enthalten; Druckdesign und
-  Prüfsummen werden durch die Integritätsprüfung validiert. Keine Sicherung oder
-  Wiederherstellung gestartet.
+  Prüfsummen werden durch die Integritätsprüfung validiert. Keine manuellen
+  Backups oder Restores gestartet.
 - Reale Repository-Aufrufe: verweigerte Editor-/fremde Reihen-/Verwaltungszugriffe,
   Produktdeaktivierung auch für Admin, Rechteentzug, Archivgrenzen, fremde IDs,
   vollständiger Rollback bei erzwungenem Fehler während der Karteninsertion,
@@ -68,7 +68,7 @@ Loopback beschränkt und benötigt die privaten synthetischen Testkonten.
 
 ## Migration und Betriebsgrenzen
 
-Review-Datenbank: `bingo_preparation_review_20261027`, nur synthetische Daten.
+Review-Datenbank: `bingo_preparation_review_20261027b`, nur synthetische Daten.
 Dedizierter Laufzeitbenutzer ohne Rechte zum Lesen der bestehenden Development-
 Datenbank; der entsprechende Negativtest besteht. Keine Production-Verbindung.
 Die neue Migration wurde ausgeführt. Ältere Migrationen wurden in dieser neu
