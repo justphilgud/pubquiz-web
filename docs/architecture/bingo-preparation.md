@@ -12,10 +12,14 @@ their meanings. The AP1 core supplies card generation and validation unchanged.
 Preparation has its own optimistic revision; it is not a second game/runtime
 status. A future runtime can reference rounds and immutable cards directly.
 
-`app/bingo/preparation/repository.server.ts` owns transactions, current policies,
-revision checks, idempotence, generation and persisted-card decoding. UI components
-own only editing/feedback/navigation protection. `pdf.server.ts` receives stored
-cards and frozen design bytes and performs no database writes or network access.
+`app/bingo/preparation/repository.server.ts` owns preparation transactions,
+revision checks, idempotence and generation. `access.server.ts` shares current
+authorization and lock ordering. `readExport.server.ts` reads stored cards in an
+explicitly read-only transaction and has no generation/source-asset IO dependency.
+This keeps the PDF function inside the regular serverless package limit rather
+than bundling unused source assets. UI components own only editing/feedback/
+navigation protection. `pdf.server.ts` receives stored cards and frozen design
+bytes and performs no database writes or network access.
 
 ## Additive persistence
 

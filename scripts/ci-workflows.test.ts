@@ -241,3 +241,11 @@ test("AP2 preview requires exact trusted branch and own synthetic runtime and mi
   assert.ok(preview.includes("inputs.isolated_game_teams && 'game_teams_review_20261026'"));
   assert.ok(preview.includes("DATABASE_URL: ${{ secrets.GAME_TEAMS_DATABASE_URL }}"));
 });
+
+test("Bingo preparation cannot enter the shared database migration workflow", () => {
+  const job = preview.slice(preview.indexOf("  deploy-preview:"));
+  const gate = job.slice(job.indexOf("    if:"), job.indexOf("    runs-on:"));
+  assert.ok(gate.includes("github.ref != 'refs/heads/codex/bingo-preparation' &&"));
+  assert.ok(preview.includes("node --import tsx scripts/deploy-vercel-git-preview.ts"), "existing targeted preview checks remain intact");
+  assert.ok(preview.includes("node scripts/verify-preview-ci.ts"), "successful exact-head CI remains required");
+});

@@ -2,32 +2,15 @@ import "server-only";
 import { randomBytes, randomInt, randomUUID } from "node:crypto";
 import type { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
-import { gameSeriesForActor } from "@/app/games/gameDraftRepository.server";
 import { isGameId } from "@/app/games/gameDraft";
 import { resolveSharedDesign } from "@/app/rendering/sharedDesign/sharedDesignRepository.server";
 import { generateCard } from "../core/cards";
+import { preparationContext as context } from "./access.server";
+import { storedCard } from "./readExport.server";
+export { readExport } from "./readExport.server";
 import { capturePrintSnapshot } from "./printAssets.server";
 import { canonical, designHash, parsePrintSnapshot, sha256 } from "./printSnapshot";
-import { BingoPreparationError, CARD_PAGE_SIZE, ROUND_PAGE_SIZE, denied, decodeCard, parseCommand, type PreparationView, type StoredCard } from "./policy";
-
-async function context(tx: Prisma.TransactionClient, userId: number, gameId: string, write = false) {
-  if (!isGameId(gameId)) throw denied();
-  if (write) await tx.$queryRaw`SELECT id FROM pubquiz.game_drafts WHERE id=${gameId}::uuid FOR UPDATE`;
-  const game = await tx.game_drafts.findUnique({ where: { id: gameId } });
-  if (!game || game.eventart !== "BINGO") throw denied();
-  if (write) {
-    await tx.$queryRaw`SELECT pg_advisory_xact_lock(860012, ${game.eventreihe_id})::text`;
-    await tx.$queryRaw`SELECT eventreihe_id FROM pubquiz.eventreihen WHERE eventreihe_id=${game.eventreihe_id} FOR SHARE`;
-    await tx.$queryRaw`SELECT id FROM pubquiz.users WHERE id=${userId} FOR SHARE`;
-    await tx.$queryRaw`SELECT benutzer_id FROM pubquiz.benutzer_reihenrollen WHERE benutzer_id=${userId} FOR SHARE`;
-    await tx.$queryRaw`SELECT rollenzuweisung_id FROM pubquiz.benutzer_rollenzuweisungen WHERE benutzer_id=${userId} FOR SHARE`;
-  }
-  const choices = await gameSeriesForActor(tx, userId, "BINGO");
-  if (!choices.some(c => c.id === game.eventreihe_id && c.canWrite)) throw denied();
-  const series = await tx.eventreihen.findUniqueOrThrow({ where: { eventreihe_id: game.eventreihe_id } });
-  if (write && series.ist_archiviert) throw new BingoPreparationError("Archivierte Eventreihen können nicht verändert werden. Vorhandene Karten können weiterhin exportiert werden.");
-  return { game, series };
-}
+import { BingoPreparationError, CARD_PAGE_SIZE, ROUND_PAGE_SIZE, denied, parseCommand, type PreparationView } from "./policy";
 
 export async function readPreparation(userId: number, gameId: string, page = 1, seriesPage = 1): Promise<PreparationView> {
   return prisma.$transaction(async tx => {
@@ -135,22 +118,5 @@ export async function readCards(userId: number, gameId: string, seriesId: string
     const where = { series_id: series.id, printed_code: { contains: search, mode: "insensitive" as const } };
     const rows = await tx.bingo_cards.findMany({ where, orderBy: { ordinal: "asc" }, skip: (page - 1) * CARD_PAGE_SIZE, take: CARD_PAGE_SIZE });
     return { code: series.code, count: await tx.bingo_cards.count({ where }), total: series.card_count, snapshot: parsePrintSnapshot(series.print_snapshot), cards: rows.map(storedCard) };
-  }, { isolationLevel: "RepeatableRead" });
-}
-function storedCard(row: { id: string; printed_code: string; ordinal: number; cells: unknown; layout_hash: string }): StoredCard {
-  const cells = decodeCard(row.cells);
-  if (sha256(canonical(cells)) !== row.layout_hash) throw new BingoPreparationError("Die gespeicherte Karte besteht die Integritätsprüfung nicht.");
-  return { id: row.id, code: row.printed_code, ordinal: row.ordinal, cells };
-}
-export async function readExport(userId: number, gameId: string, seriesId: string, from: number, to: number) {
-  if (!isGameId(seriesId)) throw denied();
-  return prisma.$transaction(async tx => {
-    await context(tx, userId, gameId);
-    const series = await tx.bingo_card_series.findFirst({ where: { id: seriesId, game_id: gameId } });
-    if (!series) throw denied();
-    if (!Number.isInteger(from) || !Number.isInteger(to) || from < 1 || to < from || to > series.card_count || to - from + 1 > 200) throw new BingoPreparationError("Ungültiger PDF-Bereich; höchstens 200 Karten je PDF.");
-    const rows = await tx.bingo_cards.findMany({ where: { series_id: series.id, ordinal: { gte: from, lte: to } }, orderBy: { ordinal: "asc" } });
-    if (rows.length !== to - from + 1) throw new BingoPreparationError("Die gespeicherte Kartenserie ist unvollständig.");
-    return { code: series.code, snapshot: parsePrintSnapshot(series.print_snapshot), cards: rows.map(storedCard) };
   }, { isolationLevel: "RepeatableRead" });
 }

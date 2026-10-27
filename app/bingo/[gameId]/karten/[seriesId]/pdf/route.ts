@@ -1,6 +1,6 @@
 import { requireActor } from "@/app/lib/permissions";
 import { BingoPreparationError } from "../../../../preparation/policy";
-import { readExport } from "../../../../preparation/repository.server";
+import { readExport } from "../../../../preparation/readExport.server";
 import { createCardsPdf } from "../../../../preparation/pdf.server";
 export const runtime = "nodejs";
 export async function GET(request: Request, { params }: { params: Promise<{ gameId: string; seriesId: string }> }) {

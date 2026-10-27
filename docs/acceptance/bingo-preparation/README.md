@@ -21,6 +21,17 @@ derselben Schrift und einen eingebetteten durchsuchbaren Textanteil; dies verhin
 die in der echten Rasterprüfung gefundenen fehlenden Glyphen. Keine zusätzliche
 Schriftverarbeitungsabhängigkeit wurde installiert.
 
+Die erste gehostete Preview scheiterte am regulären 250-MB-Funktionslimit, weil der
+PDF-Importgraph auch die Quelldateien der Erzeugung mitpackte. Der lesende Export
+wurde deshalb mit gemeinsamer unveränderter Autorisierung getrennt; eine
+Importgrenzen-Regression verhindert die erneute Einbindung des Asset-Laders.
+Das Plattformlimit und bestehende Schutzregeln wurden nicht geändert.
+Der generische Preview-Migrationsworkflow ist für diesen einzelnen Branch
+ausdrücklich gesperrt, damit er die AP2-Migration nicht versehentlich auf die
+gemeinsame Development-Datenbank anwendet. Bereitgestellt wird über das bestehende
+gezielte administrative Git-Preview-Werkzeug mit externer exakter Branch-Freigabe,
+erfolgreicher Head-CI und eigener branchgebundener Review-Verbindung.
+
 ## Tatsächlich durchgeführte Prüfungen
 
 - Typecheck und ESLint sämtlicher geänderter Anwendungs-/Testdateien: erfolgreich.

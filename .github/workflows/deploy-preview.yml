@@ -52,8 +52,11 @@ concurrency:
 jobs:
   deploy-preview:
     name: Migrate and deploy Preview
+    # Bingo AP2 uses its separately verified synthetic database and the targeted
+    # administrative Git Preview path. Never run this shared-DB migration path.
     if: >-
       vars.ACTIONS_DEPLOYMENTS_ENABLED == 'true' &&
+      github.ref != 'refs/heads/codex/bingo-preparation' &&
       !inputs.editorial_dry_run_only && !inputs.editorial_repair_test_questions &&
       (github.ref != 'refs/heads/codex/shared-game-design' || inputs.isolated_shared_design) &&
       (!inputs.isolated_shared_design || github.ref == 'refs/heads/codex/shared-game-design') &&
