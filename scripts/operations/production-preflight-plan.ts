@@ -13,6 +13,39 @@ export function approvedPreflightPlan(baseline: string, candidate: string): Appr
   return APPROVED_PREFLIGHT_PLANS.find(plan => plan.baselineSha === baseline && plan.candidateSha === candidate);
 }
 
+// No SQL replay or application execution: only this immutable, reviewed layout release.
+export const NO_DELTA_PREFLIGHT_PLAN = Object.freeze({
+  baselineSha: "a4c5a9fd9adb182776afcfae38a977a12805a9ea",
+  candidateSha: "c50e56a0308276d16bc19681f3e6a7600c41682f",
+  migrationCount: 64,
+  lastMigration: "20261026210000_shared_game_design",
+});
+
+export function approvedNoDeltaPreflightPlan(baseline: string, candidate: string) {
+  return baseline === NO_DELTA_PREFLIGHT_PLAN.baselineSha && candidate === NO_DELTA_PREFLIGHT_PLAN.candidateSha
+    ? NO_DELTA_PREFLIGHT_PLAN : undefined;
+}
+
+export function assertNoDeltaManifest(baseline: string, candidate: string,
+  before: readonly {name: string; checksum: string}[], after: readonly {name: string; checksum: string}[],
+  baselineSchema: string, candidateSchema: string) {
+  const plan = approvedNoDeltaPreflightPlan(baseline, candidate);
+  if (!plan || before.length !== plan.migrationCount || after.length !== plan.migrationCount ||
+      new Set(after.map(file => file.name)).size !== plan.migrationCount ||
+      !after.some(file => file.name === plan.lastMigration) || baselineSchema !== candidateSchema ||
+      JSON.stringify(before.map(({name,checksum}) => ({name,checksum}))) !== JSON.stringify(after.map(({name,checksum}) => ({name,checksum})))) {
+    throw new Error("NO_DELTA_MANIFEST_UNVERIFIED");
+  }
+  return {kind: "NO_SCHEMA_MIGRATION_DELTA" as const, ...plan, manifest: after.map(({name,checksum}) => ({name,checksum}))};
+}
+
+export function hasCompleteNoDeltaHistory(result: {gate: {status: string}; applied?: readonly string[]; pending?: readonly string[]; expected?: readonly string[]},
+  manifest: readonly {name: string}[]) {
+  return result.gate.status === "PASS" && manifest.length === NO_DELTA_PREFLIGHT_PLAN.migrationCount &&
+    result.applied?.length === manifest.length && new Set(result.applied).size === manifest.length &&
+    manifest.every(file => result.applied?.includes(file.name)) && result.pending?.length === 0 && result.expected?.length === 0;
+}
+
 export function hasApprovedPendingDelta(plan: ApprovedPreflightPlan | undefined,
   expected: readonly string[], pending: readonly string[], files: readonly {name: string; checksum: string}[]) {
   return Boolean(plan && expected.length === 1 && expected[0] === plan.delta && pending.length === 1 && pending[0] === plan.delta &&
