@@ -9,6 +9,7 @@ import { SynchronizedSpeech } from "./SynchronizedSpeech";
 import { mediaRemainingSeconds, formatMediaRemaining, introResumePosition } from "./mediaCountdown";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import QRCode from "react-qr-code";
+import { ClassicalChoiceSlide } from "./ClassicalChoiceSlide";
 import { FactsPresentation } from "./FactsPresentation";
 import { TeamJoinWelcome } from "./TeamJoinWelcome";
 import { SponsorMoment } from "./SponsorMoment";
@@ -684,6 +685,13 @@ function renderPunkteBadge(punkteModus?: string | null) {
 
 function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   const frage = { ...slide.frage, medien: questionPhaseMedia(slide.frage.templateId, slide.frage.medien, "QUESTION") };
+
+  if (zeigtAntwortoptionen(frage) && frage.medien.every(medium => isBild(medium.datei)) && !frage.templateConfig?.templateData && (!frage.templateId || ["standard", "multiple_choice"].includes(frage.templateId))) {
+    const images = frage.medien.filter(medium => isBild(medium.datei));
+    return <ClassicalChoiceSlide question={frage.frage} answers={sortiereAntworten(frage)} solution={false}
+      source={false ? frage.quelle : null} label={false ? "Auflösung" : <>Frage {slide.frageIndexImBlock}{renderPunkteBadge(frage.punkte_modus)}</>}
+      media={images.length ? images.map(medium => renderMedienKarte(medium, "large")) : undefined} />;
+  }
   const templateData = frage.templateConfig?.templateData;
   const hatAntwortmoeglichkeiten = zeigtAntwortoptionen(frage);
   const layoutVariant = frage.presentationLayouts.question.variant;
@@ -1557,6 +1565,13 @@ function renderFunnySlide(slide: Extract<Slide, { typ: "funny" }>) {
 
 function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
   const frage = { ...slide.frage, medien: questionPhaseMedia(slide.frage.templateId, slide.frage.medien, "SOLUTION") };
+
+  if (zeigtAntwortoptionen(frage) && frage.medien.every(medium => isBild(medium.datei)) && !frage.templateConfig?.templateData && (!frage.templateId || ["standard", "multiple_choice"].includes(frage.templateId))) {
+    const images = frage.medien.filter(medium => isBild(medium.datei));
+    return <ClassicalChoiceSlide question={frage.frage} answers={sortiereAntworten(frage)} solution={true}
+      source={true ? frage.quelle : null} label={true ? "Auflösung" : <>Frage {slide.frageIndexImBlock}{renderPunkteBadge(frage.punkte_modus)}</>}
+      media={images.length ? images.map(medium => renderMedienKarte(medium, "large")) : undefined} />;
+  }
   const templateData = frage.templateConfig?.templateData;
   const layoutVariant = frage.presentationLayouts.solution.variant;
   const antworten = sortiereAntworten(frage);

@@ -342,11 +342,11 @@ button {
   [data-storybook-variant="SPLIT"],
   [data-storybook-variant="SEQUENCE"],
   [data-storybook-variant="MEMORY"]
-) .presentation-storybook-content {
+) .presentation-storybook-content:not(:has([data-choice-fit])) {
   padding-right: 50%;
 }
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-variant="COVER"] .presentation-storybook-content,
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-variant="MEMORY"] .presentation-storybook-content {
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-variant="COVER"] .presentation-storybook-content:not(:has([data-choice-fit])),
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-variant="MEMORY"] .presentation-storybook-content:not(:has([data-choice-fit])) {
   padding-right: 57%;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-variant="COVER"] .presentation-question-card > div:first-child {
@@ -445,7 +445,7 @@ button {
   grid-template-rows: minmax(0, 1fr) auto;
   gap: 1.5rem;
 }
-.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-variant="MEMORY"] .presentation-storybook-content {
+.presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-variant="MEMORY"] .presentation-storybook-content:not(:has([data-choice-fit])) {
   height: auto !important;
 }
 .presentation-template[data-design-style="BIRTHDAY"] .presentation-stage[data-storybook-variant="MEMORY"] .presentation-storybook-content > [data-presentation-layout] {
@@ -1962,7 +1962,7 @@ button {
   content: "";
 }
 
-.presentation-template[data-design-style="EDITORIAL"]:not(:has(.presentation-editorial-header)) .presentation-storybook-content {
+.presentation-template[data-design-style="EDITORIAL"]:not(:has(.presentation-editorial-header)) .presentation-storybook-content:not(:has([data-choice-fit])) {
   visibility: hidden;
 }
 

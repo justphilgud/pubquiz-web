@@ -81,23 +81,19 @@ for (const style of ["EDITORIAL", "NEON", "KOMM_ONE", "BIRTHDAY", "CORPORATE"] a
     });
     assert.equal(question.presentationLayouts.question.variant, "MEDIA_FOCUS");
     const before = renderToStaticMarkup(createElement(PresentationSlideRenderer, fixture));
-    assert.match(before, /data-media-choices="true"/);
+    assert.match(before, /data-choice-media="true"/);
     assert.match(before, /src="[^"]*flag.png"/);
-    const options = style === "BIRTHDAY"
-      ? [...(before.match(/<ol class="presentation-storybook-choices">([\s\S]*?)<\/ol>/)?.[1] ?? "").matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)]
-      : [...before.matchAll(/class="presentation-answer-option[^"]*"[^>]*>([\s\S]*?)<\/div>/g)];
+    const options = [...before.matchAll(/class="presentation-answer-option[^"]*"[^>]*>([\s\S]*?)<\/div>/g)];
     assert.equal(options.length, 4);
     for (const [index, id] of question.antwort_reihenfolge.entries()) {
       assert.ok(options[index][1].includes(question.antworten.find(answer => answer.antwort_id === id)!.antwort));
-      assert.ok(options[index][1].includes(style === "BIRTHDAY" ? `${String.fromCharCode(65 + index)}</span>` : `${String.fromCharCode(65 + index)}.`));
+      assert.ok(options[index][1].includes(`${String.fromCharCode(65 + index)}.`));
     }
     assert.doesNotMatch(before, /Information-|data-correct=|Richtige Antwort/);
     const after = renderToStaticMarkup(createElement(PresentationSlideRenderer, {
       ...fixture, slide: { ...fixture.slide, typ: "aufloesung" },
     }));
-    const resolved = style === "BIRTHDAY"
-      ? [...(after.match(/<ol class="presentation-storybook-solution-choices">([\s\S]*?)<\/ol>/)?.[1] ?? "").matchAll(/<li[^>]*>([\s\S]*?)<\/li>/g)]
-      : [...after.matchAll(/class="presentation-solution-option[^"]*"[^>]*>([\s\S]*?)<\/div>/g)];
+    const resolved = [...after.matchAll(/class="presentation-solution-option[^"]*"[^>]*>([\s\S]*?)<\/div>/g)];
     assert.equal(resolved.length, 4);
     for (const [index, id] of question.antwort_reihenfolge.entries()) {
       const answer = question.antworten.find(entry => entry.antwort_id === id)!;
