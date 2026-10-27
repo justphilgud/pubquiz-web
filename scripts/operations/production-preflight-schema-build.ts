@@ -1,3 +1,5 @@
+import {approvedBingoPlan,assertBingoManifest} from './production-preflight-bingo-plan';
+import {testBingoDelta} from './production-preflight-bingo-delta';
 import {execFileSync} from 'node:child_process';
 import {writeFileSync,readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
@@ -18,7 +20,9 @@ async function main(){
   return;
  }
  const reference=JSON.parse(readFileSync('scripts/operations/schema-reference/provenance.json','utf8'));
- const approved=approvedPreflightPlan(sha,process.env.RELEASE_CANDIDATE_SHA??reference.candidateSha);
+ const bingo=approvedBingoPlan(sha,candidate);
+ if(bingo){const schema=(rev:string)=>execFileSync('git',['show',`${rev}:prisma/schema.prisma`],{encoding:'utf8'});assertBingoManifest(sha,candidate,migrationFiles(sha),migrationFiles(candidate),schema(sha),schema(candidate));}
+ const approved=approvedPreflightPlan(sha,process.env.RELEASE_CANDIDATE_SHA??reference.candidateSha)??(bingo?{baselineSha:sha,candidateSha:candidate,delta:'',checksum:'',kind:'bingo-ap2'}:undefined);
  if(!approved)throw new Error('RELEASE_PLAN_UNAPPROVED');
  const plan={...reference,...approved};
  const bootstrap=readFileSync('scripts/operations/schema-reference/prehistory.sql');
@@ -39,6 +43,16 @@ async function main(){
   phase='CATALOG_CAPTURE';
   const columns=query(DIAGNOSTIC_COLUMNS_SQL),catalog=query(DIAGNOSTIC_CATALOG_SQL),objects=query(SCHEMA_OBJECTS_SQL);
   phase='DELTA_TEST';
+  if(bingo){
+    const deltaTest=testBingoDelta(sql,query,sha,candidate,manifest,columns,catalog,objects);
+    writeFileSync('delta-test.json',JSON.stringify(deltaTest,null,2),{flag:'wx'});
+    phase='NEW_INSTALL_REPLAY';sql('CREATE DATABASE reinstall;');
+    let replay;for(const file of manifest){try{docker(['exec','-i',name,'psql','--no-psqlrc','--set','ON_ERROR_STOP=1','-U','postgres','-d','reinstall','-At'],execFileSync('git',['show',`${sha}:prisma/migrations/${file.name}/migration.sql`]));}catch{replay={status:'FAIL',code:'HISTORICAL_BASELINE_OVERLAP',migration:file.name};break;}}
+    if(replay?.migration!=='20260713130000_add_question_draft_fields')throw new Error('UNKNOWN_REPLAY_RESULT');
+    writeFileSync('new-install-replay.json',JSON.stringify(replay,null,2),{flag:'wx'});
+    writeFileSync('expected-schema.json',JSON.stringify({referencePlan:{...reference,...bingo},newInstallReplay:replay,deltaTest,baselineSha:sha,manifest:manifest.map(({name,checksum})=>({name,checksum})),major:17,columns,catalog,objects},null,2),{flag:'wx'});
+    return;
+  }
   sql("INSERT INTO pubquiz.fragen(frage) VALUES('Isolated schema delta fixture');");
   const before=JSON.parse(sql("SELECT json_agg(to_jsonb(t) ORDER BY fragen_id) FROM pubquiz.fragen t").trim());
   const delta=execFileSync('git',['show',`${plan.candidateSha}:prisma/migrations/${plan.delta}/migration.sql`]);

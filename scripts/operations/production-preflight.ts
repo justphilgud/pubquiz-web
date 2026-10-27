@@ -1,3 +1,4 @@
+import {approvedBingoPlan,bingoPendingDelta,bingoDeltaEvidence} from "./production-preflight-bingo-plan";
 import {compareFullSchema,SCHEMA_OBJECTS_SQL,type SchemaEvidence} from "./production-preflight-schema";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
@@ -93,6 +94,15 @@ export async function readMigrationSession(client: Pick<Client, "query">, candid
     const privileges=publicPrivileges;
     const privilegesGate = assessMigrationPrivileges(privileges);
     if (privilegesGate.status !== 'PASS') return { gate: privilegesGate, privileges, diagnosis };
+    if(evidence && approvedBingoPlan(evidence.baseline.sha,evidence.candidate.sha)) {
+      const rights=(await client.query(`SELECT has_schema_privilege(current_user,'pubquiz','USAGE') AND EXISTS (
+        SELECT 1 FROM pg_default_acl d CROSS JOIN LATERAL aclexplode(d.defaclacl) a
+        WHERE d.defaclrole=(SELECT relowner FROM pg_class WHERE oid='pubquiz.game_drafts'::regclass)
+        AND d.defaclobjtype='r' AND d.defaclnamespace IN (0,'pubquiz'::regnamespace::oid)
+        AND a.privilege_type='SELECT' AND a.grantee IN (0,current_user::regrole::oid)
+      ) AS backup_default_select`)).rows[0];
+      if(rights?.backup_default_select!==true)return {gate:gate('BLOCKED','BINGO_BACKUP_DEFAULT_SELECT_UNVERIFIED'),privilegesGate,diagnosis};
+    }
     const rows = (await client.query(DATABASE_READ_QUERIES[4])).rows as Applied[];
     let additionalDiagnostics;
     if(evidence){
@@ -116,8 +126,9 @@ export async function readMigrationSession(client: Pick<Client, "query">, candid
     const appliedMatchesBaseline=assessment.applied.length===baseline.length&&baseline.every(file=>assessment.applied.includes(file.name));
     const schemaGate=!appliedMatchesBaseline?gate('BLOCKED','APPLIED_SCHEMA_PLAN_UNVERIFIED'):additionalDiagnostics?.schemaGate;
     const plan = evidence && approvedPreflightPlan(evidence.baseline.sha, evidence.candidate.sha);
-    const expectedDeltaGate=gate(hasApprovedPendingDelta(plan,assessment.expected,assessment.pending,candidate)?'PASS':'BLOCKED','EXPECTED_DELTA_CHECK');
-    const deltaGate=gate(hasApprovedDeltaEvidence(plan,evidence?.expectedSchema?.deltaTest)?'PASS':'BLOCKED','ISOLATED_DELTA_EVIDENCE');
+    const bingo = evidence && approvedBingoPlan(evidence.baseline.sha,evidence.candidate.sha);
+    const expectedDeltaGate=gate((bingo?bingoPendingDelta(bingo.baselineSha,bingo.candidateSha,assessment.expected,assessment.pending,candidate):hasApprovedPendingDelta(plan,assessment.expected,assessment.pending,candidate))?'PASS':'BLOCKED','EXPECTED_DELTA_CHECK');
+    const deltaGate=gate((bingo?bingoDeltaEvidence(bingo.baselineSha,bingo.candidateSha,evidence?.expectedSchema?.deltaTest):hasApprovedDeltaEvidence(plan,evidence?.expectedSchema?.deltaTest))?'PASS':'BLOCKED','ISOLATED_DELTA_EVIDENCE');
     const replay=evidence?.expectedSchema?.newInstallReplay as {status?:string;code?:string;migration?:string}|undefined;
     const replayGate=gate(replay?.status==='FAIL'&&replay.code==='HISTORICAL_BASELINE_OVERLAP'&&replay.migration==='20260713130000_add_question_draft_fields'?'PASS':'BLOCKED','NEW_INSTALL_LIMITATION_DOCUMENTED');
     const finalGate=[assessment.gate,schemaGate??gate('BLOCKED','EXPECTED_SCHEMA_UNAVAILABLE'),expectedDeltaGate,deltaGate,replayGate].find(item=>item.status!=='PASS')??assessment.gate;
