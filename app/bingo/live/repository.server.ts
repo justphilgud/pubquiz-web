@@ -175,6 +175,8 @@ export async function readLiveAsset(userId: number, key: string, kind: string) {
   await preparationContext(tx, userId, row.game_id);
   const assets = parseLiveAssets(row.visual_assets), result = assets[kind as "display" | "body" | "logo" | "background"];
   if (!result) fail("ASSET_NOT_FOUND");
-  return { bytes: Buffer.from(result.bytes, "base64"), contentType: kind === "logo" || kind === "background" ? "image/png" : "font/ttf" };
+  const bytes = Buffer.from(result.bytes, "base64");
+  const fontTypes: Record<string, string> = { "774f4646": "font/woff", "774f4632": "font/woff2", "4f54544f": "font/otf", "00010000": "font/ttf" };
+  return { bytes, contentType: kind === "logo" || kind === "background" ? "image/png" : fontTypes[bytes.subarray(0, 4).toString("hex")] };
   }, { isolationLevel: "RepeatableRead" });
 }

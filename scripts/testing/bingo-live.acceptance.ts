@@ -87,6 +87,12 @@ export async function exerciseBingoLive(db: Client, live: typeof Live, preparati
   const drawRace = await Promise.allSettled([live.commandLive(1, raceOne), live.commandLive(1, raceTwo)]);
   assert.equal(drawRace.filter(r => r.status === "fulfilled").length, 1);
   await assert.rejects(live.commandLive(1, await request({ kind: "draw", number: used[0] })), /DUPLICATE_DRAW_NUMBER/);
+  const atTarget = (await view()).live!.state.run.rounds[0].draws;
+  await send({ kind: "target", number: atTarget.length });
+  const beyond = Array.from({ length: 75 }, (_, i) => i + 1).find(n => !atTarget.some(d => d.number === n))!;
+  await send({ kind: "draw", number: beyond });
+  assert.equal((await view()).live!.state.run.status, "RUNNING");
+  assert.equal((await view()).live!.state.run.rounds[0].draws.length, atTarget.length + 1, "target is planning, not automatic closure");
   const paused = await request({ kind: "pause" });
   await live.commandLive(1, paused); await live.commandLive(1, paused);
   await assert.rejects(live.commandLive(1, await request({ kind: "draw", number: 75 })), /RUN_NOT_RUNNING/);

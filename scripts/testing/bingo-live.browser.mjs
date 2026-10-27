@@ -41,6 +41,8 @@ const revision = s => evaluate(s, 'Number(document.querySelector("[data-revision
 async function write(s, label, last = false) { const before = await revision(s); await button(s, label, last); await until(async () => await revision(s) > before, "persisted command: " + label); }
 async function screenshot(s, name, width, height) {
   await call("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile: width < 500 }, s);
+  await evaluate(s, "document.fonts.ready");
+  await until(() => evaluate(s, '[...document.images].every(image=>image.complete&&image.naturalWidth>0)'), name + " original images loaded");
   await delay(180);
   assert.equal(await evaluate(s, "document.documentElement.scrollWidth<=innerWidth"), true, name + " horizontal overflow");
   const shot = await call("Page.captureScreenshot", { format: "png", captureBeyondViewport: false }, s);
@@ -87,6 +89,7 @@ async function screenshot(s, name, width, height) {
     await set(mod, "Gerufene Stufe", stage); await write(mod, "Bingo-Ruf jetzt erfassen");
     await set(mod, "Kartenkennung", code); await write(mod, "Karte für diesen Ruf prüfen");
     await set(mod, "Begründung der Entscheidung", "Geometrisch geprüft: " + stage); await write(mod, "Gewinn bestätigen", true);
+    if (stage === "BINGO") { await set(mod, "Ziehungsziel", 5); await write(mod, "Ziehungsziel ändern"); }
   }
   await set(mod, "Physisch gezogene Zahl", fixture.correction); await set(mod, "Begründung der Korrektur", "Letzte Kugel falsch erfasst");
   const beforeCorrection = await revision(mod); await button(mod, "Letzte Zahl korrigieren"); await button(mod, "Bestätigen");

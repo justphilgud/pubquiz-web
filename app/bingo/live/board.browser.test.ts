@@ -7,6 +7,7 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, mkdirSync, writeFileSync
 import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { getPresentationTemplate } from "../../rendering/templateRegistry";
+import sharp from "sharp";
 
 test("actual Bingo board fits both dimensions, stable positions, fonts, states, resizing and scaled preview", { timeout: 60000 }, async () => {
   const source = String.raw`
@@ -20,6 +21,11 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
       flushSync(()=>root.render(<div style={scaled?{width:1280,height:720,transform:'scale(.4)',transformOrigin:'top left'}:{height:'100dvh'}}><Board data={data}/></div>));
     };
     window.mountPolling=()=>flushSync(()=>root.render(<Audience initial={{...window.currentData,id:'polling',revision:0,draws:[]}} audienceKey="fixture"/>));
+    window.slowFonts=()=>{
+      const t=getPresentationTemplate('phil-gud');
+      const data={id:'cold',revision:1,startedAt:1,status:'RUNNING',label:'Originalschrift lädt',target:30,draws:[{id:'42',position:1,number:42}],design:{version:1,templateId:'phil-gud',name:'Phil Gud',config:{version:1,tokens:t.tokens,design:t.design,surfaces:{presentation:t.variant,answerForm:'BRANDED',moderation:'BRANDED'}}},assetBase:'/assets/phil-gud-cold',claims:[]};
+      flushSync(()=>root.render(<div style={{height:'100dvh'}}><Board data={data}/></div>));
+    };
     window.checkStalledConnection=async()=>{try{await fetchLiveView('/hanging');return 'UNEXPECTED_SUCCESS';}catch(e){return e.name;}};
     window.measure=()=>{
       const stage=document.querySelector('[aria-label="Bingo-Präsentation"]'),bound=stage.getBoundingClientRect(),cells=[...stage.querySelectorAll('[data-number]')],issues=[];
@@ -29,7 +35,7 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
         if(e.scrollWidth>e.clientWidth+1||e.scrollHeight>e.clientHeight+1)issues.push('scroll '+e.tagName+' '+JSON.stringify({text:e.textContent,cw:e.clientWidth,sw:e.scrollWidth,ch:e.clientHeight,sh:e.scrollHeight,font:getComputedStyle(e).fontSize}));
       }
       return{fit:stage.dataset.fit,issues,numbers:cells.map(c=>Number(c.dataset.number)),states:cells.map(c=>c.dataset.state),sizes:cells.map(c=>getComputedStyle(c).fontSize),positions:cells.map(c=>{const r=c.getBoundingClientRect();return[r.left,r.top,r.width,r.height]}),logo:[...stage.querySelectorAll('img')].every(i=>i.complete&&i.naturalWidth>0),font:document.fonts.check('24px "Bingo Live Body"'),errors:window.errors};
-    };window.show();
+    };if(location.search==='?cold')window.slowFonts();else window.show();
   `;
   const bundle = await build({ stdin: { contents: source, resolveDir: process.cwd(), loader: "tsx" }, bundle: true, write: false, platform: "browser", format: "iife", outdir: "out", loader: { ".css": "local-css" }, define: { "process.env": "{}", "process.env.NODE_ENV": '"production"' } });
   const js = bundle.outputFiles.find(f => f.path.endsWith(".js"))!, css = bundle.outputFiles.find(f => f.path.endsWith(".css"))!;
@@ -46,9 +52,11 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
     } else if (path === "/bundle.js") { res.setHeader("Content-Type", "text/javascript"); res.end(js.contents); }
     else if (path === "/style.css") { res.setHeader("Content-Type", "text/css"); res.end(css.contents); }
     else if (path.startsWith("/assets/")) {
-      const [, , id, kind] = path.split("/"), t = getPresentationTemplate(id)!;
+      const [, , rawId, kind] = path.split("/"), id = rawId.replace(/-(slow|cold)$/, ""), t = getPresentationTemplate(id)!;
       const asset = kind === "logo" ? resolve("public", "." + t.tokens.assets.logo) : kind === "display" && id === "phil-gud" ? resolve("public/branding/phil-gud/phil-gud.woff") : resolve(id === "lovd-ungegoogelt" ? "assets/fonts/bingo/montserrat.ttf" : "assets/fonts/bingo/geist.ttf");
-      res.setHeader("Content-Type", kind === "logo" ? "image/png" : "font/ttf"); res.end(readFileSync(asset));
+      res.setHeader("Content-Type", kind === "logo" ? "image/png" : "font/ttf");
+      if (rawId.endsWith("-cold") && kind !== "logo") setTimeout(() => res.end(readFileSync(asset)), 2000);
+      else res.end(readFileSync(asset));
     } else { res.setHeader("Content-Type", "text/html"); res.end('<meta charset="utf-8"><link rel="stylesheet" href="/style.css"><style>html,body{margin:0;width:100%;height:100%}</style><div id="app"></div><script>window.errors=[];window.onerror=m=>window.errors.push(m)</script><script src="/bundle.js"></script>'); }
   });
   await new Promise<void>(r => server.listen(0, "127.0.0.1", r));
@@ -102,6 +110,23 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
     assert.deepEqual((await evaluate("window.measure()") as { issues: string[] }).issues, []);
     await evaluate("document.exitFullscreen()");
     assert.equal(await evaluate("document.fullscreenElement===null"), true);
+    // A fresh document and unique URLs prevent an already loaded face from hiding FOIT.
+    const coldTarget = await call("Target.createTarget", { url: "about:blank" });
+    const coldSession = (await call("Target.attachToTarget", { targetId: coldTarget.targetId, flatten: true })).sessionId;
+    await call("Emulation.setDeviceMetricsOverride", { width: 1280, height: 600, deviceScaleFactor: 1, mobile: false }, coldSession);
+    await call("Page.navigate", { url: `http://127.0.0.1:${address.port}/?cold` }, coldSession);
+    const coldEvaluate = async (expression: string) => { const r = await call("Runtime.evaluate", { expression, returnByValue: true, awaitPromise: true }, coldSession); assert.equal(r.exceptionDetails, undefined); return r.result?.value; };
+    const coldDeadline = Date.now() + 5000;
+    while (!await coldEvaluate('!!document.querySelector("[data-current-number]")') && Date.now() < coldDeadline) await new Promise(r => setTimeout(r, 20));
+    await new Promise(r => setTimeout(r, 150));
+    assert.equal(await coldEvaluate('document.fonts.status'), "loading", "exercise actual cold pending original font");
+    const numberBox = await coldEvaluate('(()=>{const r=document.querySelector("[data-current-number]").getBoundingClientRect();return{x:r.x,y:r.y,width:r.width,height:r.height,scale:1}})()') as { x: number; y: number; width: number; height: number; scale: number };
+    const loadingShot = await call("Page.captureScreenshot", { format: "png", clip: numberBox }, coldSession);
+    const { data: pixels, info } = await sharp(Buffer.from(loadingShot.data!, "base64")).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+    let visible = 0;
+    for (let p = 0; p < pixels.length; p += info.channels) if (pixels[p] > 200 && pixels[p + 1] > 200 && pixels[p + 2] > 180) visible++;
+    assert.ok(visible > 100, "current number must already paint while original font is pending");
+    await coldEvaluate("document.fonts.ready");
     await call("Emulation.setDeviceMetricsOverride", { width: 390, height: 400, deviceScaleFactor: 1, mobile: false }, sessionId);
     await evaluate("window.show()"); await new Promise(r => setTimeout(r, 100));
     assert.equal((await evaluate("window.measure()") as { fit: string }).fit, "unreadable");
