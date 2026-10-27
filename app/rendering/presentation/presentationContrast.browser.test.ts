@@ -1,3 +1,4 @@
+import { build } from "esbuild";
 import assert from "node:assert/strict";
 /* eslint-disable react/no-children-prop -- Typed SSR theme fixtures require children in the props object. */
 import { execFile } from "node:child_process";
@@ -219,13 +220,16 @@ test("choices remain readable and image choices coexist after container resize",
   const markup = styles.flatMap(style => (["choice4", "choice-long", "image-choice", "image-choice-solution"] as const).map(scenario =>
     `<section data-readability-case="${style}-${scenario}" style="width:1280px;height:720px;padding:16px;box-sizing:border-box">${renderToStaticMarkup(createElement(PresentationSlideRenderer, buildPresentationQualityFixture(scenario, style)))}</section>`,
   )).join("");
-  const html = `<!doctype html><html><head><meta charset="utf-8"><style>${css}</style></head><body>${markup}<pre id="readability-result"></pre><script>
+  const fitScript = await build({entryPoints:["app/rendering/presentation/fitChoiceContent.ts"],bundle:true,write:false,format:"iife",globalName:"choiceFit"});
+  const html = `<!doctype html><html><head><meta charset="utf-8"><style>${css}</style></head><body>${markup}<pre id="readability-result"></pre><script>${fitScript.outputFiles[0].text}</script><script>
   try {
     const results=[];
     for(const root of document.querySelectorAll('[data-readability-case]')) {
       for(const width of [1280,1920,1600,1280]) {
         root.style.width=width+'px';root.style.height=width*9/16+'px';
-        const question=root.querySelector('.presentation-question-card h2, .presentation-storybook-question h2');
+        // This SSR harness must execute the same bounded client fit as the hydrated player.
+        for(let pass=0;pass<3;pass++) for(const choice of root.querySelectorAll('[data-choice-fit]')) choiceFit.fitChoiceContent(choice);
+        const question=root.querySelector('.presentation-choice-question, .presentation-question-card h2, .presentation-storybook-question h2');
         const options=[...root.querySelectorAll('.presentation-answer-option, .presentation-solution-option, .presentation-storybook-choices li, .presentation-storybook-solution-choices li')];
         if(options.length!==4) throw Error(root.dataset.readabilityCase+': missing choices '+options.length);
         for(const option of options) {

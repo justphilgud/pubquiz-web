@@ -22,6 +22,7 @@ Messungen erfolgen beim Inhaltswechsel, ResizeObserver auf der extern bemessenen
 - Fälle: beide gemeldeten vollständigen Auflösungen, vier kurze Antworten, vier mehrzeilige Antworten als Frage und Auflösung, gemischte Längen, lange Frage mit kurzen Antworten sowie Bildfrage und Bildauflösung. Das Bild im automatischen Test ist ein vorhandenes lokales SVG, um externe Netzabhängigkeit zu vermeiden.
 - Verglichen werden vollständige Frage/Antwort/Erläuterung mit Fixture-Daten, Buchstaben/Reihenfolge, einheitliche Schriftgrößen, Textzeilen über DOM-Ranges, Überschneidungen zwischen Optionen, Sichtbarkeit in Karte/Stage, Scrollmaße und tatsächliche Bildladung.
 - Zusätzlich: Größenwechsel derselben gemounteten Folie, lange → kurze → lange Folie ohne Remount, Rückkehr zur vorherigen Größe und stabile Größen nach weiterem Warten; keine Browser-/ResizeObserver-Fehler. Kurze Antworten sind in jeder Vorlage/Größe mindestens 20 % größer als der Schwabtunnel-Fall.
+- Bestehender statischer Resize-/Bildharness führt nun dieselbe Client-Einpassung aus; sämtliche bisherigen Größen-/Bildassertionen bleiben erhalten. Beide Kontrast-/Resize-Browsertests erfolgreich. Der isolierte Compilerharness verwendet verfügbare Basis-/Fallbackschriften; die gehostete Abnahme prüft zusätzlich die tatsächlich geladenen App-Schriften.
 - Vollständige CI und gehostete Preview: maßgebliche aktuelle Runs und Deploymentnachweis im PR. Keine physische Beamerabnahme behauptet.
 
 ## Messwerte und identische Vorher-/Nachhergrößen

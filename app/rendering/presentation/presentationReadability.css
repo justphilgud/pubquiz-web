@@ -118,18 +118,18 @@
 .presentation-template.presentation-readable[data-design-style] .presentation-answer-option > span { flex-shrink: 0; }
 
 /* Closed image questions reserve a reading column for question and choices. */
-.presentation-template.presentation-readable[data-design-style] [data-media-choices="true"] {
+.presentation-template.presentation-readable[data-design-style] [data-media-choices="true"]:not([data-choice-fit]) {
   grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr);
 }
-.presentation-template.presentation-readable[data-design-style] [data-media-choices="true"] .presentation-answer-options {
+.presentation-template.presentation-readable[data-design-style] [data-media-choices="true"]:not([data-choice-fit]) .presentation-answer-options {
   height: auto;
   flex-shrink: 0;
   margin-top: 1rem;
   grid-template-columns: minmax(0, 1fr);
   gap: .6rem;
 }
-.presentation-template.presentation-readable[data-design-style] [data-media-choices="true"] .presentation-answer-option { padding: .4em .65em; }
-.presentation-template.presentation-readable[data-design-style] [data-media-choices="true"] .presentation-question-card h2 {
+.presentation-template.presentation-readable[data-design-style] [data-media-choices="true"]:not([data-choice-fit]) .presentation-answer-option { padding: .4em .65em; }
+.presentation-template.presentation-readable[data-design-style] [data-media-choices="true"]:not([data-choice-fit]) .presentation-question-card h2 {
   flex-shrink: 0;
   font-size: clamp(2rem, 2.5cqw, 3rem) !important;
 }

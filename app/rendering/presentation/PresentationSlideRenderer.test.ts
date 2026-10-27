@@ -81,7 +81,7 @@ for (const style of ["EDITORIAL", "NEON", "KOMM_ONE", "BIRTHDAY", "CORPORATE"] a
     });
     assert.equal(question.presentationLayouts.question.variant, "MEDIA_FOCUS");
     const before = renderToStaticMarkup(createElement(PresentationSlideRenderer, fixture));
-    assert.match(before, /data-choice-media="true"/);
+    assert.match(before, /data-media-choices="true"/);
     assert.match(before, /src="[^"]*flag.png"/);
     const options = [...before.matchAll(/class="presentation-answer-option[^"]*"[^>]*>([\s\S]*?)<\/div>/g)];
     assert.equal(options.length, 4);

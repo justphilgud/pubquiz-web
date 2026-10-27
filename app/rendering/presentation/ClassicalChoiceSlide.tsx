@@ -35,7 +35,7 @@ export function ClassicalChoiceSlide({ question, answers, solution, media, sourc
       window.removeEventListener("resize", schedule);
     };
   }, [contentKey]);
-  return <section ref={ref} data-choice-fit="pending" data-choice-media={media ? "true" : undefined} data-presentation-layout={layoutVariant} data-storybook-question-kind={storybookKind ?? undefined} data-storybook-phase={storybookKind && solution ? "SOLUTION" : undefined} className="presentation-classical-choice">
+  return <section ref={ref} data-choice-fit="pending" data-choice-media={media ? "true" : undefined} data-media-choices={media ? "true" : undefined} data-presentation-layout={layoutVariant} data-storybook-question-kind={storybookKind ?? undefined} data-storybook-phase={storybookKind && solution ? "SOLUTION" : undefined} className="presentation-classical-choice">
     <div className="presentation-choice-lead">
       <div className="presentation-choice-label">{label}</div>
       <h2 className="presentation-choice-question">{question}</h2>
@@ -51,4 +51,3 @@ export function ClassicalChoiceSlide({ question, answers, solution, media, sourc
     </div>
   </section>;
 }
-

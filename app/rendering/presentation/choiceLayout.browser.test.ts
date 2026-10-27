@@ -13,7 +13,7 @@ test("classical choices: real text geometry, shared type, resizing and long-shor
   const artifact = process.env.CHOICE_ARTIFACTS;
   if (artifact) mkdirSync(artifact, {recursive:true});
   const globals = readFileSync("app/globals.css", "utf8").replace('@import "./rendering/presentation/presentationReadability.css";',readFileSync("app/rendering/presentation/presentationReadability.css","utf8")).replace('@import "./rendering/presentation/bookingSlide.css";',readFileSync("app/rendering/presentation/bookingSlide.css","utf8"));
-  const css = (await postcss([tailwindcss()]).process(globals,{from:resolve("app/globals.css")})).css + readFileSync("app/branding/philGud.css","utf8");
+  const css = (await postcss([tailwindcss()]).process(globals,{from:resolve("app/globals.css")})).css + readFileSync("app/branding/philGud.css","utf8") + readFileSync("app/rendering/presentation/kommOnePresentation.css","utf8");
   const source = String.raw`
     import React from 'react'; import{createRoot}from'react-dom/client';import{flushSync}from'react-dom';
     import Renderer from './app/rendering/presentation/PresentationSlideRenderer';

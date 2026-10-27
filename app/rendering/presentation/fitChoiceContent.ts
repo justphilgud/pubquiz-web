@@ -39,6 +39,3 @@ export function fitChoiceContent(root: HTMLElement) {
   write(best.size ? Math.max(18, best.size - .5) : 18, best.layout);
   root.dataset.choiceFit = best.size && fits() ? "fitted" : "unreadable";
 }
-
-
-
