@@ -40,9 +40,11 @@ async function login(s, account) { await goto(s, "/login"); await set(s, "[name=
 const revision = s => evaluate(s, 'Number(document.querySelector("[data-revision]")?.dataset.revision??-1)');
 async function write(s, label, last = false) { const before = await revision(s); await button(s, label, last); await until(async () => await revision(s) > before, "persisted command: " + label); }
 async function screenshot(s, name, width, height) {
+  await call("Page.bringToFront", {}, s);
   await call("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile: width < 500 }, s);
-  await evaluate(s, "document.fonts.ready");
+  await evaluate(s, 'Promise.all([document.fonts.load(\'24px "Bingo Live Body"\'),document.fonts.load(\'24px "Bingo Live Display"\')]).then(()=>document.fonts.ready)');
   await until(() => evaluate(s, '[...document.images].every(image=>image.complete&&image.naturalWidth>0)'), name + " original images loaded");
+  assert.equal(await evaluate(s, '[...document.fonts].filter(f=>f.family.includes("Bingo Live")).length===2&&[...document.fonts].filter(f=>f.family.includes("Bingo Live")).every(f=>f.status==="loaded")'), true, name + " both frozen original font faces loaded");
   await delay(180);
   assert.equal(await evaluate(s, "document.documentElement.scrollWidth<=innerWidth"), true, name + " horizontal overflow");
   const shot = await call("Page.captureScreenshot", { format: "png", captureBeyondViewport: false }, s);

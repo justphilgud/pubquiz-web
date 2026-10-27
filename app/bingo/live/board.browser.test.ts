@@ -8,8 +8,14 @@ import { join, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { getPresentationTemplate } from "../../rendering/templateRegistry";
 import sharp from "sharp";
+import { contrastRatio } from "../../rendering/presentationTemplates/presentationTemplate";
 
 test("actual Bingo board fits both dimensions, stable positions, fonts, states, resizing and scaled preview", { timeout: 60000 }, async () => {
+  for (const id of ["phil-gud", "lovd-ungegoogelt"]) {
+    const t = getPresentationTemplate(id)!.tokens;
+    assert.ok(contrastRatio(t.colors.text, t.colors.background) >= 4.5);
+    assert.ok(contrastRatio(t.colors.textMuted, t.colors.surface) >= 4.5);
+  }
   const source = String.raw`
     import React from 'react';import{createRoot}from'react-dom/client';import{flushSync}from'react-dom';
     import Board from './app/bingo/live/BingoBoard';import Audience from './app/bingo/live/AudienceClient';import{getPresentationTemplate}from'./app/rendering/templateRegistry';import{fetchLiveView}from'./app/bingo/live/useLivePolling';
@@ -34,7 +40,7 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
         if(r.width&&r.height&&(r.left<bound.left-1||r.right>bound.right+1||r.top<bound.top-1||r.bottom>bound.bottom+1))issues.push('outside '+e.tagName);
         if(e.scrollWidth>e.clientWidth+1||e.scrollHeight>e.clientHeight+1)issues.push('scroll '+e.tagName+' '+JSON.stringify({text:e.textContent,cw:e.clientWidth,sw:e.scrollWidth,ch:e.clientHeight,sh:e.scrollHeight,font:getComputedStyle(e).fontSize}));
       }
-      return{fit:stage.dataset.fit,issues,numbers:cells.map(c=>Number(c.dataset.number)),states:cells.map(c=>c.dataset.state),sizes:cells.map(c=>getComputedStyle(c).fontSize),positions:cells.map(c=>{const r=c.getBoundingClientRect();return[r.left,r.top,r.width,r.height]}),logo:[...stage.querySelectorAll('img')].every(i=>i.complete&&i.naturalWidth>0),font:document.fonts.check('24px "Bingo Live Body"'),errors:window.errors};
+      return{fit:stage.dataset.fit,issues,numbers:cells.map(c=>Number(c.dataset.number)),states:cells.map(c=>c.dataset.state),sizes:cells.map(c=>getComputedStyle(c).fontSize),positions:cells.map(c=>{const r=c.getBoundingClientRect();return[r.left,r.top,r.width,r.height]}),logo:[...stage.querySelectorAll('img')].every(i=>i.complete&&i.naturalWidth>0),font:[...document.fonts].filter(f=>f.family.includes('Bingo Live')).length===2&&[...document.fonts].filter(f=>f.family.includes('Bingo Live')).every(f=>f.status==='loaded'),errors:window.errors};
     };if(location.search==='?cold')window.slowFonts();else window.show();
   `;
   const bundle = await build({ stdin: { contents: source, resolveDir: process.cwd(), loader: "tsx" }, bundle: true, write: false, platform: "browser", format: "iife", outdir: "out", loader: { ".css": "local-css" }, define: { "process.env": "{}", "process.env.NODE_ENV": '"production"' } });
@@ -54,7 +60,7 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
     else if (path.startsWith("/assets/")) {
       const [, , rawId, kind] = path.split("/"), id = rawId.replace(/-(slow|cold)$/, ""), t = getPresentationTemplate(id)!;
       const asset = kind === "logo" ? resolve("public", "." + t.tokens.assets.logo) : kind === "display" && id === "phil-gud" ? resolve("public/branding/phil-gud/phil-gud.woff") : resolve(id === "lovd-ungegoogelt" ? "assets/fonts/bingo/montserrat.ttf" : "assets/fonts/bingo/geist.ttf");
-      res.setHeader("Content-Type", kind === "logo" ? "image/png" : "font/ttf");
+      res.setHeader("Content-Type", kind === "logo" ? "image/png" : kind === "display" && id === "phil-gud" ? "font/woff" : "font/ttf");
       if (rawId.endsWith("-cold") && kind !== "logo") setTimeout(() => res.end(readFileSync(asset)), 2000);
       else res.end(readFileSync(asset));
     } else { res.setHeader("Content-Type", "text/html"); res.end('<meta charset="utf-8"><link rel="stylesheet" href="/style.css"><style>html,body{margin:0;width:100%;height:100%}</style><div id="app"></div><script>window.errors=[];window.onerror=m=>window.errors.push(m)</script><script src="/bundle.js"></script>'); }
@@ -127,6 +133,9 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
     for (let p = 0; p < pixels.length; p += info.channels) if (pixels[p] > 200 && pixels[p + 1] > 200 && pixels[p + 2] > 180) visible++;
     assert.ok(visible > 100, "current number must already paint while original font is pending");
     await coldEvaluate("document.fonts.ready");
+    assert.equal(await coldEvaluate('[...document.fonts].filter(f=>f.family.includes("Bingo Live")).length===2&&[...document.fonts].filter(f=>f.family.includes("Bingo Live")).every(f=>f.status==="loaded")'), true, "both original frozen faces actually loaded");
+    await call("Target.closeTarget", { targetId: coldTarget.targetId });
+    await call("Page.bringToFront", {}, sessionId);
     await call("Emulation.setDeviceMetricsOverride", { width: 390, height: 400, deviceScaleFactor: 1, mobile: false }, sessionId);
     await evaluate("window.show()"); await new Promise(r => setTimeout(r, 100));
     assert.equal((await evaluate("window.measure()") as { fit: string }).fit, "unreadable");

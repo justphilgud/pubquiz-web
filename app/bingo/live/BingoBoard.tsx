@@ -43,6 +43,7 @@ export default function BingoBoard({ data }: { data: AudienceView }) {
   const feedback = data.claims.filter(c => c.action).at(-1);
   const style = { background: t.colors.background, color: t.colors.text, "--bingo-surface": t.colors.surface,
     "--bingo-primary": t.colors.primary, "--bingo-border": t.colors.border,
+    "--bingo-radius": t.radii.medium,
     "--bingo-muted": t.colors.textMuted, fontFamily: data.assetBase ? '"Bingo Live Body", sans-serif' : t.typography.family,
     backgroundImage: t.assets.backgroundImage ? `url("${data.assetBase ? data.assetBase + "/background" : t.assets.backgroundImage}")` : undefined } as CSSProperties;
   return <section ref={ref} className={styles.stage} style={style} data-quiz-theme-version="1" aria-label="Bingo-Präsentation" data-run-id={data.id} data-revision={data.revision} data-status={data.status}>
