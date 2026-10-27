@@ -8,7 +8,7 @@ export function fitChoiceContent(root: HTMLElement) {
   const hasMedia = root.dataset.choiceMedia === "true";
   const layouts = hasMedia ? ["side-grid", "side-list"] : ["top-grid", "side-list", "side-grid", "top-list"];
   const maxAnswer = Math.min(144, width * .075, height * .23);
-  const maxQuestion = Math.min(64, width * .052, height * .2);
+  const maxQuestion = Math.max(26, Math.min(64, width * .052, height * .2));
   const write = (answer: number, layout: string) => {
     root.dataset.choiceLayout = layout;
     root.style.setProperty("--pres-answer", `${answer}px`);
@@ -42,3 +42,4 @@ export function fitChoiceContent(root: HTMLElement) {
   write(best.size ? Math.max(18, best.size - .5) : 18, best.layout);
   root.dataset.choiceFit = best.size && fits() ? "fitted" : "unreadable";
 }
+
