@@ -43,6 +43,14 @@ test("real PostgreSQL17: archive dump/guarded restore retains encrypted PNG, key
     // Same fixture supports the pre-release baseline and later archive-aware main.
     schema = schema.replace(/^\s*meme_archive_sources meme_archive_sources\[\]\r?\n/m, "")
       .replace(/model meme_archive_sources \{[\s\S]*?^\}/m, "").replace(/model meme_archive_entries \{[\s\S]*?^\}/m, "");
+    // This is explicitly the historical pre-Bingo restore fixture. Current model
+    // tables without their executable objects are not a valid historical schema.
+    const bingoModels=["bingo_preparations","bingo_rounds","bingo_card_series","bingo_cards","bingo_round_series","bingo_issuance_changes","bingo_series_labels","bingo_print_versions"];
+    for(const model of bingoModels){
+      schema=schema.replace(new RegExp(`model ${model} \\{[\\s\\S]*?^\\}`,"m"),"");
+      schema=schema.replace(new RegExp(`^.*\\s${model}(?:\\[\\]|\\?)?[^\\n]*$`,"gm"),"");
+    }
+    schema=schema.replace(/^.*bingo_print_config[^\n]*$/gm,"");
     const schemaPath = join(directory, "baseline.prisma"); await writeFile(schemaPath, schema);
     const ddl = execFileSync(process.execPath, [resolve("node_modules/prisma/build/index.js"), "migrate", "diff", "--from-empty", "--to-schema", schemaPath, "--script"],
       {encoding: "utf8", env: {...process.env, DATABASE_URL: "postgresql://postgres@postgres:5432/restore_ci", JITI_CACHE: "false"}});
