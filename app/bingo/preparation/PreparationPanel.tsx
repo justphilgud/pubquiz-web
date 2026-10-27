@@ -13,6 +13,11 @@ export default function PreparationPanel({ data }: { data: PreparationView }) {
   const ready = useSyncExternalStore(subscribe, () => true, () => false);
   const [message, setMessage] = useState("");
   const [dirtyRounds, setDirtyRounds] = useState<Set<string>>(new Set());
+  const [busyRounds, setBusyRounds] = useState<Set<string>>(new Set());
+  const trackBusy = useCallback((id: string, busy: boolean) => setBusyRounds(current => {
+    if (current.has(id) === busy) return current;
+    const next = new Set(current); if (busy) next.add(id); else next.delete(id); return next;
+  }), []);
   const trackDirty = useCallback((id: string, dirty: boolean) => setDirtyRounds(current => {
     if (current.has(id) === dirty) return current;
     const next = new Set(current); if (dirty) next.add(id); else next.delete(id); return next;
@@ -27,13 +32,13 @@ export default function PreparationPanel({ data }: { data: PreparationView }) {
     <p className="text-sm text-slate-600">Vorbereitung · Bingo ist noch nicht spielbar. Die geplante Ziehungszahl beendet später keine Runde automatisch.</p>
     {data.archived && <p role="status">Archivierte Eventreihe: nur Lesen und PDF-Export möglich.</p>}
     {message && <p role="alert">{message}</p>}
-    <Button disabled={!ready || pending || data.archived || dirtyRounds.size > 0} onClick={() => run({ operation: "createRound" })}>Runde hinzufügen</Button>
+    <Button disabled={!ready || pending || data.archived || dirtyRounds.size > 0 || busyRounds.size > 0} onClick={() => run({ operation: "createRound" })}>Runde hinzufügen</Button>
     {!data.rounds.length && <p>Noch keine Runden vorhanden.</p>}
-    {data.rounds.map(r => <RoundEditor key={`${r.id}-${data.revision}`} round={r} data={data} onDirty={trackDirty} externallyBlocked={[...dirtyRounds].some(id => id !== r.id)} />)}
+    {data.rounds.map(r => <RoundEditor key={`${r.id}-${data.revision}`} round={r} data={data} onDirty={trackDirty} onBusy={trackBusy} externallyBlocked={pending || [...dirtyRounds, ...busyRounds].some(id => id !== r.id)} />)}
     <nav aria-label="Rundenseiten" className="flex flex-wrap gap-4">{data.page > 1 && <Link href={`?page=${data.page - 1}&seriesPage=${data.seriesPage}`}>Vorherige Runden</Link>}{data.page * 25 < data.roundCount && <Link href={`?page=${data.page + 1}&seriesPage=${data.seriesPage}`}>Weitere Runden</Link>}</nav>
   </div>;
 }
-function RoundEditor({ round, data, onDirty, externallyBlocked }: { round: RoundView; data: PreparationView; onDirty: (id: string, dirty: boolean) => void; externallyBlocked: boolean }) {
+function RoundEditor({ round, data, onDirty, onBusy, externallyBlocked }: { round: RoundView; data: PreparationView; onDirty: (id: string, dirty: boolean) => void; onBusy: (id: string, busy: boolean) => void; externallyBlocked: boolean }) {
   const router = useRouter(), [pending, start] = useTransition(), busy = useRef(false);
   const ready = useSyncExternalStore(subscribe, () => true, () => false);
   const initial = { label: round.label, target: String(round.target), strategy: round.strategy, issued: round.issued === null ? "" : String(round.issued) };
@@ -46,7 +51,7 @@ function RoundEditor({ round, data, onDirty, externallyBlocked }: { round: Round
   type Extra = Record<string, unknown> & { operation: string };
   function run(extra: Extra, saving = false) {
     if (busy.current) return;
-    busy.current = true; setMessage(null);
+    busy.current = true; onBusy(round.id, true); setMessage(null);
     start(async () => {
       try {
         const result = await savePreparation({ ...base, ...extra });
@@ -54,7 +59,7 @@ function RoundEditor({ round, data, onDirty, externallyBlocked }: { round: Round
         if (saving) markSaved();
         router.refresh(); setMessage({ text: "Gespeichert.", error: false });
       } catch { setMessage({ text: "Speichern fehlgeschlagen. Deine Eingaben bleiben erhalten. Bitte erneut versuchen.", error: true }); }
-      finally { busy.current = false; }
+      finally { busy.current = false; onBusy(round.id, false); }
     });
   }
   const blocked = !ready || pending || data.archived || externallyBlocked;

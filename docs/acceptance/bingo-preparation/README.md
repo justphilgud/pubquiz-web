@@ -51,6 +51,9 @@ Schriftverarbeitungsabhängigkeit wurde installiert.
   Ausgabe speichern und neu laden; stale Formular in zweitem Tab behält Eingaben;
   Kartenkennung suchen; tatsächlicher PDF-Download; Editor-Direktlink abgewiesen,
   sein bisheriger Stammdaten-Lesezugriff bleibt erhalten; Quizverwaltung erreichbar.
+- Native Tastaturbedienung: Tab-Reihenfolge, sichtbarer Fokus und Bearbeitung des
+  Zahlenfelds mit der Pfeiltaste. Während einer Kartenerzeugung sind andere
+  Rundenaktionen gesperrt, damit deren Aktualisierung keine Eingaben verdrängt.
 - Der native Abbruchdialog wurde **automatisiert** abgebrochen: Seite und geänderte
   Eingabe blieben erhalten. Dies ist keine behauptete menschliche Abnahme.
 - Laptop 1366×768 und Mobilviewport 390×844: Runden- und Kartenansichten geprüft,

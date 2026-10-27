@@ -28,12 +28,20 @@ async function screenshot(s,name,width,height){console.log('Viewport check: '+na
  await button(s,'Runde hinzufügen');await until(()=>evaluate(s,'document.querySelectorAll("section[aria-labelledby]").length===1'),'first round');
  const r1=await evaluate(s,'document.querySelector("input[id^=label-]").id.slice(6)');await set(s,`#label-${r1}`,'Druckrunde 1');await set(s,`#target-${r1}`,'40');await button(s,'Runde speichern');await until(()=>evaluate(s,'document.querySelector("h2").textContent==="Druckrunde 1"'),'round save');
  await goto(s,`/bingo/${game}/vorbereitung`);await until(()=>evaluate(s,`document.querySelector('#target-${r1}')?.value==='40'`),'round reload');
+ await until(()=>evaluate(s,`!document.querySelector('#label-${r1}').matches(':disabled')`),'round hydration');
+ await evaluate(s,`document.querySelector('#label-${r1}').focus()`);
+ await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9},s);await call('Input.dispatchKeyEvent',{type:'keyUp',key:'Tab',code:'Tab',windowsVirtualKeyCode:9},s);
+ assert.equal(await evaluate(s,`document.activeElement.id==='target-${r1}'&&document.activeElement.matches(':focus-visible')`),true,'native keyboard tab order and focus');
+ assert.equal(await evaluate(s,`(()=>{const c=getComputedStyle(document.activeElement);return c.boxShadow!=='none'||(c.outlineStyle!=='none'&&parseFloat(c.outlineWidth)>0)})()`),true,'visible keyboard focus');
+ await call('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowUp',code:'ArrowUp',windowsVirtualKeyCode:38},s);await call('Input.dispatchKeyEvent',{type:'keyUp',key:'ArrowUp',code:'ArrowUp',windowsVirtualKeyCode:38},s);
+ await until(()=>evaluate(s,`document.querySelector('#target-${r1}').value==='41'`),'native keyboard number editing');await set(s,`#target-${r1}`,'40');
  await set(s,`#label-${r1}`,'Ungespeichert');let dialog=false;
  const previous=ws.onmessage;ws.onmessage=e=>{const m=JSON.parse(String(e.data));if(m.method==='Page.javascriptDialogOpening'){dialog=true;call('Page.handleJavaScriptDialog',{accept:false},m.sessionId);}previous(e);};
  await evaluate(s,`setTimeout(()=>[...document.querySelectorAll('a')].find(a=>a.textContent==='Zum Spiel').click(),0);true`);await until(()=>dialog,'native unsaved dialog');
  assert.equal(await evaluate(s,`location.pathname.endsWith('/vorbereitung')&&document.querySelector('#label-${r1}').value==='Ungespeichert'`),true,'cancel must preserve page and field');
  await set(s,`#label-${r1}`,'Druckrunde 1');await set(s,`#count-${r1}`,'9');
  await evaluate(s,`(()=>{const b=[...document.querySelectorAll('button')].find(b=>b.textContent==='Kartenserie erzeugen');b.click();b.click();})()`);
+ await until(()=>evaluate(s,'[...document.querySelectorAll("button")].find(b=>b.textContent==="Runde hinzufügen").disabled'),'cross-round actions disabled during generation');
  await until(()=>evaluate(s,'[...document.querySelectorAll("a")].some(a=>a.href.includes("/karten?series="))'),'card generation',60000);
  const series=await evaluate(s,'new URL([...document.querySelectorAll("a")].find(a=>a.href.includes("/karten?series=")).href).searchParams.get("series")');
  await button(s,'Runde hinzufügen');await until(()=>evaluate(s,'document.querySelectorAll("section[aria-labelledby]").length===2'),'second round');
@@ -56,5 +64,5 @@ async function screenshot(s,name,width,height){console.log('Viewport check: '+na
  const restricted=(await call('Target.createBrowserContext')).browserContextId,e=await tab(origin+'/login',restricted);await login(e,accounts.find(a=>a.id===3));
  await goto(e,`/bingo/${game}`);await until(async()=>/Nur Lesezugriff/.test(await text(e)),'editor masterdata preserved');await goto(e,`/bingo/${game}/vorbereitung`);await until(async()=>/404|not be found|nicht gefunden/i.test(await text(e)),'editor preparation denied');
  await goto(s,'/quiz');await until(async()=>/Synthetische Quiz-Regression/.test(await text(s)),'quiz administration regression');
- fs.writeFileSync('.artifacts/bingo-ap2/browser-results.json',JSON.stringify({origin,game,series,downloadFilename,passed:['fresh password login','round create/edit/reload','native unsaved navigation cancellation preserves page+input','double click generation','existing card series reuse','issued total durable reload','concurrent stale form preserves input','stored code search','browser PDF download','editor scope denial with masterdata read preserved','quiz administration','1366x768 and 390x844 no overflow'],productionChanged:false},null,2));console.log('AP2 actual local browser acceptance PASS');
+ fs.writeFileSync('.artifacts/bingo-ap2/browser-results.json',JSON.stringify({origin,game,series,downloadFilename,passed:['fresh password login','round create/edit/reload','native keyboard tab order, visible focus and number editing','native unsaved navigation cancellation preserves page+input','double click generation and cross-round pending guard','existing card series reuse','issued total durable reload','concurrent stale form preserves input','stored code search','browser PDF download','editor scope denial with masterdata read preserved','quiz administration','1366x768 and 390x844 no overflow'],productionChanged:false},null,2));console.log('AP2 actual local browser acceptance PASS');
 })().catch(e=>{console.error(e.stack);process.exitCode=1;}).finally(async()=>{if(ws?.readyState===1){await call('Browser.close').catch(()=>{});ws.close();}browser.kill();});
