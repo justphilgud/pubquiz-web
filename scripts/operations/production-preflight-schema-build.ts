@@ -3,11 +3,20 @@ import {writeFileSync,readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {migrationFiles} from './production-preflight';
 import {compareFullSchema,DIAGNOSTIC_COLUMNS_SQL,DIAGNOSTIC_CATALOG_SQL,SCHEMA_OBJECTS_SQL} from './production-preflight-schema';
-import {approvedPreflightPlan} from './production-preflight-plan';
+import {approvedPreflightPlan,approvedNoDeltaPreflightPlan,assertNoDeltaManifest} from './production-preflight-plan';
 import {assertOnlyArchiveSchemaAdded,ARCHIVE_CAPTURE_FIXTURE_SQL} from './production-preflight-archive-delta';
 async function main(){
  const sha=process.env.EXPECTED_PRODUCTION_SHA??'';
  if(process.env.GITHUB_ACTIONS!=='true'||process.env.GITHUB_REPOSITORY!=='justphilgud/pubquiz-web'||!/^[a-f0-9]{40}$/.test(sha))throw new Error('CONTEXT');
+ const candidate=process.env.RELEASE_CANDIDATE_SHA??'';
+ if(approvedNoDeltaPreflightPlan(sha,candidate)){
+  const schema=(revision:string)=>execFileSync('git',['show',`${revision}:prisma/schema.prisma`],{encoding:'utf8'});
+  const proof=assertNoDeltaManifest(sha,candidate,migrationFiles(sha),migrationFiles(candidate),schema(sha),schema(candidate));
+  writeFileSync('expected-schema.json',JSON.stringify(proof,null,2),{flag:'wx'});
+  writeFileSync('delta-test.json',JSON.stringify({status:'PASS',code:'NO_SCHEMA_MIGRATION_DELTA',baselineSha:sha,candidateSha:candidate}),{flag:'wx'});
+  writeFileSync('new-install-replay.json',JSON.stringify({status:'NOT_RUN',code:'HISTORICAL_BOOTSTRAP_LIMITATION_UNCHANGED'}),{flag:'wx'});
+  return;
+ }
  const reference=JSON.parse(readFileSync('scripts/operations/schema-reference/provenance.json','utf8'));
  const approved=approvedPreflightPlan(sha,process.env.RELEASE_CANDIDATE_SHA??reference.candidateSha);
  if(!approved)throw new Error('RELEASE_PLAN_UNAPPROVED');

@@ -2,10 +2,13 @@ import { execFileSync } from "node:child_process";
 import { appendFileSync, writeFileSync, readFileSync } from "node:fs";
 import { initRepositoryEvidence, inventoryFromGit } from "./production-preflight-diagnostics";
 import { assertPreflightContext, gate, migrationFiles, readProductionDeployment, readProductionMigrations } from "./production-preflight";
+import { approvedPreflightPlan, approvedNoDeltaPreflightPlan, assertNoDeltaManifest, hasCompleteNoDeltaHistory } from "./production-preflight-plan";
 
 async function main() {
   assertPreflightContext(process.env);
   if (!/^[a-f0-9]{40}$/.test(process.env.RELEASE_CANDIDATE_SHA ?? "") || !/^[a-f0-9]{40}$/.test(process.env.EXPECTED_PRODUCTION_SHA ?? "")) throw new Error("INVALID_SHA");
+  if (!approvedPreflightPlan(process.env.EXPECTED_PRODUCTION_SHA!, process.env.RELEASE_CANDIDATE_SHA!) &&
+      !approvedNoDeltaPreflightPlan(process.env.EXPECTED_PRODUCTION_SHA!, process.env.RELEASE_CANDIDATE_SHA!)) throw new Error("RELEASE_PLAN_UNAPPROVED");
   const mode = process.argv[2];
   let result;
   if (mode === "deployment" && process.env.PREFLIGHT_ENVIRONMENT === "production") {
@@ -17,6 +20,19 @@ async function main() {
     migrationFiles(candidate); migrationFiles(baseline);
     try { execFileSync("git", ["merge-base", "--is-ancestor", baseline, candidate]); }
     catch { result = { gate: gate("BLOCKED", "RELEASE_ANCESTRY_UNVERIFIED") }; }
+    if (!result && approvedNoDeltaPreflightPlan(baseline,candidate)) {
+      const schema=(revision:string)=>execFileSync("git",["show",`${revision}:prisma/schema.prisma`],{encoding:"utf8"});
+      const before=migrationFiles(baseline),after=migrationFiles(candidate);
+      const proof=assertNoDeltaManifest(baseline,candidate,before,after,schema(baseline),schema(candidate));
+      if (JSON.stringify(JSON.parse(readFileSync("expected-schema.json","utf8"))) !== JSON.stringify(proof)) throw new Error("MANIFEST_ARTIFACT_MISMATCH");
+      const history=await readProductionMigrations(process.env.PRODUCTION_BACKUP_DATABASE_URL ?? "",after,before);
+      result={...history,repositoryEvidence:proof,
+        schemaGate:gate("PASS","REPOSITORY_SCHEMA_IDENTICAL_LIVE_DDL_NOT_RECHECKED"),
+        expectedDeltaGate:gate("PASS","REPOSITORY_MIGRATION_DELTA_EMPTY"),deltaGate:gate("PASS","NO_SQL_DELTA_TO_EXECUTE"),
+        replayGate:undefined,deltaTest:{status:"NOT_APPLICABLE",code:"NO_SQL_DELTA"},
+        newInstallReplay:{status:"NOT_RUN",code:"HISTORICAL_BOOTSTRAP_LIMITATION_UNCHANGED"},
+        gate:history.gate.status!=="PASS"?history.gate:gate(hasCompleteNoDeltaHistory(history,after)?"PASS":"FAIL","COMPLETE_NO_DELTA_HISTORY_CHECK")};
+    }
     result ??= await readProductionMigrations(process.env.PRODUCTION_BACKUP_DATABASE_URL ?? "", migrationFiles(candidate), migrationFiles(baseline), {candidate:initRepositoryEvidence(candidate),baseline:initRepositoryEvidence(baseline),inventory:inventoryFromGit(baseline),expectedSchema:JSON.parse(readFileSync("expected-schema.json","utf8"))});
   } else throw new Error("CONTEXT_INVALID");
   writeFileSync(`preflight-${mode}.json`, JSON.stringify({ candidateSha: process.env.RELEASE_CANDIDATE_SHA, baselineSha: process.env.EXPECTED_PRODUCTION_SHA,
