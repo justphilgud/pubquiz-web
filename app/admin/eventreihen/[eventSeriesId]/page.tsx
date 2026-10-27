@@ -59,7 +59,7 @@ export default async function EventSeriesDetailPage({
           <div className="sm:col-span-2"><h2 className="font-semibold">Beschreibung</h2><p className="mt-1 whitespace-pre-wrap break-words text-slate-600">{series.description ?? "–"}</p></div>
           <div className="sm:col-span-2"><h2 className="font-semibold">Interne Bemerkung</h2><p className="mt-1 whitespace-pre-wrap break-words text-slate-600">{series.internalNote ?? "–"}</p></div>
         </section>
-        <EventTypeProducts eventSeriesId={series.id} initialEnabled={series.enabledEventTypes} canEdit={series.canManageProducts} />
+        <Link className="inline-flex min-h-11 items-center underline" href={`/admin/eventreihen/${series.id}/design`}>Gemeinsames Design und Vorschau</Link><EventTypeProducts eventSeriesId={series.id} initialEnabled={series.enabledEventTypes} canEdit={series.canManageProducts} />
         <EventSeriesLogoEditor id={series.id} initialUrl={series.logoUrl} canEdit={series.canEdit && !series.isArchived} environmentPrefix={getMediaUploadEnvironmentPrefix()} />
         {series.isPublic && !series.isArchived && (
           <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">

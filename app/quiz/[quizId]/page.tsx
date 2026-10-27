@@ -114,7 +114,7 @@ export default async function QuizDetailPage({
   }
 
   return (
-    <><AppHeader /><main className="min-h-screen bg-slate-100 px-4 py-8 text-slate-900 md:px-8">
+    <><AppHeader /><Link className="mx-4 inline-flex min-h-11 items-center underline" href={`/quiz/${quizId}/design`}>Gemeinsames Design und Vorschau</Link><main className="min-h-screen bg-slate-100 px-4 py-8 text-slate-900 md:px-8">
       <div className="mx-auto max-w-7xl">
         <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div>

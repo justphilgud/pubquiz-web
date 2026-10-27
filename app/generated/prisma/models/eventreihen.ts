@@ -48,6 +48,7 @@ export type EventreihenMinAggregateOutputType = {
   archiviert_am: Date | null
   created_at: Date | null
   updated_at: Date | null
+  shared_design_template_id: string | null
   default_presentation_template_id: string | null
   default_answer_form_template_id: string | null
 }
@@ -66,6 +67,7 @@ export type EventreihenMaxAggregateOutputType = {
   archiviert_am: Date | null
   created_at: Date | null
   updated_at: Date | null
+  shared_design_template_id: string | null
   default_presentation_template_id: string | null
   default_answer_form_template_id: string | null
 }
@@ -84,6 +86,7 @@ export type EventreihenCountAggregateOutputType = {
   archiviert_am: number
   created_at: number
   updated_at: number
+  shared_design_template_id: number
   default_presentation_template_id: number
   default_answer_form_template_id: number
   _all: number
@@ -112,6 +115,7 @@ export type EventreihenMinAggregateInputType = {
   archiviert_am?: true
   created_at?: true
   updated_at?: true
+  shared_design_template_id?: true
   default_presentation_template_id?: true
   default_answer_form_template_id?: true
 }
@@ -130,6 +134,7 @@ export type EventreihenMaxAggregateInputType = {
   archiviert_am?: true
   created_at?: true
   updated_at?: true
+  shared_design_template_id?: true
   default_presentation_template_id?: true
   default_answer_form_template_id?: true
 }
@@ -148,6 +153,7 @@ export type EventreihenCountAggregateInputType = {
   archiviert_am?: true
   created_at?: true
   updated_at?: true
+  shared_design_template_id?: true
   default_presentation_template_id?: true
   default_answer_form_template_id?: true
   _all?: true
@@ -253,6 +259,7 @@ export type EventreihenGroupByOutputType = {
   archiviert_am: Date | null
   created_at: Date
   updated_at: Date
+  shared_design_template_id: string | null
   default_presentation_template_id: string
   default_answer_form_template_id: string
   _count: EventreihenCountAggregateOutputType | null
@@ -294,6 +301,7 @@ export type eventreihenWhereInput = {
   archiviert_am?: Prisma.DateTimeNullableFilter<"eventreihen"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"eventreihen"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"eventreihen"> | Date | string
+  shared_design_template_id?: Prisma.StringNullableFilter<"eventreihen"> | string | null
   default_presentation_template_id?: Prisma.StringFilter<"eventreihen"> | string
   default_answer_form_template_id?: Prisma.StringFilter<"eventreihen"> | string
   game_drafts?: Prisma.Game_draftsListRelationFilter
@@ -323,6 +331,7 @@ export type eventreihenOrderByWithRelationInput = {
   archiviert_am?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  shared_design_template_id?: Prisma.SortOrderInput | Prisma.SortOrder
   default_presentation_template_id?: Prisma.SortOrder
   default_answer_form_template_id?: Prisma.SortOrder
   game_drafts?: Prisma.game_draftsOrderByRelationAggregateInput
@@ -355,6 +364,7 @@ export type eventreihenWhereUniqueInput = Prisma.AtLeast<{
   archiviert_am?: Prisma.DateTimeNullableFilter<"eventreihen"> | Date | string | null
   created_at?: Prisma.DateTimeFilter<"eventreihen"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"eventreihen"> | Date | string
+  shared_design_template_id?: Prisma.StringNullableFilter<"eventreihen"> | string | null
   default_presentation_template_id?: Prisma.StringFilter<"eventreihen"> | string
   default_answer_form_template_id?: Prisma.StringFilter<"eventreihen"> | string
   game_drafts?: Prisma.Game_draftsListRelationFilter
@@ -384,6 +394,7 @@ export type eventreihenOrderByWithAggregationInput = {
   archiviert_am?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  shared_design_template_id?: Prisma.SortOrderInput | Prisma.SortOrder
   default_presentation_template_id?: Prisma.SortOrder
   default_answer_form_template_id?: Prisma.SortOrder
   _count?: Prisma.eventreihenCountOrderByAggregateInput
@@ -410,6 +421,7 @@ export type eventreihenScalarWhereWithAggregatesInput = {
   archiviert_am?: Prisma.DateTimeNullableWithAggregatesFilter<"eventreihen"> | Date | string | null
   created_at?: Prisma.DateTimeWithAggregatesFilter<"eventreihen"> | Date | string
   updated_at?: Prisma.DateTimeWithAggregatesFilter<"eventreihen"> | Date | string
+  shared_design_template_id?: Prisma.StringNullableWithAggregatesFilter<"eventreihen"> | string | null
   default_presentation_template_id?: Prisma.StringWithAggregatesFilter<"eventreihen"> | string
   default_answer_form_template_id?: Prisma.StringWithAggregatesFilter<"eventreihen"> | string
 }
@@ -427,6 +439,7 @@ export type eventreihenCreateInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
@@ -456,6 +469,7 @@ export type eventreihenUncheckedCreateInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
@@ -484,6 +498,7 @@ export type eventreihenUpdateInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
@@ -513,6 +528,7 @@ export type eventreihenUncheckedUpdateInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -542,6 +558,7 @@ export type eventreihenCreateManyInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
 }
@@ -559,6 +576,7 @@ export type eventreihenUpdateManyMutationInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -577,6 +595,7 @@ export type eventreihenUncheckedUpdateManyInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
 }
@@ -600,6 +619,7 @@ export type eventreihenCountOrderByAggregateInput = {
   archiviert_am?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  shared_design_template_id?: Prisma.SortOrder
   default_presentation_template_id?: Prisma.SortOrder
   default_answer_form_template_id?: Prisma.SortOrder
 }
@@ -622,6 +642,7 @@ export type eventreihenMaxOrderByAggregateInput = {
   archiviert_am?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  shared_design_template_id?: Prisma.SortOrder
   default_presentation_template_id?: Prisma.SortOrder
   default_answer_form_template_id?: Prisma.SortOrder
 }
@@ -640,6 +661,7 @@ export type eventreihenMinOrderByAggregateInput = {
   archiviert_am?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  shared_design_template_id?: Prisma.SortOrder
   default_presentation_template_id?: Prisma.SortOrder
   default_answer_form_template_id?: Prisma.SortOrder
 }
@@ -826,6 +848,7 @@ export type eventreihenCreateWithoutQuizInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
@@ -854,6 +877,7 @@ export type eventreihenUncheckedCreateWithoutQuizInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
@@ -897,6 +921,7 @@ export type eventreihenUpdateWithoutQuizInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
@@ -925,6 +950,7 @@ export type eventreihenUncheckedUpdateWithoutQuizInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -952,6 +978,7 @@ export type eventreihenCreateWithoutStory_elementeInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
@@ -980,6 +1007,7 @@ export type eventreihenUncheckedCreateWithoutStory_elementeInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
@@ -1023,6 +1051,7 @@ export type eventreihenUpdateWithoutStory_elementeInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
@@ -1051,6 +1080,7 @@ export type eventreihenUncheckedUpdateWithoutStory_elementeInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -1078,6 +1108,7 @@ export type eventreihenCreateWithoutLive_pollsInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
@@ -1106,6 +1137,7 @@ export type eventreihenUncheckedCreateWithoutLive_pollsInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
@@ -1149,6 +1181,7 @@ export type eventreihenUpdateWithoutLive_pollsInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
@@ -1177,6 +1210,7 @@ export type eventreihenUncheckedUpdateWithoutLive_pollsInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -1204,6 +1238,7 @@ export type eventreihenCreateWithoutRollenzuweisungenInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
@@ -1232,6 +1267,7 @@ export type eventreihenUncheckedCreateWithoutRollenzuweisungenInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
@@ -1275,6 +1311,7 @@ export type eventreihenUpdateWithoutRollenzuweisungenInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
@@ -1303,6 +1340,7 @@ export type eventreihenUncheckedUpdateWithoutRollenzuweisungenInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -1330,6 +1368,7 @@ export type eventreihenCreateWithoutBenutzerrollenInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
@@ -1358,6 +1397,7 @@ export type eventreihenUncheckedCreateWithoutBenutzerrollenInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
@@ -1401,6 +1441,7 @@ export type eventreihenUpdateWithoutBenutzerrollenInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
@@ -1429,6 +1470,7 @@ export type eventreihenUncheckedUpdateWithoutBenutzerrollenInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -1456,6 +1498,7 @@ export type eventreihenCreateWithoutFragenInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
@@ -1484,6 +1527,7 @@ export type eventreihenUncheckedCreateWithoutFragenInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
@@ -1527,6 +1571,7 @@ export type eventreihenUpdateWithoutFragenInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
@@ -1555,6 +1600,7 @@ export type eventreihenUncheckedUpdateWithoutFragenInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -1582,6 +1628,7 @@ export type eventreihenCreateWithoutEventartenInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
@@ -1610,6 +1657,7 @@ export type eventreihenUncheckedCreateWithoutEventartenInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
@@ -1653,6 +1701,7 @@ export type eventreihenUpdateWithoutEventartenInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
@@ -1681,6 +1730,7 @@ export type eventreihenUncheckedUpdateWithoutEventartenInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -1708,6 +1758,7 @@ export type eventreihenCreateWithoutEventartrollenInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
@@ -1736,6 +1787,7 @@ export type eventreihenUncheckedCreateWithoutEventartrollenInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
@@ -1779,6 +1831,7 @@ export type eventreihenUpdateWithoutEventartrollenInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
@@ -1807,6 +1860,7 @@ export type eventreihenUncheckedUpdateWithoutEventartrollenInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -1834,6 +1888,7 @@ export type eventreihenCreateWithoutVerwalterInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
@@ -1862,6 +1917,7 @@ export type eventreihenUncheckedCreateWithoutVerwalterInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
@@ -1905,6 +1961,7 @@ export type eventreihenUpdateWithoutVerwalterInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
@@ -1933,6 +1990,7 @@ export type eventreihenUncheckedUpdateWithoutVerwalterInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -1960,6 +2018,7 @@ export type eventreihenCreateWithoutReihenrollenInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
@@ -1988,6 +2047,7 @@ export type eventreihenUncheckedCreateWithoutReihenrollenInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
@@ -2031,6 +2091,7 @@ export type eventreihenUpdateWithoutReihenrollenInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
@@ -2059,6 +2120,7 @@ export type eventreihenUncheckedUpdateWithoutReihenrollenInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -2086,6 +2148,7 @@ export type eventreihenCreateWithoutGame_draftsInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   reihenrollen?: Prisma.benutzer_reihenrollenCreateNestedManyWithoutEventreiheInput
@@ -2114,6 +2177,7 @@ export type eventreihenUncheckedCreateWithoutGame_draftsInput = {
   archiviert_am?: Date | string | null
   created_at?: Date | string
   updated_at?: Date | string
+  shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedCreateNestedManyWithoutEventreiheInput
@@ -2157,6 +2221,7 @@ export type eventreihenUpdateWithoutGame_draftsInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   reihenrollen?: Prisma.benutzer_reihenrollenUpdateManyWithoutEventreiheNestedInput
@@ -2185,6 +2250,7 @@ export type eventreihenUncheckedUpdateWithoutGame_draftsInput = {
   archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -2334,6 +2400,7 @@ export type eventreihenSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   archiviert_am?: boolean
   created_at?: boolean
   updated_at?: boolean
+  shared_design_template_id?: boolean
   default_presentation_template_id?: boolean
   default_answer_form_template_id?: boolean
   game_drafts?: boolean | Prisma.eventreihen$game_draftsArgs<ExtArgs>
@@ -2364,6 +2431,7 @@ export type eventreihenSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   archiviert_am?: boolean
   created_at?: boolean
   updated_at?: boolean
+  shared_design_template_id?: boolean
   default_presentation_template_id?: boolean
   default_answer_form_template_id?: boolean
 }, ExtArgs["result"]["eventreihen"]>
@@ -2382,6 +2450,7 @@ export type eventreihenSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   archiviert_am?: boolean
   created_at?: boolean
   updated_at?: boolean
+  shared_design_template_id?: boolean
   default_presentation_template_id?: boolean
   default_answer_form_template_id?: boolean
 }, ExtArgs["result"]["eventreihen"]>
@@ -2400,11 +2469,12 @@ export type eventreihenSelectScalar = {
   archiviert_am?: boolean
   created_at?: boolean
   updated_at?: boolean
+  shared_design_template_id?: boolean
   default_presentation_template_id?: boolean
   default_answer_form_template_id?: boolean
 }
 
-export type eventreihenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"reservierungs_url" | "logo_url" | "eventreihe_id" | "name" | "slug" | "oeffentlicher_name" | "beschreibung" | "interne_bemerkung" | "ist_oeffentlich" | "ist_archiviert" | "archiviert_am" | "created_at" | "updated_at" | "default_presentation_template_id" | "default_answer_form_template_id", ExtArgs["result"]["eventreihen"]>
+export type eventreihenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"reservierungs_url" | "logo_url" | "eventreihe_id" | "name" | "slug" | "oeffentlicher_name" | "beschreibung" | "interne_bemerkung" | "ist_oeffentlich" | "ist_archiviert" | "archiviert_am" | "created_at" | "updated_at" | "shared_design_template_id" | "default_presentation_template_id" | "default_answer_form_template_id", ExtArgs["result"]["eventreihen"]>
 export type eventreihenInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   game_drafts?: boolean | Prisma.eventreihen$game_draftsArgs<ExtArgs>
   reihenrollen?: boolean | Prisma.eventreihen$reihenrollenArgs<ExtArgs>
@@ -2451,6 +2521,7 @@ export type $eventreihenPayload<ExtArgs extends runtime.Types.Extensions.Interna
     archiviert_am: Date | null
     created_at: Date
     updated_at: Date
+    shared_design_template_id: string | null
     default_presentation_template_id: string
     default_answer_form_template_id: string
   }, ExtArgs["result"]["eventreihen"]>
@@ -2900,6 +2971,7 @@ export interface eventreihenFieldRefs {
   readonly archiviert_am: Prisma.FieldRef<"eventreihen", 'DateTime'>
   readonly created_at: Prisma.FieldRef<"eventreihen", 'DateTime'>
   readonly updated_at: Prisma.FieldRef<"eventreihen", 'DateTime'>
+  readonly shared_design_template_id: Prisma.FieldRef<"eventreihen", 'String'>
   readonly default_presentation_template_id: Prisma.FieldRef<"eventreihen", 'String'>
   readonly default_answer_form_template_id: Prisma.FieldRef<"eventreihen", 'String'>
 }

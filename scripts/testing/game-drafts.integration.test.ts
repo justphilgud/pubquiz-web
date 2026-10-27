@@ -48,10 +48,12 @@ test("additive draft migration and real repository authorization on isolated Pos
     INSERT INTO pubquiz.eventreihe_verwaltung(benutzer_id,eventreihe_id)VALUES(6,10);
     INSERT INTO pubquiz.quiz(quiz_id,eventreihe_id,titel,quiz_datum,intro_begruessungstext)VALUES(11,10,'Existing synthetic quiz','2026-10-26','Preserve me');
   `);
+  await db.query("ALTER TABLE pubquiz.quiz ADD COLUMN shared_design_template_id VARCHAR(64), ADD COLUMN shared_design_snapshot JSONB; ALTER TABLE pubquiz.eventreihen ADD COLUMN shared_design_template_id VARCHAR(64)");
   const before = (await db.query("SELECT to_jsonb(q) data FROM pubquiz.quiz q WHERE quiz_id=11")).rows[0].data;
   const rolesBefore = (await db.query("SELECT * FROM pubquiz.benutzer_reihenrollen ORDER BY benutzer_id")).rows;
   await db.query(migration);
   await db.query(readFileSync('prisma/migrations/20261026180000_game_team_assignments/migration.sql','utf8'));
+  await db.query("ALTER TABLE pubquiz.game_drafts ADD COLUMN shared_design_template_id VARCHAR(64)");
   assert.deepEqual((await db.query("SELECT to_jsonb(q) data FROM pubquiz.quiz q WHERE quiz_id=11")).rows[0].data,before);
   assert.deepEqual((await db.query("SELECT * FROM pubquiz.benutzer_reihenrollen ORDER BY benutzer_id")).rows,rolesBefore);
   const prisma = new PrismaClient({adapter:new PrismaPg({connectionString:target.toString()})});
@@ -81,7 +83,7 @@ test("additive draft migration and real repository authorization on isolated Pos
   assert.equal(bingo.status,"DRAFT");
   const columns = (await db.query(COLUMN_SQL)).rows[0].coalesce as Column[];
   auditColumns(columns);
-  assert.equal(columns.filter(c=>c.schema==="pubquiz"&&c.table==="game_drafts").length,9,"backup column inventory must include every new column");
+  assert.equal(columns.filter(c=>c.schema==="pubquiz"&&c.table==="game_drafts").length,10,"backup column inventory must include every new column");
   const catalog = (await db.query(CATALOG_SQL)).rows[0].json_build_object as {constraints:{table:string}[]};
   assert.equal(catalog.constraints.filter(c=>c.table==="game_drafts").length,6,"backup catalog must cover new constraints");
   const storedRow=(await db.query("SELECT to_jsonb(g) data FROM pubquiz.game_drafts g WHERE id=$1",[bingo.id])).rows[0].data;

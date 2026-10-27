@@ -68,6 +68,8 @@ test("real PostgreSQL migration, current Actions, product lifecycle and legacy g
     SELECT setval(pg_get_serial_sequence('pubquiz.fragen','fragen_id'),200);
     SELECT setval(pg_get_serial_sequence('pubquiz.quiz_abschnitte','quiz_abschnitt_id'),100);
   `);
+  // Current runtime reads the additive AP1/AP2/AP3 schema; preserve all existing assertions.
+  for(const name of ['20261026160000_standalone_game_drafts','20261026180000_game_team_assignments','20261026210000_shared_game_design'])await db.query(readFileSync('prisma/migrations/'+name+'/migration.sql','utf8'));
   const before = (await db.query("SELECT jsonb_agg(to_jsonb(q) ORDER BY quiz_id) AS data FROM pubquiz.quiz q")).rows[0].data;
   const oldRoles = (await db.query("SELECT * FROM pubquiz.benutzer_rollenzuweisungen ORDER BY rollenzuweisung_id")).rows;
   console.info("Event type DB stage: migration");

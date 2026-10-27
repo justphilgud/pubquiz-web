@@ -34,14 +34,12 @@ test("new quizzes persist the blockwise solution strategy by default", () => {
   assert.match(quizForm, /solutionStrategy: DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY/);
 });
 
-test("presentation selection is the only template choice in event series and quiz forms", () => {
+test("legacy forms keep one choice; AP3 explicitly separates presentation and answer form", () => {
   assert.doesNotMatch(eventSeriesManager, /defaultAnswerFormTemplateId/);
   assert.doesNotMatch(quizForm, /answerFormTemplateId/);
-  assert.doesNotMatch(quizTemplateResolver, /answer_form_template_id/);
-  assert.match(
-    quizTemplateResolver,
-    /resolveAnswerFormTemplate\(\{[\s\S]*quizTemplateId: quiz\.presentation_template_id,[\s\S]*eventSeriesTemplateId: quiz\.eventreihe\.default_presentation_template_id/,
-  );
+  assert.match(quizTemplateResolver,/quiz.shared_design_template_id \? quiz.answer_form_template_id : quiz.presentation_template_id/);
+  assert.match(quizTemplateResolver,/quiz.shared_design_template_id \? quiz.eventreihe.default_answer_form_template_id : quiz.eventreihe.default_presentation_template_id/);
+  assert.match(read('app/rendering/sharedDesign/SharedDesignSelection.tsx'),/Antwortformularvorlage \(getrennt\)/);
 });
 
 test("quiz overview and editor expose compact, distinct settings and content actions", () => {

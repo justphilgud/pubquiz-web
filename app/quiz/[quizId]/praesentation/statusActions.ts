@@ -1,4 +1,5 @@
 "use server";
+import { freezeQuizDesign } from "@/app/rendering/sharedDesign/sharedDesignRepository.server";
 import { assertMemeArchiveResetSafe } from "../../memeArchive/archive.server";
 
 import { presentationCountdownDeadline } from "../../blockCountdown";
@@ -414,6 +415,7 @@ export async function starteQuiz(quizId: number, expectedRevision: number) {
     const status = await requireQuizNotStopped(tx, quizId);
     assertLifecycleRevision(status.lifecycle_revision, expectedRevision);
     if (resolveQuizLifecycle(status) === "RUNNING") return status;
+    await freezeQuizDesign(tx,quizId);
     return tx.quiz_praesentation_status.update({
       where: { quiz_id: quizId },
       data: { quiz_started_at: new Date() },
@@ -459,7 +461,7 @@ export async function resetQuizDurchlauf(quizId: number, expectedRevision: numbe
     await tx.quiz_interaction_runs.deleteMany({ where: { quiz_id: quizId } });
     await tx.quiz_block_freigaben.deleteMany({ where: { quiz_id: quizId } });
     await tx.quiz_teams.deleteMany({ where: { quiz_id: quizId } });
-    await tx.quiz.update({ where: { quiz_id: quizId }, data: { team_anzahl: 0, teilnehmer_anzahl: 0, manuelle_bewertungen: 0 } });
+    await tx.quiz.update({ where: { quiz_id: quizId }, data: { team_anzahl: 0, teilnehmer_anzahl: 0, manuelle_bewertungen: 0, shared_design_snapshot: Prisma.DbNull } });
     return tx.quiz_praesentation_status.update({
       where: { quiz_id: quizId },
       data: { ...RESET_PRESENTATION_DATA, slide_started_at: new Date(), audio_aktion_id: { increment: 1 }, lifecycle_revision: { increment: 1 } },
