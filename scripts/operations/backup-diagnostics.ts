@@ -12,17 +12,19 @@ export const backupFailureCodes = {
 } as const;
 export type BackupPhase = keyof typeof backupFailureCodes;
 export class BackupDiagnosticError extends OperationsError {
-  constructor(readonly phase: BackupPhase) { super(backupFailureCodes[phase]); }
+  constructor(readonly phase: BackupPhase, readonly reason?: "SCHEMA_SECURITY_REVIEW_REQUIRED") { super(backupFailureCodes[phase]); }
 }
 export function backupPhaseError(error: unknown, phase: BackupPhase): BackupDiagnosticError {
   if (!Object.hasOwn(backupFailureCodes, phase)) throw new OperationsError("BACKUP_DIAGNOSTIC_PHASE_INVALID");
   // Preserve the precise nested readback/integrity phase; never retain raw errors/causes.
-  return error instanceof BackupDiagnosticError ? error : new BackupDiagnosticError(phase);
+  return error instanceof BackupDiagnosticError ? error : new BackupDiagnosticError(phase,
+    phase === "SOURCE_CAPTURE" && error instanceof OperationsError && error.code === "SCHEMA_SECURITY_REVIEW_REQUIRED"
+      ? "SCHEMA_SECURITY_REVIEW_REQUIRED" : undefined);
 }
 export async function backupPhase<T>(phase: BackupPhase, operation: () => Promise<T>): Promise<T> {
   try { return await operation(); } catch (error) { throw backupPhaseError(error, phase); }
 }
 export function backupFailureEvidence(error: unknown) {
   const classified = backupPhaseError(error, "PREPARATION");
-  return { version: 1, status: "FAIL", phase: classified.phase, code: classified.code } as const;
+  return { version: 1, status: "FAIL", phase: classified.phase, code: classified.code, ...(classified.reason ? {reason: classified.reason} : {}) } as const;
 }

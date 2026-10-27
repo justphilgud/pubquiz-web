@@ -1,9 +1,11 @@
 import { createHash } from "node:crypto";
 import reference from "./schema-reference/meme-archive-routines.json";
+import roleGuards from "./schema-reference/role-guard-routines.json";
 import { inspectValue } from "./acceptance-policy";
 import { requireCondition } from "./guards";
 
 export const MEME_ARCHIVE_EXECUTABLE_SQL = `SELECT json_build_object(
+ 'roleTables',(SELECT coalesce(json_agg(c.relname ORDER BY c.relname),'[]') FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='pubquiz' AND c.relkind='r' AND c.relname IN ('eventarten','eventreihe_eventarten','benutzer_eventartrollen','eventreihe_verwaltung','benutzer_reihenrollen')),
  'tables',(SELECT coalesce(json_agg(c.relname ORDER BY c.relname),'[]') FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='pubquiz' AND c.relkind='r' AND c.relname IN ('meme_archive_sources','meme_archive_entries')),
  'routines',(SELECT coalesce(json_agg(x ORDER BY schema,name),'[]') FROM (SELECT n.nspname AS schema,p.proname AS name,
  ARRAY(SELECT format_type(t,NULL) FROM unnest(p.proargtypes) t) AS "argumentTypes",p.proargnames AS "argumentNames",
@@ -25,14 +27,18 @@ const trigger = {schema: "pubquiz", name: "capture_confirmed_meme", table: "team
   functionName: "capture_confirmed_meme", type: 5, enabled: "O", deferrable: false, deferred: false, constraint: false, columns: "", arguments: "", condition: null};
 const stable = (value: unknown): string => JSON.stringify(value, (_key, item) => item && typeof item === "object" && !Array.isArray(item)
   ? Object.fromEntries(Object.entries(item).sort(([a], [b]) => a.localeCompare(b, "en"))) : item);
-export type ArchiveSchemaProof = {version: 1; migrationSha256: string; executableSha256: string};
+export type ArchiveSchemaProof = {version: 1; migrationSha256: string; executableSha256: string; roleGuardMigrations?: {name:string;sha256:string}[]};
 
 /** Exact approved bodies/signatures/security attributes, never a name-only exception. */
 export function reviewMemeArchiveExecutables(value: unknown): ArchiveSchemaProof | undefined {
   requireCondition(Boolean(value) && typeof value === "object" && !Array.isArray(value), "SCHEMA_SECURITY_REVIEW_REQUIRED");
   const data = value as Record<string, unknown>;
   requireCondition(Array.isArray(data.tables) && Array.isArray(data.routines) && Array.isArray(data.triggers), "SCHEMA_SECURITY_REVIEW_REQUIRED");
-  if (!data.tables.length && !data.routines.length && !data.triggers.length) return undefined;
+  const roleTables = data.roleTables ?? [];
+  requireCondition(Array.isArray(roleTables), "SCHEMA_SECURITY_REVIEW_REQUIRED");
+  const hasRoleGuards = roleTables.length > 0;
+  if (hasRoleGuards) requireCondition(stable(roleTables) === stable(roleGuards.tables), "SCHEMA_SECURITY_REVIEW_REQUIRED");
+  if (!data.tables.length && !data.routines.length && !data.triggers.length && !hasRoleGuards) return undefined;
   requireCondition(stable(data.tables) === stable(["meme_archive_entries", "meme_archive_sources"]), "SCHEMA_SECURITY_REVIEW_REQUIRED");
   const routines = data.routines.map((item: unknown): Record<string, unknown> => {
     requireCondition(Boolean(item) && typeof item === "object" && !Array.isArray(item), "SCHEMA_SECURITY_REVIEW_REQUIRED");
@@ -40,10 +46,14 @@ export function reviewMemeArchiveExecutables(value: unknown): ArchiveSchemaProof
     requireCondition(typeof source === "string", "SCHEMA_SECURITY_REVIEW_REQUIRED");
     return {...attributes, sourceSha256: createHash("sha256").update(source.replaceAll("\r\n", "\n")).digest("hex")};
   }).sort((a, b) => String(a.name).localeCompare(String(b.name), "en"));
-  requireCondition(stable(routines) === stable([...reference.routines].sort((a, b) => a.name.localeCompare(b.name, "en"))) &&
-    stable(data.triggers) === stable([trigger]), "SCHEMA_SECURITY_REVIEW_REQUIRED");
+  const expectedRoutines = [...reference.routines, ...(hasRoleGuards ? roleGuards.routines : [])];
+  const expectedTriggers = [trigger, ...(hasRoleGuards ? roleGuards.triggers : [])];
+  const byName = (a: {name: unknown}, b: {name: unknown}) => String(a.name).localeCompare(String(b.name), "en");
+  requireCondition(stable(routines) === stable(expectedRoutines.sort(byName)) &&
+    stable(data.triggers.slice().sort(byName)) === stable(expectedTriggers.sort(byName)), "SCHEMA_SECURITY_REVIEW_REQUIRED");
   return {version: 1, migrationSha256: reference.migrationSha256,
-    executableSha256: createHash("sha256").update(stable({routines, triggers: data.triggers})).digest("hex")};
+    executableSha256: createHash("sha256").update(stable({routines, triggers: data.triggers})).digest("hex"),
+    ...(hasRoleGuards ? {roleGuardMigrations: roleGuards.migrations} : {})};
 }
 
 function bytea(value: unknown, maximum: number, exact?: number) {

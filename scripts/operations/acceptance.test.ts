@@ -380,3 +380,12 @@ test("real backup CLI fails closed and creates only safe new evidence", async ()
     assert.match(repeated.stderr,/BACKUP_DIAGNOSTIC_WRITE_FAILED/);
   } finally { await rm(directory,{recursive:true,force:true}); }
 });
+
+test("snapshot schema rejection retains only its exact constant diagnostic reason", () => {
+  const evidence = backupFailureEvidence(backupPhaseError(new OperationsError("SCHEMA_SECURITY_REVIEW_REQUIRED"), "SOURCE_CAPTURE"));
+  assert.deepEqual(evidence, {version:1,status:"FAIL",phase:"SOURCE_CAPTURE",code:"DB_SNAPSHOT_FAILED",reason:"SCHEMA_SECURITY_REVIEW_REQUIRED"});
+  for (const error of [new OperationsError("SCHEMA_SECURITY_REVIEW_REQUIRED_SYNTHETIC_SECRET"), new Error("SCHEMA_SECURITY_REVIEW_REQUIRED SYNTHETIC_SECRET"), {code:"SCHEMA_SECURITY_REVIEW_REQUIRED",message:"SYNTHETIC_SECRET"}]) {
+    const result = backupFailureEvidence(backupPhaseError(error, "SOURCE_CAPTURE"));
+    assert.equal("reason" in result, false); assert.doesNotMatch(JSON.stringify(result), /SYNTHETIC_SECRET/);
+  }
+});

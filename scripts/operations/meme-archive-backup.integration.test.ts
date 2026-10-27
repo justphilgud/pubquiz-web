@@ -13,6 +13,7 @@ import {restoreSql} from "./acceptance-restore";
 import {captureMedia, verifyMediaFiles} from "./private-artifacts";
 import {RESTORE_TARGET} from "./acceptance-policy";
 import {temporaryDatabaseMarker} from "./temporary-restore-target";
+import roleGuards from "./schema-reference/role-guard-routines.json";
 import {ARCHIVE_CAPTURE_FIXTURE_SQL} from "./production-preflight-archive-delta";
 
 test("real PostgreSQL17: archive dump/guarded restore retains encrypted PNG, keys, source bytes and exact routines", {skip: !process.env.RESTORE_CI_DATABASE_URL}, async () => {
@@ -48,7 +49,15 @@ test("real PostgreSQL17: archive dump/guarded restore retains encrypted PNG, key
     await source.query(ddl.slice(ddl.indexOf("-- CreateSchema")));
     const migration = (await readFile("scripts/operations/schema-reference/meme-archive-migration.sql", "utf8")).replaceAll("\r\n", "\n");
     assert.equal(sha256(migration), "99a4b9d18e55d2294383a31cf35fb30973e6a30f9750c3c5da752f102818f641");
-    await source.query(migration); await source.query(ARCHIVE_CAPTURE_FIXTURE_SQL);
+    await source.query(migration);
+    // Prisma schema baselines omit routines/triggers: install the actual immutable PR130 guards.
+    for (const reviewed of roleGuards.migrations) {
+      const text = (await readFile(`prisma/migrations/${reviewed.name}/migration.sql`, "utf8")).replaceAll("\r\n", "\n");
+      assert.equal(sha256(text), reviewed.sha256);
+      for (const match of text.matchAll(/CREATE FUNCTION pubquiz\.[\s\S]*?\$\$;/g)) await source.query(match[0]);
+      for (const match of text.matchAll(/CREATE TRIGGER[\s\S]*?EXECUTE FUNCTION[^;]+;/g)) await source.query(match[0]);
+    }
+    await source.query(ARCHIVE_CAPTURE_FIXTURE_SQL);
     const png = await sharp({create: {width: 3, height: 2, channels: 4, background: "#ff8800"}}).png().toBuffer();
     const key = randomBytes(32), nonce = randomBytes(12), cipher = createCipheriv("aes-256-gcm", key, nonce);
     const encrypted = Buffer.concat([cipher.update(png), cipher.final()]);
@@ -58,7 +67,7 @@ test("real PostgreSQL17: archive dump/guarded restore retains encrypted PNG, key
     await source.query("UPDATE pubquiz.meme_archive_sources SET image_url='https://bix6h2j23vjzi240.public.blob.vercel-storage.com/deleted-original.png',image_bytes=$1", [png]);
     await source.query("UPDATE pubquiz.meme_archive_entries SET status='READY',blob_url=$1,encryption_key=$2,png_sha256=$3,png_size=$4", [blob, key, sha256(png), png.length]);
     const expected = await snapshot(source);
-    assert.ok(expected.archiveSchema); assert.deepEqual(expected.media, [blob]);
+    assert.ok(expected.archiveSchema); assert.deepEqual(expected.archiveSchema.roleGuardMigrations, roleGuards.migrations); assert.deepEqual(expected.media, [blob]);
     const records = await captureMedia(expected.media, directory, (async (url, options) => {
       assert.equal(url, blob); assert.equal(options?.redirect, "error"); return new Response(new Uint8Array(bytes));
     }) as typeof fetch);
@@ -71,6 +80,7 @@ test("real PostgreSQL17: archive dump/guarded restore retains encrypted PNG, key
     assert.equal((await target.query("SELECT to_regclass('pubquiz.meme_archive_entries') AS relation")).rows[0].relation, null);
     pgTool("psql", ["-X", "-q", "-v", "ON_ERROR_STOP=1", "--single-transaction", "--file=-"], environment(targetName, "neondb_owner"), sql);
     compareSnapshots(expected, await snapshot(target));
+    await assert.rejects(target.query("INSERT INTO pubquiz.benutzer_eventartrollen DEFAULT VALUES"), {code:"42501"}, "restored role guard remains active");
     assert.equal((await target.query("SELECT count(*) FROM pubquiz.meme_archive_entries")).rows[0].count, "1", "post-data trigger does not backfill during restore");
     const restored = (await target.query("SELECT encryption_key,png_sha256 FROM pubquiz.meme_archive_entries")).rows[0] as {encryption_key: Buffer; png_sha256: string};
     const restoredBytes = await readFile(join(directory, records[0].name));
