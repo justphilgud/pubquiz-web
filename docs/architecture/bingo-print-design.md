@@ -133,3 +133,19 @@ Template-/SharedDesign-/Quiz-/Karaoke-Regressionen, `test:bingo-print:browser` u
 `scripts/testing/bingo-print-pdf.verify.py`. Letzteres prüft tatsächlich erzeugte
 PDFs und Rasterpixel (nicht nur Textextraktion), Quadratflächen, Duplexplätze,
 vollständige Logos, Fonts, gespeicherte Zahlen und Zellränder.
+
+## Release backup security gate
+
+The row validator alone is insufficient: before inventory, `collectSnapshot`
+requires the reviewed complete executable catalog. AP2 adds exactly nine functions
+and fifteen triggers, bound to the three unchanged migration hashes in
+`scripts/operations/schema-reference/bingo-ap2-routines.json`. Existing Meme/role
+security attributes and historical acceptance remain enforced. No prefix bypass.
+The actual AP2 PostgreSQL integration now installs the hash-checked historical
+Meme/role executables omitted by its model baseline, then runs complete
+`collectSnapshot`: every populated Bingo table, frozen fonts/logos and print
+versions, row hashes, result reconstruction and repeat integrity comparison.
+Tampered trigger state and SECURITY DEFINER are rejected; restoring exact state
+passes again. Model DDL plus explicit reviewed executables is a representative
+fixture, not a full chronological historical migration replay. This is neither a
+Production weekly-backup result nor a historical PRIVATE_READBACK_FAILED fix.

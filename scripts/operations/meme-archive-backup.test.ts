@@ -3,7 +3,7 @@ import test from "node:test";
 import {createHash} from "node:crypto";
 import {readFileSync} from "node:fs";
 import reference from "./schema-reference/meme-archive-routines.json";
-import {MEME_ARCHIVE_EXECUTABLE_SQL, reviewMemeArchiveExecutables, inspectMemeArchiveRow} from "./meme-archive-backup-policy";
+import {assertBingoMigrationChecksums, MEME_ARCHIVE_EXECUTABLE_SQL, reviewMemeArchiveExecutables, inspectMemeArchiveRow} from "./meme-archive-backup-policy";
 import {collectSnapshot, compareSnapshots, type Snapshot} from "./snapshot";
 import type {PgSession} from "./pg-session";
 
@@ -123,4 +123,54 @@ test("role guard review rejects missing, changed, additional and security-sensit
     (f: ReturnType<typeof roleGuardFixture>) => { f.triggers.at(-1)!.functionName = "capture_confirmed_meme"; },
   ];
   for (const change of changes) {const fixture=roleGuardFixture();change(fixture);assert.throws(()=>reviewMemeArchiveExecutables(fixture), /SCHEMA_SECURITY_REVIEW_REQUIRED/);}
+});
+
+import bingo from "./schema-reference/bingo-ap2-routines.json";
+function bingoFixture() {
+  const source = new Map<string,string>();
+  for (const migration of bingo.migrations) {
+    const sql = readFileSync(new URL(`../../prisma/migrations/${migration.name}/migration.sql`, import.meta.url), "utf8").replaceAll("\r\n","\n");
+    assert.equal(hash(sql),migration.sha256);
+    for (const [,name,body] of sql.matchAll(/CREATE FUNCTION pubquiz\.(\w+)\([^)]*\) RETURNS \w+\s+LANGUAGE plpgsql(?: IMMUTABLE)? AS \$\$([\s\S]*?)\$\$;/g)) source.set(name,body);
+  }
+  assert.equal(source.size,9); assert.equal(bingo.triggers.length,15);
+  for (const r of bingo.routines) assert.equal(hash(source.get(r.name)!),r.sourceSha256);
+  const old = roleGuardFixture();
+  return {...old,bingoTables:[...bingo.tables],routines:[...old.routines,...bingo.routines.map(({sourceSha256:_hash,...r})=>{void _hash;return {...r,source:source.get(r.name)!};})],triggers:[...old.triggers,...structuredClone(bingo.triggers)]};
+}
+test("Bingo exact SQL-bound executable reference preserves historical backup acceptance",()=>{
+  assert.ok(reviewMemeArchiveExecutables(executableFixture()));
+  assert.ok(reviewMemeArchiveExecutables(roleGuardFixture()));
+  const f=bingoFixture(),before=JSON.stringify(f),proof=reviewMemeArchiveExecutables(f)!;
+  assert.deepEqual(proof.bingoMigrations,bingo.migrations);assert.equal(JSON.stringify(f),before);
+  const base:Snapshot={columns:[],catalog:{},tables:[],media:[],authRows:{},resultRows:[]};
+  assert.doesNotThrow(()=>compareSnapshots({...base,archiveSchema:proof},{...base,archiveSchema:proof}));
+  assert.throws(()=>compareSnapshots({...base,archiveSchema:proof},{...base,archiveSchema:reviewMemeArchiveExecutables(roleGuardFixture())}),/RESTORE_ARCHIVESCHEMA_MISMATCH/);
+});
+test("Bingo missing/additional/changed functions, bindings, security and trigger state fail closed",()=>{
+  const changes=[
+    (f:ReturnType<typeof bingoFixture>)=>{f.bingoTables.pop();},
+    (f:ReturnType<typeof bingoFixture>)=>{f.bingoTables.push("unknown");},
+    (f:ReturnType<typeof bingoFixture>)=>{f.routines.pop();},
+    (f:ReturnType<typeof bingoFixture>)=>{f.routines.push({...f.routines.at(-1)!,name:"unknown"});},
+    (f:ReturnType<typeof bingoFixture>)=>{f.routines.at(-1)!.source+=" ";},
+    (f:ReturnType<typeof bingoFixture>)=>{f.routines.at(-1)!.securityDefiner=true;},
+    (f:ReturnType<typeof bingoFixture>)=>{f.routines.at(-1)!.argumentTypes=["text"];},
+    (f:ReturnType<typeof bingoFixture>)=>{f.routines.at(-1)!.configuration=["search_path=public"] as never;},
+    (f:ReturnType<typeof bingoFixture>)=>{f.triggers.pop();},
+    (f:ReturnType<typeof bingoFixture>)=>{f.triggers.push({...f.triggers.at(-1)!,name:"unknown"});},
+    (f:ReturnType<typeof bingoFixture>)=>{f.triggers.at(-1)!.enabled="D";},
+    (f:ReturnType<typeof bingoFixture>)=>{f.triggers.at(-1)!.table="quiz";},
+    (f:ReturnType<typeof bingoFixture>)=>{f.triggers.at(-1)!.functionName="capture_confirmed_meme";},
+    (f:ReturnType<typeof bingoFixture>)=>{f.triggers.find(t=>t.name==="bingo_game_identity")!.columns="eventart";},
+  ];
+  for(const mutate of changes){const f=bingoFixture();mutate(f);assert.throws(()=>reviewMemeArchiveExecutables(f),/SCHEMA_SECURITY_REVIEW_REQUIRED/);}
+});
+
+test("Bingo migration reference rejects wrong/missing/additional/reordered checksums",()=>{
+  assert.doesNotThrow(()=>assertBingoMigrationChecksums(bingo.migrations));
+  for(const invalid of [bingo.migrations.slice(1),[...bingo.migrations,{name:"unknown",sha256:"a".repeat(64)}],
+    [...bingo.migrations].reverse(),bingo.migrations.map((m,i)=>i===0?{...m,sha256:"0".repeat(64)}:m)]){
+    assert.throws(()=>assertBingoMigrationChecksums(invalid),/BINGO_MIGRATION_REFERENCE_MISMATCH/);
+  }
 });

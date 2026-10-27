@@ -11,8 +11,12 @@ import { execFileSync } from "node:child_process";
 import { createRequire } from "node:module";
 import { runInNewContext } from "node:vm";
 import { build } from "esbuild";
+import {collectSnapshot,compareSnapshots} from "../operations/snapshot";
+import type {PgSession} from "../operations/pg-session";
+import roleGuards from "../operations/schema-reference/role-guard-routines.json";
 import { COLUMN_SQL, CATALOG_SQL } from "../operations/snapshot";
 import { auditColumns, inspectRow, type Column } from "../operations/acceptance-policy";
+import {sha256} from "../operations/snapshot";
 import { designHash } from "@/app/bingo/preparation/printSnapshot";
 
 const base = process.env.BINGO_PREPARATION_TEST_DATABASE_URL;
@@ -210,5 +214,31 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   oldSource.print_snapshot.designHash = designHash(oldSource.print_snapshot.design);
   assert.throws(() => inspectRow(oldSource, new Set(), "pubquiz", "bingo_card_series"), "source ownership rules still apply");
   assert.deepEqual((await db.query("SELECT to_jsonb(q) data FROM pubquiz.quiz q WHERE quiz_id=11")).rows[0].data, before);
+  // Model baseline omits executable objects. Install only the reviewed historical
+  // bodies/triggers, never treat the incomplete model baseline as a full replay.
+  for (const file of ["scripts/operations/schema-reference/meme-archive-migration.sql", ...roleGuards.migrations.map(m=>`prisma/migrations/${m.name}/migration.sql`)]) {
+    const text=readFileSync(file,"utf8").replaceAll("\r\n","\n");
+    const expected=file.includes("meme-archive-migration")?"99a4b9d18e55d2294383a31cf35fb30973e6a30f9750c3c5da752f102818f641":roleGuards.migrations.find(m=>file.includes(m.name))!.sha256;
+    assert.equal(sha256(text),expected);
+    for(const match of text.matchAll(/CREATE FUNCTION pubquiz\.[\s\S]*?\$\$;/g))await db.query(match[0]);
+    for(const match of text.matchAll(/CREATE TRIGGER[\s\S]*?EXECUTE FUNCTION[^;]+;/g))await db.query(match[0]);
+  }
+  const snapshot=async()=>{
+    await db.query("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY; SET LOCAL search_path=pg_catalog");
+    try{return await collectSnapshot({json:async(sql:string)=>Object.values((await db.query(sql)).rows[0])[0]} as unknown as PgSession);}finally{await db.query("ROLLBACK");}
+  };
+  const full=await snapshot();compareSnapshots(full,await snapshot());
+  assert.equal(full.archiveSchema?.bingoMigrations?.length,3);
+  for(const table of ["bingo_preparations","bingo_rounds","bingo_card_series","bingo_cards","bingo_round_series","bingo_issuance_changes","bingo_print_versions","bingo_series_labels"]){
+    const item=full.tables.find(t=>t.schema==="pubquiz"&&t.table===table);assert.ok(item);assert.ok(item.rows>0,table);assert.match(item.sha256,/^[a-f0-9]{64}$/);
+  }
+  await db.query("ALTER TABLE pubquiz.bingo_cards DISABLE TRIGGER bingo_cards_immutable");
+  await assert.rejects(snapshot(),/SCHEMA_SECURITY_REVIEW_REQUIRED/);
+  await db.query("ALTER TABLE pubquiz.bingo_cards ENABLE TRIGGER bingo_cards_immutable");
+  await db.query("ALTER FUNCTION pubquiz.bingo_valid_card(jsonb) SECURITY DEFINER");
+  await assert.rejects(snapshot(),/SCHEMA_SECURITY_REVIEW_REQUIRED/);
+  await db.query("ALTER FUNCTION pubquiz.bingo_valid_card(jsonb) SECURITY INVOKER");
+  compareSnapshots(full,await snapshot());
+  console.info("Full real collectSnapshot, all eight populated Bingo tables, frozen assets and integrity: PASS");
   console.info("AP2 isolated PostgreSQL acceptance passed:", name);
 });

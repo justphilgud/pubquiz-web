@@ -121,3 +121,24 @@ Kein physischer Duplex-/Druckertest und keine vollstÃ¤ndige PDF-Viewer-/GerÃ¤tem
 Mathematische Zuordnung ersetzt keine PrÃ¼fung mechanischer Druckertoleranzen.
 Bingo bleibt Vorbereitung; keine Liveziehung, kein AP3. Keine Production-Daten,
 Rechte oder Sessions verÃ¤ndert; keine Backups/Restores gestartet.
+
+## Ergänzende Releaseprüfung: vollständiger Sicherungspfad
+
+Der vorherige Bericht prüfte Druckzeilen, aber nicht das vorgeschaltete Gate für
+Funktionen und Trigger. Dieser konkrete Blocker wird durch eine feste Referenz
+für exakt 9 Bingo-Funktionen und 15 Trigger geschlossen, gebunden an die drei
+unveränderten Migrationsprüfsummen. Geänderte Körper, Signaturen, Sicherheits-
+attribute, Bindungen, deaktivierte/fehlende/zusätzliche Objekte und falsche
+Migrationsprüfsummen werden weiterhin abgewiesen. Historische Backups bleiben
+zulässig; Wiederherstellungsvergleiche erfassen die zusätzliche Referenz.
+
+Der echte PostgreSQL-Test `bingo-preparation.integration.test.ts` führte nach
+Installation der explizit hashgeprüften historischen Bestandsfunktionen den
+vollständigen READ-ONLY-`collectSnapshot` aus: alle acht befüllten Bingo-Tabellen,
+Drucksnapshots und eingefrorene Assets, Zeileninventur/-hashes sowie vollständiger
+wiederholter Integritätsvergleich erfolgreich. Manipulierte Trigger/Sicherheits-
+attribute abgewiesen, nach Wiederherstellung erneut erfolgreich. Keine Fehler der
+unvollständigen Modellbaseline ausgeblendet: deren fehlende Bestandsroutinen
+werden ausdrücklich ergänzt. Kein vollständiger historischer SQL-Replay,
+Production-Backup/-Restore oder Wochenlauf behauptet. Release-/Preflightnachweise
+werden am finalen Head im PR geführt; bisheriger Gestaltungsstand unverändert.

@@ -102,8 +102,15 @@ migration or modify existing cards, identities, assignments or issue totals.
 
 ## Backup, restore and local operation
 
-The existing dynamic column/catalog inventory and database dump include all eight
-ordinary tables, constraints, indexes, functions and triggers. The narrow
+The dynamic inventory and schema-scoped database dump include all eight ordinary
+Bingo tables. Executable objects require an additional exact security review:
+`schema-reference/bingo-ap2-routines.json` binds nine functions and fifteen triggers
+to the three immutable AP2 migration checksums. The existing reviewer checks the
+complete body/signature/security/trigger set; no name-prefix exception is allowed.
+Unknown, missing, disabled or altered objects fail before row export. Legacy
+pre-Bingo snapshots retain their existing exact validation. Trigger UPDATE OF
+bindings use ordered column names instead of physical attribute numbers, retaining
+semantic equality across independently constructed model baselines. The narrow
 `inspectRow` case validates print-snapshot shape, checksums and existing design
 token/media rules; it does not exempt other JSON or secret-bearing fields. Cards
 are decoded with AP1 validation. Embedded frozen assets travel inside the database
