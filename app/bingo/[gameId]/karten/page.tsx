@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import AppHeader from "@/app/components/AppHeader";
 import { requireActor } from "@/app/lib/permissions";
 import { BingoPreparationError, cardSearch, pageNumber } from "../../preparation/policy";
-import { readCards, readPreparation } from "../../preparation/repository.server";
+import { readCards, readPreparation } from "../../preparation/readPreparation.server";
 import { Button, Input } from "@/components/ui";
 export default async function Page({ params, searchParams }: { params: Promise<{ gameId: string }>; searchParams: Promise<{ series?: string; seriesPage?: string; page?: string; search?: string }> }) {
   const { actor } = await requireActor(), { gameId } = await params, q = await searchParams;

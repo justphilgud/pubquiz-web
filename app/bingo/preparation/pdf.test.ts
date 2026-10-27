@@ -46,5 +46,5 @@ test("actual Phil Gud and LOVD PDF export embeds original frozen fonts/logo, pag
     await assert.rejects(api.createCardsPdf(snapshot, [cards[0], cards[0]]), /Kartenmenge/);
     await assert.rejects(api.createCardsPdf({ ...snapshot, title: "Bingo 🦄" }, cards), /nicht alle Zeichen/);
   }
-  for (const url of ["https://example.com/logo.png", "http://localhost/logo.png", "https://example.public.blob.vercel-storage.com/logo.png?secret=x", "/branding/phil-gud/website-logo.jpg?url=https://example.com"]) await assert.rejects(api.loadPrintLogo(url));
+  for (const url of ["https://example.com/logo.png", "http://localhost/logo.png", "https://example.public.blob.vercel-storage.com/logo.png?secret=x", "/branding/phil-gud/website-logo.jpg?url=https://example.com", "/../docs/acceptance/bingo-preparation/images/cards-mobile.jpg", "/%2e%2e/docs/acceptance/bingo-preparation/images/cards-mobile.jpg"]) await assert.rejects(api.loadPrintLogo(url));
 });

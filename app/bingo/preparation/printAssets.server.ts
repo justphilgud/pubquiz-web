@@ -1,6 +1,6 @@
 import "server-only";
 import { readFile, realpath, stat } from "node:fs/promises";
-import { resolve, sep } from "node:path";
+import { join, resolve, sep } from "node:path";
 import sharp from "sharp";
 import { isSafeTemplateAssetReference } from "@/app/rendering/presentationTemplates/presentationTemplateAssets";
 import { parseSharedDesign, type SharedDesign } from "@/app/rendering/sharedDesign/sharedDesign";
@@ -24,9 +24,13 @@ export async function loadPrintLogo(reference: string): Promise<Uint8Array> {
   let bytes: Buffer;
   if (reference.startsWith("/")) {
     const root = await realpath(resolve("public"));
-    const file = await realpath(resolve(root, `.${decodeURIComponent(reference)}`));
-    if (!file.startsWith(root + sep) || (await stat(file)).size > 10 * 1024 * 1024) throw new BingoPreparationError("Das Logo kann nicht sicher für den Druck geladen werden.");
+    // Keep the actual IO path statically rooted in public for file tracing.
+    // Canonical resolution is still mandatory before following any local link.
+    const file = join(resolve("public"), decodeURIComponent(reference).slice(1));
+    const canonicalFile = await realpath(file);
+    if (!canonicalFile.startsWith(root + sep) || (await stat(file)).size > 10 * 1024 * 1024) throw new BingoPreparationError("Das Logo kann nicht sicher für den Druck geladen werden.");
     bytes = await readFile(file);
+    if (bytes.length > 10 * 1024 * 1024) throw new BingoPreparationError("Das Logo ist zu groß für den Druck.");
   } else {
     const url = new URL(reference);
     if (url.protocol !== "https:" || !url.hostname.endsWith(".blob.vercel-storage.com") || url.port || url.username || url.password || url.search || url.hash) throw new BingoPreparationError("Das Logo ist keine zulässige Bildreferenz.");

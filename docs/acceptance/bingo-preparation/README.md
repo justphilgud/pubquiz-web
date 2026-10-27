@@ -26,6 +26,12 @@ PDF-Importgraph auch die Quelldateien der Erzeugung mitpackte. Der lesende Expor
 wurde deshalb mit gemeinsamer unveränderter Autorisierung getrennt; eine
 Importgrenzen-Regression verhindert die erneute Einbindung des Asset-Laders.
 Das Plattformlimit und bestehende Schutzregeln wurden nicht geändert.
+Ein weiterer Build zeigte denselben unnötigen Schreibimport in der Kartenansicht.
+Auch die lesenden Seitenzugriffe sind nun getrennt; der lokale Logo-Lesepfad
+bleibt statisch unter `public` und wird zusätzlich kanonisch geprüft. Nach dem
+regulären lokalen Build umfassen die verfolgten Dateien rund 9,2 MB für den
+PDF-Export, 8,5 MB für die Kartenansicht und 38,8 MB für die Vorbereitung.
+Das sind lokale Tracing-Messungen; der endgültige Vercel-READY-Nachweis steht im PR.
 Der generische Preview-Migrationsworkflow ist für diesen einzelnen Branch
 ausdrücklich gesperrt, damit er die AP2-Migration nicht versehentlich auf die
 gemeinsame Development-Datenbank anwendet. Bereitgestellt wird über das bestehende

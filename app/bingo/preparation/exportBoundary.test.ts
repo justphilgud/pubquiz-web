@@ -13,3 +13,13 @@ test("actual PDF route excludes generation and source-asset IO from its applicat
   assert.ok(!inputs.some(p => p.endsWith("/bingo/preparation/repository.server.ts") || p.endsWith("/printAssets.server.ts")), "exports read frozen bytes rather than packaging the generation asset loader");
   assert.ok(!Object.values(bundle.metafile.outputs).flatMap(o => o.imports).some(i => i.path === "sharp"), "PDF export must not pull in the image-ingestion runtime");
 });
+
+test("card overview reads do not import the generation asset loader", async () => {
+  const bundle = await build({ entryPoints: ["app/bingo/[gameId]/karten/page.tsx"], bundle: true, write: false, metafile: true, platform: "node", format: "esm", packages: "external", plugins: [{ name: "overview-boundary", setup(b) {
+    b.onResolve({ filter: /^(server-only|@\/app\/lib\/prisma|@\/app\/lib\/permissions|@\/app\/generated\/prisma\/client|@\/app\/components\/AppHeader|@\/components\/ui|next\/link|next\/navigation)$/ }, a => ({ path: a.path, namespace: "fixture" }));
+    b.onLoad({ filter: /.*/, namespace: "fixture" }, a => ({ contents: a.path === "server-only" ? "" : a.path.endsWith("permissions") ? "export async function requireActor(){throw Error('Not executed')}" : a.path.endsWith("prisma") ? "export const prisma={}" : a.path.endsWith("client") ? "export const Prisma={}" : a.path.endsWith("ui") ? "export function Button(){};export function Input(){}" : a.path.endsWith("navigation") ? "export function notFound(){}" : "export default function Component(){}" }));
+  } }] });
+  const inputs = Object.keys(bundle.metafile.inputs).map(p => p.replaceAll("\\", "/"));
+  assert.ok(inputs.includes("app/bingo/preparation/readPreparation.server.ts"));
+  assert.ok(!inputs.some(p => p.endsWith("/bingo/preparation/repository.server.ts") || p.endsWith("/printAssets.server.ts")), "the overview must not package generation source assets");
+});

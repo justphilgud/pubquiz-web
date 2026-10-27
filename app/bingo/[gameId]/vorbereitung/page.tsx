@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import AppHeader from "@/app/components/AppHeader";
 import { requireActor } from "@/app/lib/permissions";
 import { BingoPreparationError, pageNumber } from "../../preparation/policy";
-import { readPreparation } from "../../preparation/repository.server";
+import { readPreparation } from "../../preparation/readPreparation.server";
 import PreparationPanel from "../../preparation/PreparationPanel";
 
 export default async function Page({ params, searchParams }: { params: Promise<{ gameId: string }>; searchParams: Promise<{ page?: string; seriesPage?: string }> }) {

@@ -14,7 +14,8 @@ status. A future runtime can reference rounds and immutable cards directly.
 
 `app/bingo/preparation/repository.server.ts` owns preparation transactions,
 revision checks, idempotence and generation. `access.server.ts` shares current
-authorization and lock ordering. `readExport.server.ts` reads stored cards in an
+authorization and lock ordering. `readPreparation.server.ts` serves the overview
+without importing generation. `readExport.server.ts` reads stored cards in an
 explicitly read-only transaction and has no generation/source-asset IO dependency.
 This keeps the PDF function inside the regular serverless package limit rather
 than bundling unused source assets. UI components own only editing/feedback/
@@ -97,6 +98,8 @@ allowlist, with redirects forbidden and bounded bytes/time/pixels. No arbitrary
 user URL or URL parameters are accepted. Logos are frozen as PNG. Scene background
 imagery is not part of the light paper layout. Later design changes are indicated
 as an older design and never mutate or silently redesign existing series.
+Local logo IO retains a static `public` path for packaging and separately verifies
+its canonical resolved path stays within that root before reading bytes.
 
 A4 portrait contains four cards in a 2×2 layout, BINGO header, free centre, printed
 identity, light background, brand color/logo and cut marks. A small dark logo
