@@ -54,6 +54,9 @@ test("additive draft migration and real repository authorization on isolated Pos
   await db.query(migration);
   await db.query(readFileSync('prisma/migrations/20261026180000_game_team_assignments/migration.sql','utf8'));
   await db.query("ALTER TABLE pubquiz.game_drafts ADD COLUMN shared_design_template_id VARCHAR(64)");
+  // Keep the current Prisma runtime at the additive schema after the historical
+  // migration probe; all original data/authorization assertions remain intact.
+  for(const name of ['20261027180000_bingo_preparation','20261027210000_bingo_print_design','20261027213000_bingo_label_allocation'])await db.query(readFileSync(`prisma/migrations/${name}/migration.sql`,'utf8'));
   assert.deepEqual((await db.query("SELECT to_jsonb(q) data FROM pubquiz.quiz q WHERE quiz_id=11")).rows[0].data,before);
   assert.deepEqual((await db.query("SELECT * FROM pubquiz.benutzer_reihenrollen ORDER BY benutzer_id")).rows,rolesBefore);
   const prisma = new PrismaClient({adapter:new PrismaPg({connectionString:target.toString()})});
@@ -83,9 +86,9 @@ test("additive draft migration and real repository authorization on isolated Pos
   assert.equal(bingo.status,"DRAFT");
   const columns = (await db.query(COLUMN_SQL)).rows[0].coalesce as Column[];
   auditColumns(columns);
-  assert.equal(columns.filter(c=>c.schema==="pubquiz"&&c.table==="game_drafts").length,10,"backup column inventory must include every new column");
+  assert.equal(columns.filter(c=>c.schema==="pubquiz"&&c.table==="game_drafts").length,11,"backup column inventory must include every new column, including print overrides");
   const catalog = (await db.query(CATALOG_SQL)).rows[0].json_build_object as {constraints:{table:string}[]};
-  assert.equal(catalog.constraints.filter(c=>c.table==="game_drafts").length,6,"backup catalog must cover new constraints");
+  assert.equal(catalog.constraints.filter(c=>c.table==="game_drafts").length,7,"backup catalog must cover new constraints, including the print-only Bingo gate");
   const storedRow=(await db.query("SELECT to_jsonb(g) data FROM pubquiz.game_drafts g WHERE id=$1",[bingo.id])).rows[0].data;
   assert.doesNotThrow(()=>inspectRow(storedRow,new Set(),"pubquiz","game_drafts"));
   assert.equal((await api.readGameDraft(3,"BINGO",bingo.id)).game.date,"2028-02-29");

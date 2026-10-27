@@ -1,5 +1,7 @@
 "use client";
 
+import PrintFields from '@/app/bingo/preparation/PrintFields';
+import { defaultBingoPrint } from '@/app/bingo/preparation/bingoPrint';
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 
@@ -351,7 +353,7 @@ export function PresentationTemplateGenerator({
                   {presentationTemplateOptions.fonts.map((font) => <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>{font.label} · {font.character}</option>)}
                 </select>
               </label>
-              <div className="mt-5 flex flex-col gap-2 sm:flex-row">
+              <details className="mt-5 rounded-lg border p-3"><summary className="cursor-pointer py-2 font-semibold">Bingo-Druckstandard (nur Papierkarten)</summary><PrintFields value={draft.config.bingoPrint??defaultBingoPrint({templateId:initialTemplate.id,config:draft.config})} templateLogo={draft.config.tokens.assets.logo} onChange={value=>updateConfig(config=>{config.bingoPrint=value;})}/><button type="button" className="min-h-11 underline" onClick={()=>updateConfig(config=>{delete config.bingoPrint;})}>Druckstandard aus Markenbasis wiederherstellen</button></details><div className="mt-5 flex flex-col gap-2 sm:flex-row">
                 <button type="button" onClick={resetToSavedBranding} className="min-h-11 rounded-xl border border-slate-300 px-4 font-bold">Änderungen zurücksetzen</button>
                 <button type="button" onClick={resetToStyleDefaults} className="min-h-11 rounded-xl border border-slate-300 px-4 font-bold">Auf Stil-Standard zurücksetzen</button>
               </div>

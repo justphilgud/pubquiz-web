@@ -61,6 +61,7 @@ export type Game_draftsMaxAggregateOutputType = {
 }
 
 export type Game_draftsCountAggregateOutputType = {
+  bingo_print_config: number
   shared_design_template_id: number
   id: number
   eventart: number
@@ -110,6 +111,7 @@ export type Game_draftsMaxAggregateInputType = {
 }
 
 export type Game_draftsCountAggregateInputType = {
+  bingo_print_config?: true
   shared_design_template_id?: true
   id?: true
   eventart?: true
@@ -210,6 +212,7 @@ export type game_draftsGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 }
 
 export type Game_draftsGroupByOutputType = {
+  bingo_print_config: runtime.JsonValue | null
   shared_design_template_id: string | null
   id: string
   eventart: string
@@ -246,6 +249,7 @@ export type game_draftsWhereInput = {
   AND?: Prisma.game_draftsWhereInput | Prisma.game_draftsWhereInput[]
   OR?: Prisma.game_draftsWhereInput[]
   NOT?: Prisma.game_draftsWhereInput | Prisma.game_draftsWhereInput[]
+  bingo_print_config?: Prisma.JsonNullableFilter<"game_drafts">
   shared_design_template_id?: Prisma.StringNullableFilter<"game_drafts"> | string | null
   id?: Prisma.UuidFilter<"game_drafts"> | string
   eventart?: Prisma.StringFilter<"game_drafts"> | string
@@ -256,11 +260,16 @@ export type game_draftsWhereInput = {
   status?: Prisma.StringFilter<"game_drafts"> | string
   created_at?: Prisma.DateTimeFilter<"game_drafts"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"game_drafts"> | Date | string
+  bingo_series_labels?: Prisma.Bingo_series_labelsListRelationFilter
+  bingo_preparation?: Prisma.XOR<Prisma.Bingo_preparationsNullableScalarRelationFilter, Prisma.bingo_preparationsWhereInput> | null
+  bingo_rounds?: Prisma.Bingo_roundsListRelationFilter
+  bingo_card_series?: Prisma.Bingo_card_seriesListRelationFilter
   team_assignments?: Prisma.Game_team_assignmentsListRelationFilter
   eventreihe?: Prisma.XOR<Prisma.EventreihenScalarRelationFilter, Prisma.eventreihenWhereInput>
 }
 
 export type game_draftsOrderByWithRelationInput = {
+  bingo_print_config?: Prisma.SortOrderInput | Prisma.SortOrder
   shared_design_template_id?: Prisma.SortOrderInput | Prisma.SortOrder
   id?: Prisma.SortOrder
   eventart?: Prisma.SortOrder
@@ -271,6 +280,10 @@ export type game_draftsOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  bingo_series_labels?: Prisma.bingo_series_labelsOrderByRelationAggregateInput
+  bingo_preparation?: Prisma.bingo_preparationsOrderByWithRelationInput
+  bingo_rounds?: Prisma.bingo_roundsOrderByRelationAggregateInput
+  bingo_card_series?: Prisma.bingo_card_seriesOrderByRelationAggregateInput
   team_assignments?: Prisma.game_team_assignmentsOrderByRelationAggregateInput
   eventreihe?: Prisma.eventreihenOrderByWithRelationInput
 }
@@ -280,6 +293,7 @@ export type game_draftsWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.game_draftsWhereInput | Prisma.game_draftsWhereInput[]
   OR?: Prisma.game_draftsWhereInput[]
   NOT?: Prisma.game_draftsWhereInput | Prisma.game_draftsWhereInput[]
+  bingo_print_config?: Prisma.JsonNullableFilter<"game_drafts">
   shared_design_template_id?: Prisma.StringNullableFilter<"game_drafts"> | string | null
   eventart?: Prisma.StringFilter<"game_drafts"> | string
   eventreihe_id?: Prisma.IntFilter<"game_drafts"> | number
@@ -289,11 +303,16 @@ export type game_draftsWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.StringFilter<"game_drafts"> | string
   created_at?: Prisma.DateTimeFilter<"game_drafts"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"game_drafts"> | Date | string
+  bingo_series_labels?: Prisma.Bingo_series_labelsListRelationFilter
+  bingo_preparation?: Prisma.XOR<Prisma.Bingo_preparationsNullableScalarRelationFilter, Prisma.bingo_preparationsWhereInput> | null
+  bingo_rounds?: Prisma.Bingo_roundsListRelationFilter
+  bingo_card_series?: Prisma.Bingo_card_seriesListRelationFilter
   team_assignments?: Prisma.Game_team_assignmentsListRelationFilter
   eventreihe?: Prisma.XOR<Prisma.EventreihenScalarRelationFilter, Prisma.eventreihenWhereInput>
 }, "id">
 
 export type game_draftsOrderByWithAggregationInput = {
+  bingo_print_config?: Prisma.SortOrderInput | Prisma.SortOrder
   shared_design_template_id?: Prisma.SortOrderInput | Prisma.SortOrder
   id?: Prisma.SortOrder
   eventart?: Prisma.SortOrder
@@ -315,6 +334,7 @@ export type game_draftsScalarWhereWithAggregatesInput = {
   AND?: Prisma.game_draftsScalarWhereWithAggregatesInput | Prisma.game_draftsScalarWhereWithAggregatesInput[]
   OR?: Prisma.game_draftsScalarWhereWithAggregatesInput[]
   NOT?: Prisma.game_draftsScalarWhereWithAggregatesInput | Prisma.game_draftsScalarWhereWithAggregatesInput[]
+  bingo_print_config?: Prisma.JsonNullableWithAggregatesFilter<"game_drafts">
   shared_design_template_id?: Prisma.StringNullableWithAggregatesFilter<"game_drafts"> | string | null
   id?: Prisma.UuidWithAggregatesFilter<"game_drafts"> | string
   eventart?: Prisma.StringWithAggregatesFilter<"game_drafts"> | string
@@ -328,6 +348,7 @@ export type game_draftsScalarWhereWithAggregatesInput = {
 }
 
 export type game_draftsCreateInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   shared_design_template_id?: string | null
   id?: string
   eventart: string
@@ -337,11 +358,16 @@ export type game_draftsCreateInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsCreateNestedManyWithoutGameInput
+  bingo_preparation?: Prisma.bingo_preparationsCreateNestedOneWithoutGameInput
+  bingo_rounds?: Prisma.bingo_roundsCreateNestedManyWithoutGameInput
+  bingo_card_series?: Prisma.bingo_card_seriesCreateNestedManyWithoutGameInput
   team_assignments?: Prisma.game_team_assignmentsCreateNestedManyWithoutGameInput
   eventreihe: Prisma.eventreihenCreateNestedOneWithoutGame_draftsInput
 }
 
 export type game_draftsUncheckedCreateInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   shared_design_template_id?: string | null
   id?: string
   eventart: string
@@ -352,10 +378,15 @@ export type game_draftsUncheckedCreateInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsUncheckedCreateNestedManyWithoutGameInput
+  bingo_preparation?: Prisma.bingo_preparationsUncheckedCreateNestedOneWithoutGameInput
+  bingo_rounds?: Prisma.bingo_roundsUncheckedCreateNestedManyWithoutGameInput
+  bingo_card_series?: Prisma.bingo_card_seriesUncheckedCreateNestedManyWithoutGameInput
   team_assignments?: Prisma.game_team_assignmentsUncheckedCreateNestedManyWithoutGameInput
 }
 
 export type game_draftsUpdateInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventart?: Prisma.StringFieldUpdateOperationsInput | string
@@ -365,11 +396,16 @@ export type game_draftsUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsUpdateManyWithoutGameNestedInput
+  bingo_preparation?: Prisma.bingo_preparationsUpdateOneWithoutGameNestedInput
+  bingo_rounds?: Prisma.bingo_roundsUpdateManyWithoutGameNestedInput
+  bingo_card_series?: Prisma.bingo_card_seriesUpdateManyWithoutGameNestedInput
   team_assignments?: Prisma.game_team_assignmentsUpdateManyWithoutGameNestedInput
   eventreihe?: Prisma.eventreihenUpdateOneRequiredWithoutGame_draftsNestedInput
 }
 
 export type game_draftsUncheckedUpdateInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventart?: Prisma.StringFieldUpdateOperationsInput | string
@@ -380,10 +416,15 @@ export type game_draftsUncheckedUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsUncheckedUpdateManyWithoutGameNestedInput
+  bingo_preparation?: Prisma.bingo_preparationsUncheckedUpdateOneWithoutGameNestedInput
+  bingo_rounds?: Prisma.bingo_roundsUncheckedUpdateManyWithoutGameNestedInput
+  bingo_card_series?: Prisma.bingo_card_seriesUncheckedUpdateManyWithoutGameNestedInput
   team_assignments?: Prisma.game_team_assignmentsUncheckedUpdateManyWithoutGameNestedInput
 }
 
 export type game_draftsCreateManyInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   shared_design_template_id?: string | null
   id?: string
   eventart: string
@@ -397,6 +438,7 @@ export type game_draftsCreateManyInput = {
 }
 
 export type game_draftsUpdateManyMutationInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventart?: Prisma.StringFieldUpdateOperationsInput | string
@@ -409,6 +451,7 @@ export type game_draftsUpdateManyMutationInput = {
 }
 
 export type game_draftsUncheckedUpdateManyInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventart?: Prisma.StringFieldUpdateOperationsInput | string
@@ -432,6 +475,7 @@ export type game_draftsOrderByRelationAggregateInput = {
 }
 
 export type game_draftsCountOrderByAggregateInput = {
+  bingo_print_config?: Prisma.SortOrder
   shared_design_template_id?: Prisma.SortOrder
   id?: Prisma.SortOrder
   eventart?: Prisma.SortOrder
@@ -525,6 +569,62 @@ export type game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput = {
   deleteMany?: Prisma.game_draftsScalarWhereInput | Prisma.game_draftsScalarWhereInput[]
 }
 
+export type game_draftsCreateNestedOneWithoutBingo_preparationInput = {
+  create?: Prisma.XOR<Prisma.game_draftsCreateWithoutBingo_preparationInput, Prisma.game_draftsUncheckedCreateWithoutBingo_preparationInput>
+  connectOrCreate?: Prisma.game_draftsCreateOrConnectWithoutBingo_preparationInput
+  connect?: Prisma.game_draftsWhereUniqueInput
+}
+
+export type game_draftsUpdateOneRequiredWithoutBingo_preparationNestedInput = {
+  create?: Prisma.XOR<Prisma.game_draftsCreateWithoutBingo_preparationInput, Prisma.game_draftsUncheckedCreateWithoutBingo_preparationInput>
+  connectOrCreate?: Prisma.game_draftsCreateOrConnectWithoutBingo_preparationInput
+  upsert?: Prisma.game_draftsUpsertWithoutBingo_preparationInput
+  connect?: Prisma.game_draftsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.game_draftsUpdateToOneWithWhereWithoutBingo_preparationInput, Prisma.game_draftsUpdateWithoutBingo_preparationInput>, Prisma.game_draftsUncheckedUpdateWithoutBingo_preparationInput>
+}
+
+export type game_draftsCreateNestedOneWithoutBingo_roundsInput = {
+  create?: Prisma.XOR<Prisma.game_draftsCreateWithoutBingo_roundsInput, Prisma.game_draftsUncheckedCreateWithoutBingo_roundsInput>
+  connectOrCreate?: Prisma.game_draftsCreateOrConnectWithoutBingo_roundsInput
+  connect?: Prisma.game_draftsWhereUniqueInput
+}
+
+export type game_draftsUpdateOneRequiredWithoutBingo_roundsNestedInput = {
+  create?: Prisma.XOR<Prisma.game_draftsCreateWithoutBingo_roundsInput, Prisma.game_draftsUncheckedCreateWithoutBingo_roundsInput>
+  connectOrCreate?: Prisma.game_draftsCreateOrConnectWithoutBingo_roundsInput
+  upsert?: Prisma.game_draftsUpsertWithoutBingo_roundsInput
+  connect?: Prisma.game_draftsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.game_draftsUpdateToOneWithWhereWithoutBingo_roundsInput, Prisma.game_draftsUpdateWithoutBingo_roundsInput>, Prisma.game_draftsUncheckedUpdateWithoutBingo_roundsInput>
+}
+
+export type game_draftsCreateNestedOneWithoutBingo_card_seriesInput = {
+  create?: Prisma.XOR<Prisma.game_draftsCreateWithoutBingo_card_seriesInput, Prisma.game_draftsUncheckedCreateWithoutBingo_card_seriesInput>
+  connectOrCreate?: Prisma.game_draftsCreateOrConnectWithoutBingo_card_seriesInput
+  connect?: Prisma.game_draftsWhereUniqueInput
+}
+
+export type game_draftsUpdateOneRequiredWithoutBingo_card_seriesNestedInput = {
+  create?: Prisma.XOR<Prisma.game_draftsCreateWithoutBingo_card_seriesInput, Prisma.game_draftsUncheckedCreateWithoutBingo_card_seriesInput>
+  connectOrCreate?: Prisma.game_draftsCreateOrConnectWithoutBingo_card_seriesInput
+  upsert?: Prisma.game_draftsUpsertWithoutBingo_card_seriesInput
+  connect?: Prisma.game_draftsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.game_draftsUpdateToOneWithWhereWithoutBingo_card_seriesInput, Prisma.game_draftsUpdateWithoutBingo_card_seriesInput>, Prisma.game_draftsUncheckedUpdateWithoutBingo_card_seriesInput>
+}
+
+export type game_draftsCreateNestedOneWithoutBingo_series_labelsInput = {
+  create?: Prisma.XOR<Prisma.game_draftsCreateWithoutBingo_series_labelsInput, Prisma.game_draftsUncheckedCreateWithoutBingo_series_labelsInput>
+  connectOrCreate?: Prisma.game_draftsCreateOrConnectWithoutBingo_series_labelsInput
+  connect?: Prisma.game_draftsWhereUniqueInput
+}
+
+export type game_draftsUpdateOneRequiredWithoutBingo_series_labelsNestedInput = {
+  create?: Prisma.XOR<Prisma.game_draftsCreateWithoutBingo_series_labelsInput, Prisma.game_draftsUncheckedCreateWithoutBingo_series_labelsInput>
+  connectOrCreate?: Prisma.game_draftsCreateOrConnectWithoutBingo_series_labelsInput
+  upsert?: Prisma.game_draftsUpsertWithoutBingo_series_labelsInput
+  connect?: Prisma.game_draftsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.game_draftsUpdateToOneWithWhereWithoutBingo_series_labelsInput, Prisma.game_draftsUpdateWithoutBingo_series_labelsInput>, Prisma.game_draftsUncheckedUpdateWithoutBingo_series_labelsInput>
+}
+
 export type game_draftsCreateNestedOneWithoutTeam_assignmentsInput = {
   create?: Prisma.XOR<Prisma.game_draftsCreateWithoutTeam_assignmentsInput, Prisma.game_draftsUncheckedCreateWithoutTeam_assignmentsInput>
   connectOrCreate?: Prisma.game_draftsCreateOrConnectWithoutTeam_assignmentsInput
@@ -540,6 +640,7 @@ export type game_draftsUpdateOneRequiredWithoutTeam_assignmentsNestedInput = {
 }
 
 export type game_draftsCreateWithoutEventreiheInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   shared_design_template_id?: string | null
   id?: string
   eventart: string
@@ -549,10 +650,15 @@ export type game_draftsCreateWithoutEventreiheInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsCreateNestedManyWithoutGameInput
+  bingo_preparation?: Prisma.bingo_preparationsCreateNestedOneWithoutGameInput
+  bingo_rounds?: Prisma.bingo_roundsCreateNestedManyWithoutGameInput
+  bingo_card_series?: Prisma.bingo_card_seriesCreateNestedManyWithoutGameInput
   team_assignments?: Prisma.game_team_assignmentsCreateNestedManyWithoutGameInput
 }
 
 export type game_draftsUncheckedCreateWithoutEventreiheInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   shared_design_template_id?: string | null
   id?: string
   eventart: string
@@ -562,6 +668,10 @@ export type game_draftsUncheckedCreateWithoutEventreiheInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsUncheckedCreateNestedManyWithoutGameInput
+  bingo_preparation?: Prisma.bingo_preparationsUncheckedCreateNestedOneWithoutGameInput
+  bingo_rounds?: Prisma.bingo_roundsUncheckedCreateNestedManyWithoutGameInput
+  bingo_card_series?: Prisma.bingo_card_seriesUncheckedCreateNestedManyWithoutGameInput
   team_assignments?: Prisma.game_team_assignmentsUncheckedCreateNestedManyWithoutGameInput
 }
 
@@ -595,6 +705,7 @@ export type game_draftsScalarWhereInput = {
   AND?: Prisma.game_draftsScalarWhereInput | Prisma.game_draftsScalarWhereInput[]
   OR?: Prisma.game_draftsScalarWhereInput[]
   NOT?: Prisma.game_draftsScalarWhereInput | Prisma.game_draftsScalarWhereInput[]
+  bingo_print_config?: Prisma.JsonNullableFilter<"game_drafts">
   shared_design_template_id?: Prisma.StringNullableFilter<"game_drafts"> | string | null
   id?: Prisma.UuidFilter<"game_drafts"> | string
   eventart?: Prisma.StringFilter<"game_drafts"> | string
@@ -607,7 +718,8 @@ export type game_draftsScalarWhereInput = {
   updated_at?: Prisma.DateTimeFilter<"game_drafts"> | Date | string
 }
 
-export type game_draftsCreateWithoutTeam_assignmentsInput = {
+export type game_draftsCreateWithoutBingo_preparationInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   shared_design_template_id?: string | null
   id?: string
   eventart: string
@@ -617,10 +729,15 @@ export type game_draftsCreateWithoutTeam_assignmentsInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsCreateNestedManyWithoutGameInput
+  bingo_rounds?: Prisma.bingo_roundsCreateNestedManyWithoutGameInput
+  bingo_card_series?: Prisma.bingo_card_seriesCreateNestedManyWithoutGameInput
+  team_assignments?: Prisma.game_team_assignmentsCreateNestedManyWithoutGameInput
   eventreihe: Prisma.eventreihenCreateNestedOneWithoutGame_draftsInput
 }
 
-export type game_draftsUncheckedCreateWithoutTeam_assignmentsInput = {
+export type game_draftsUncheckedCreateWithoutBingo_preparationInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   shared_design_template_id?: string | null
   id?: string
   eventart: string
@@ -631,6 +748,362 @@ export type game_draftsUncheckedCreateWithoutTeam_assignmentsInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsUncheckedCreateNestedManyWithoutGameInput
+  bingo_rounds?: Prisma.bingo_roundsUncheckedCreateNestedManyWithoutGameInput
+  bingo_card_series?: Prisma.bingo_card_seriesUncheckedCreateNestedManyWithoutGameInput
+  team_assignments?: Prisma.game_team_assignmentsUncheckedCreateNestedManyWithoutGameInput
+}
+
+export type game_draftsCreateOrConnectWithoutBingo_preparationInput = {
+  where: Prisma.game_draftsWhereUniqueInput
+  create: Prisma.XOR<Prisma.game_draftsCreateWithoutBingo_preparationInput, Prisma.game_draftsUncheckedCreateWithoutBingo_preparationInput>
+}
+
+export type game_draftsUpsertWithoutBingo_preparationInput = {
+  update: Prisma.XOR<Prisma.game_draftsUpdateWithoutBingo_preparationInput, Prisma.game_draftsUncheckedUpdateWithoutBingo_preparationInput>
+  create: Prisma.XOR<Prisma.game_draftsCreateWithoutBingo_preparationInput, Prisma.game_draftsUncheckedCreateWithoutBingo_preparationInput>
+  where?: Prisma.game_draftsWhereInput
+}
+
+export type game_draftsUpdateToOneWithWhereWithoutBingo_preparationInput = {
+  where?: Prisma.game_draftsWhereInput
+  data: Prisma.XOR<Prisma.game_draftsUpdateWithoutBingo_preparationInput, Prisma.game_draftsUncheckedUpdateWithoutBingo_preparationInput>
+}
+
+export type game_draftsUpdateWithoutBingo_preparationInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  eventart?: Prisma.StringFieldUpdateOperationsInput | string
+  titel?: Prisma.StringFieldUpdateOperationsInput | string
+  datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uhrzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsUpdateManyWithoutGameNestedInput
+  bingo_rounds?: Prisma.bingo_roundsUpdateManyWithoutGameNestedInput
+  bingo_card_series?: Prisma.bingo_card_seriesUpdateManyWithoutGameNestedInput
+  team_assignments?: Prisma.game_team_assignmentsUpdateManyWithoutGameNestedInput
+  eventreihe?: Prisma.eventreihenUpdateOneRequiredWithoutGame_draftsNestedInput
+}
+
+export type game_draftsUncheckedUpdateWithoutBingo_preparationInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  eventart?: Prisma.StringFieldUpdateOperationsInput | string
+  eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
+  titel?: Prisma.StringFieldUpdateOperationsInput | string
+  datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uhrzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsUncheckedUpdateManyWithoutGameNestedInput
+  bingo_rounds?: Prisma.bingo_roundsUncheckedUpdateManyWithoutGameNestedInput
+  bingo_card_series?: Prisma.bingo_card_seriesUncheckedUpdateManyWithoutGameNestedInput
+  team_assignments?: Prisma.game_team_assignmentsUncheckedUpdateManyWithoutGameNestedInput
+}
+
+export type game_draftsCreateWithoutBingo_roundsInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: string | null
+  id?: string
+  eventart: string
+  titel: string
+  datum?: Date | string | null
+  uhrzeit?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsCreateNestedManyWithoutGameInput
+  bingo_preparation?: Prisma.bingo_preparationsCreateNestedOneWithoutGameInput
+  bingo_card_series?: Prisma.bingo_card_seriesCreateNestedManyWithoutGameInput
+  team_assignments?: Prisma.game_team_assignmentsCreateNestedManyWithoutGameInput
+  eventreihe: Prisma.eventreihenCreateNestedOneWithoutGame_draftsInput
+}
+
+export type game_draftsUncheckedCreateWithoutBingo_roundsInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: string | null
+  id?: string
+  eventart: string
+  eventreihe_id: number
+  titel: string
+  datum?: Date | string | null
+  uhrzeit?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsUncheckedCreateNestedManyWithoutGameInput
+  bingo_preparation?: Prisma.bingo_preparationsUncheckedCreateNestedOneWithoutGameInput
+  bingo_card_series?: Prisma.bingo_card_seriesUncheckedCreateNestedManyWithoutGameInput
+  team_assignments?: Prisma.game_team_assignmentsUncheckedCreateNestedManyWithoutGameInput
+}
+
+export type game_draftsCreateOrConnectWithoutBingo_roundsInput = {
+  where: Prisma.game_draftsWhereUniqueInput
+  create: Prisma.XOR<Prisma.game_draftsCreateWithoutBingo_roundsInput, Prisma.game_draftsUncheckedCreateWithoutBingo_roundsInput>
+}
+
+export type game_draftsUpsertWithoutBingo_roundsInput = {
+  update: Prisma.XOR<Prisma.game_draftsUpdateWithoutBingo_roundsInput, Prisma.game_draftsUncheckedUpdateWithoutBingo_roundsInput>
+  create: Prisma.XOR<Prisma.game_draftsCreateWithoutBingo_roundsInput, Prisma.game_draftsUncheckedCreateWithoutBingo_roundsInput>
+  where?: Prisma.game_draftsWhereInput
+}
+
+export type game_draftsUpdateToOneWithWhereWithoutBingo_roundsInput = {
+  where?: Prisma.game_draftsWhereInput
+  data: Prisma.XOR<Prisma.game_draftsUpdateWithoutBingo_roundsInput, Prisma.game_draftsUncheckedUpdateWithoutBingo_roundsInput>
+}
+
+export type game_draftsUpdateWithoutBingo_roundsInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  eventart?: Prisma.StringFieldUpdateOperationsInput | string
+  titel?: Prisma.StringFieldUpdateOperationsInput | string
+  datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uhrzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsUpdateManyWithoutGameNestedInput
+  bingo_preparation?: Prisma.bingo_preparationsUpdateOneWithoutGameNestedInput
+  bingo_card_series?: Prisma.bingo_card_seriesUpdateManyWithoutGameNestedInput
+  team_assignments?: Prisma.game_team_assignmentsUpdateManyWithoutGameNestedInput
+  eventreihe?: Prisma.eventreihenUpdateOneRequiredWithoutGame_draftsNestedInput
+}
+
+export type game_draftsUncheckedUpdateWithoutBingo_roundsInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  eventart?: Prisma.StringFieldUpdateOperationsInput | string
+  eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
+  titel?: Prisma.StringFieldUpdateOperationsInput | string
+  datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uhrzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsUncheckedUpdateManyWithoutGameNestedInput
+  bingo_preparation?: Prisma.bingo_preparationsUncheckedUpdateOneWithoutGameNestedInput
+  bingo_card_series?: Prisma.bingo_card_seriesUncheckedUpdateManyWithoutGameNestedInput
+  team_assignments?: Prisma.game_team_assignmentsUncheckedUpdateManyWithoutGameNestedInput
+}
+
+export type game_draftsCreateWithoutBingo_card_seriesInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: string | null
+  id?: string
+  eventart: string
+  titel: string
+  datum?: Date | string | null
+  uhrzeit?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsCreateNestedManyWithoutGameInput
+  bingo_preparation?: Prisma.bingo_preparationsCreateNestedOneWithoutGameInput
+  bingo_rounds?: Prisma.bingo_roundsCreateNestedManyWithoutGameInput
+  team_assignments?: Prisma.game_team_assignmentsCreateNestedManyWithoutGameInput
+  eventreihe: Prisma.eventreihenCreateNestedOneWithoutGame_draftsInput
+}
+
+export type game_draftsUncheckedCreateWithoutBingo_card_seriesInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: string | null
+  id?: string
+  eventart: string
+  eventreihe_id: number
+  titel: string
+  datum?: Date | string | null
+  uhrzeit?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsUncheckedCreateNestedManyWithoutGameInput
+  bingo_preparation?: Prisma.bingo_preparationsUncheckedCreateNestedOneWithoutGameInput
+  bingo_rounds?: Prisma.bingo_roundsUncheckedCreateNestedManyWithoutGameInput
+  team_assignments?: Prisma.game_team_assignmentsUncheckedCreateNestedManyWithoutGameInput
+}
+
+export type game_draftsCreateOrConnectWithoutBingo_card_seriesInput = {
+  where: Prisma.game_draftsWhereUniqueInput
+  create: Prisma.XOR<Prisma.game_draftsCreateWithoutBingo_card_seriesInput, Prisma.game_draftsUncheckedCreateWithoutBingo_card_seriesInput>
+}
+
+export type game_draftsUpsertWithoutBingo_card_seriesInput = {
+  update: Prisma.XOR<Prisma.game_draftsUpdateWithoutBingo_card_seriesInput, Prisma.game_draftsUncheckedUpdateWithoutBingo_card_seriesInput>
+  create: Prisma.XOR<Prisma.game_draftsCreateWithoutBingo_card_seriesInput, Prisma.game_draftsUncheckedCreateWithoutBingo_card_seriesInput>
+  where?: Prisma.game_draftsWhereInput
+}
+
+export type game_draftsUpdateToOneWithWhereWithoutBingo_card_seriesInput = {
+  where?: Prisma.game_draftsWhereInput
+  data: Prisma.XOR<Prisma.game_draftsUpdateWithoutBingo_card_seriesInput, Prisma.game_draftsUncheckedUpdateWithoutBingo_card_seriesInput>
+}
+
+export type game_draftsUpdateWithoutBingo_card_seriesInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  eventart?: Prisma.StringFieldUpdateOperationsInput | string
+  titel?: Prisma.StringFieldUpdateOperationsInput | string
+  datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uhrzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsUpdateManyWithoutGameNestedInput
+  bingo_preparation?: Prisma.bingo_preparationsUpdateOneWithoutGameNestedInput
+  bingo_rounds?: Prisma.bingo_roundsUpdateManyWithoutGameNestedInput
+  team_assignments?: Prisma.game_team_assignmentsUpdateManyWithoutGameNestedInput
+  eventreihe?: Prisma.eventreihenUpdateOneRequiredWithoutGame_draftsNestedInput
+}
+
+export type game_draftsUncheckedUpdateWithoutBingo_card_seriesInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  eventart?: Prisma.StringFieldUpdateOperationsInput | string
+  eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
+  titel?: Prisma.StringFieldUpdateOperationsInput | string
+  datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uhrzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsUncheckedUpdateManyWithoutGameNestedInput
+  bingo_preparation?: Prisma.bingo_preparationsUncheckedUpdateOneWithoutGameNestedInput
+  bingo_rounds?: Prisma.bingo_roundsUncheckedUpdateManyWithoutGameNestedInput
+  team_assignments?: Prisma.game_team_assignmentsUncheckedUpdateManyWithoutGameNestedInput
+}
+
+export type game_draftsCreateWithoutBingo_series_labelsInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: string | null
+  id?: string
+  eventart: string
+  titel: string
+  datum?: Date | string | null
+  uhrzeit?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  bingo_preparation?: Prisma.bingo_preparationsCreateNestedOneWithoutGameInput
+  bingo_rounds?: Prisma.bingo_roundsCreateNestedManyWithoutGameInput
+  bingo_card_series?: Prisma.bingo_card_seriesCreateNestedManyWithoutGameInput
+  team_assignments?: Prisma.game_team_assignmentsCreateNestedManyWithoutGameInput
+  eventreihe: Prisma.eventreihenCreateNestedOneWithoutGame_draftsInput
+}
+
+export type game_draftsUncheckedCreateWithoutBingo_series_labelsInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: string | null
+  id?: string
+  eventart: string
+  eventreihe_id: number
+  titel: string
+  datum?: Date | string | null
+  uhrzeit?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  bingo_preparation?: Prisma.bingo_preparationsUncheckedCreateNestedOneWithoutGameInput
+  bingo_rounds?: Prisma.bingo_roundsUncheckedCreateNestedManyWithoutGameInput
+  bingo_card_series?: Prisma.bingo_card_seriesUncheckedCreateNestedManyWithoutGameInput
+  team_assignments?: Prisma.game_team_assignmentsUncheckedCreateNestedManyWithoutGameInput
+}
+
+export type game_draftsCreateOrConnectWithoutBingo_series_labelsInput = {
+  where: Prisma.game_draftsWhereUniqueInput
+  create: Prisma.XOR<Prisma.game_draftsCreateWithoutBingo_series_labelsInput, Prisma.game_draftsUncheckedCreateWithoutBingo_series_labelsInput>
+}
+
+export type game_draftsUpsertWithoutBingo_series_labelsInput = {
+  update: Prisma.XOR<Prisma.game_draftsUpdateWithoutBingo_series_labelsInput, Prisma.game_draftsUncheckedUpdateWithoutBingo_series_labelsInput>
+  create: Prisma.XOR<Prisma.game_draftsCreateWithoutBingo_series_labelsInput, Prisma.game_draftsUncheckedCreateWithoutBingo_series_labelsInput>
+  where?: Prisma.game_draftsWhereInput
+}
+
+export type game_draftsUpdateToOneWithWhereWithoutBingo_series_labelsInput = {
+  where?: Prisma.game_draftsWhereInput
+  data: Prisma.XOR<Prisma.game_draftsUpdateWithoutBingo_series_labelsInput, Prisma.game_draftsUncheckedUpdateWithoutBingo_series_labelsInput>
+}
+
+export type game_draftsUpdateWithoutBingo_series_labelsInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  eventart?: Prisma.StringFieldUpdateOperationsInput | string
+  titel?: Prisma.StringFieldUpdateOperationsInput | string
+  datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uhrzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_preparation?: Prisma.bingo_preparationsUpdateOneWithoutGameNestedInput
+  bingo_rounds?: Prisma.bingo_roundsUpdateManyWithoutGameNestedInput
+  bingo_card_series?: Prisma.bingo_card_seriesUpdateManyWithoutGameNestedInput
+  team_assignments?: Prisma.game_team_assignmentsUpdateManyWithoutGameNestedInput
+  eventreihe?: Prisma.eventreihenUpdateOneRequiredWithoutGame_draftsNestedInput
+}
+
+export type game_draftsUncheckedUpdateWithoutBingo_series_labelsInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  eventart?: Prisma.StringFieldUpdateOperationsInput | string
+  eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
+  titel?: Prisma.StringFieldUpdateOperationsInput | string
+  datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uhrzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_preparation?: Prisma.bingo_preparationsUncheckedUpdateOneWithoutGameNestedInput
+  bingo_rounds?: Prisma.bingo_roundsUncheckedUpdateManyWithoutGameNestedInput
+  bingo_card_series?: Prisma.bingo_card_seriesUncheckedUpdateManyWithoutGameNestedInput
+  team_assignments?: Prisma.game_team_assignmentsUncheckedUpdateManyWithoutGameNestedInput
+}
+
+export type game_draftsCreateWithoutTeam_assignmentsInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: string | null
+  id?: string
+  eventart: string
+  titel: string
+  datum?: Date | string | null
+  uhrzeit?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsCreateNestedManyWithoutGameInput
+  bingo_preparation?: Prisma.bingo_preparationsCreateNestedOneWithoutGameInput
+  bingo_rounds?: Prisma.bingo_roundsCreateNestedManyWithoutGameInput
+  bingo_card_series?: Prisma.bingo_card_seriesCreateNestedManyWithoutGameInput
+  eventreihe: Prisma.eventreihenCreateNestedOneWithoutGame_draftsInput
+}
+
+export type game_draftsUncheckedCreateWithoutTeam_assignmentsInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: string | null
+  id?: string
+  eventart: string
+  eventreihe_id: number
+  titel: string
+  datum?: Date | string | null
+  uhrzeit?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsUncheckedCreateNestedManyWithoutGameInput
+  bingo_preparation?: Prisma.bingo_preparationsUncheckedCreateNestedOneWithoutGameInput
+  bingo_rounds?: Prisma.bingo_roundsUncheckedCreateNestedManyWithoutGameInput
+  bingo_card_series?: Prisma.bingo_card_seriesUncheckedCreateNestedManyWithoutGameInput
 }
 
 export type game_draftsCreateOrConnectWithoutTeam_assignmentsInput = {
@@ -650,6 +1123,7 @@ export type game_draftsUpdateToOneWithWhereWithoutTeam_assignmentsInput = {
 }
 
 export type game_draftsUpdateWithoutTeam_assignmentsInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventart?: Prisma.StringFieldUpdateOperationsInput | string
@@ -659,10 +1133,15 @@ export type game_draftsUpdateWithoutTeam_assignmentsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsUpdateManyWithoutGameNestedInput
+  bingo_preparation?: Prisma.bingo_preparationsUpdateOneWithoutGameNestedInput
+  bingo_rounds?: Prisma.bingo_roundsUpdateManyWithoutGameNestedInput
+  bingo_card_series?: Prisma.bingo_card_seriesUpdateManyWithoutGameNestedInput
   eventreihe?: Prisma.eventreihenUpdateOneRequiredWithoutGame_draftsNestedInput
 }
 
 export type game_draftsUncheckedUpdateWithoutTeam_assignmentsInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventart?: Prisma.StringFieldUpdateOperationsInput | string
@@ -673,9 +1152,14 @@ export type game_draftsUncheckedUpdateWithoutTeam_assignmentsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsUncheckedUpdateManyWithoutGameNestedInput
+  bingo_preparation?: Prisma.bingo_preparationsUncheckedUpdateOneWithoutGameNestedInput
+  bingo_rounds?: Prisma.bingo_roundsUncheckedUpdateManyWithoutGameNestedInput
+  bingo_card_series?: Prisma.bingo_card_seriesUncheckedUpdateManyWithoutGameNestedInput
 }
 
 export type game_draftsCreateManyEventreiheInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   shared_design_template_id?: string | null
   id?: string
   eventart: string
@@ -688,6 +1172,7 @@ export type game_draftsCreateManyEventreiheInput = {
 }
 
 export type game_draftsUpdateWithoutEventreiheInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventart?: Prisma.StringFieldUpdateOperationsInput | string
@@ -697,10 +1182,15 @@ export type game_draftsUpdateWithoutEventreiheInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsUpdateManyWithoutGameNestedInput
+  bingo_preparation?: Prisma.bingo_preparationsUpdateOneWithoutGameNestedInput
+  bingo_rounds?: Prisma.bingo_roundsUpdateManyWithoutGameNestedInput
+  bingo_card_series?: Prisma.bingo_card_seriesUpdateManyWithoutGameNestedInput
   team_assignments?: Prisma.game_team_assignmentsUpdateManyWithoutGameNestedInput
 }
 
 export type game_draftsUncheckedUpdateWithoutEventreiheInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventart?: Prisma.StringFieldUpdateOperationsInput | string
@@ -710,10 +1200,15 @@ export type game_draftsUncheckedUpdateWithoutEventreiheInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_series_labels?: Prisma.bingo_series_labelsUncheckedUpdateManyWithoutGameNestedInput
+  bingo_preparation?: Prisma.bingo_preparationsUncheckedUpdateOneWithoutGameNestedInput
+  bingo_rounds?: Prisma.bingo_roundsUncheckedUpdateManyWithoutGameNestedInput
+  bingo_card_series?: Prisma.bingo_card_seriesUncheckedUpdateManyWithoutGameNestedInput
   team_assignments?: Prisma.game_team_assignmentsUncheckedUpdateManyWithoutGameNestedInput
 }
 
 export type game_draftsUncheckedUpdateManyWithoutEventreiheInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   eventart?: Prisma.StringFieldUpdateOperationsInput | string
@@ -731,10 +1226,16 @@ export type game_draftsUncheckedUpdateManyWithoutEventreiheInput = {
  */
 
 export type Game_draftsCountOutputType = {
+  bingo_series_labels: number
+  bingo_rounds: number
+  bingo_card_series: number
   team_assignments: number
 }
 
 export type Game_draftsCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  bingo_series_labels?: boolean | Game_draftsCountOutputTypeCountBingo_series_labelsArgs
+  bingo_rounds?: boolean | Game_draftsCountOutputTypeCountBingo_roundsArgs
+  bingo_card_series?: boolean | Game_draftsCountOutputTypeCountBingo_card_seriesArgs
   team_assignments?: boolean | Game_draftsCountOutputTypeCountTeam_assignmentsArgs
 }
 
@@ -751,12 +1252,34 @@ export type Game_draftsCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.
 /**
  * Game_draftsCountOutputType without action
  */
+export type Game_draftsCountOutputTypeCountBingo_series_labelsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.bingo_series_labelsWhereInput
+}
+
+/**
+ * Game_draftsCountOutputType without action
+ */
+export type Game_draftsCountOutputTypeCountBingo_roundsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.bingo_roundsWhereInput
+}
+
+/**
+ * Game_draftsCountOutputType without action
+ */
+export type Game_draftsCountOutputTypeCountBingo_card_seriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.bingo_card_seriesWhereInput
+}
+
+/**
+ * Game_draftsCountOutputType without action
+ */
 export type Game_draftsCountOutputTypeCountTeam_assignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.game_team_assignmentsWhereInput
 }
 
 
 export type game_draftsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  bingo_print_config?: boolean
   shared_design_template_id?: boolean
   id?: boolean
   eventart?: boolean
@@ -767,12 +1290,17 @@ export type game_draftsSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   status?: boolean
   created_at?: boolean
   updated_at?: boolean
+  bingo_series_labels?: boolean | Prisma.game_drafts$bingo_series_labelsArgs<ExtArgs>
+  bingo_preparation?: boolean | Prisma.game_drafts$bingo_preparationArgs<ExtArgs>
+  bingo_rounds?: boolean | Prisma.game_drafts$bingo_roundsArgs<ExtArgs>
+  bingo_card_series?: boolean | Prisma.game_drafts$bingo_card_seriesArgs<ExtArgs>
   team_assignments?: boolean | Prisma.game_drafts$team_assignmentsArgs<ExtArgs>
   eventreihe?: boolean | Prisma.eventreihenDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.Game_draftsCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["game_drafts"]>
 
 export type game_draftsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  bingo_print_config?: boolean
   shared_design_template_id?: boolean
   id?: boolean
   eventart?: boolean
@@ -787,6 +1315,7 @@ export type game_draftsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
 }, ExtArgs["result"]["game_drafts"]>
 
 export type game_draftsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  bingo_print_config?: boolean
   shared_design_template_id?: boolean
   id?: boolean
   eventart?: boolean
@@ -801,6 +1330,7 @@ export type game_draftsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
 }, ExtArgs["result"]["game_drafts"]>
 
 export type game_draftsSelectScalar = {
+  bingo_print_config?: boolean
   shared_design_template_id?: boolean
   id?: boolean
   eventart?: boolean
@@ -813,8 +1343,12 @@ export type game_draftsSelectScalar = {
   updated_at?: boolean
 }
 
-export type game_draftsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"shared_design_template_id" | "id" | "eventart" | "eventreihe_id" | "titel" | "datum" | "uhrzeit" | "status" | "created_at" | "updated_at", ExtArgs["result"]["game_drafts"]>
+export type game_draftsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"bingo_print_config" | "shared_design_template_id" | "id" | "eventart" | "eventreihe_id" | "titel" | "datum" | "uhrzeit" | "status" | "created_at" | "updated_at", ExtArgs["result"]["game_drafts"]>
 export type game_draftsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  bingo_series_labels?: boolean | Prisma.game_drafts$bingo_series_labelsArgs<ExtArgs>
+  bingo_preparation?: boolean | Prisma.game_drafts$bingo_preparationArgs<ExtArgs>
+  bingo_rounds?: boolean | Prisma.game_drafts$bingo_roundsArgs<ExtArgs>
+  bingo_card_series?: boolean | Prisma.game_drafts$bingo_card_seriesArgs<ExtArgs>
   team_assignments?: boolean | Prisma.game_drafts$team_assignmentsArgs<ExtArgs>
   eventreihe?: boolean | Prisma.eventreihenDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.Game_draftsCountOutputTypeDefaultArgs<ExtArgs>
@@ -829,10 +1363,15 @@ export type game_draftsIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.
 export type $game_draftsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "game_drafts"
   objects: {
+    bingo_series_labels: Prisma.$bingo_series_labelsPayload<ExtArgs>[]
+    bingo_preparation: Prisma.$bingo_preparationsPayload<ExtArgs> | null
+    bingo_rounds: Prisma.$bingo_roundsPayload<ExtArgs>[]
+    bingo_card_series: Prisma.$bingo_card_seriesPayload<ExtArgs>[]
     team_assignments: Prisma.$game_team_assignmentsPayload<ExtArgs>[]
     eventreihe: Prisma.$eventreihenPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    bingo_print_config: runtime.JsonValue | null
     shared_design_template_id: string | null
     id: string
     eventart: string
@@ -926,8 +1465,8 @@ export interface game_draftsDelegate<ExtArgs extends runtime.Types.Extensions.In
    * // Get first 10 Game_drafts
    * const game_drafts = await prisma.game_drafts.findMany({ take: 10 })
    *
-   * // Only select the `shared_design_template_id`
-   * const game_draftsWithShared_design_template_idOnly = await prisma.game_drafts.findMany({ select: { shared_design_template_id: true } })
+   * // Only select the `bingo_print_config`
+   * const game_draftsWithBingo_print_configOnly = await prisma.game_drafts.findMany({ select: { bingo_print_config: true } })
    *
    */
   findMany<T extends game_draftsFindManyArgs>(args?: Prisma.SelectSubset<T, game_draftsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$game_draftsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -971,9 +1510,9 @@ export interface game_draftsDelegate<ExtArgs extends runtime.Types.Extensions.In
    *   ]
    * })
    *
-   * // Create many Game_drafts and only return the `shared_design_template_id`
-   * const game_draftsWithShared_design_template_idOnly = await prisma.game_drafts.createManyAndReturn({
-   *   select: { shared_design_template_id: true },
+   * // Create many Game_drafts and only return the `bingo_print_config`
+   * const game_draftsWithBingo_print_configOnly = await prisma.game_drafts.createManyAndReturn({
+   *   select: { bingo_print_config: true },
    *   data: [
    *     // ... provide data here
    *   ]
@@ -1062,9 +1601,9 @@ export interface game_draftsDelegate<ExtArgs extends runtime.Types.Extensions.In
    *   ]
    * })
    *
-   * // Update zero or more Game_drafts and only return the `shared_design_template_id`
-   * const game_draftsWithShared_design_template_idOnly = await prisma.game_drafts.updateManyAndReturn({
-   *   select: { shared_design_template_id: true },
+   * // Update zero or more Game_drafts and only return the `bingo_print_config`
+   * const game_draftsWithBingo_print_configOnly = await prisma.game_drafts.updateManyAndReturn({
+   *   select: { bingo_print_config: true },
    *   where: {
    *     // ... provide filter here
    *   },
@@ -1237,6 +1776,10 @@ readonly fields: game_draftsFieldRefs;
  */
 export interface Prisma__game_draftsClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  bingo_series_labels<T extends Prisma.game_drafts$bingo_series_labelsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.game_drafts$bingo_series_labelsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$bingo_series_labelsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  bingo_preparation<T extends Prisma.game_drafts$bingo_preparationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.game_drafts$bingo_preparationArgs<ExtArgs>>): Prisma.Prisma__bingo_preparationsClient<runtime.Types.Result.GetResult<Prisma.$bingo_preparationsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  bingo_rounds<T extends Prisma.game_drafts$bingo_roundsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.game_drafts$bingo_roundsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$bingo_roundsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  bingo_card_series<T extends Prisma.game_drafts$bingo_card_seriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.game_drafts$bingo_card_seriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$bingo_card_seriesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   team_assignments<T extends Prisma.game_drafts$team_assignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.game_drafts$team_assignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$game_team_assignmentsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   eventreihe<T extends Prisma.eventreihenDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.eventreihenDefaultArgs<ExtArgs>>): Prisma.Prisma__eventreihenClient<runtime.Types.Result.GetResult<Prisma.$eventreihenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
@@ -1268,6 +1811,7 @@ export interface Prisma__game_draftsClient<T, Null = never, ExtArgs extends runt
  * Fields of the game_drafts model
  */
 export interface game_draftsFieldRefs {
+  readonly bingo_print_config: Prisma.FieldRef<"game_drafts", 'Json'>
   readonly shared_design_template_id: Prisma.FieldRef<"game_drafts", 'String'>
   readonly id: Prisma.FieldRef<"game_drafts", 'String'>
   readonly eventart: Prisma.FieldRef<"game_drafts", 'String'>
@@ -1676,6 +2220,97 @@ export type game_draftsDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many game_drafts to delete.
    */
   limit?: number
+}
+
+/**
+ * game_drafts.bingo_series_labels
+ */
+export type game_drafts$bingo_series_labelsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the bingo_series_labels
+   */
+  select?: Prisma.bingo_series_labelsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the bingo_series_labels
+   */
+  omit?: Prisma.bingo_series_labelsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.bingo_series_labelsInclude<ExtArgs> | null
+  where?: Prisma.bingo_series_labelsWhereInput
+  orderBy?: Prisma.bingo_series_labelsOrderByWithRelationInput | Prisma.bingo_series_labelsOrderByWithRelationInput[]
+  cursor?: Prisma.bingo_series_labelsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Bingo_series_labelsScalarFieldEnum | Prisma.Bingo_series_labelsScalarFieldEnum[]
+}
+
+/**
+ * game_drafts.bingo_preparation
+ */
+export type game_drafts$bingo_preparationArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the bingo_preparations
+   */
+  select?: Prisma.bingo_preparationsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the bingo_preparations
+   */
+  omit?: Prisma.bingo_preparationsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.bingo_preparationsInclude<ExtArgs> | null
+  where?: Prisma.bingo_preparationsWhereInput
+}
+
+/**
+ * game_drafts.bingo_rounds
+ */
+export type game_drafts$bingo_roundsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the bingo_rounds
+   */
+  select?: Prisma.bingo_roundsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the bingo_rounds
+   */
+  omit?: Prisma.bingo_roundsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.bingo_roundsInclude<ExtArgs> | null
+  where?: Prisma.bingo_roundsWhereInput
+  orderBy?: Prisma.bingo_roundsOrderByWithRelationInput | Prisma.bingo_roundsOrderByWithRelationInput[]
+  cursor?: Prisma.bingo_roundsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Bingo_roundsScalarFieldEnum | Prisma.Bingo_roundsScalarFieldEnum[]
+}
+
+/**
+ * game_drafts.bingo_card_series
+ */
+export type game_drafts$bingo_card_seriesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the bingo_card_series
+   */
+  select?: Prisma.bingo_card_seriesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the bingo_card_series
+   */
+  omit?: Prisma.bingo_card_seriesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.bingo_card_seriesInclude<ExtArgs> | null
+  where?: Prisma.bingo_card_seriesWhereInput
+  orderBy?: Prisma.bingo_card_seriesOrderByWithRelationInput | Prisma.bingo_card_seriesOrderByWithRelationInput[]
+  cursor?: Prisma.bingo_card_seriesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Bingo_card_seriesScalarFieldEnum | Prisma.Bingo_card_seriesScalarFieldEnum[]
 }
 
 /**

@@ -1,0 +1,115 @@
+{
+  "reports": [
+    {
+      "file": "bingo-lovd-ungegoogelt-duplex.pdf",
+      "cards": 8,
+      "pages": 4,
+      "squares": true,
+      "mirroredBacks": true,
+      "storedCells": "PASS",
+      "visibleNumericInkMargins": "PASS",
+      "embeddedFonts": 2,
+      "fullAspectLogos": "PASS"
+    },
+    {
+      "file": "bingo-lovd-ungegoogelt-partial.pdf",
+      "cards": 5,
+      "pages": 4,
+      "squares": true,
+      "mirroredBacks": true,
+      "storedCells": "PASS",
+      "visibleNumericInkMargins": "PASS",
+      "embeddedFonts": 2,
+      "fullAspectLogos": "PASS"
+    },
+    {
+      "file": "bingo-phil-gud-duplex.pdf",
+      "cards": 8,
+      "pages": 4,
+      "squares": true,
+      "mirroredBacks": true,
+      "storedCells": "PASS",
+      "visibleNumericInkMargins": "PASS",
+      "embeddedFonts": 2,
+      "fullAspectLogos": "PASS"
+    },
+    {
+      "file": "bingo-phil-gud-partial.pdf",
+      "cards": 5,
+      "pages": 4,
+      "squares": true,
+      "mirroredBacks": true,
+      "storedCells": "PASS",
+      "visibleNumericInkMargins": "PASS",
+      "embeddedFonts": 2,
+      "fullAspectLogos": "PASS"
+    },
+    {
+      "file": "font-ARIMO-ARIMO.pdf",
+      "cards": 15,
+      "pages": 4,
+      "squares": true,
+      "mirroredBacks": false,
+      "storedCells": "PASS",
+      "visibleNumericInkMargins": "PASS",
+      "embeddedFonts": 2,
+      "fullAspectLogos": "PASS"
+    },
+    {
+      "file": "font-ARIMO-MONTSERRAT.pdf",
+      "cards": 15,
+      "pages": 4,
+      "squares": true,
+      "mirroredBacks": false,
+      "storedCells": "PASS",
+      "visibleNumericInkMargins": "PASS",
+      "embeddedFonts": 2,
+      "fullAspectLogos": "PASS"
+    },
+    {
+      "file": "font-MONTSERRAT-ARIMO.pdf",
+      "cards": 15,
+      "pages": 4,
+      "squares": true,
+      "mirroredBacks": false,
+      "storedCells": "PASS",
+      "visibleNumericInkMargins": "PASS",
+      "embeddedFonts": 2,
+      "fullAspectLogos": "PASS"
+    },
+    {
+      "file": "font-MONTSERRAT-MONTSERRAT.pdf",
+      "cards": 15,
+      "pages": 4,
+      "squares": true,
+      "mirroredBacks": false,
+      "storedCells": "PASS",
+      "visibleNumericInkMargins": "PASS",
+      "embeddedFonts": 2,
+      "fullAspectLogos": "PASS"
+    },
+    {
+      "file": "font-PHIL_GUD-ARIMO.pdf",
+      "cards": 15,
+      "pages": 4,
+      "squares": true,
+      "mirroredBacks": false,
+      "storedCells": "PASS",
+      "visibleNumericInkMargins": "PASS",
+      "embeddedFonts": 2,
+      "fullAspectLogos": "PASS"
+    },
+    {
+      "file": "font-PHIL_GUD-MONTSERRAT.pdf",
+      "cards": 15,
+      "pages": 4,
+      "squares": true,
+      "mirroredBacks": false,
+      "storedCells": "PASS",
+      "visibleNumericInkMargins": "PASS",
+      "embeddedFonts": 2,
+      "fullAspectLogos": "PASS"
+    }
+  ],
+  "physicalDuplexTest": false
+}
