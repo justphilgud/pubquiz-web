@@ -26,7 +26,11 @@ async function main() {
       const proof=assertNoDeltaManifest(baseline,candidate,before,after,schema(baseline),schema(candidate));
       if (JSON.stringify(JSON.parse(readFileSync("expected-schema.json","utf8"))) !== JSON.stringify(proof)) throw new Error("MANIFEST_ARTIFACT_MISMATCH");
       const history=await readProductionMigrations(process.env.PRODUCTION_BACKUP_DATABASE_URL ?? "",after,before);
-      result={...history,repositoryEvidence:proof,newInstallReplay:{status:"NOT_RUN",code:"HISTORICAL_BOOTSTRAP_LIMITATION_UNCHANGED"},
+      result={...history,repositoryEvidence:proof,
+        schemaGate:gate("PASS","REPOSITORY_SCHEMA_IDENTICAL_LIVE_DDL_NOT_RECHECKED"),
+        expectedDeltaGate:gate("PASS","REPOSITORY_MIGRATION_DELTA_EMPTY"),deltaGate:gate("PASS","NO_SQL_DELTA_TO_EXECUTE"),
+        replayGate:undefined,deltaTest:{status:"NOT_APPLICABLE",code:"NO_SQL_DELTA"},
+        newInstallReplay:{status:"NOT_RUN",code:"HISTORICAL_BOOTSTRAP_LIMITATION_UNCHANGED"},
         gate:history.gate.status!=="PASS"?history.gate:gate(hasCompleteNoDeltaHistory(history,after)?"PASS":"FAIL","COMPLETE_NO_DELTA_HISTORY_CHECK")};
     }
     result ??= await readProductionMigrations(process.env.PRODUCTION_BACKUP_DATABASE_URL ?? "", migrationFiles(candidate), migrationFiles(baseline), {candidate:initRepositoryEvidence(candidate),baseline:initRepositoryEvidence(baseline),inventory:inventoryFromGit(baseline),expectedSchema:JSON.parse(readFileSync("expected-schema.json","utf8"))});
