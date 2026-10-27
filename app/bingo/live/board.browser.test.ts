@@ -11,7 +11,7 @@ import { getPresentationTemplate } from "../../rendering/templateRegistry";
 test("actual Bingo board fits both dimensions, stable positions, fonts, states, resizing and scaled preview", { timeout: 60000 }, async () => {
   const source = String.raw`
     import React from 'react';import{createRoot}from'react-dom/client';import{flushSync}from'react-dom';
-    import Board from './app/bingo/live/BingoBoard';import Audience from './app/bingo/live/AudienceClient';import{getPresentationTemplate}from'./app/rendering/templateRegistry';
+    import Board from './app/bingo/live/BingoBoard';import Audience from './app/bingo/live/AudienceClient';import{getPresentationTemplate}from'./app/rendering/templateRegistry';import{fetchLiveView}from'./app/bingo/live/useLivePolling';
     const root=createRoot(document.getElementById('app'));
     window.show=(id='phil-gud',count=20,status='RUNNING',scaled=false)=>{
       const t=getPresentationTemplate(id);
@@ -20,6 +20,7 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
       flushSync(()=>root.render(<div style={scaled?{width:1280,height:720,transform:'scale(.4)',transformOrigin:'top left'}:{height:'100dvh'}}><Board data={data}/></div>));
     };
     window.mountPolling=()=>flushSync(()=>root.render(<Audience initial={{...window.currentData,id:'polling',revision:0,draws:[]}} audienceKey="fixture"/>));
+    window.checkStalledConnection=async()=>{try{await fetchLiveView('/hanging');return 'UNEXPECTED_SUCCESS';}catch(e){return e.name;}};
     window.measure=()=>{
       const stage=document.querySelector('[aria-label="Bingo-Präsentation"]'),bound=stage.getBoundingClientRect(),cells=[...stage.querySelectorAll('[data-number]')],issues=[];
       for(const e of [stage,...stage.querySelectorAll('header,footer,ol,li,strong')]){
@@ -35,6 +36,7 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
   let pollRequests = 0;
   const server = createServer((req, res) => {
     const path = req.url ?? "/";
+    if (path === "/hanging") { return; }
     if (path === "/api/bingo/presentation/fixture") {
       pollRequests++;
       const count = pollRequests === 1 ? 12 : pollRequests === 2 ? 11 : pollRequests === 5 ? 0 : pollRequests === 6 ? 75 : pollRequests >= 7 ? 1 : 13, t = getPresentationTemplate("phil-gud")!;
@@ -130,6 +132,7 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
     await evaluate("window.show();window.mountPolling()");
     await waitFor('document.querySelector("[data-run-id]")?.dataset.runId==="new-run"&&document.querySelector("[data-revision]")?.dataset.revision==="1"');
     assert.deepEqual(await evaluate("window.errors"), []);
+    assert.equal(await evaluate("window.checkStalledConnection()"), "AbortError", "stalled response is bounded by the real client timeout");
     console.info(JSON.stringify({ boardCases: results.length, results }));
   } finally {
     socket?.close(); browser.kill(); if (browser.exitCode === null) await new Promise(r => browser.once("exit", r));

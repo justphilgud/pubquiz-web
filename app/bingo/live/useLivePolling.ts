@@ -1,5 +1,17 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+/** A stalled connection must become visible instead of stopping polling forever. */
+export async function fetchLiveView<T>(url: string, signal?: AbortSignal): Promise<T> {
+  const request = new AbortController(), stop = () => request.abort();
+  const deadline = setTimeout(stop, 8000);
+  if (signal?.aborted) stop();
+  signal?.addEventListener("abort", stop, { once: true });
+  try {
+    const response = await fetch(url, { cache: "no-store", signal: request.signal });
+    if (!response.ok) throw Error("CONNECTION");
+    return await response.json() as T;
+  } finally { clearTimeout(deadline); signal?.removeEventListener("abort", stop); }
+}
 /** Serialized polling; a delayed response can never replace a newer revision. */
 export function useLivePolling<T extends { id: string; revision: number; startedAt: number }>(url: string, initial: T) {
   const [data, setData] = useState(initial), [connected, setConnected] = useState(true);
@@ -9,9 +21,7 @@ export function useLivePolling<T extends { id: string; revision: number; started
     const controller = new AbortController();
     async function poll() {
       try {
-        const response = await fetch(url, { cache: "no-store", signal: controller.signal });
-        if (!response.ok) throw Error("CONNECTION");
-        const next = await response.json() as T;
+        const next = await fetchLiveView<T>(url, controller.signal);
         if (!cancelled) {
           if (Number.isSafeInteger(next.revision) && ((next.id === newest.current.id && next.revision >= newest.current.revision) || next.startedAt > newest.current.startedAt)) {
             newest.current = next; setData(next);

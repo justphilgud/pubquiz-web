@@ -99,6 +99,8 @@ vergeben; alte Antworten eines früheren Durchlaufs können einen neueren nicht
 
 Polling ist seriell und behält bei Verbindungsfehlern den letzten bestätigten
 Stand. Innerhalb desselben Durchlaufs werden ältere Revisionen verworfen.
+Eine unbeantwortete Pollanfrage wird nach acht Sekunden abgebrochen; der
+Verbindungsfehler wird sichtbar und die nächste Anfrage erneut versucht.
 Animationen hängen an der Ziehungsidentität, nicht an Pollantworten, und enden
 selbstständig; reduzierte Bewegung deaktiviert sie.
 

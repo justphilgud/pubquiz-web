@@ -10,6 +10,7 @@ import type { LiveCommand } from "./live";
 import type { AudienceView, ModerationView } from "./repository.server";
 import { saveLive } from "./actions";
 import BingoBoard from "./BingoBoard";
+import { fetchLiveView } from "./useLivePolling";
 const lineName = (line: string) => line.startsWith("ROW_") ? `Zeile ${line.slice(4)}` : line.startsWith("COL_") ? `Spalte ${line.slice(4)}` : line === "DIAGONAL_DOWN" ? "Diagonale links oben → rechts unten" : "Diagonale links unten → rechts oben";
 
 export default function ModerationPanel({ initial }: { initial: ModerationView }) {
@@ -26,9 +27,7 @@ export default function ModerationPanel({ initial }: { initial: ModerationView }
   useContentNavigationGuard(Boolean(number || reason || target || cardCode || Object.values(decisionReasons).some(Boolean)));
   const runId = initial.live?.id;
   async function refresh() {
-    const response = await fetch(`/api/bingo/live/${initial.gameId}${runId ? `?run=${runId}` : ""}`, { cache: "no-store" });
-    if (!response.ok) throw Error("CONNECTION");
-    const next = await response.json() as ModerationView;
+    const next = await fetchLiveView<ModerationView>(`/api/bingo/live/${initial.gameId}${runId ? `?run=${runId}` : ""}`);
     if (!current.current.live || next.live?.id !== current.current.live.id || (next.live?.revision ?? -1) >= current.current.live.revision) {
       current.current = next; setData(next);
     }
@@ -36,11 +35,10 @@ export default function ModerationPanel({ initial }: { initial: ModerationView }
   }
   useEffect(() => {
     let disposed = false, timer: ReturnType<typeof setTimeout>;
+    const controller = new AbortController();
     const poll = async () => {
       try {
-        const response = await fetch(`/api/bingo/live/${initial.gameId}${runId ? `?run=${runId}` : ""}`, { cache: "no-store" });
-        if (!response.ok) throw Error("CONNECTION");
-        const next = await response.json() as ModerationView;
+        const next = await fetchLiveView<ModerationView>(`/api/bingo/live/${initial.gameId}${runId ? `?run=${runId}` : ""}`, controller.signal);
         if (!disposed) {
           if (!current.current.live || next.live?.id !== current.current.live.id || (next.live?.revision ?? -1) >= current.current.live.revision) { current.current = next; setData(next); }
           setConnected(true);
@@ -49,7 +47,7 @@ export default function ModerationPanel({ initial }: { initial: ModerationView }
       if (!disposed) timer = setTimeout(poll, 1500);
     };
     void poll();
-    return () => { disposed = true; clearTimeout(timer); };
+    return () => { disposed = true; controller.abort(); clearTimeout(timer); };
   }, [initial.gameId, runId]);
   async function submit(input: Parameters<typeof saveLive>[0]) {
     if (pending.current) return;
