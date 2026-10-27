@@ -1,5 +1,5 @@
-# Bingo AP3 work in progress
+# Bingo AP3
 
-The live integration is being developed on `codex/bingo-live-run`.
+Contract, persistence, access, backup and tests:
+[Bingo Live](../../../docs/architecture/bingo-live.md).
 AP1 remains the rules authority; AP2 retains preparation and immutable cards.
-No merge or production deployment is authorized for this implementation.

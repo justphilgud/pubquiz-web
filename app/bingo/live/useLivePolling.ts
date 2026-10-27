@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 /** Serialized polling; a delayed response can never replace a newer revision. */
-export function useLivePolling<T extends { id: string; revision: number }>(url: string, initial: T) {
+export function useLivePolling<T extends { id: string; revision: number; startedAt: number }>(url: string, initial: T) {
   const [data, setData] = useState(initial), [connected, setConnected] = useState(true);
   const newest = useRef(initial);
   useEffect(() => {
@@ -13,7 +13,7 @@ export function useLivePolling<T extends { id: string; revision: number }>(url: 
         if (!response.ok) throw Error("CONNECTION");
         const next = await response.json() as T;
         if (!cancelled) {
-          if (next.id !== newest.current.id || next.revision >= newest.current.revision) {
+          if (Number.isSafeInteger(next.revision) && ((next.id === newest.current.id && next.revision >= newest.current.revision) || next.startedAt > newest.current.startedAt)) {
             newest.current = next; setData(next);
           }
           setConnected(true);

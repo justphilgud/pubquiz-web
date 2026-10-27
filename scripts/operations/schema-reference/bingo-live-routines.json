@@ -1,0 +1,75 @@
+{
+  "migrations": [
+    {
+      "name": "20261028090000_bingo_live",
+      "sha256": "43b739f502a8f6e556191538f24f368c15ed546b4f38d8639ad55878e6c5bca4"
+    }
+  ],
+  "tables": [
+    "bingo_live_cards",
+    "bingo_live_events",
+    "bingo_live_runs"
+  ],
+  "triggers": [
+    {
+      "schema": "pubquiz",
+      "name": "bingo_live_cards_immutable",
+      "table": "bingo_live_cards",
+      "functionSchema": "pubquiz",
+      "functionName": "bingo_immutable_record",
+      "type": 27,
+      "enabled": "O",
+      "deferrable": false,
+      "deferred": false,
+      "constraint": false,
+      "columns": "",
+      "arguments": "",
+      "condition": null
+    },
+    {
+      "schema": "pubquiz",
+      "name": "bingo_live_events_immutable",
+      "table": "bingo_live_events",
+      "functionSchema": "pubquiz",
+      "functionName": "bingo_immutable_record",
+      "type": 27,
+      "enabled": "O",
+      "deferrable": false,
+      "deferred": false,
+      "constraint": false,
+      "columns": "",
+      "arguments": "",
+      "condition": null
+    },
+    {
+      "schema": "pubquiz",
+      "name": "bingo_live_run_delete",
+      "table": "bingo_live_runs",
+      "functionSchema": "pubquiz",
+      "functionName": "bingo_immutable_record",
+      "type": 11,
+      "enabled": "O",
+      "deferrable": false,
+      "deferred": false,
+      "constraint": false,
+      "columns": "",
+      "arguments": "",
+      "condition": null
+    },
+    {
+      "schema": "pubquiz",
+      "name": "bingo_live_run_identity",
+      "table": "bingo_live_runs",
+      "functionSchema": "pubquiz",
+      "functionName": "bingo_immutable_record",
+      "type": 19,
+      "enabled": "O",
+      "deferrable": false,
+      "deferred": false,
+      "constraint": false,
+      "columns": "id,game_id,round_id,eventreihe_id,started_at,created_by,round_snapshot,design_snapshot,visual_assets,audience_key,start_request_id,start_request_hash",
+      "arguments": "",
+      "condition": null
+    }
+  ]
+}

@@ -2,11 +2,13 @@ import { createHash } from "node:crypto";
 import reference from "./schema-reference/meme-archive-routines.json";
 import {readFileSync} from "node:fs";
 import bingo from "./schema-reference/bingo-ap2-routines.json";
+import bingoLive from "./schema-reference/bingo-live-routines.json";
 import roleGuards from "./schema-reference/role-guard-routines.json";
 import { inspectValue } from "./acceptance-policy";
 import { requireCondition } from "./guards";
 
 export const MEME_ARCHIVE_EXECUTABLE_SQL = `SELECT json_build_object(
+ 'bingoLiveTables',(SELECT coalesce(json_agg(c.relname ORDER BY c.relname),'[]') FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='pubquiz' AND c.relkind='r' AND c.relname IN ('bingo_live_cards','bingo_live_events','bingo_live_runs')),
  'bingoTables',(SELECT coalesce(json_agg(c.relname ORDER BY c.relname),'[]') FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='pubquiz' AND c.relkind='r' AND c.relname IN ('bingo_preparations','bingo_rounds','bingo_card_series','bingo_cards','bingo_round_series','bingo_issuance_changes','bingo_series_labels','bingo_print_versions')),
  'roleTables',(SELECT coalesce(json_agg(c.relname ORDER BY c.relname),'[]') FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='pubquiz' AND c.relkind='r' AND c.relname IN ('eventarten','eventreihe_eventarten','benutzer_eventartrollen','eventreihe_verwaltung','benutzer_reihenrollen')),
  'tables',(SELECT coalesce(json_agg(c.relname ORDER BY c.relname),'[]') FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='pubquiz' AND c.relkind='r' AND c.relname IN ('meme_archive_sources','meme_archive_entries')),
@@ -30,7 +32,7 @@ const trigger = {schema: "pubquiz", name: "capture_confirmed_meme", table: "team
   functionName: "capture_confirmed_meme", type: 5, enabled: "O", deferrable: false, deferred: false, constraint: false, columns: "", arguments: "", condition: null};
 const stable = (value: unknown): string => JSON.stringify(value, (_key, item) => item && typeof item === "object" && !Array.isArray(item)
   ? Object.fromEntries(Object.entries(item).sort(([a], [b]) => a.localeCompare(b, "en"))) : item);
-export type ArchiveSchemaProof = {version: 1; migrationSha256: string; executableSha256: string; roleGuardMigrations?: {name:string;sha256:string}[]; bingoMigrations?: {name:string;sha256:string}[]};
+export type ArchiveSchemaProof = {version: 1; migrationSha256: string; executableSha256: string; roleGuardMigrations?: {name:string;sha256:string}[]; bingoMigrations?: {name:string;sha256:string}[]; bingoLiveMigrations?: {name:string;sha256:string}[]};
 
 export function assertBingoMigrationChecksums(actual: readonly {name:string;sha256:string}[]) {
   requireCondition(stable(actual) === stable(bingo.migrations), "BINGO_MIGRATION_REFERENCE_MISMATCH");
@@ -40,10 +42,21 @@ export function assertBingoMigrationChecksums(actual: readonly {name:string;sha2
 export function reviewMemeArchiveExecutables(value: unknown): ArchiveSchemaProof | undefined {
   requireCondition(Boolean(value) && typeof value === "object" && !Array.isArray(value), "SCHEMA_SECURITY_REVIEW_REQUIRED");
   const data = value as Record<string, unknown>;
+  const liveTables = data.bingoLiveTables ?? [];
+  requireCondition(Array.isArray(liveTables), "SCHEMA_SECURITY_REVIEW_REQUIRED");
+  const hasLive = liveTables.length > 0;
+  if (hasLive) {
+    requireCondition(stable(liveTables) === stable(bingoLive.tables), "SCHEMA_SECURITY_REVIEW_REQUIRED");
+    for (const migration of bingoLive.migrations) {
+      const sql = readFileSync(new URL(`../../prisma/migrations/${migration.name}/migration.sql`, import.meta.url), "utf8").replaceAll("\r\n", "\n");
+      requireCondition(createHash("sha256").update(sql).digest("hex") === migration.sha256, "BINGO_LIVE_MIGRATION_REFERENCE_MISMATCH");
+    }
+  }
   requireCondition(Array.isArray(data.tables) && Array.isArray(data.routines) && Array.isArray(data.triggers), "SCHEMA_SECURITY_REVIEW_REQUIRED");
   const bingoTables = data.bingoTables ?? [];
   requireCondition(Array.isArray(bingoTables), "SCHEMA_SECURITY_REVIEW_REQUIRED");
   const hasBingo = bingoTables.length > 0;
+  requireCondition(!hasLive || hasBingo, "SCHEMA_SECURITY_REVIEW_REQUIRED");
   if (hasBingo) {
     requireCondition(stable(bingoTables) === stable(bingo.tables), "SCHEMA_SECURITY_REVIEW_REQUIRED");
     assertBingoMigrationChecksums(bingo.migrations.map(migration => {
@@ -64,14 +77,15 @@ export function reviewMemeArchiveExecutables(value: unknown): ArchiveSchemaProof
     return {...attributes, sourceSha256: createHash("sha256").update(source.replaceAll("\r\n", "\n")).digest("hex")};
   }).sort((a, b) => String(a.name).localeCompare(String(b.name), "en"));
   const expectedRoutines = [...reference.routines, ...(hasRoleGuards ? roleGuards.routines : []), ...(hasBingo ? bingo.routines : [])];
-  const expectedTriggers = [trigger, ...(hasRoleGuards ? roleGuards.triggers : []), ...(hasBingo ? bingo.triggers : [])];
+  const expectedTriggers = [trigger, ...(hasRoleGuards ? roleGuards.triggers : []), ...(hasBingo ? bingo.triggers : []), ...(hasLive ? bingoLive.triggers : [])];
   const byName = (a: {name: unknown}, b: {name: unknown}) => String(a.name).localeCompare(String(b.name), "en");
   requireCondition(stable(routines) === stable(expectedRoutines.sort(byName)) &&
     stable(data.triggers.slice().sort(byName)) === stable(expectedTriggers.sort(byName)), "SCHEMA_SECURITY_REVIEW_REQUIRED");
   return {version: 1, migrationSha256: reference.migrationSha256,
     executableSha256: createHash("sha256").update(stable({routines, triggers: data.triggers})).digest("hex"),
     ...(hasRoleGuards ? {roleGuardMigrations: roleGuards.migrations} : {}),
-    ...(hasBingo ? {bingoMigrations: bingo.migrations} : {})};
+    ...(hasBingo ? {bingoMigrations: bingo.migrations} : {}),
+    ...(hasLive ? {bingoLiveMigrations: bingoLive.migrations} : {})};
 }
 
 function bytea(value: unknown, maximum: number, exact?: number) {

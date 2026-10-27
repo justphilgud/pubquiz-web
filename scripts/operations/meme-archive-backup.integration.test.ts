@@ -45,7 +45,7 @@ test("real PostgreSQL17: archive dump/guarded restore retains encrypted PNG, key
       .replace(/model meme_archive_sources \{[\s\S]*?^\}/m, "").replace(/model meme_archive_entries \{[\s\S]*?^\}/m, "");
     // This is explicitly the historical pre-Bingo restore fixture. Current model
     // tables without their executable objects are not a valid historical schema.
-    const bingoModels=["bingo_preparations","bingo_rounds","bingo_card_series","bingo_cards","bingo_round_series","bingo_issuance_changes","bingo_series_labels","bingo_print_versions"];
+    const bingoModels=["bingo_preparations","bingo_rounds","bingo_card_series","bingo_cards","bingo_round_series","bingo_issuance_changes","bingo_series_labels","bingo_print_versions","bingo_live_runs","bingo_live_cards","bingo_live_events"];
     for(const model of bingoModels){
       schema=schema.replace(new RegExp(`model ${model} \\{[\\s\\S]*?^\\}`,"m"),"");
       schema=schema.replace(new RegExp(`^.*\\s${model}(?:\\[\\]|\\?)?[^\\n]*$`,"gm"),"");

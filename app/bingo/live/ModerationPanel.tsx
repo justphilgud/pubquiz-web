@@ -1,7 +1,8 @@
 "use client";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Button, Input, Select } from "@/components/ui";
+import { Button, Input, Select, ConfirmDialog } from "@/components/ui";
 import { useContentNavigationGuard } from "@/app/components/content/useContentNavigationGuard";
 import { evaluateClaim } from "../core/round";
 import type { Stage } from "../core/cards";
@@ -9,16 +10,20 @@ import type { LiveCommand } from "./live";
 import type { AudienceView, ModerationView } from "./repository.server";
 import { saveLive } from "./actions";
 import BingoBoard from "./BingoBoard";
+const lineName = (line: string) => line.startsWith("ROW_") ? `Zeile ${line.slice(4)}` : line.startsWith("COL_") ? `Spalte ${line.slice(4)}` : line === "DIAGONAL_DOWN" ? "Diagonale links oben → rechts unten" : "Diagonale links unten → rechts oben";
 
 export default function ModerationPanel({ initial }: { initial: ModerationView }) {
+  const router = useRouter();
   const [data, setData] = useState(initial), [connected, setConnected] = useState(true), [message, setMessage] = useState("");
   const [roundId, setRoundId] = useState(""), [number, setNumber] = useState(""), [preview, setPreview] = useState<number | null>(null);
   const [target, setTarget] = useState(""), [reason, setReason] = useState(""), [cardCode, setCardCode] = useState("");
+  const [decisionReasons, setDecisionReasons] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false), [stage, setStage] = useState<Stage>("BINGO");
   const [canRetry, setCanRetry] = useState(false);
+  const [confirmation, setConfirmation] = useState<{ title: string; text: string; apply: () => void } | null>(null);
   const pending = useRef(false), retry = useRef<Parameters<typeof saveLive>[0] | null>(null);
   const current = useRef(initial);
-  const saved = useContentNavigationGuard(Boolean(number || reason || target || cardCode));
+  useContentNavigationGuard(Boolean(number || reason || target || cardCode || Object.values(decisionReasons).some(Boolean)));
   const runId = initial.live?.id;
   async function refresh() {
     const response = await fetch(`/api/bingo/live/${initial.gameId}${runId ? `?run=${runId}` : ""}`, { cache: "no-store" });
@@ -52,7 +57,18 @@ export default function ModerationPanel({ initial }: { initial: ModerationView }
     try {
       const result = await saveLive(input);
       if (!result.success) { setMessage(result.message); retry.current = null; return; }
-      retry.current = null; setMessage("Gespeichert."); setNumber(""); setPreview(null); setReason(""); setTarget(""); setCardCode(""); saved();
+      retry.current = null; setMessage("Gespeichert.");
+      if (input.operation === "start" && "runId" in result) {
+        router.replace(`/bingo/${data.gameId}/moderation?run=${result.runId}`);
+        return;
+      }
+      if (input.operation === "command") {
+        if (input.command.kind === "draw" || input.command.kind === "correct") { setNumber(""); setPreview(null); }
+        if (input.command.kind === "correct") setReason("");
+        if (input.command.kind === "decide") { const callId = input.command.callId; setDecisionReasons(current => ({ ...current, [callId]: "" })); }
+        if (input.command.kind === "target") setTarget("");
+        if (input.command.kind === "identify") setCardCode("");
+      }
       await refresh();
     } catch { setCanRetry(true); setMessage("Antwort unklar. Bitte dieselbe Anfrage erneut senden; sie wird nicht doppelt ausgeführt."); }
     finally { pending.current = false; setBusy(false); }
@@ -62,10 +78,12 @@ export default function ModerationPanel({ initial }: { initial: ModerationView }
     void submit({ operation: "command", gameId: data.gameId, runId: data.live.id, revision: data.live.revision, requestId: crypto.randomUUID(), command });
   }
   const live = data.live, round = live?.state.run.rounds[0], status = live?.state.run.status;
-  const board: AudienceView | null = live && round ? { id: live.id, revision: live.revision, status: live.state.run.status, label: live.round.label, target: round.plannedDraws, draws: round.draws, design: live.design, claims: round.claims.map(c => ({ id: c.id, stage: c.stage, action: c.decisions.at(-1)?.action ?? null, needsReview: c.needsReview })) } : null;
+  const board: AudienceView | null = live && round ? { id: live.id, revision: live.revision, startedAt: live.startedAt, status: live.state.run.status, label: live.round.label, target: round.plannedDraws, draws: round.draws, design: live.design, assetBase: `/api/bingo/presentation/${live.audienceKey}/assets`, claims: round.claims.map(c => ({ id: c.id, stage: c.stage, action: c.decisions.at(-1)?.action ?? null, needsReview: c.needsReview })) } : null;
   return <div className="space-y-5">
+    <ConfirmDialog open={confirmation !== null} title={confirmation?.title ?? ""} onClose={() => setConfirmation(null)} onConfirm={() => { const action = confirmation?.apply; setConfirmation(null); action?.(); }}>{confirmation?.text}</ConfirmDialog>
     <p role="status">{connected ? "Verbunden" : "Verbindung unterbrochen · letzter bestätigter Stand"}{busy ? " · Speichert …" : ""}</p>
     {message && <p role="status">{message}</p>}
+    <Link href={`/bingo/${data.gameId}/praesentation`} target="_blank" rel="noreferrer" className="underline">Präsentation vorab öffnen</Link>
     {canRetry && !busy && <Button onClick={() => { if (retry.current) void submit(retry.current); }}>Dieselbe Anfrage erneut senden</Button>}
     {!live || status === "ENDED" ? <section className="space-y-3 rounded-xl border p-4"><h2>Neuen Durchlauf starten</h2>
       <p>Eine vorbereitete Runde und ihre ausdrücklich zugeordneten Karten werden mit dem aktuellen Präsentationsdesign eingefroren.</p>
@@ -73,7 +91,7 @@ export default function ModerationPanel({ initial }: { initial: ModerationView }
       {roundId && <p>Kartenserien: {data.rounds.find(r => r.id === roundId)?.series.map(s => s.series.code).join(", ")}</p>}
       {!data.rounds.some(r => r.series.length) && <p>Bitte zuerst eine Runde vorbereiten und Kartenserien zuordnen.</p>}
       <Button disabled={busy || !roundId || data.archived} onClick={() => {
-        if (window.confirm("Neuen Durchlauf mit dieser Runde und diesen Kartenserien starten?")) void submit({ operation: "start", gameId: data.gameId, roundId, requestId: crypto.randomUUID(), expectedSeriesId: data.seriesId, preparationRevision: data.preparationRevision });
+        setConfirmation({ title: "Durchlauf starten?", text: "Diese Runde, ihre Kartenserien und das aktuelle Präsentationsdesign werden für den neuen Durchlauf eingefroren.", apply: () => { void submit({ operation: "start", gameId: data.gameId, roundId, requestId: crypto.randomUUID(), expectedSeriesId: data.seriesId, preparationRevision: data.preparationRevision }); } });
       }}>Durchlauf bewusst starten</Button>
     </section> : null}
     {live && round && <><section className="space-y-3 rounded-xl border p-4"><h2>{live.round.label} · {status === "RUNNING" ? "Läuft" : status === "PAUSED" ? "Pause" : "Beendet"}</h2>
@@ -85,10 +103,10 @@ export default function ModerationPanel({ initial }: { initial: ModerationView }
           <label>Physisch gezogene Zahl<Input inputMode="numeric" value={number} onChange={e => { setNumber(e.target.value); setPreview(null); }} /></label><Button type="submit" disabled={status !== "RUNNING"}>Zahl prüfen</Button>
         </form>
         {preview !== null && <div><p>Vorschau: <strong>{preview}</strong></p><Button disabled={status !== "RUNNING"} onClick={() => send({ kind: "draw", number: preview })}>Zahl veröffentlichen</Button></div>}
-        <div className="flex flex-wrap gap-3"><Button onClick={() => send({ kind: status === "PAUSED" ? "resume" : "pause" })}>{status === "PAUSED" ? "Fortsetzen" : "Pause"}</Button><Button onClick={() => { if (window.confirm("Durchlauf endgültig beenden? Er kann danach nicht fortgesetzt werden.")) send({ kind: "end" }); }}>Durchlauf beenden</Button></div>
+        <div className="flex flex-wrap gap-3"><Button onClick={() => send({ kind: status === "PAUSED" ? "resume" : "pause" })}>{status === "PAUSED" ? "Fortsetzen" : "Pause"}</Button><Button onClick={() => setConfirmation({ title: "Durchlauf endgültig beenden?", text: "Der gespeicherte Durchlauf kann danach nicht fortgesetzt werden. Karten und Historie bleiben erhalten.", apply: () => send({ kind: "end" }) })}>Durchlauf beenden</Button></div>
         <label>Ziehungsziel<Input inputMode="numeric" value={target} onChange={e => setTarget(e.target.value)} /></label><Button onClick={() => send({ kind: "target", number: Number(target) })}>Ziehungsziel ändern</Button>
-        <label>Begründung<Input value={reason} onChange={e => setReason(e.target.value)} maxLength={1000} /></label>
-        <Button disabled={!round.draws.length || !number || !reason.trim()} onClick={() => { if (window.confirm("Nur die zuletzt veröffentlichte Zahl korrigieren? Bestätigte Gewinne werden nachgeprüft.")) send({ kind: "correct", number: Number(number), reason }); }}>Letzte Zahl korrigieren</Button>
+        <label>Begründung der Korrektur<Input value={reason} onChange={e => setReason(e.target.value)} maxLength={1000} /></label>
+        <Button disabled={!round.draws.length || !number || !reason.trim()} onClick={() => setConfirmation({ title: "Letzte Zahl korrigieren?", text: "Nur die letzte Ziehung wird korrigiert. Betroffene bestätigte Gewinne werden zur Nachprüfung markiert.", apply: () => send({ kind: "correct", number: Number(number), reason }) })}>Letzte Zahl korrigieren</Button>
       </fieldset>}
       <ol aria-label="Ziehungshistorie" className="flex flex-wrap gap-3">{round.draws.map(d => <li key={d.id}>{d.position}. <strong>{d.number}</strong></li>)}</ol>
       {round.corrections.map(c => <p key={c.id}>Korrektur {c.position}: {c.before} → {c.after} · {c.reason}</p>)}
@@ -103,8 +121,9 @@ export default function ModerationPanel({ initial }: { initial: ModerationView }
         return <article key={call.id} className="space-y-2 border-t py-3"><h3>{call.stage === "BINGO" ? "Bingo" : call.stage === "DOUBLE" ? "Doppel-Bingo" : "Triple-Bingo"} · Ruf bei Ziehung {call.throughPosition}</h3>
           {!card ? <Button onClick={() => { const found = live.cards.find(c => [c.id, c.code, c.shortCode].some(code => code.toUpperCase() === cardCode.trim().toUpperCase())); if (!found) { setMessage("Keine zugeordnete Karte gefunden."); return; } send({ kind: "identify", callId: call.id, cardId: found.id }); }}>Karte für diesen Ruf prüfen</Button> : <>
             <p>{card.shortCode} · {card.code}</p><table aria-label={`Geprüfte Karte ${card.shortCode}`}><tbody>{card.cells.map((row, r) => <tr key={r}>{row.map((n, c) => <td key={c} className="border p-2" style={{ fontWeight: n === null || round.draws.slice(0, call.throughPosition).some(d => d.number === n) ? 800 : 400 }}>{n ?? "Frei"}</td>)}</tr>)}</tbody></table>
-            <p>Linien: {evaluation?.lines.join(", ") || "keine"} · {evaluation?.stages.includes(call.stage) ? "Gewinnstufe erfüllt" : "Gewinnstufe nicht erfüllt"}{claim?.needsReview ? " · Nachprüfung erforderlich" : ""}</p>
-            <div className="flex flex-wrap gap-3">{(["CONFIRM", "REJECT", "REVOKE"] as const).map(action => <Button key={action} disabled={!reason.trim()} onClick={() => send({ kind: "decide", callId: call.id, action, reason })}>{action === "CONFIRM" ? "Gewinn bestätigen" : action === "REJECT" ? "Ruf ablehnen" : "Bestätigung zurücknehmen"}</Button>)}</div>
+            <p>Linien: {evaluation?.lines.map(lineName).join(", ") || "keine"} · {evaluation?.stages.includes(call.stage) ? "Gewinnstufe erfüllt" : "Gewinnstufe nicht erfüllt"}{claim?.needsReview ? " · Nachprüfung erforderlich" : ""}</p>
+            <label>Begründung der Entscheidung<Input maxLength={1000} value={decisionReasons[call.id] ?? ""} onChange={e => setDecisionReasons(current => ({ ...current, [call.id]: e.target.value }))} /></label>
+            <div className="flex flex-wrap gap-3">{(["CONFIRM", "REJECT", "REVOKE"] as const).map(action => <Button key={action} disabled={!decisionReasons[call.id]?.trim()} onClick={() => send({ kind: "decide", callId: call.id, action, reason: decisionReasons[call.id] })}>{action === "CONFIRM" ? "Gewinn bestätigen" : action === "REJECT" ? "Ruf ablehnen" : "Bestätigung zurücknehmen"}</Button>)}</div>
             {claim?.decisions.map(d => <p key={d.id}>{d.action === "CONFIRM" ? "Bestätigt" : d.action === "REJECT" ? "Abgelehnt" : "Zurückgenommen"} · {d.reason}</p>)}
           </>}
         </article>;

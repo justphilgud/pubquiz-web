@@ -32,7 +32,7 @@ export default function GameDraftForm({ type, initial, choices, canWrite, return
       router.refresh();
     } catch { setMessage({ error: true, text: "Speichern fehlgeschlagen. Deine Eingaben bleiben erhalten." }); }
   }); }} className="space-y-5 rounded-2xl border border-slate-200 bg-white p-4 sm:p-6">
-    <p className="text-sm text-slate-600">Entwurf · Vorbereitung – dieses Spiel ist noch nicht spielbar.</p>
+    <p className="text-sm text-slate-600">{type === "BINGO" ? "Spielstammdaten · Karten vorbereiten und anschließend einen eigenen Durchlauf bewusst starten." : "Entwurf · Vorbereitung – dieses Spiel ist noch nicht spielbar."}</p>
     {!canWrite && <p role="status">Nur Lesezugriff. Spiele verwalten Eventmanager und Administratoren.</p>}
     <fieldset disabled={!ready || pending || teamBusy || !canWrite} className="min-w-0 space-y-4">
       <FormField label="Titel" htmlFor="game-title"><Input id="game-title" name="title" required maxLength={150} value={fields.title} onChange={event => change("title", event.target.value)} /></FormField>

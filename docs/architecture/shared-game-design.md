@@ -18,6 +18,11 @@ Auswahlseiten sind eigene Unterseiten bestehender Objekte mit vorhandenem Naviga
 
 ## Betrieb und Tests
 
+Die spätere formatspezifische Liveintegration ist für Bingo in
+[Bingo Live AP3](bingo-live.md) beschrieben. Sie nutzt diesen Resolver und friert
+ihn beim bewussten Durchlaufstart ein. Der gemeinsame Designvertrag selbst bleibt
+unverändert; Karaoke erhält dadurch keine Laufzeit.
+
 Migration ausschließlich neue nullable Spalten, keine Konvertierung/Backfill. Vorhandene dynamische Dump-/Kataloginventur erfasst Spalten. Snapshot-JSON wird eng anhand des regulären Konfigurationsvalidators geprüft, nicht pauschal von der Integritätsprüfung ausgenommen. displayFamily ist ausschließlich optional aus derselben Schrift-Whitelist zugelassen; unbekannte Felder bleiben Fehler. Historisches PRIVATE_READBACK_FAILED ungeklärt, kein Ursachenfix behauptet. Keine manuellen Backups/Restores.
 
 Zu prüfen: Legacy-Regression, getrennte Antwortauswahl, echte Vererbung/Override/Reload, Snapshotstabilität, Rechte/Produkte/IDs/CAS, leere/befüllte additive Migration, Backupvalidator, reale Browser mit zwei Marken und drei Formaten, Laptop/groß/mobil inklusive Schrift/Überlauf. Historische Bootstrapgrenzen bleiben bestehen. Kein Merge/Production.

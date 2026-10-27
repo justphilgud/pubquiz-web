@@ -126,6 +126,7 @@ test("role guard review rejects missing, changed, additional and security-sensit
 });
 
 import bingo from "./schema-reference/bingo-ap2-routines.json";
+import bingoLive from "./schema-reference/bingo-live-routines.json";
 function bingoFixture() {
   const source = new Map<string,string>();
   for (const migration of bingo.migrations) {
@@ -173,4 +174,28 @@ test("Bingo migration reference rejects wrong/missing/additional/reordered check
     [...bingo.migrations].reverse(),bingo.migrations.map((m,i)=>i===0?{...m,sha256:"0".repeat(64)}:m)]){
     assert.throws(()=>assertBingoMigrationChecksums(invalid),/BINGO_MIGRATION_REFERENCE_MISMATCH/);
   }
+});
+
+test("AP3 exact immutable bindings preserve AP2 and reject missing, disabled, changed or extra objects", () => {
+  const fixture = () => { const old = bingoFixture(); return { ...old, bingoLiveTables: [...bingoLive.tables], triggers: [...old.triggers, ...structuredClone(bingoLive.triggers)] }; };
+  const f = fixture(), proof = reviewMemeArchiveExecutables(f)!;
+  assert.deepEqual(proof.bingoLiveMigrations, bingoLive.migrations);
+  assert.deepEqual(proof.bingoMigrations, bingo.migrations);
+  for (const migration of bingoLive.migrations) {
+    const sql = readFileSync(new URL(`../../prisma/migrations/${migration.name}/migration.sql`, import.meta.url), "utf8").replaceAll("\r\n", "\n");
+    assert.equal(hash(sql), migration.sha256);
+    assert.equal(/CREATE\s+(OR REPLACE\s+)?FUNCTION/i.test(sql), false);
+    assert.equal([...sql.matchAll(/CREATE TRIGGER /g)].length, 4);
+  }
+  const changes = [
+    (v: ReturnType<typeof fixture>) => { v.bingoLiveTables.pop(); },
+    (v: ReturnType<typeof fixture>) => { v.bingoLiveTables.push("bingo_live_unreviewed"); },
+    (v: ReturnType<typeof fixture>) => { v.triggers.pop(); },
+    (v: ReturnType<typeof fixture>) => { v.triggers.push({ ...v.triggers.at(-1)!, name: "bingo_live_unreviewed" }); },
+    (v: ReturnType<typeof fixture>) => { v.triggers.at(-1)!.enabled = "D"; },
+    (v: ReturnType<typeof fixture>) => { v.triggers.at(-1)!.table = "quiz"; },
+    (v: ReturnType<typeof fixture>) => { v.triggers.at(-1)!.columns = ""; },
+    (v: ReturnType<typeof fixture>) => { v.routines.find(r => r.name === "bingo_immutable_record")!.source += " "; },
+  ];
+  for (const mutate of changes) { const value = fixture(); mutate(value); assert.throws(() => reviewMemeArchiveExecutables(value), /SCHEMA_SECURITY_REVIEW_REQUIRED/); }
 });

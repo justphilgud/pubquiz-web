@@ -1,9 +1,10 @@
-import { parseQuizDesignSnapshot } from "../../app/rendering/sharedDesign/sharedDesign";
+import { parseQuizDesignSnapshot, parseSharedDesign } from "../../app/rendering/sharedDesign/sharedDesign";
 import { assertRestoreTarget, requireCondition } from "./guards";
 import { brandFontOptions } from "../../app/rendering/templateRegistry";
 import { isSafeTemplateAssetReference } from "../../app/rendering/presentationTemplates/presentationTemplateAssets";
 import { parsePrintSnapshot } from "../../app/bingo/preparation/printSnapshot";
 import { decodeCard } from "../../app/bingo/preparation/policy";
+import { parseLiveAssets } from "../../app/bingo/live/visualAssets";
 
 export const RESTORE_TARGET = {
   project: "icy-leaf-46256271", branch: "br-bitter-paper-b20sx4lu",
@@ -67,6 +68,18 @@ function exactKeys(value: unknown, keys: string): asserts value is Record<string
 // Only this persisted presentation field uses "tokens" for design, not authentication.
 // Check exact shape and bounded design values, then retain the ordinary recursive scan.
 export function inspectRow(value: Record<string, unknown>, media: Set<string>, schema: string, table: string) {
+  if (schema === "pubquiz" && table === "bingo_live_runs") {
+    const design = parseSharedDesign(value.design_snapshot);
+    requireCondition(design !== null, "DESIGN_TOKEN_STRUCTURE_REVIEW_REQUIRED");
+    const assets = parseLiveAssets(value.visual_assets);
+    const { design_snapshot: _snapshot, visual_assets: _assets, ...rest } = value;
+    void _snapshot;
+    void _assets;
+    inspectValue([assets.display.name, assets.body.name, assets.logo?.name ?? null, assets.background?.name ?? null], media);
+    inspectValue(rest, media);
+    inspectValue({ version: design.version, templateId: design.templateId, name: design.name }, media);
+    return inspectRow({ theme_config_json: design.config }, new Set<string>(), "pubquiz", "presentation_templates");
+  }
   if (schema === "pubquiz" && (table === "bingo_card_series" || table === "bingo_print_versions")) {
     const snapshotField=table==='bingo_card_series'?'print_snapshot':'snapshot';
     const snapshot = parsePrintSnapshot(value[snapshotField]);

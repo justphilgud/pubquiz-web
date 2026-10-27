@@ -4,6 +4,9 @@ Status: AP2 implemented with local isolated acceptance; exact-head CI/hosted-pre
 evidence is tracked in PR #143 and the linked acceptance report. No runtime, public
 join link, draw state, claim workflow or AP3 implementation is included.
 
+AP3 adds the separate persisted integration in [Bingo Live](bingo-live.md).
+Preparation and immutable print contracts remain owned by this AP2 module.
+
 ## Ownership and boundaries
 
 `game_drafts.id` remains the sole game identity. Existing master data, optional

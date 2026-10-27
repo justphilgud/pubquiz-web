@@ -27,6 +27,7 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/*": ["./assets/fonts/arimo/Arimo.ttf"],
     "/bingo/*/vorbereitung": ["./assets/fonts/bingo/*.ttf", "./public/branding/phil-gud/phil-gud.woff"],
+    "/bingo/*/moderation": ["./assets/fonts/bingo/*.ttf", "./public/branding/phil-gud/phil-gud.woff"],
     "/bingo/*/design/druck": ["./assets/fonts/bingo/*.ttf", "./public/branding/phil-gud/phil-gud.woff"],
     "/admin/eventreihen/*/design/druck": ["./assets/fonts/bingo/*.ttf", "./public/branding/phil-gud/phil-gud.woff"],
     "/bingo/*/karten/*/druckgestaltung": ["./assets/fonts/bingo/*.ttf", "./public/branding/phil-gud/phil-gud.woff"],
