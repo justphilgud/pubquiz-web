@@ -420,6 +420,7 @@ model meme_archive_entries {
 }
 
 model eventreihen {
+  bingo_print_config Json?
   game_drafts game_drafts[]
   reihenrollen benutzer_reihenrollen[]
   eventarten eventreihe_eventarten[]
@@ -1403,6 +1404,7 @@ enum LivePollPublicationMode {
 }
 
 model users {
+  bingo_print_versions bingo_print_versions[]
   bingo_series_created bingo_card_series[]
   bingo_issuance_changes bingo_issuance_changes[]
   reihenrollen benutzer_reihenrollen[] @relation("SeriesRoleUser")
@@ -1576,6 +1578,8 @@ model benutzer_reihenrollen {
 
 /// Standalone non-playable game instances. No Quiz identity or live state.
 model game_drafts {
+  bingo_print_config Json?
+  bingo_series_labels bingo_series_labels[]
   bingo_preparation bingo_preparations?
   bingo_rounds bingo_rounds[]
   bingo_card_series bingo_card_series[]
@@ -1620,6 +1624,8 @@ model bingo_rounds {
   @@schema("pubquiz")
 }
 model bingo_card_series {
+  short_label bingo_series_labels?
+  print_versions bingo_print_versions[]
   id String @id @default(uuid()) @db.Uuid
   game_id String @db.Uuid
   origin_round_id String @db.Uuid
@@ -1638,6 +1644,29 @@ model bingo_card_series {
   @@unique([id,game_id])
   @@unique([game_id,request_id])
   @@index([game_id,created_at,id])
+  @@schema("pubquiz")
+}
+
+model bingo_series_labels {
+  series_id String @id @db.Uuid
+  game_id String @db.Uuid
+  prefix Int
+  series bingo_card_series @relation(fields:[series_id,game_id],references:[id,game_id],onDelete:Restrict)
+  game game_drafts @relation(fields:[game_id],references:[id],onDelete:Restrict)
+  @@unique([game_id,prefix])
+  @@unique([series_id,game_id])
+  @@schema("pubquiz")
+}
+
+model bingo_print_versions {
+  series_id String @db.Uuid
+  version Int
+  snapshot Json
+  created_by Int
+  created_at DateTime @default(now()) @db.Timestamptz(3)
+  series bingo_card_series @relation(fields:[series_id],references:[id],onDelete:Restrict)
+  actor users @relation(fields:[created_by],references:[id],onDelete:Restrict)
+  @@id([series_id,version])
   @@schema("pubquiz")
 }
 model bingo_cards {

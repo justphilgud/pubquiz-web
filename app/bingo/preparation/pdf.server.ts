@@ -3,6 +3,7 @@ import fontkit from "@pdf-lib/fontkit";
 import { PDFDocument, concatTransformationMatrix, popGraphicsState, pushGraphicsState, rgb, type PDFFont, type PDFPage } from "pdf-lib";
 import { parsePrintSnapshot, type PrintSnapshot } from "./printSnapshot";
 import { BingoPreparationError, decodeCard, MAX_EXPORT, type StoredCard } from "./policy";
+import { createSquareCardsPdf, type PrintMode } from "./pdfSquare.server";
 
 function fittedLines(text: string, font: PDFFont, width: number, maxLines: number, initial: number) {
   for (let size = initial; size >= 7; size -= 0.5) {
@@ -46,8 +47,10 @@ function color(value: string) {
   return rgb(parseInt(match[1].slice(0, 2), 16) / 255, parseInt(match[1].slice(2, 4), 16) / 255, parseInt(match[1].slice(4, 6), 16) / 255);
 }
 /** Pure export of stored cards and frozen bytes. No repository writes or asset fetches. */
-export async function createCardsPdf(input: PrintSnapshot, cards: readonly StoredCard[]): Promise<Uint8Array> {
+export async function createCardsPdf(input: PrintSnapshot, cards: readonly StoredCard[], mode: PrintMode = 'front'): Promise<Uint8Array> {
   const snapshot = parsePrintSnapshot(input);
+  if(snapshot.version===2)return createSquareCardsPdf(snapshot,cards,mode);
+  if(mode!=='front')throw new BingoPreparationError('Dieses historische Druckdesign hat keine Rückseite. Bitte eine neue Druckdesign-Version anlegen.');
   if (!cards.length || cards.length > MAX_EXPORT || new Set(cards.map(c => c.id)).size !== cards.length) throw new BingoPreparationError("Ungültige Kartenmenge für den PDF-Export.");
   for (const card of cards) decodeCard(card.cells);
   const pdf = await PDFDocument.create();

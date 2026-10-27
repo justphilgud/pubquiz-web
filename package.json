@@ -34,8 +34,9 @@
     "test:event-publication": "node --import tsx --test app/eventreihen/publicEventContent.test.ts app/eventreihen/eventSeriesForm.browser.test.ts app/quiz/quizEventImage.test.ts",
     "test:analysis": "node --import tsx --test app/components/content/contentPaging.test.ts app/quiz/fixedSlideSaving.test.ts app/quiz/evaluation/difficultyAudit.test.ts && tsx --test app/components/content/contentSearch.browser.test.ts",
     "test:lovd": "npm run test:analysis && node --import tsx --test app/rendering/presentation/questionPhaseMedia.test.ts app/rendering/presentation/mediaCountdown.test.ts app/quiz/memeNavigationPolicy.test.ts app/quiz/liveSnapshotRevision.test.ts app/quiz/estimationTiebreak.test.ts app/quiz/yearlyRanking.server.test.ts && tsx --test app/rendering/presentation/synchronizedMedia.browser.test.ts",
-    "test:bingo-preparation": "node --import tsx --test app/bingo/preparation/policy.test.ts app/bingo/preparation/pdf.test.ts app/bingo/preparation/exportBoundary.test.ts",
-    "test:bingo-preparation:browser": "node scripts/testing/bingo-preparation.browser.mjs"
+    "test:bingo-preparation": "node --import tsx --test app/bingo/preparation/policy.test.ts app/bingo/preparation/pdf.test.ts app/bingo/preparation/exportBoundary.test.ts app/bingo/preparation/printDesign.test.ts",
+    "test:bingo-preparation:browser": "node scripts/testing/bingo-preparation.browser.mjs",
+    "test:bingo-print:browser": "node scripts/testing/bingo-preparation.browser.mjs --print"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

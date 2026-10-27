@@ -6,6 +6,7 @@ import type {
 } from "@/app/rendering/templateRegistry";
 import { brandFontOptions, presentationDesigns, UNGEGOOGELT_NEON_COLORS } from "@/app/rendering/templateRegistry";
 import { isSafeTemplateAssetReference } from "./presentationTemplateAssets";
+import { parseBingoPrint, printContrastIssues, type BingoPrint } from "@/app/bingo/preparation/bingoPrint";
 import {
   normalizeStorybookConfiguration,
   validateStorybookConfiguration,
@@ -23,6 +24,7 @@ export type PresentationTemplateStatus =
   (typeof presentationTemplateStatuses)[number];
 
 export type PresentationTemplateConfig = {
+  bingoPrint?: BingoPrint;
   version: typeof PRESENTATION_TEMPLATE_CONTRACT_VERSION;
   tokens: BrandTokens;
   surfaces: {
@@ -305,7 +307,8 @@ function validateConfig(value: unknown) {
   if (!isRecord(value)) {
     return { errors: [{ field: "config", message: "Theme-Konfiguration fehlt." }] };
   }
-  rejectUnknownFields(value, ["version", "tokens", "surfaces", "design"], "config", errors);
+  rejectUnknownFields(value, ["version", "tokens", "surfaces", "design", "bingoPrint"], "config", errors);
+  if (Object.hasOwn(value,"bingoPrint") && !parseBingoPrint(value.bingoPrint)) errors.push({field:"config.bingoPrint",message:"Ungültige Bingo-Druckeinstellungen."});
   if (value.version !== PRESENTATION_TEMPLATE_CONTRACT_VERSION) {
     errors.push({ field: "config.version", message: "Unbekannte Vertragsversion." });
   }
@@ -427,6 +430,11 @@ export function validatePresentationTemplateDraft(
     errors.push({ field: "status", message: "Unbekannter Status." });
   }
   errors.push(...validateConfig(normalized.config).errors);
+  const printConfig=parseBingoPrint(normalized.config.bingoPrint);
+  if(printConfig)for(const message of printContrastIssues(printConfig)){
+    const issue={field:'config.bingoPrint.colors',message};
+    if(normalized.status==='ACTIVE')errors.push(issue);else warnings.push(issue);
+  }
 
   const unsafeColors = (
     normalized.config as unknown as { tokens?: { colors?: unknown } }

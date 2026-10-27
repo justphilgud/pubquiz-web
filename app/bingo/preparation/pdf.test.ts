@@ -23,7 +23,9 @@ test("actual Phil Gud and LOVD PDF export embeds original frozen fonts/logo, pag
   for (const id of ["phil-gud", "lovd-ungegoogelt"]) {
     const template: PresentationTemplate = getPresentationTemplate(id)!;
     const design: SharedDesign = { version: 1, templateId: id, name: id, config: { version: 1, tokens: template.tokens, design: template.design, surfaces: { presentation: template.variant, moderation: template.moderationVariant ?? "BRANDED", answerForm: "BRANDED" } } };
-    const snapshot = await api.capturePrintSnapshot(design, "Bingo – gemeinsam spielen", "Runde 1");
+    const captured = await api.capturePrintSnapshot(design, "Bingo – gemeinsam spielen", "Runde 1");
+    // Preserve every existing V1 export assertion, alongside the separate V2 suite.
+    const snapshot = parsePrintSnapshot({version:1,title:captured.title,roundLabel:captured.roundLabel,design,designHash:(await import('./printSnapshot')).designHash(design),display:await api.printFont(design.config.tokens.typography.displayFamily??design.config.tokens.typography.family),body:await api.printFont(design.config.tokens.typography.family),logo:captured.logo});
     assert.ok(snapshot.body.bytes.length > 1000); assert.ok(snapshot.display.bytes.length > 1000); assert.ok(snapshot.logo);
     assert.doesNotThrow(() => parsePrintSnapshot(JSON.parse(JSON.stringify(snapshot))));
     assert.throws(() => parsePrintSnapshot({ ...snapshot, logo: null }), "a configured logo must have its actual frozen bytes");

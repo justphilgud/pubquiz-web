@@ -50,6 +50,9 @@ test("shared design additive migration, real policies, inheritance and frozen ru
     INSERT INTO pubquiz.teams(team_id,teamname,teamname_normalisiert,team_passwort)VALUES(1001,'Preserved team','preserved team','not-a-real-password');
     INSERT INTO pubquiz.game_team_assignments(id,game_id,team_id)VALUES('33000000-0000-4000-8000-000000000003','33000000-0000-4000-8000-000000000001',1001);
   `);
+  // Current runtime has additive print-only columns. Include them before recording
+  // the baseline, preserving the original SharedDesign migration assertions.
+  for(const name of ['20261027180000_bingo_preparation','20261027210000_bingo_print_design','20261027213000_bingo_label_allocation'])await db.query(readFileSync(`prisma/migrations/${name}/migration.sql`,'utf8'));
   const quizBefore=(await db.query('SELECT to_jsonb(t) data FROM pubquiz.quiz t')).rows[0].data;
   const gameBefore=(await db.query('SELECT to_jsonb(t) data FROM pubquiz.game_drafts t ORDER BY id')).rows.map(r=>r.data);
   const linksBefore=(await db.query('SELECT to_jsonb(t) data FROM pubquiz.game_team_assignments t')).rows;

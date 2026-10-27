@@ -94,6 +94,9 @@ test("real PostgreSQL migration, current Actions, product lifecycle and legacy g
   assert.equal((await db.query("SELECT count(*)::int n FROM pubquiz.benutzer_reihenrollen")).rows[0].n,3);
   await assert.rejects(db.query("UPDATE pubquiz.benutzer_eventartrollen SET rolle='EDITOR' WHERE benutzer_id=3"), { code: "42501" });
   console.info("Event type DB stage: real Actions");
+  // Advance only this isolated fixture to the current additive scalar schema;
+  // the historical migration and unchanged preservation assertions ran above.
+  for(const name of ['20261027180000_bingo_preparation','20261027210000_bingo_print_design','20261027213000_bingo_label_allocation'])await db.query(readFileSync(`prisma/migrations/${name}/migration.sql`,'utf8'));
   const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: target.toString() }) });
   let currentUser = 1;
   const fixture = { db: prisma, session: () => ({ user: { id: String(currentUser) } }) };

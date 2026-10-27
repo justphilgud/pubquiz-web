@@ -1,3 +1,4 @@
+import {runPrintDesignBrowser} from './bingo-print-design.browser.mjs';
 import assert from "node:assert/strict"; import fs from "node:fs"; import path from "node:path"; import os from "node:os"; import {spawn} from "node:child_process";
 const origin=process.env.BINGO_PREPARATION_REVIEW_URL||"http://localhost:3062";let game;
 const target=new URL(origin);if(!(["localhost","127.0.0.1"].includes(target.hostname)&&target.protocol==="http:")&&!(target.protocol==="https:"&&target.hostname==="pubquiz-web-git-codex-bingo-preparation-just-phil-gud.vercel.app"))throw Error("Only the isolated AP2 review origin is permitted");
@@ -63,6 +64,7 @@ async function screenshot(s,name,width,height){console.log('Viewport check: '+na
  const downloadFilename=fs.readdirSync(download).find(n=>n.endsWith('.pdf')&&!previousDownloads.has(n));
  const restricted=(await call('Target.createBrowserContext')).browserContextId,e=await tab(origin+'/login',restricted);await login(e,accounts.find(a=>a.id===3));
  await goto(e,`/bingo/${game}`);await until(async()=>/Nur Lesezugriff/.test(await text(e)),'editor masterdata preserved');await goto(e,`/bingo/${game}/vorbereitung`);await until(async()=>/404|not be found|nicht gefunden/i.test(await text(e)),'editor preparation denied');
+ if(process.argv.includes('--print'))await runPrintDesignBrowser({s,e,context,game,series,origin,goto,evaluate,text,button,set,until,tab,screenshot,resetDialog:()=>{dialog=false;},sawDialog:()=>dialog});
  await goto(s,'/quiz');await until(async()=>/Synthetische Quiz-Regression/.test(await text(s)),'quiz administration regression');
  fs.writeFileSync('.artifacts/bingo-ap2/browser-results.json',JSON.stringify({origin,game,series,downloadFilename,passed:['fresh password login','round create/edit/reload','native keyboard tab order, visible focus and number editing','native unsaved navigation cancellation preserves page+input','double click generation and cross-round pending guard','existing card series reuse','issued total durable reload','concurrent stale form preserves input','stored code search','browser PDF download','editor scope denial with masterdata read preserved','quiz administration','1366x768 and 390x844 no overflow'],productionChanged:false},null,2));console.log('AP2 actual local browser acceptance PASS');
 })().catch(e=>{console.error(e.stack);process.exitCode=1;}).finally(async()=>{if(ws?.readyState===1){await call('Browser.close').catch(()=>{});ws.close();}browser.kill();});

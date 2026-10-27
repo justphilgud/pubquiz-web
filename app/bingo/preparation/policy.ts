@@ -70,4 +70,4 @@ export function decodeCard(value: unknown): CardLayout {
 export type RoundView = { id: string; position: number; label: string; target: number; strategy: CardStrategy; issued: number | null; cardCount: number; series: { id: string; code: string; count: number }[]; history: { actor: string; at: string; before: number | null; after: number | null }[] };
 export type SeriesView = { id: string; code: string; count: number; originRoundId: string; createdAt: string; designName: string; olderDesign: boolean };
 export type PreparationView = { gameId: string; title: string; seriesId: number; revision: number; archived: boolean; rounds: RoundView[]; roundCount: number; page: number; available: SeriesView[]; seriesPage: number; seriesCount: number };
-export type StoredCard = { id: string; code: string; ordinal: number; cells: CardLayout };
+export type StoredCard = { id: string; code: string; shortCode?: string; ordinal: number; cells: CardLayout };

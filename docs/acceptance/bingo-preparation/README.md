@@ -1,5 +1,8 @@
 # Bingo AP2 – isolierte Abnahme
 
+**Aktuelle Drucküberarbeitung:** [Quadratische Karten, Rückseiten, Druckeinstellungen, Versionierung und neue Downloads](print-design.md).
+Die nachfolgende ursprüngliche Drucklayout-Abnahme bleibt als historischer Erststand dokumentiert; maßgeblich für neue Druckstände ist der verlinkte Bericht.
+
 Die lokale technische Abnahme ist unten dokumentiert. Verbindliche Nachweise zu
 Head-CI, gehosteter Preview, ausgeliefertem Commit und ihrer Browserabnahme werden
 im [zugehörigen PR #143](https://github.com/justphilgud/pubquiz-web/pull/143) geführt.

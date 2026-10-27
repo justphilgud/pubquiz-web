@@ -40,7 +40,7 @@ export async function resolveSharedDesign(tx:Prisma.TransactionClient,selection:
   const design:SharedDesign={version:1,templateId:id,name:template.name,config};
   return {design,source:selection && selection!=='INHERIT'?'Spielauswahl':series.shared_design_template_id?'Reihenstandard':'Systemstandard'};
 }
-async function context(tx:Prisma.TransactionClient,userId:number,target:DesignTarget) {
+export async function sharedDesignContext(tx:Prisma.TransactionClient,userId:number,target:DesignTarget) {
   const actor=await getActorPermissions(userId,tx);
   const game=target.kind==='SERIES'?null:target.kind==='QUIZ'?await tx.quiz.findUnique({where:{quiz_id:Number(target.id)},include:{praesentation_status:true}}):await tx.game_drafts.findUnique({where:{id:target.id}});
   if(target.kind!=='SERIES'&&(!game||('eventart'in game&&game.eventart!==target.kind)))return deny();
@@ -55,6 +55,7 @@ async function context(tx:Prisma.TransactionClient,userId:number,target:DesignTa
   const canWrite=!archived&&!started&&(target.kind==='SERIES'?canManageEventSeries(actor,seriesId):hasEventTypeAccess(actor,seriesId,target.kind==='QUIZ'?'QUIZ':target.kind,'EVENT_MANAGER'));
   return {series,game,canWrite,selection:game?game.shared_design_template_id:series.shared_design_template_id,seriesId};
 }
+const context=sharedDesignContext;
 export async function readDesign(userId:number,input:unknown) {
   const target=validateTarget(input);
   const data=await prisma.$transaction(async tx=>{
@@ -69,7 +70,7 @@ export async function readDesign(userId:number,input:unknown) {
       const system:PresentationTemplate|undefined=getPresentationTemplate(id);
       legacyConfig=system?{version:1 as const,tokens:system.tokens,design:system.design,surfaces:{presentation:system.variant,moderation:system.moderationVariant??'BRANDED' as const,answerForm:'BRANDED' as const}}:stored.get(id)!;
     }
-    return {answerSelection:c.game&&'answer_form_template_id'in c.game?c.game.answer_form_template_id:null,selection:c.selection,seriesId:c.seriesId,canWrite:c.canWrite,seriesName:c.series.name,...resolved,source:target.kind==='SERIES'?(c.selection?'Reihenstandard':'Systemstandard'):resolved.source,...(snapshot&&!c.canWrite?{design:snapshot,source:'Eingefroren beim Quizstart'}:{}),legacyConfig};
+    return {bingoPrintAvailable:c.series.eventarten.some(e=>e.eventart==='BINGO'&&e.ist_freigeschaltet),answerSelection:c.game&&'answer_form_template_id'in c.game?c.game.answer_form_template_id:null,selection:c.selection,seriesId:c.seriesId,canWrite:c.canWrite,seriesName:c.series.name,...resolved,source:target.kind==='SERIES'?(c.selection?'Reihenstandard':'Systemstandard'):resolved.source,...(snapshot&&!c.canWrite?{design:snapshot,source:'Eingefroren beim Quizstart'}:{}),legacyConfig};
   },{isolationLevel:'RepeatableRead'});
   const managed=(await listManagedPresentationTemplates()).templates;
   const templates=managed.filter(t=>(t.status==='SYSTEM'||t.status==='ACTIVE')&&supportsSharedDesign(t.config)).map(t=>({id:t.id,name:t.name}));

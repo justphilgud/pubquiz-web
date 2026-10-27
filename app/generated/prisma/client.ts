@@ -361,6 +361,16 @@ export type bingo_rounds = Prisma.bingo_roundsModel
  */
 export type bingo_card_series = Prisma.bingo_card_seriesModel
 /**
+ * Model bingo_series_labels
+ *
+ */
+export type bingo_series_labels = Prisma.bingo_series_labelsModel
+/**
+ * Model bingo_print_versions
+ *
+ */
+export type bingo_print_versions = Prisma.bingo_print_versionsModel
+/**
  * Model bingo_cards
  *
  */

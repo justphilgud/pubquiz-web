@@ -6,6 +6,7 @@ import { isSafeTemplateAssetReference } from "@/app/rendering/presentationTempla
 import { parseSharedDesign, type SharedDesign } from "@/app/rendering/sharedDesign/sharedDesign";
 import { asset, designHash, parsePrintSnapshot, type PrintSnapshot } from "./printSnapshot";
 import { BingoPreparationError } from "./policy";
+import { defaultBingoPrint, printFonts, printContrastIssues, type BingoPrint } from "@/app/bingo/preparation/bingoPrint";
 
 const fonts: Record<string, string> = {
   "geist-sans": "geist", "geist-mono": "geistmono", "source-sans-3": "sourcesans3", "plus-jakarta-sans": "plusjakartasans", "space-grotesk": "spacegrotesk", montserrat: "montserrat", nunito: "nunito", oswald: "oswald", "roboto-slab": "robotoslab", lora: "lora", "playfair-display": "playfairdisplay",
@@ -42,10 +43,13 @@ export async function loadPrintLogo(reference: string): Promise<Uint8Array> {
   }
   return sharp(bytes, { limitInputPixels: 16_000_000 }).resize({ width: 1000, height: 1000, fit: "inside", withoutEnlargement: true }).png().toBuffer();
 }
-export async function capturePrintSnapshot(input: SharedDesign, title: string, roundLabel: string): Promise<PrintSnapshot> {
+export async function capturePrintSnapshot(input: SharedDesign, title: string, roundLabel: string, settings: BingoPrint = defaultBingoPrint(input)): Promise<PrintSnapshot> {
   const design = parseSharedDesign(input);
   if (!design) throw new BingoPreparationError("Das ausgewählte Druckdesign ist ungültig.");
-  const t = design.config.tokens;
-  const [display, body, logo] = await Promise.all([printFont(t.typography.displayFamily ?? t.typography.family), printFont(t.typography.family), t.assets.logo ? loadPrintLogo(t.assets.logo).then(b => asset("Logo", b)) : null]);
-  return parsePrintSnapshot({ version: 1, title, roundLabel, design, designHash: designHash(design), display, body, logo });
+  const issues=printContrastIssues(settings);if(issues.length)throw new BingoPreparationError(issues.join(' '));
+  design.config.bingoPrint=settings;
+  const font=(id:string)=>printFonts.find(f=>f.id===id)!;
+  const [display,body,logo,...backLogos]=await Promise.all([printFont(font(settings.headerFont).family),printFont(font(settings.numberFont).family),loadPrintLogo(settings.frontLogo).then(b=>asset('Vorderes Logo',b)),...settings.backLogos.map((ref,i)=>loadPrintLogo(ref).then(b=>asset(`Rückseitenlogo ${i+1}`,b)))]);
+  display.name=font(settings.headerFont).name;body.name=font(settings.numberFont).name;
+  return parsePrintSnapshot({version:2,title,roundLabel,design,designHash:designHash(design),display,body,logo,settings,backLogos});
 }

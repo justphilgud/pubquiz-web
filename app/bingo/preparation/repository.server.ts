@@ -10,6 +10,7 @@ export { readPreparation, readCards } from "./readPreparation.server";
 import { capturePrintSnapshot } from "./printAssets.server";
 import { canonical, sha256 } from "./printSnapshot";
 import { BingoPreparationError, denied, parseCommand } from "./policy";
+import { resolveBingoPrint } from "./printDesign";
 
 export async function writePreparation(userId: number, input: unknown) {
   const command = parseCommand(input);
@@ -69,7 +70,7 @@ export async function writePreparation(userId: number, input: unknown) {
       case "generate": {
         if (round!.strategy !== "NEW") throw new BingoPreparationError("Diese Runde verwendet vorhandene Karten. Bitte eine Serie ausdrücklich zuordnen.");
         const design = (await resolveSharedDesign(tx, game.shared_design_template_id, series)).design;
-        const snapshot = await capturePrintSnapshot(design, game.titel, round!.label);
+        const snapshot = await capturePrintSnapshot(design, game.titel, round!.label,resolveBingoPrint(design,series.bingo_print_config,game.bingo_print_config));
         const seriesId = randomUUID(), code = `BG-${randomBytes(6).toString("hex").toUpperCase()}`, hashes = new Set<string>();
         const cards: Prisma.bingo_cardsCreateManyInput[] = [];
         for (let attempt = 0; cards.length < command.count && attempt < command.count * 20; attempt++) {

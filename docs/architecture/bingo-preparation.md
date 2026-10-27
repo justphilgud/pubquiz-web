@@ -24,7 +24,7 @@ bytes and performs no database writes or network access.
 
 ## Additive persistence
 
-Migration `20261027180000_bingo_preparation` adds six tables:
+Migration `20261027180000_bingo_preparation` adds the six original tables (the square-print extension adds two more; see its linked contract):
 
 | Table | Responsibility |
 | --- | --- |
@@ -90,39 +90,19 @@ eligibility, sale, payment or assignment to a person/team. PDF export never chan
 
 ## Print contract
 
-Design resolution reuses game override → series default → Phil Gud. Series creation
-freezes validated version-1 design, game/round labels, original font bytes, logo
-bytes and SHA-256 checksums. Local assets must resolve inside `public`; remote logo
-references must pass existing template-reference rules and the managed-Blob host
-allowlist, with redirects forbidden and bounded bytes/time/pixels. No arbitrary
-user URL or URL parameters are accepted. Logos are frozen as PNG. Scene background
-imagery is not part of the light paper layout. Later design changes are indicated
-as an older design and never mutate or silently redesign existing series.
-Local logo IO retains a static `public` path for packaging and separately verifies
-its canonical resolved path stays within that root before reading bytes.
-
-A4 portrait contains four cards in a 2×2 layout, BINGO header, free centre, printed
-identity, light background, brand color/logo and cut marks. A small dark logo
-backplate preserves contrast for original light/transparent logos. The original display
-family is used for headings; the selected readable body family for numbers.
-Arial uses the explicitly named licensed Arimo print face; system-ui uses the
-explicitly named bundled Geist print face. There is no OS-font assumption or
-silent loading fallback. Font provenance/licenses are under `assets/fonts/bingo`.
-The PDF contains embedded searchable text plus visible vector contours from the
-same original face, weight and glyph positions. This avoids the variable-font
-subset rendering defect observed in raster QA without a substitute font, rasterized text, or an additional
-font-processing dependency. Unsupported characters produce an explicit export error.
-
-PDF is a separate authorized download using only stored cells and frozen assets.
-Exports are bounded to 200 cards per PDF; larger series offer explicit contiguous
-packages (e.g. 1–200, 201–400, 401–500) and a validated custom range. Invalid or too
-large ranges fail, never truncate. Stable order/layout/identities/design are
-required on reexport; byte-identical metadata/compression is not required. PDFs
-are generated on demand and not permanently stored in the application database.
+The approved square-card extension is binding for new print snapshots:
+[Bingo print design V2](bingo-print-design.md). It defines print-only inherited
+settings in the existing template architecture, square cards, centre logos,
+front/back rendering, explicit immutable redesign versions, stable short codes,
+long-edge duplex, exact preview and visual/integrity regressions. Historical V1
+snapshots and their original export remain unchanged and explicitly selectable.
+Two additional additive migrations introduce the print overrides, version/label
+tables and serialized label allocation. They do not rewrite this package's first
+migration or modify existing cards, identities, assignments or issue totals.
 
 ## Backup, restore and local operation
 
-The existing dynamic column/catalog inventory and database dump include all six
+The existing dynamic column/catalog inventory and database dump include all eight
 ordinary tables, constraints, indexes, functions and triggers. The narrow
 `inspectRow` case validates print-snapshot shape, checksums and existing design
 token/media rules; it does not exempt other JSON or secret-bearing fields. Cards

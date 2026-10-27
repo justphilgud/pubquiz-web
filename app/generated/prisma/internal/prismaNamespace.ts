@@ -459,6 +459,8 @@ export const ModelName = {
   bingo_preparations: 'bingo_preparations',
   bingo_rounds: 'bingo_rounds',
   bingo_card_series: 'bingo_card_series',
+  bingo_series_labels: 'bingo_series_labels',
+  bingo_print_versions: 'bingo_print_versions',
   bingo_cards: 'bingo_cards',
   bingo_round_series: 'bingo_round_series',
   bingo_issuance_changes: 'bingo_issuance_changes',
@@ -478,7 +480,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "external_question_import_batches" | "external_question_import_items" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "meme_archive_sources" | "meme_archive_entries" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "live_polls" | "live_poll_revisions" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "live_poll_responses" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "meme_moderation_selections" | "meme_moderation_candidates" | "meme_presentations" | "meme_result_entries" | "meme_votes" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen" | "eventarten" | "eventreihe_eventarten" | "benutzer_eventartrollen" | "eventreihe_verwaltung" | "benutzer_reihenrollen" | "game_drafts" | "bingo_preparations" | "bingo_rounds" | "bingo_card_series" | "bingo_cards" | "bingo_round_series" | "bingo_issuance_changes" | "game_team_assignments"
+    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "external_question_import_batches" | "external_question_import_items" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "meme_archive_sources" | "meme_archive_entries" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "live_polls" | "live_poll_revisions" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "live_poll_responses" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "meme_moderation_selections" | "meme_moderation_candidates" | "meme_presentations" | "meme_result_entries" | "meme_votes" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen" | "eventarten" | "eventreihe_eventarten" | "benutzer_eventartrollen" | "eventreihe_verwaltung" | "benutzer_reihenrollen" | "game_drafts" | "bingo_preparations" | "bingo_rounds" | "bingo_card_series" | "bingo_series_labels" | "bingo_print_versions" | "bingo_cards" | "bingo_round_series" | "bingo_issuance_changes" | "game_team_assignments"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -5070,6 +5072,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    bingo_series_labels: {
+      payload: Prisma.$bingo_series_labelsPayload<ExtArgs>
+      fields: Prisma.bingo_series_labelsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.bingo_series_labelsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_series_labelsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.bingo_series_labelsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_series_labelsPayload>
+        }
+        findFirst: {
+          args: Prisma.bingo_series_labelsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_series_labelsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.bingo_series_labelsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_series_labelsPayload>
+        }
+        findMany: {
+          args: Prisma.bingo_series_labelsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_series_labelsPayload>[]
+        }
+        create: {
+          args: Prisma.bingo_series_labelsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_series_labelsPayload>
+        }
+        createMany: {
+          args: Prisma.bingo_series_labelsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.bingo_series_labelsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_series_labelsPayload>[]
+        }
+        delete: {
+          args: Prisma.bingo_series_labelsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_series_labelsPayload>
+        }
+        update: {
+          args: Prisma.bingo_series_labelsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_series_labelsPayload>
+        }
+        deleteMany: {
+          args: Prisma.bingo_series_labelsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.bingo_series_labelsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.bingo_series_labelsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_series_labelsPayload>[]
+        }
+        upsert: {
+          args: Prisma.bingo_series_labelsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_series_labelsPayload>
+        }
+        aggregate: {
+          args: Prisma.Bingo_series_labelsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBingo_series_labels>
+        }
+        groupBy: {
+          args: Prisma.bingo_series_labelsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Bingo_series_labelsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.bingo_series_labelsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Bingo_series_labelsCountAggregateOutputType> | number
+        }
+      }
+    }
+    bingo_print_versions: {
+      payload: Prisma.$bingo_print_versionsPayload<ExtArgs>
+      fields: Prisma.bingo_print_versionsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.bingo_print_versionsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_print_versionsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.bingo_print_versionsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_print_versionsPayload>
+        }
+        findFirst: {
+          args: Prisma.bingo_print_versionsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_print_versionsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.bingo_print_versionsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_print_versionsPayload>
+        }
+        findMany: {
+          args: Prisma.bingo_print_versionsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_print_versionsPayload>[]
+        }
+        create: {
+          args: Prisma.bingo_print_versionsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_print_versionsPayload>
+        }
+        createMany: {
+          args: Prisma.bingo_print_versionsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.bingo_print_versionsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_print_versionsPayload>[]
+        }
+        delete: {
+          args: Prisma.bingo_print_versionsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_print_versionsPayload>
+        }
+        update: {
+          args: Prisma.bingo_print_versionsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_print_versionsPayload>
+        }
+        deleteMany: {
+          args: Prisma.bingo_print_versionsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.bingo_print_versionsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.bingo_print_versionsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_print_versionsPayload>[]
+        }
+        upsert: {
+          args: Prisma.bingo_print_versionsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_print_versionsPayload>
+        }
+        aggregate: {
+          args: Prisma.Bingo_print_versionsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBingo_print_versions>
+        }
+        groupBy: {
+          args: Prisma.bingo_print_versionsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Bingo_print_versionsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.bingo_print_versionsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Bingo_print_versionsCountAggregateOutputType> | number
+        }
+      }
+    }
     bingo_cards: {
       payload: Prisma.$bingo_cardsPayload<ExtArgs>
       fields: Prisma.bingo_cardsFieldRefs
@@ -5724,6 +5874,7 @@ export type Meme_archive_entriesScalarFieldEnum = (typeof Meme_archive_entriesSc
 
 
 export const EventreihenScalarFieldEnum = {
+  bingo_print_config: 'bingo_print_config',
   reservierungs_url: 'reservierungs_url',
   logo_url: 'logo_url',
   eventreihe_id: 'eventreihe_id',
@@ -6382,6 +6533,7 @@ export type Benutzer_reihenrollenScalarFieldEnum = (typeof Benutzer_reihenrollen
 
 
 export const Game_draftsScalarFieldEnum = {
+  bingo_print_config: 'bingo_print_config',
   shared_design_template_id: 'shared_design_template_id',
   id: 'id',
   eventart: 'eventart',
@@ -6433,6 +6585,26 @@ export const Bingo_card_seriesScalarFieldEnum = {
 } as const
 
 export type Bingo_card_seriesScalarFieldEnum = (typeof Bingo_card_seriesScalarFieldEnum)[keyof typeof Bingo_card_seriesScalarFieldEnum]
+
+
+export const Bingo_series_labelsScalarFieldEnum = {
+  series_id: 'series_id',
+  game_id: 'game_id',
+  prefix: 'prefix'
+} as const
+
+export type Bingo_series_labelsScalarFieldEnum = (typeof Bingo_series_labelsScalarFieldEnum)[keyof typeof Bingo_series_labelsScalarFieldEnum]
+
+
+export const Bingo_print_versionsScalarFieldEnum = {
+  series_id: 'series_id',
+  version: 'version',
+  snapshot: 'snapshot',
+  created_by: 'created_by',
+  created_at: 'created_at'
+} as const
+
+export type Bingo_print_versionsScalarFieldEnum = (typeof Bingo_print_versionsScalarFieldEnum)[keyof typeof Bingo_print_versionsScalarFieldEnum]
 
 
 export const Bingo_cardsScalarFieldEnum = {
@@ -7241,6 +7413,8 @@ export type GlobalOmitConfig = {
   bingo_preparations?: Prisma.bingo_preparationsOmit
   bingo_rounds?: Prisma.bingo_roundsOmit
   bingo_card_series?: Prisma.bingo_card_seriesOmit
+  bingo_series_labels?: Prisma.bingo_series_labelsOmit
+  bingo_print_versions?: Prisma.bingo_print_versionsOmit
   bingo_cards?: Prisma.bingo_cardsOmit
   bingo_round_series?: Prisma.bingo_round_seriesOmit
   bingo_issuance_changes?: Prisma.bingo_issuance_changesOmit

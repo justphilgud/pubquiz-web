@@ -67,9 +67,10 @@ function exactKeys(value: unknown, keys: string): asserts value is Record<string
 // Only this persisted presentation field uses "tokens" for design, not authentication.
 // Check exact shape and bounded design values, then retain the ordinary recursive scan.
 export function inspectRow(value: Record<string, unknown>, media: Set<string>, schema: string, table: string) {
-  if (schema === "pubquiz" && table === "bingo_card_series") {
-    const snapshot = parsePrintSnapshot(value.print_snapshot);
-    const { print_snapshot: _snapshot, ...rest } = value;
+  if (schema === "pubquiz" && (table === "bingo_card_series" || table === "bingo_print_versions")) {
+    const snapshotField=table==='bingo_card_series'?'print_snapshot':'snapshot';
+    const snapshot = parsePrintSnapshot(value[snapshotField]);
+    const { [snapshotField]: _snapshot, ...rest } = value;
     void _snapshot;
     inspectValue(rest, media);
     inspectValue({ title: snapshot.title, roundLabel: snapshot.roundLabel, name: snapshot.design.name, templateId: snapshot.design.templateId, displayName: snapshot.display.name, bodyName: snapshot.body.name, logoName: snapshot.logo?.name ?? null }, media);

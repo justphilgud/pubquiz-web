@@ -113,6 +113,8 @@ export const ModelName = {
   bingo_preparations: 'bingo_preparations',
   bingo_rounds: 'bingo_rounds',
   bingo_card_series: 'bingo_card_series',
+  bingo_series_labels: 'bingo_series_labels',
+  bingo_print_versions: 'bingo_print_versions',
   bingo_cards: 'bingo_cards',
   bingo_round_series: 'bingo_round_series',
   bingo_issuance_changes: 'bingo_issuance_changes',
@@ -454,6 +456,7 @@ export type Meme_archive_entriesScalarFieldEnum = (typeof Meme_archive_entriesSc
 
 
 export const EventreihenScalarFieldEnum = {
+  bingo_print_config: 'bingo_print_config',
   reservierungs_url: 'reservierungs_url',
   logo_url: 'logo_url',
   eventreihe_id: 'eventreihe_id',
@@ -1112,6 +1115,7 @@ export type Benutzer_reihenrollenScalarFieldEnum = (typeof Benutzer_reihenrollen
 
 
 export const Game_draftsScalarFieldEnum = {
+  bingo_print_config: 'bingo_print_config',
   shared_design_template_id: 'shared_design_template_id',
   id: 'id',
   eventart: 'eventart',
@@ -1163,6 +1167,26 @@ export const Bingo_card_seriesScalarFieldEnum = {
 } as const
 
 export type Bingo_card_seriesScalarFieldEnum = (typeof Bingo_card_seriesScalarFieldEnum)[keyof typeof Bingo_card_seriesScalarFieldEnum]
+
+
+export const Bingo_series_labelsScalarFieldEnum = {
+  series_id: 'series_id',
+  game_id: 'game_id',
+  prefix: 'prefix'
+} as const
+
+export type Bingo_series_labelsScalarFieldEnum = (typeof Bingo_series_labelsScalarFieldEnum)[keyof typeof Bingo_series_labelsScalarFieldEnum]
+
+
+export const Bingo_print_versionsScalarFieldEnum = {
+  series_id: 'series_id',
+  version: 'version',
+  snapshot: 'snapshot',
+  created_by: 'created_by',
+  created_at: 'created_at'
+} as const
+
+export type Bingo_print_versionsScalarFieldEnum = (typeof Bingo_print_versionsScalarFieldEnum)[keyof typeof Bingo_print_versionsScalarFieldEnum]
 
 
 export const Bingo_cardsScalarFieldEnum = {
