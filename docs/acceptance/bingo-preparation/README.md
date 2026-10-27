@@ -1,7 +1,9 @@
 # Bingo AP2 – isolierte Abnahme
 
-Arbeitsstand: Implementierung lokal geprüft; abschließende Head-CI und gehostete
-Preview werden vor der Übergabe hier ergänzt. Kein Merge, kein Production-Release.
+Die lokale technische Abnahme ist unten dokumentiert. Verbindliche Nachweise zu
+Head-CI, gehosteter Preview, ausgeliefertem Commit und ihrer Browserabnahme werden
+im [zugehörigen PR #143](https://github.com/justphilgud/pubquiz-web/pull/143) geführt.
+Kein Merge, kein Production-Release.
 
 ## Umfang und Architektur
 
@@ -97,3 +99,33 @@ AP2 bietet dafür keine vorgetäuschten Schaltflächen oder Publikumslinks an.
 
 Kontodaten werden ausschließlich privat in der Übergabe bereitgestellt, nicht in
 diesem Bericht, im PR, in Screenshots oder im Repository.
+
+## Fachliche Abnahme in sechs Schritten
+
+Preview-Einstieg: [Login](https://pubquiz-web-git-codex-bingo-preparation-just-phil-gud.vercel.app/login).
+Die folgenden Links gehören ausschließlich zur isolierten Review-Datenbank;
+Bereitstellungsstatus und Runtime-Commit stehen im verlinkten PR-Nachweis.
+
+1. Mit dem privat übergebenen Admin-Testkonto anmelden. Öffne
+   [Phil Gud – Runden](https://pubquiz-web-git-codex-bingo-preparation-just-phil-gud.vercel.app/bingo/25000000-0000-4000-8000-000000000001/vorbereitung)
+   oder [LOVD – Runden](https://pubquiz-web-git-codex-bingo-preparation-just-phil-gud.vercel.app/bingo/25000000-0000-4000-8000-000000000002/vorbereitung).
+   Jeweils zwei vorbereitete Runden und eine Serie mit zwölf Karten sind vorhanden.
+2. „Runde hinzufügen“ anklicken, „Bezeichnung“ und „Geplante Ziehungen“ ändern,
+   „Runde speichern“ anklicken und die Seite vollständig neu laden. Die Angaben
+   müssen erhalten bleiben; über „Nach oben“/„Nach unten“ lässt sich die Runde ordnen.
+3. Bei „Neue Karten je Runde“ die „Anzahl neuer Karten“ prüfen (Standard 100) und
+   „Kartenserie erzeugen“ anklicken. Die neue Serienkennung und Kartenanzahl erscheinen.
+   Erst danach bei „Karten und PDF“ die gespeicherten Karten öffnen.
+4. In einer weiteren Runde „Vorhandene Karten verwenden“ wählen, „Runde speichern“,
+   die gewünschte „Vorhandene Serie“ auswählen und „Serie zuordnen“ anklicken.
+   „Ausgegebene Karten gesamt“ eintragen und speichern: leer bedeutet nicht erfasst,
+   0 ausdrücklich keine. Nach Reload müssen Zuordnung und Ausgabe erhalten bleiben.
+5. Unter [Phil Gud – Karten](https://pubquiz-web-git-codex-bingo-preparation-just-phil-gud.vercel.app/bingo/25000000-0000-4000-8000-000000000001/karten)
+   beziehungsweise [LOVD – Karten](https://pubquiz-web-git-codex-bingo-preparation-just-phil-gud.vercel.app/bingo/25000000-0000-4000-8000-000000000002/karten)
+   eine Serienkennung öffnen, eine Kartenkennung suchen und „PDF herunterladen“
+   mit dem angebotenen Kartenbereich anklicken. Vier Karten passen auf eine A4-Seite;
+   Kennung und Zahlen müssen mit der Bildschirmkarte übereinstimmen.
+6. Eine Rundenangabe ändern, „Abbrechen“ anklicken und den Wechsel im Browserdialog
+   abbrechen: Seite und Eingabe bleiben erhalten. Danach die Änderung bewusst
+   verwerfen. Optional mit dem Editor-Testkonto prüfen: Stammdaten bleiben lesbar,
+   Vorbereitung und PDF-Zugriff sind gesperrt. Es gibt keinen Spielstart.
