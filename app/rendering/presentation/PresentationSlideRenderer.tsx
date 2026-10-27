@@ -686,10 +686,10 @@ function renderPunkteBadge(punkteModus?: string | null) {
 function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
   const frage = { ...slide.frage, medien: questionPhaseMedia(slide.frage.templateId, slide.frage.medien, "QUESTION") };
 
-  if (zeigtAntwortoptionen(frage) && frage.medien.every(medium => isBild(medium.datei)) && !frage.templateConfig?.templateData && (!frage.templateId || ["standard", "multiple_choice"].includes(frage.templateId))) {
+  if ((frage.presentationLayouts.question.variant === "CHOICE_GRID" || frage.medien.some(medium => isBild(medium.datei))) && zeigtAntwortoptionen(frage) && frage.medien.every(medium => isBild(medium.datei)) && !frage.templateConfig?.templateData && (!frage.templateId || ["standard", "multiple_choice"].includes(frage.templateId))) {
     const images = frage.medien.filter(medium => isBild(medium.datei));
-    return <ClassicalChoiceSlide question={frage.frage} answers={sortiereAntworten(frage)} solution={false}
-      source={false ? frage.quelle : null} label={false ? "Auflösung" : <>Frage {slide.frageIndexImBlock}{renderPunkteBadge(frage.punkte_modus)}</>}
+    return <ClassicalChoiceSlide themeKey={JSON.stringify([theme.design, theme.appearance])} layoutVariant={frage.presentationLayouts.question.variant} storybookKind={theme.design.stylePreset === "BIRTHDAY" ? resolveStorybookQuestionKind(frage) : undefined} question={frage.frage} answers={sortiereAntworten(frage)} solution={false}
+      label={<>Frage {slide.frageIndexImBlock}{renderPunkteBadge(frage.punkte_modus)}</>}
       media={images.length ? images.map(medium => renderMedienKarte(medium, "large")) : undefined} />;
   }
   const templateData = frage.templateConfig?.templateData;
@@ -1566,10 +1566,10 @@ function renderFunnySlide(slide: Extract<Slide, { typ: "funny" }>) {
 function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
   const frage = { ...slide.frage, medien: questionPhaseMedia(slide.frage.templateId, slide.frage.medien, "SOLUTION") };
 
-  if (zeigtAntwortoptionen(frage) && frage.medien.every(medium => isBild(medium.datei)) && !frage.templateConfig?.templateData && (!frage.templateId || ["standard", "multiple_choice"].includes(frage.templateId))) {
+  if ((frage.presentationLayouts.question.variant === "CHOICE_GRID" || frage.medien.some(medium => isBild(medium.datei))) && zeigtAntwortoptionen(frage) && frage.medien.every(medium => isBild(medium.datei)) && !frage.templateConfig?.templateData && (!frage.templateId || ["standard", "multiple_choice"].includes(frage.templateId))) {
     const images = frage.medien.filter(medium => isBild(medium.datei));
-    return <ClassicalChoiceSlide question={frage.frage} answers={sortiereAntworten(frage)} solution={true}
-      source={true ? frage.quelle : null} label={true ? "Auflösung" : <>Frage {slide.frageIndexImBlock}{renderPunkteBadge(frage.punkte_modus)}</>}
+    return <ClassicalChoiceSlide themeKey={JSON.stringify([theme.design, theme.appearance])} layoutVariant={frage.presentationLayouts.solution.variant} storybookKind={theme.design.stylePreset === "BIRTHDAY" ? resolveStorybookQuestionKind(frage) : undefined} question={frage.frage} answers={sortiereAntworten(frage)} solution={true}
+      source={frage.quelle} label="Auflösung"
       media={images.length ? images.map(medium => renderMedienKarte(medium, "large")) : undefined} />;
   }
   const templateData = frage.templateConfig?.templateData;

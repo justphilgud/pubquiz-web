@@ -8,7 +8,7 @@ Der unveränderte Main-Renderer reproduziert bei 1280×600 überlappende Antwort
 
 `ClassicalChoiceSlide` hält Antwort und Erläuterung als natürliche gemeinsame Grid-Zeile zusammen. `fitChoiceContent` misst den vom vorhandenen Stage tatsächlich zugewiesenen Bereich nach Header/Footer, erprobt obere bzw. seitliche Frage mit Liste/2×2-Raster und bestimmt mit beschränkter binärer Suche eine gemeinsame Antwort- und Erläuterungsgröße. Frage und Bild besitzen eigene Größenverhältnisse; Bilder erhalten eine Mindestfläche. Kurze Inhalte wachsen bis höchstens 144 px Antwortschrift (zusätzlich an Breite/Höhe gebunden); Erläuterungen mindestens 14 px, Antworten mindestens 18 px. Diese Grenzen sind keine Garantie für beliebig viel Inhalt.
 
-Der Produktionsrenderer delegiert ausschließlich klassische geschlossene Fragen ohne strukturierte Template-Daten (legacy/standard/multiple_choice) und ohne Nicht-Bild-Medien. Antwortreihenfolge und Medienrendering bleiben beim vorhandenen Renderer. Audio-, Pixel-, Meme-, Spezialformate und Quizlaufzeit werden nicht umgebaut. Keine Schema-/Datenmigration, Templatezuweisung oder neue Abhängigkeit. Gemeinsame Designs aus PR #136 bleiben erhalten.
+Der Produktionsrenderer delegiert ausschließlich klassische geschlossene Fragen ohne strukturierte Template-Daten (legacy/standard/multiple_choice) und ohne Nicht-Bild-Medien. Antwortreihenfolge und Medienrendering bleiben beim vorhandenen Renderer. Audio-, Pixel-, Meme-, Spezialformate und Quizlaufzeit werden nicht umgebaut. Bestehende Layout-, Storybook- und Fehlende-Bild-Vertragsmerkmale bleiben erhalten. Keine Schema-/Datenmigration, Templatezuweisung oder neue Abhängigkeit. Gemeinsame Designs aus PR #136 bleiben erhalten.
 
 Messungen erfolgen beim Inhaltswechsel, ResizeObserver auf der extern bemessenen Box, Größen-/Vollbildereignissen sowie nach Bild- und Schriftladung. Es gibt eine gebündelte Ereignisberechnung, keine laufende Frame-Schleife. Ein nur dann ausgeblendeter Scrollhinweis, wenn die vollständige Einpassung tatsächlich gelingt; kein Abschneiden als Lösung. Storybook-Fotospalten werden ausschließlich auf diesen Folien freigegeben.
 
@@ -16,7 +16,7 @@ Messungen erfolgen beim Inhaltswechsel, ResizeObserver auf der extern bemessenen
 
 - TypeScript `npm run typecheck`: erfolgreich.
 - ESLint aller geänderten TS/TSX-Dateien: erfolgreich.
-- 67 vorhandene Renderer-, Readability- und Architekturregressionen: erfolgreich. Die vorhandenen Bild-/Reihenfolge-/Erläuterungsassertionen wurden auf das gemeinsame klassische Markup umgestellt, nicht entfernt.
+- 120 vorhandene Renderer-, Readability-, Template- und Storybook-Regressionsprüfungen: erfolgreich. Die vorhandenen Bild-/Reihenfolge-/Erläuterungsassertionen wurden auf das gemeinsame klassische Markup umgestellt, nicht entfernt.
 - Neuer Chromium-Regressionscheck im regulären `npm test`: 270 Kombinationen = 6 Designwelten × 5 echte CSS-Viewports × 9 Fälle. LOVD, Phil Gud, Neon, Corporate, Storybook und Komm.ONE.
 - Viewports: **1280×600, 1280×720, 1366×768, 1920×1080, 2560×1440**. Gemessen über `innerWidth/innerHeight`, nicht Bildschirmauflösung.
 - Fälle: beide gemeldeten vollständigen Auflösungen, vier kurze Antworten, vier mehrzeilige Antworten als Frage und Auflösung, gemischte Längen, lange Frage mit kurzen Antworten sowie Bildfrage und Bildauflösung. Das Bild im automatischen Test ist ein vorhandenes lokales SVG, um externe Netzabhängigkeit zu vermeiden.
@@ -26,7 +26,7 @@ Messungen erfolgen beim Inhaltswechsel, ResizeObserver auf der extern bemessenen
 
 ## Messwerte und identische Vorher-/Nachhergrößen
 
-Die maschinenlesbaren Messwerte stehen in [measurements.json](choice-layout-20261027/measurements.json). Beispiel LOVD bei 1280×600: Schwabtunnel ca. 34 px Antwort / 18 px Erläuterung, kurze Antworten ca. 86 px. Bei 1920×1080 ca. 57/30 px gegenüber 135 px kurzen Antworten; bei 2560×1440 ca. 81/42 px gegenüber 143 px. Die Frage hat eine separate Größe. Exakte Nachkommastellen siehe Messdatei.
+Die maschinenlesbaren Messwerte stehen in [measurements.json](choice-layout-20261027/measurements.json). Beispiel LOVD bei 1280×600: Schwabtunnel ca. 34 px Antwort / 18 px Erläuterung, kurze Antworten ca. 86 px. Bei 1920×1080 ca. 58/30 px gegenüber 135 px kurzen Antworten; bei 2560×1440 ca. 83/43 px gegenüber 143 px. Die Frage hat eine separate Größe. Exakte Nachkommastellen siehe Messdatei.
 
 ### Schwabtunnel, 1280×600
 

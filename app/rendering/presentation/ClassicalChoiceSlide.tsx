@@ -6,11 +6,11 @@ import { fitChoiceContent } from "./fitChoiceContent";
 type Choice = { antwort_id: number; antwort: string; zusatzinformation?: string | null; ist_richtig: boolean };
 
 /** Classical choices only. Media/playback and answer ordering belong to the caller. */
-export function ClassicalChoiceSlide({ question, answers, solution, media, source, label }: {
-  question: string; answers: Choice[]; solution: boolean; media?: ReactNode; source?: string | null; label: ReactNode;
+export function ClassicalChoiceSlide({ question, answers, solution, media, source, label, layoutVariant, storybookKind, themeKey }: {
+  themeKey: string; layoutVariant: string; storybookKind?: string | null; question: string; answers: Choice[]; solution: boolean; media?: ReactNode; source?: string | null; label: ReactNode;
 }) {
   const ref = useRef<HTMLElement>(null);
-  const contentKey = JSON.stringify([question, answers, solution, source]);
+  const contentKey = JSON.stringify([question, answers, solution, source, Boolean(media), layoutVariant, storybookKind, themeKey]);
   useLayoutEffect(() => {
     const root = ref.current;
     if (!root) return;
@@ -35,7 +35,7 @@ export function ClassicalChoiceSlide({ question, answers, solution, media, sourc
       window.removeEventListener("resize", schedule);
     };
   }, [contentKey]);
-  return <section ref={ref} data-choice-fit="pending" data-choice-media={media ? "true" : undefined} data-presentation-layout="CLASSICAL_CHOICE" className="presentation-classical-choice">
+  return <section ref={ref} data-choice-fit="pending" data-choice-media={media ? "true" : undefined} data-presentation-layout={layoutVariant} data-storybook-question-kind={storybookKind ?? undefined} data-storybook-phase={storybookKind && solution ? "SOLUTION" : undefined} className="presentation-classical-choice">
     <div className="presentation-choice-lead">
       <div className="presentation-choice-label">{label}</div>
       <h2 className="presentation-choice-question">{question}</h2>
