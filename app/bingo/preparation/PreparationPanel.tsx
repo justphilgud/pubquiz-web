@@ -29,7 +29,7 @@ export default function PreparationPanel({ data }: { data: PreparationView }) {
     start(async () => { try { const result = await savePreparation({ ...base, ...extra }); if (result.success) router.refresh(); else setMessage(result.message); } catch { setMessage("Speichern fehlgeschlagen. Bitte erneut versuchen."); } finally { busy.current = false; } });
   }
   return <div className="space-y-5">
-    <p className="text-sm text-slate-600">Vorbereitung · Bingo ist noch nicht spielbar. Die geplante Ziehungszahl beendet später keine Runde automatisch.</p>
+    <p className="text-sm text-slate-600">Vorbereitung · Durchläufe werden in der Moderation bewusst gestartet. Die geplante Ziehungszahl beendet keine Runde automatisch.</p>
     {data.archived && <p role="status">Archivierte Eventreihe: nur Lesen und PDF-Export möglich.</p>}
     {message && <p role="alert">{message}</p>}
     <Button disabled={!ready || pending || data.archived || dirtyRounds.size > 0 || busyRounds.size > 0} onClick={() => run({ operation: "createRound" })}>Runde hinzufügen</Button>
