@@ -1,3 +1,4 @@
+import {approvedBingoLivePlan,assertBingoLiveManifest,bingoLiveDeltaEvidence} from "./production-preflight-bingo-live-plan";
 import {createHash} from 'node:crypto';
 type File={name:string;checksum:string};
 export const BINGO_AP2_PLAN=Object.freeze({
@@ -10,9 +11,10 @@ export const BINGO_AP2_PLAN=Object.freeze({
  {name:'20261027213000_bingo_label_allocation',checksum:'09a5d228854865c5712779bdd007b5d165a52d650afd62637769e8b3412b82e6'},
  ] as readonly File[],
 });
-export function approvedBingoPlan(baseline:string,candidate:string){return baseline===BINGO_AP2_PLAN.baselineSha&&candidate===BINGO_AP2_PLAN.candidateSha?BINGO_AP2_PLAN:undefined;}
+export function approvedBingoPlan(baseline:string,candidate:string){return approvedBingoLivePlan(baseline,candidate)??(baseline===BINGO_AP2_PLAN.baselineSha&&candidate===BINGO_AP2_PLAN.candidateSha?BINGO_AP2_PLAN:undefined);}
 const hash=(v:string)=>createHash('sha256').update(v).digest('hex');
 export function assertBingoManifest(baseline:string,candidate:string,before:readonly File[],after:readonly File[],beforeSchema:string,afterSchema:string){
+ if(approvedBingoLivePlan(baseline,candidate))return assertBingoLiveManifest(baseline,candidate,before,after,beforeSchema,afterSchema);
  const plan=approvedBingoPlan(baseline,candidate);
  const files=(v:readonly File[])=>v.map(({name,checksum})=>({name,checksum}));
  if(!plan||before.length!==64||after.length!==67||new Set(after.map(f=>f.name)).size!==67||
@@ -25,6 +27,7 @@ export function bingoPendingDelta(baseline:string,candidate:string,expected:read
  const p=approvedBingoPlan(baseline,candidate);return Boolean(p&&JSON.stringify(expected)===JSON.stringify(p.migrations.map(m=>m.name))&&JSON.stringify(pending)===JSON.stringify(expected)&&p.migrations.every(m=>files.some(f=>f.name===m.name&&f.checksum===m.checksum)));
 }
 export function bingoDeltaEvidence(baseline:string,candidate:string,value:unknown){
+ if(approvedBingoLivePlan(baseline,candidate))return bingoLiveDeltaEvidence(baseline,candidate,value);
  if(!approvedBingoPlan(baseline,candidate)||!value||typeof value!=='object')return false;const v=value as Record<string,unknown>;
  return v.status==='PASS'&&v.baselineSha===baseline&&v.candidateSha===candidate&&JSON.stringify(v.migrations)===JSON.stringify(BINGO_AP2_PLAN.migrations)&&
  ['rowsUnchanged','onlyExpectedSchemaChanges','oldColumnProjectionCompatible','constraintsEnforced','stableLabels','rollbackProbe'].every(k=>v[k]===true);
