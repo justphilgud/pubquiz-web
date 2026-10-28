@@ -72,4 +72,3 @@ Main-CI, bestehender geschützter Migration-/Deploymentprozess und ausschließli
 schreibfreie Production-Smokes. Kein Bingo-Start, kein Session-Reset.
 PRIVATE_READBACK_FAILED und erster echter Wochenlauf bleiben getrennte
 Betriebspunkte. Konkrete Läufe und ausgelieferte SHAs im PR dokumentieren.
-
