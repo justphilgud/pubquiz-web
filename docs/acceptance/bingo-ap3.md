@@ -1,25 +1,45 @@
 # Bingo AP3: Prüfbericht und ausstehende gehostete Abnahme
 
-## Status
+## Status und gehosteter Nachweis (28.10.2026)
 
-**Blockiert für die vollständige Lieferung; kein Merge, keine Production-Änderung.**
 PR: https://github.com/justphilgud/pubquiz-web/pull/145
 Basis: `4f437c17d675cdf027b25cb2c2196f9ef19f5345`.
-Lokal geprüfter Anwendungscode: `88ea3e0384d53aac5b6f7f1be70acea4e32e9a55`.
-Der anschließende Prüfbericht-/Testcommit verändert den Anwendungscode nicht.
+Der vollständige gehostete Funktionsablauf wurde auf
+`73b22580b4c8236fb7173d1e32c38f1049872dbc` erfolgreich geprüft.
+Initiales READY-Deployment: `dpl_6DoFMumMB2DXH5whizTZm1FtAGrv`,
+https://pubquiz-4hqqn9dae-just-phil-gud.vercel.app .
+Alias und authentifiziertes Admin-Monitoring bestätigten exakt diesen SHA und
+`environment=preview`; Datenbankverbindung erfolgreich.
 
-Die isolierte gehostete Preview ist **noch nicht bereitgestellt oder geprüft**.
-Die separat angefragte menschliche Branch-Vertrauensfreigabe für
-`codex/bingo-live-run` steht aus. Die Vorschrift in
-[media-upload-environments.md](../architecture/media-upload-environments.md)
-(„Neue Namen werden erst nach menschlicher Vertrauensprüfung separat aufgenommen“)
-wird nicht durch eine bestehende andere Branch-Freigabe ersetzt. Weder Allowlist
-noch Environment-Branch-Policy wurden umgangen. Nächster Schritt: nach dieser
-Freigabe erfolgreiche genaue Head-CI prüfen, ausschließlich die isolierte
-synthetische Datenbank anbinden, READY/Alias/Runtime nachweisen und den echten
-gehosteten Ablauf samt frischem Login durchführen. Erst danach Previewlinks und
-synthetischen Zugang direkt an den Auftraggeber liefern. Zugangsdaten stehen
-nicht im Repository, in Screenshots oder im PR.
+Danach korrigiert `e36fdbc69eaee675764536bad794205209e8a056`
+ausschließlich den veralteten AP2-Hinweis „Bingo ist noch nicht spielbar“ in der
+Vorbereitung. Keine Spiel-/Speicher-/Rechtelogik geändert. Finale Head-CI,
+Auslieferung dieser Textkorrektur und deren gehostete Sichtprüfung werden mit
+Deployment-ID und Runtime-SHA im PR festgehalten. Ein späterer Berichtscommit
+ist von diesem Anwendungscode ausdrücklich zu unterscheiden.
+
+Stabiler eigener Preview-Einstieg:
+https://pubquiz-web-git-codex-bingo-live-run-just-phil-gud.vercel.app .
+Es gelten weiterhin die vorhandene Vercel-Anmeldung und die separate
+Anwendungsanmeldung. Synthetische Zugangsdaten werden ausschließlich direkt an
+den Auftraggeber gegeben, nicht hier, im PR, in Screenshots oder Logs.
+
+Der menschliche Fortsetzungsauftrag gibt genau `codex/bingo-live-run` ab dem
+oben genannten Head separat frei. Nur dieser Name wurde zur bestehenden
+`TRUSTED_PREVIEW_BRANCHES`-Liste und zur exakten Environment-Branch-Policy
+hinzugefügt. Bestehende Einträge und Schutzregeln bleiben erhalten. Der gemeinsame
+Preview-Migrationsworkflow bleibt für diesen Branch gesperrt. Der gezielte
+administrative Git-Preview-Weg prüft erfolgreiche genaue Push-CI und die sechs
+zentralen Medienmetadaten. Nur `DATABASE_URL` und `AUTH_SECRET` erhielten
+branchgebundene Overrides. Keine zentralen Medienwerte oder fremden Bestände
+geändert, keine storeweite Bereinigung. AP3 verwendet gegebenenfalls ausschließlich
+seinen eigenen bestehenden Branch-Präfix.
+
+Vor Konfiguration und nach Abschluss: exakt eigene isolierte synthetische
+Datenbank `bingo_live_review_20261027c` und eigener Runtime-Benutzer verifiziert;
+68 registrierte Migrationen mit passenden kanonischen Repository-Checksummen.
+Kein erneuter Seed, keine Migration in gemeinsam genutzte Development-Datenbank.
+Kein Merge, kein Production-Deployment, keine Production-Daten-/Rechteänderung.
 
 ## Architektur und Migration
 
@@ -97,7 +117,7 @@ korrekte Teiltreffer erzeugen. Die Anwendungssuche wurde nicht geändert. Der
 Test prüft jetzt einen eindeutigen Kurzcode sowie den deterministischen
 Kollisionsfall mit exakten Kartenidentitäten und Trefferzahlen.
 
-## Kurze Anleitung (lokal erprobt, gehostet noch nicht vollständig verifiziert)
+## Kurze Anleitung (lokal und im gehosteten Browser erprobter Ablauf)
 
 Für die spätere persönliche Abnahme bleibt Spiel
 `26000000-0000-4000-8000-000000000001` ungestartet. Die separate automatisierte
@@ -105,7 +125,8 @@ Browserprüfung nutzte ausschließlich Spiel `…0002`; Beispiel `…0003` ist b
 Vorbereitung: `/bingo/26000000-0000-4000-8000-000000000001/vorbereitung`.
 Moderation: `/bingo/26000000-0000-4000-8000-000000000001/moderation`.
 Präsentation: `/bingo/26000000-0000-4000-8000-000000000001/praesentation`.
-Dies sind **Routen, keine nachgewiesenen gehosteten Previewlinks**.
+Diese Routen unter dem oben verifizierten Branch-Alias verwenden. Der Abnahmefall
+wurde gehostet rein lesend geöffnet; er bleibt ungestartet.
 
 1. Mit dem später direkt mitgeteilten synthetischen Admin anmelden. Moderation
    öffnen und „Präsentation vorab öffnen“ in einem zweiten angemeldeten Fenster
@@ -149,4 +170,67 @@ Keine Production-Migration/Datenschreibaktion, kein Backup/Restore auf Productio
 kein Merge. Keine OCR, Pi-/Offline-Synchronisierung, digitalen Teilnehmerkarten,
 Selbstanmeldung, Statistik, Mehr-Runden-Komfort oder physischer Beamertest.
 Historisches PRIVATE_READBACK_FAILED und der echte Wochenlauf bleiben getrennte
-Betriebspunkte. AP3 ist erst nach erfolgreicher gehosteter Abnahme reviewbereit.
+Betriebspunkte. Die Freigabe des PR aus Draft erfolgt erst nach erfolgreicher finaler Head-CI,
+Runtime-/Aliasprüfung und Sichtprüfung der eng begrenzten Textkorrektur.
+
+
+## Tatsächlich gehostete Browserabnahme
+
+Frischer Admin-Login am Branch-Alias, separates Präsentationsfenster vor dem
+bewussten Start. Zusätzlich eigenständige Anmeldungen als Manager und Editor auf
+der festen Deployment-URL; keine Änderung ihrer synthetischen Rechte nötig.
+Manager darf die eigene Reihe öffnen, fremde Reihe liefert 404; Editor erhält
+auch bei direktem Moderationslink der eigenen Reihe 404.
+
+Der Durchlauf `3bd681b9-8777-4f26-8be7-1e093291b302` in Prüfspiel `…0002`
+wurde ausschließlich über die gehostete UI erzeugt und regulär beendet:
+
+- Start abbrechen, danach bewusst starten; vorab geöffnetes Publikum übernimmt
+  neuen Run mit Revision 0. Ungültige Zahl 0 schreibt nichts.
+- Ungültiger Ruf bei Ziehung 0: Karte zuordnen, Bestätigung wird abgewiesen,
+  ausdrücklich ablehnen. Nach 14 späteren Zahlen bleibt die erneute Bestätigung
+  dieses historischen Rufs abgewiesen, Revision unverändert.
+- Alle 14 Zahlen einzeln vorprüfen/veröffentlichen; getrenntes Publikum übernimmt
+  jede aktuelle Zahl. Bingo, Doppel und Triple bestätigt mit Kurzkennung,
+  vollständiger Kennung und UUID. Ein erreichtes Ziel 5 beendet nichts automatisch.
+- Letzte Zahl 73 mit Begründung nach 1 korrigiert: Triple sichtbar nachzuprüfen,
+  aktuelle Linien nur noch zwei; Bestätigung ausdrücklich zurückgenommen.
+- Pause sperrt Veröffentlichung; Ziel 50, vollständiger Reload beider Fenster,
+  gleiche Revision 31 und Pausenzustand; Fortsetzen erfolgreich.
+- **Echter Ausfall des eigenen gehosteten Endpunkts:** ausschließlich der eigene
+  Preview-Alias wurde 45 Sekunden entfernt und automatisch auf dasselbe geprüfte
+  Deployment zurückgestellt. Offizielle Vercel-Alias-API, keine Änderung der
+  Schutzregeln. Publikum zeigt Verbindungsfehler und behält Revision 32/Zahl 1.
+  Die separate Moderation über die feste Deployment-URL speichert Ziel 60 mit
+  Revision 33. Nach Wiederherstellung übernimmt das Publikum Revision 33 ohne
+  Reload und entfernt die Verbindungswarnung. Kein physisches WLAN-Abschalten
+  behauptet; keine Production-Aliasse berührt.
+- Ausdrückliches Beenden mit Dialogbestätigung. Moderation und Publikum nach
+  Reload beendet; kein Fortsetzen angeboten. Abschließende reine DB-Prüfung:
+  alle Testdurchläufe beendet, Abnahmespiel `…0001` weiterhin ohne Durchlauf.
+- Beide Marken in tatsächlich gemessenen 1280×600, 1366×768 und 1920×1080:
+  75 Zellen, fitted-Status, keine Dokument-Scrollfläche. Vergrößern und
+  Verkleinern über den vorhandenen Viewport-Mechanismus. Originalschrift und
+  Logo sichtbar; Moderation zusätzlich 390×844 ohne horizontalen Überlauf.
+
+**Zusätzliche Prüfgrenze:** Der native Navigations-Abbruchdialog ließ sich im
+gehosteten In-App-Browser nicht zuverlässig bedienen: Input-/Screenshot-Timeout,
+Dialog-API meldete keinen bedienbaren Dialog. Kein bestandener gehosteter oder
+menschlicher Nachweis hierfür behauptet; lokaler vollständiger Test ist oben
+separat dokumentiert. Native Fensterprüfung wurde nicht freigegeben und nicht
+umgangen. Der gespeicherte Spielstand blieb erhalten; regulärer Abschluss erfolgte
+anschließend im ursprünglichen Moderationsfenster. Dies ist kein nachgewiesener
+Anwendungsfehler. Keine neue native Vollbild- oder physische Beamerabnahme.
+
+Gehostete Screenshots (Vercel-Preview-Toolbar teilweise sichtbar):
+
+- [Moderation 1366×768](bingo-ap3-hosted-images/moderation-1366x768.png)
+- [Moderation 390×844](bingo-ap3-hosted-images/moderation-390x844.png)
+- LOVD: [1280×600](bingo-ap3-hosted-images/lovd-1280x600.png),
+  [1366×768](bingo-ap3-hosted-images/lovd-1366x768.png),
+  [1920×1080](bingo-ap3-hosted-images/lovd-1920x1080.png)
+- Phil Gud: [1280×600](bingo-ap3-hosted-images/phil-gud-1280x600.png),
+  [1366×768](bingo-ap3-hosted-images/phil-gud-1366x768.png),
+  [1920×1080](bingo-ap3-hosted-images/phil-gud-1920x1080.png)
+- [Verbindung unterbrochen](bingo-ap3-hosted-images/connection-interrupted.png)
+- [Beendet nach Reload](bingo-ap3-hosted-images/ended-after-reload.png)
