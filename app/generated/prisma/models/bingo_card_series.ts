@@ -256,6 +256,7 @@ export type bingo_card_seriesWhereInput = {
   print_snapshot?: Prisma.JsonFilter<"bingo_card_series">
   created_by?: Prisma.IntFilter<"bingo_card_series"> | number
   created_at?: Prisma.DateTimeFilter<"bingo_card_series"> | Date | string
+  live_cards?: Prisma.Bingo_live_cardsListRelationFilter
   short_label?: Prisma.XOR<Prisma.Bingo_series_labelsNullableScalarRelationFilter, Prisma.bingo_series_labelsWhereInput> | null
   print_versions?: Prisma.Bingo_print_versionsListRelationFilter
   game?: Prisma.XOR<Prisma.Game_draftsScalarRelationFilter, Prisma.game_draftsWhereInput>
@@ -276,6 +277,7 @@ export type bingo_card_seriesOrderByWithRelationInput = {
   print_snapshot?: Prisma.SortOrder
   created_by?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  live_cards?: Prisma.bingo_live_cardsOrderByRelationAggregateInput
   short_label?: Prisma.bingo_series_labelsOrderByWithRelationInput
   print_versions?: Prisma.bingo_print_versionsOrderByRelationAggregateInput
   game?: Prisma.game_draftsOrderByWithRelationInput
@@ -301,6 +303,7 @@ export type bingo_card_seriesWhereUniqueInput = Prisma.AtLeast<{
   print_snapshot?: Prisma.JsonFilter<"bingo_card_series">
   created_by?: Prisma.IntFilter<"bingo_card_series"> | number
   created_at?: Prisma.DateTimeFilter<"bingo_card_series"> | Date | string
+  live_cards?: Prisma.Bingo_live_cardsListRelationFilter
   short_label?: Prisma.XOR<Prisma.Bingo_series_labelsNullableScalarRelationFilter, Prisma.bingo_series_labelsWhereInput> | null
   print_versions?: Prisma.Bingo_print_versionsListRelationFilter
   game?: Prisma.XOR<Prisma.Game_draftsScalarRelationFilter, Prisma.game_draftsWhereInput>
@@ -352,6 +355,7 @@ export type bingo_card_seriesCreateInput = {
   request_hash: string
   print_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
+  live_cards?: Prisma.bingo_live_cardsCreateNestedManyWithoutSeriesInput
   short_label?: Prisma.bingo_series_labelsCreateNestedOneWithoutSeriesInput
   print_versions?: Prisma.bingo_print_versionsCreateNestedManyWithoutSeriesInput
   game: Prisma.game_draftsCreateNestedOneWithoutBingo_card_seriesInput
@@ -372,6 +376,7 @@ export type bingo_card_seriesUncheckedCreateInput = {
   print_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_by: number
   created_at?: Date | string
+  live_cards?: Prisma.bingo_live_cardsUncheckedCreateNestedManyWithoutSeriesInput
   short_label?: Prisma.bingo_series_labelsUncheckedCreateNestedOneWithoutSeriesInput
   print_versions?: Prisma.bingo_print_versionsUncheckedCreateNestedManyWithoutSeriesInput
   cards?: Prisma.bingo_cardsUncheckedCreateNestedManyWithoutSeriesInput
@@ -386,6 +391,7 @@ export type bingo_card_seriesUpdateInput = {
   request_hash?: Prisma.StringFieldUpdateOperationsInput | string
   print_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  live_cards?: Prisma.bingo_live_cardsUpdateManyWithoutSeriesNestedInput
   short_label?: Prisma.bingo_series_labelsUpdateOneWithoutSeriesNestedInput
   print_versions?: Prisma.bingo_print_versionsUpdateManyWithoutSeriesNestedInput
   game?: Prisma.game_draftsUpdateOneRequiredWithoutBingo_card_seriesNestedInput
@@ -406,6 +412,7 @@ export type bingo_card_seriesUncheckedUpdateInput = {
   print_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_by?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  live_cards?: Prisma.bingo_live_cardsUncheckedUpdateManyWithoutSeriesNestedInput
   short_label?: Prisma.bingo_series_labelsUncheckedUpdateOneWithoutSeriesNestedInput
   print_versions?: Prisma.bingo_print_versionsUncheckedUpdateManyWithoutSeriesNestedInput
   cards?: Prisma.bingo_cardsUncheckedUpdateManyWithoutSeriesNestedInput
@@ -702,6 +709,20 @@ export type bingo_card_seriesUpdateOneRequiredWithoutRoundsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.bingo_card_seriesUpdateToOneWithWhereWithoutRoundsInput, Prisma.bingo_card_seriesUpdateWithoutRoundsInput>, Prisma.bingo_card_seriesUncheckedUpdateWithoutRoundsInput>
 }
 
+export type bingo_card_seriesCreateNestedOneWithoutLive_cardsInput = {
+  create?: Prisma.XOR<Prisma.bingo_card_seriesCreateWithoutLive_cardsInput, Prisma.bingo_card_seriesUncheckedCreateWithoutLive_cardsInput>
+  connectOrCreate?: Prisma.bingo_card_seriesCreateOrConnectWithoutLive_cardsInput
+  connect?: Prisma.bingo_card_seriesWhereUniqueInput
+}
+
+export type bingo_card_seriesUpdateOneRequiredWithoutLive_cardsNestedInput = {
+  create?: Prisma.XOR<Prisma.bingo_card_seriesCreateWithoutLive_cardsInput, Prisma.bingo_card_seriesUncheckedCreateWithoutLive_cardsInput>
+  connectOrCreate?: Prisma.bingo_card_seriesCreateOrConnectWithoutLive_cardsInput
+  upsert?: Prisma.bingo_card_seriesUpsertWithoutLive_cardsInput
+  connect?: Prisma.bingo_card_seriesWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.bingo_card_seriesUpdateToOneWithWhereWithoutLive_cardsInput, Prisma.bingo_card_seriesUpdateWithoutLive_cardsInput>, Prisma.bingo_card_seriesUncheckedUpdateWithoutLive_cardsInput>
+}
+
 export type bingo_card_seriesCreateWithoutActorInput = {
   id?: string
   code: string
@@ -710,6 +731,7 @@ export type bingo_card_seriesCreateWithoutActorInput = {
   request_hash: string
   print_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
+  live_cards?: Prisma.bingo_live_cardsCreateNestedManyWithoutSeriesInput
   short_label?: Prisma.bingo_series_labelsCreateNestedOneWithoutSeriesInput
   print_versions?: Prisma.bingo_print_versionsCreateNestedManyWithoutSeriesInput
   game: Prisma.game_draftsCreateNestedOneWithoutBingo_card_seriesInput
@@ -728,6 +750,7 @@ export type bingo_card_seriesUncheckedCreateWithoutActorInput = {
   request_hash: string
   print_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
+  live_cards?: Prisma.bingo_live_cardsUncheckedCreateNestedManyWithoutSeriesInput
   short_label?: Prisma.bingo_series_labelsUncheckedCreateNestedOneWithoutSeriesInput
   print_versions?: Prisma.bingo_print_versionsUncheckedCreateNestedManyWithoutSeriesInput
   cards?: Prisma.bingo_cardsUncheckedCreateNestedManyWithoutSeriesInput
@@ -784,6 +807,7 @@ export type bingo_card_seriesCreateWithoutGameInput = {
   request_hash: string
   print_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
+  live_cards?: Prisma.bingo_live_cardsCreateNestedManyWithoutSeriesInput
   short_label?: Prisma.bingo_series_labelsCreateNestedOneWithoutSeriesInput
   print_versions?: Prisma.bingo_print_versionsCreateNestedManyWithoutSeriesInput
   origin_round: Prisma.bingo_roundsCreateNestedOneWithoutOriginal_seriesInput
@@ -802,6 +826,7 @@ export type bingo_card_seriesUncheckedCreateWithoutGameInput = {
   print_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_by: number
   created_at?: Date | string
+  live_cards?: Prisma.bingo_live_cardsUncheckedCreateNestedManyWithoutSeriesInput
   short_label?: Prisma.bingo_series_labelsUncheckedCreateNestedOneWithoutSeriesInput
   print_versions?: Prisma.bingo_print_versionsUncheckedCreateNestedManyWithoutSeriesInput
   cards?: Prisma.bingo_cardsUncheckedCreateNestedManyWithoutSeriesInput
@@ -842,6 +867,7 @@ export type bingo_card_seriesCreateWithoutOrigin_roundInput = {
   request_hash: string
   print_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
+  live_cards?: Prisma.bingo_live_cardsCreateNestedManyWithoutSeriesInput
   short_label?: Prisma.bingo_series_labelsCreateNestedOneWithoutSeriesInput
   print_versions?: Prisma.bingo_print_versionsCreateNestedManyWithoutSeriesInput
   game: Prisma.game_draftsCreateNestedOneWithoutBingo_card_seriesInput
@@ -859,6 +885,7 @@ export type bingo_card_seriesUncheckedCreateWithoutOrigin_roundInput = {
   print_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_by: number
   created_at?: Date | string
+  live_cards?: Prisma.bingo_live_cardsUncheckedCreateNestedManyWithoutSeriesInput
   short_label?: Prisma.bingo_series_labelsUncheckedCreateNestedOneWithoutSeriesInput
   print_versions?: Prisma.bingo_print_versionsUncheckedCreateNestedManyWithoutSeriesInput
   cards?: Prisma.bingo_cardsUncheckedCreateNestedManyWithoutSeriesInput
@@ -899,6 +926,7 @@ export type bingo_card_seriesCreateWithoutShort_labelInput = {
   request_hash: string
   print_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
+  live_cards?: Prisma.bingo_live_cardsCreateNestedManyWithoutSeriesInput
   print_versions?: Prisma.bingo_print_versionsCreateNestedManyWithoutSeriesInput
   game: Prisma.game_draftsCreateNestedOneWithoutBingo_card_seriesInput
   origin_round: Prisma.bingo_roundsCreateNestedOneWithoutOriginal_seriesInput
@@ -918,6 +946,7 @@ export type bingo_card_seriesUncheckedCreateWithoutShort_labelInput = {
   print_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_by: number
   created_at?: Date | string
+  live_cards?: Prisma.bingo_live_cardsUncheckedCreateNestedManyWithoutSeriesInput
   print_versions?: Prisma.bingo_print_versionsUncheckedCreateNestedManyWithoutSeriesInput
   cards?: Prisma.bingo_cardsUncheckedCreateNestedManyWithoutSeriesInput
   rounds?: Prisma.bingo_round_seriesUncheckedCreateNestedManyWithoutSeriesInput
@@ -947,6 +976,7 @@ export type bingo_card_seriesUpdateWithoutShort_labelInput = {
   request_hash?: Prisma.StringFieldUpdateOperationsInput | string
   print_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  live_cards?: Prisma.bingo_live_cardsUpdateManyWithoutSeriesNestedInput
   print_versions?: Prisma.bingo_print_versionsUpdateManyWithoutSeriesNestedInput
   game?: Prisma.game_draftsUpdateOneRequiredWithoutBingo_card_seriesNestedInput
   origin_round?: Prisma.bingo_roundsUpdateOneRequiredWithoutOriginal_seriesNestedInput
@@ -966,6 +996,7 @@ export type bingo_card_seriesUncheckedUpdateWithoutShort_labelInput = {
   print_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_by?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  live_cards?: Prisma.bingo_live_cardsUncheckedUpdateManyWithoutSeriesNestedInput
   print_versions?: Prisma.bingo_print_versionsUncheckedUpdateManyWithoutSeriesNestedInput
   cards?: Prisma.bingo_cardsUncheckedUpdateManyWithoutSeriesNestedInput
   rounds?: Prisma.bingo_round_seriesUncheckedUpdateManyWithoutSeriesNestedInput
@@ -979,6 +1010,7 @@ export type bingo_card_seriesCreateWithoutPrint_versionsInput = {
   request_hash: string
   print_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
+  live_cards?: Prisma.bingo_live_cardsCreateNestedManyWithoutSeriesInput
   short_label?: Prisma.bingo_series_labelsCreateNestedOneWithoutSeriesInput
   game: Prisma.game_draftsCreateNestedOneWithoutBingo_card_seriesInput
   origin_round: Prisma.bingo_roundsCreateNestedOneWithoutOriginal_seriesInput
@@ -998,6 +1030,7 @@ export type bingo_card_seriesUncheckedCreateWithoutPrint_versionsInput = {
   print_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_by: number
   created_at?: Date | string
+  live_cards?: Prisma.bingo_live_cardsUncheckedCreateNestedManyWithoutSeriesInput
   short_label?: Prisma.bingo_series_labelsUncheckedCreateNestedOneWithoutSeriesInput
   cards?: Prisma.bingo_cardsUncheckedCreateNestedManyWithoutSeriesInput
   rounds?: Prisma.bingo_round_seriesUncheckedCreateNestedManyWithoutSeriesInput
@@ -1027,6 +1060,7 @@ export type bingo_card_seriesUpdateWithoutPrint_versionsInput = {
   request_hash?: Prisma.StringFieldUpdateOperationsInput | string
   print_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  live_cards?: Prisma.bingo_live_cardsUpdateManyWithoutSeriesNestedInput
   short_label?: Prisma.bingo_series_labelsUpdateOneWithoutSeriesNestedInput
   game?: Prisma.game_draftsUpdateOneRequiredWithoutBingo_card_seriesNestedInput
   origin_round?: Prisma.bingo_roundsUpdateOneRequiredWithoutOriginal_seriesNestedInput
@@ -1046,6 +1080,7 @@ export type bingo_card_seriesUncheckedUpdateWithoutPrint_versionsInput = {
   print_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_by?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  live_cards?: Prisma.bingo_live_cardsUncheckedUpdateManyWithoutSeriesNestedInput
   short_label?: Prisma.bingo_series_labelsUncheckedUpdateOneWithoutSeriesNestedInput
   cards?: Prisma.bingo_cardsUncheckedUpdateManyWithoutSeriesNestedInput
   rounds?: Prisma.bingo_round_seriesUncheckedUpdateManyWithoutSeriesNestedInput
@@ -1059,6 +1094,7 @@ export type bingo_card_seriesCreateWithoutCardsInput = {
   request_hash: string
   print_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
+  live_cards?: Prisma.bingo_live_cardsCreateNestedManyWithoutSeriesInput
   short_label?: Prisma.bingo_series_labelsCreateNestedOneWithoutSeriesInput
   print_versions?: Prisma.bingo_print_versionsCreateNestedManyWithoutSeriesInput
   game: Prisma.game_draftsCreateNestedOneWithoutBingo_card_seriesInput
@@ -1078,6 +1114,7 @@ export type bingo_card_seriesUncheckedCreateWithoutCardsInput = {
   print_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_by: number
   created_at?: Date | string
+  live_cards?: Prisma.bingo_live_cardsUncheckedCreateNestedManyWithoutSeriesInput
   short_label?: Prisma.bingo_series_labelsUncheckedCreateNestedOneWithoutSeriesInput
   print_versions?: Prisma.bingo_print_versionsUncheckedCreateNestedManyWithoutSeriesInput
   rounds?: Prisma.bingo_round_seriesUncheckedCreateNestedManyWithoutSeriesInput
@@ -1107,6 +1144,7 @@ export type bingo_card_seriesUpdateWithoutCardsInput = {
   request_hash?: Prisma.StringFieldUpdateOperationsInput | string
   print_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  live_cards?: Prisma.bingo_live_cardsUpdateManyWithoutSeriesNestedInput
   short_label?: Prisma.bingo_series_labelsUpdateOneWithoutSeriesNestedInput
   print_versions?: Prisma.bingo_print_versionsUpdateManyWithoutSeriesNestedInput
   game?: Prisma.game_draftsUpdateOneRequiredWithoutBingo_card_seriesNestedInput
@@ -1126,6 +1164,7 @@ export type bingo_card_seriesUncheckedUpdateWithoutCardsInput = {
   print_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_by?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  live_cards?: Prisma.bingo_live_cardsUncheckedUpdateManyWithoutSeriesNestedInput
   short_label?: Prisma.bingo_series_labelsUncheckedUpdateOneWithoutSeriesNestedInput
   print_versions?: Prisma.bingo_print_versionsUncheckedUpdateManyWithoutSeriesNestedInput
   rounds?: Prisma.bingo_round_seriesUncheckedUpdateManyWithoutSeriesNestedInput
@@ -1139,6 +1178,7 @@ export type bingo_card_seriesCreateWithoutRoundsInput = {
   request_hash: string
   print_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Date | string
+  live_cards?: Prisma.bingo_live_cardsCreateNestedManyWithoutSeriesInput
   short_label?: Prisma.bingo_series_labelsCreateNestedOneWithoutSeriesInput
   print_versions?: Prisma.bingo_print_versionsCreateNestedManyWithoutSeriesInput
   game: Prisma.game_draftsCreateNestedOneWithoutBingo_card_seriesInput
@@ -1158,6 +1198,7 @@ export type bingo_card_seriesUncheckedCreateWithoutRoundsInput = {
   print_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_by: number
   created_at?: Date | string
+  live_cards?: Prisma.bingo_live_cardsUncheckedCreateNestedManyWithoutSeriesInput
   short_label?: Prisma.bingo_series_labelsUncheckedCreateNestedOneWithoutSeriesInput
   print_versions?: Prisma.bingo_print_versionsUncheckedCreateNestedManyWithoutSeriesInput
   cards?: Prisma.bingo_cardsUncheckedCreateNestedManyWithoutSeriesInput
@@ -1187,6 +1228,7 @@ export type bingo_card_seriesUpdateWithoutRoundsInput = {
   request_hash?: Prisma.StringFieldUpdateOperationsInput | string
   print_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  live_cards?: Prisma.bingo_live_cardsUpdateManyWithoutSeriesNestedInput
   short_label?: Prisma.bingo_series_labelsUpdateOneWithoutSeriesNestedInput
   print_versions?: Prisma.bingo_print_versionsUpdateManyWithoutSeriesNestedInput
   game?: Prisma.game_draftsUpdateOneRequiredWithoutBingo_card_seriesNestedInput
@@ -1206,9 +1248,94 @@ export type bingo_card_seriesUncheckedUpdateWithoutRoundsInput = {
   print_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_by?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  live_cards?: Prisma.bingo_live_cardsUncheckedUpdateManyWithoutSeriesNestedInput
   short_label?: Prisma.bingo_series_labelsUncheckedUpdateOneWithoutSeriesNestedInput
   print_versions?: Prisma.bingo_print_versionsUncheckedUpdateManyWithoutSeriesNestedInput
   cards?: Prisma.bingo_cardsUncheckedUpdateManyWithoutSeriesNestedInput
+}
+
+export type bingo_card_seriesCreateWithoutLive_cardsInput = {
+  id?: string
+  code: string
+  card_count: number
+  request_id: string
+  request_hash: string
+  print_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  created_at?: Date | string
+  short_label?: Prisma.bingo_series_labelsCreateNestedOneWithoutSeriesInput
+  print_versions?: Prisma.bingo_print_versionsCreateNestedManyWithoutSeriesInput
+  game: Prisma.game_draftsCreateNestedOneWithoutBingo_card_seriesInput
+  origin_round: Prisma.bingo_roundsCreateNestedOneWithoutOriginal_seriesInput
+  actor: Prisma.usersCreateNestedOneWithoutBingo_series_createdInput
+  cards?: Prisma.bingo_cardsCreateNestedManyWithoutSeriesInput
+  rounds?: Prisma.bingo_round_seriesCreateNestedManyWithoutSeriesInput
+}
+
+export type bingo_card_seriesUncheckedCreateWithoutLive_cardsInput = {
+  id?: string
+  game_id: string
+  origin_round_id: string
+  code: string
+  card_count: number
+  request_id: string
+  request_hash: string
+  print_snapshot: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  created_by: number
+  created_at?: Date | string
+  short_label?: Prisma.bingo_series_labelsUncheckedCreateNestedOneWithoutSeriesInput
+  print_versions?: Prisma.bingo_print_versionsUncheckedCreateNestedManyWithoutSeriesInput
+  cards?: Prisma.bingo_cardsUncheckedCreateNestedManyWithoutSeriesInput
+  rounds?: Prisma.bingo_round_seriesUncheckedCreateNestedManyWithoutSeriesInput
+}
+
+export type bingo_card_seriesCreateOrConnectWithoutLive_cardsInput = {
+  where: Prisma.bingo_card_seriesWhereUniqueInput
+  create: Prisma.XOR<Prisma.bingo_card_seriesCreateWithoutLive_cardsInput, Prisma.bingo_card_seriesUncheckedCreateWithoutLive_cardsInput>
+}
+
+export type bingo_card_seriesUpsertWithoutLive_cardsInput = {
+  update: Prisma.XOR<Prisma.bingo_card_seriesUpdateWithoutLive_cardsInput, Prisma.bingo_card_seriesUncheckedUpdateWithoutLive_cardsInput>
+  create: Prisma.XOR<Prisma.bingo_card_seriesCreateWithoutLive_cardsInput, Prisma.bingo_card_seriesUncheckedCreateWithoutLive_cardsInput>
+  where?: Prisma.bingo_card_seriesWhereInput
+}
+
+export type bingo_card_seriesUpdateToOneWithWhereWithoutLive_cardsInput = {
+  where?: Prisma.bingo_card_seriesWhereInput
+  data: Prisma.XOR<Prisma.bingo_card_seriesUpdateWithoutLive_cardsInput, Prisma.bingo_card_seriesUncheckedUpdateWithoutLive_cardsInput>
+}
+
+export type bingo_card_seriesUpdateWithoutLive_cardsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  card_count?: Prisma.IntFieldUpdateOperationsInput | number
+  request_id?: Prisma.StringFieldUpdateOperationsInput | string
+  request_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  print_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  short_label?: Prisma.bingo_series_labelsUpdateOneWithoutSeriesNestedInput
+  print_versions?: Prisma.bingo_print_versionsUpdateManyWithoutSeriesNestedInput
+  game?: Prisma.game_draftsUpdateOneRequiredWithoutBingo_card_seriesNestedInput
+  origin_round?: Prisma.bingo_roundsUpdateOneRequiredWithoutOriginal_seriesNestedInput
+  actor?: Prisma.usersUpdateOneRequiredWithoutBingo_series_createdNestedInput
+  cards?: Prisma.bingo_cardsUpdateManyWithoutSeriesNestedInput
+  rounds?: Prisma.bingo_round_seriesUpdateManyWithoutSeriesNestedInput
+}
+
+export type bingo_card_seriesUncheckedUpdateWithoutLive_cardsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  game_id?: Prisma.StringFieldUpdateOperationsInput | string
+  origin_round_id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  card_count?: Prisma.IntFieldUpdateOperationsInput | number
+  request_id?: Prisma.StringFieldUpdateOperationsInput | string
+  request_hash?: Prisma.StringFieldUpdateOperationsInput | string
+  print_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  created_by?: Prisma.IntFieldUpdateOperationsInput | number
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  short_label?: Prisma.bingo_series_labelsUncheckedUpdateOneWithoutSeriesNestedInput
+  print_versions?: Prisma.bingo_print_versionsUncheckedUpdateManyWithoutSeriesNestedInput
+  cards?: Prisma.bingo_cardsUncheckedUpdateManyWithoutSeriesNestedInput
+  rounds?: Prisma.bingo_round_seriesUncheckedUpdateManyWithoutSeriesNestedInput
 }
 
 export type bingo_card_seriesCreateManyActorInput = {
@@ -1231,6 +1358,7 @@ export type bingo_card_seriesUpdateWithoutActorInput = {
   request_hash?: Prisma.StringFieldUpdateOperationsInput | string
   print_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  live_cards?: Prisma.bingo_live_cardsUpdateManyWithoutSeriesNestedInput
   short_label?: Prisma.bingo_series_labelsUpdateOneWithoutSeriesNestedInput
   print_versions?: Prisma.bingo_print_versionsUpdateManyWithoutSeriesNestedInput
   game?: Prisma.game_draftsUpdateOneRequiredWithoutBingo_card_seriesNestedInput
@@ -1249,6 +1377,7 @@ export type bingo_card_seriesUncheckedUpdateWithoutActorInput = {
   request_hash?: Prisma.StringFieldUpdateOperationsInput | string
   print_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  live_cards?: Prisma.bingo_live_cardsUncheckedUpdateManyWithoutSeriesNestedInput
   short_label?: Prisma.bingo_series_labelsUncheckedUpdateOneWithoutSeriesNestedInput
   print_versions?: Prisma.bingo_print_versionsUncheckedUpdateManyWithoutSeriesNestedInput
   cards?: Prisma.bingo_cardsUncheckedUpdateManyWithoutSeriesNestedInput
@@ -1287,6 +1416,7 @@ export type bingo_card_seriesUpdateWithoutGameInput = {
   request_hash?: Prisma.StringFieldUpdateOperationsInput | string
   print_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  live_cards?: Prisma.bingo_live_cardsUpdateManyWithoutSeriesNestedInput
   short_label?: Prisma.bingo_series_labelsUpdateOneWithoutSeriesNestedInput
   print_versions?: Prisma.bingo_print_versionsUpdateManyWithoutSeriesNestedInput
   origin_round?: Prisma.bingo_roundsUpdateOneRequiredWithoutOriginal_seriesNestedInput
@@ -1305,6 +1435,7 @@ export type bingo_card_seriesUncheckedUpdateWithoutGameInput = {
   print_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_by?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  live_cards?: Prisma.bingo_live_cardsUncheckedUpdateManyWithoutSeriesNestedInput
   short_label?: Prisma.bingo_series_labelsUncheckedUpdateOneWithoutSeriesNestedInput
   print_versions?: Prisma.bingo_print_versionsUncheckedUpdateManyWithoutSeriesNestedInput
   cards?: Prisma.bingo_cardsUncheckedUpdateManyWithoutSeriesNestedInput
@@ -1342,6 +1473,7 @@ export type bingo_card_seriesUpdateWithoutOrigin_roundInput = {
   request_hash?: Prisma.StringFieldUpdateOperationsInput | string
   print_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  live_cards?: Prisma.bingo_live_cardsUpdateManyWithoutSeriesNestedInput
   short_label?: Prisma.bingo_series_labelsUpdateOneWithoutSeriesNestedInput
   print_versions?: Prisma.bingo_print_versionsUpdateManyWithoutSeriesNestedInput
   game?: Prisma.game_draftsUpdateOneRequiredWithoutBingo_card_seriesNestedInput
@@ -1359,6 +1491,7 @@ export type bingo_card_seriesUncheckedUpdateWithoutOrigin_roundInput = {
   print_snapshot?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   created_by?: Prisma.IntFieldUpdateOperationsInput | number
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  live_cards?: Prisma.bingo_live_cardsUncheckedUpdateManyWithoutSeriesNestedInput
   short_label?: Prisma.bingo_series_labelsUncheckedUpdateOneWithoutSeriesNestedInput
   print_versions?: Prisma.bingo_print_versionsUncheckedUpdateManyWithoutSeriesNestedInput
   cards?: Prisma.bingo_cardsUncheckedUpdateManyWithoutSeriesNestedInput
@@ -1382,12 +1515,14 @@ export type bingo_card_seriesUncheckedUpdateManyWithoutOrigin_roundInput = {
  */
 
 export type Bingo_card_seriesCountOutputType = {
+  live_cards: number
   print_versions: number
   cards: number
   rounds: number
 }
 
 export type Bingo_card_seriesCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  live_cards?: boolean | Bingo_card_seriesCountOutputTypeCountLive_cardsArgs
   print_versions?: boolean | Bingo_card_seriesCountOutputTypeCountPrint_versionsArgs
   cards?: boolean | Bingo_card_seriesCountOutputTypeCountCardsArgs
   rounds?: boolean | Bingo_card_seriesCountOutputTypeCountRoundsArgs
@@ -1401,6 +1536,13 @@ export type Bingo_card_seriesCountOutputTypeDefaultArgs<ExtArgs extends runtime.
    * Select specific fields to fetch from the Bingo_card_seriesCountOutputType
    */
   select?: Prisma.Bingo_card_seriesCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * Bingo_card_seriesCountOutputType without action
+ */
+export type Bingo_card_seriesCountOutputTypeCountLive_cardsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.bingo_live_cardsWhereInput
 }
 
 /**
@@ -1436,6 +1578,7 @@ export type bingo_card_seriesSelect<ExtArgs extends runtime.Types.Extensions.Int
   print_snapshot?: boolean
   created_by?: boolean
   created_at?: boolean
+  live_cards?: boolean | Prisma.bingo_card_series$live_cardsArgs<ExtArgs>
   short_label?: boolean | Prisma.bingo_card_series$short_labelArgs<ExtArgs>
   print_versions?: boolean | Prisma.bingo_card_series$print_versionsArgs<ExtArgs>
   game?: boolean | Prisma.game_draftsDefaultArgs<ExtArgs>
@@ -1493,6 +1636,7 @@ export type bingo_card_seriesSelectScalar = {
 
 export type bingo_card_seriesOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "game_id" | "origin_round_id" | "code" | "card_count" | "request_id" | "request_hash" | "print_snapshot" | "created_by" | "created_at", ExtArgs["result"]["bingo_card_series"]>
 export type bingo_card_seriesInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  live_cards?: boolean | Prisma.bingo_card_series$live_cardsArgs<ExtArgs>
   short_label?: boolean | Prisma.bingo_card_series$short_labelArgs<ExtArgs>
   print_versions?: boolean | Prisma.bingo_card_series$print_versionsArgs<ExtArgs>
   game?: boolean | Prisma.game_draftsDefaultArgs<ExtArgs>
@@ -1516,6 +1660,7 @@ export type bingo_card_seriesIncludeUpdateManyAndReturn<ExtArgs extends runtime.
 export type $bingo_card_seriesPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "bingo_card_series"
   objects: {
+    live_cards: Prisma.$bingo_live_cardsPayload<ExtArgs>[]
     short_label: Prisma.$bingo_series_labelsPayload<ExtArgs> | null
     print_versions: Prisma.$bingo_print_versionsPayload<ExtArgs>[]
     game: Prisma.$game_draftsPayload<ExtArgs>
@@ -1929,6 +2074,7 @@ readonly fields: bingo_card_seriesFieldRefs;
  */
 export interface Prisma__bingo_card_seriesClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  live_cards<T extends Prisma.bingo_card_series$live_cardsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.bingo_card_series$live_cardsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$bingo_live_cardsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   short_label<T extends Prisma.bingo_card_series$short_labelArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.bingo_card_series$short_labelArgs<ExtArgs>>): Prisma.Prisma__bingo_series_labelsClient<runtime.Types.Result.GetResult<Prisma.$bingo_series_labelsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   print_versions<T extends Prisma.bingo_card_series$print_versionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.bingo_card_series$print_versionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$bingo_print_versionsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   game<T extends Prisma.game_draftsDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.game_draftsDefaultArgs<ExtArgs>>): Prisma.Prisma__game_draftsClient<runtime.Types.Result.GetResult<Prisma.$game_draftsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
@@ -2373,6 +2519,30 @@ export type bingo_card_seriesDeleteManyArgs<ExtArgs extends runtime.Types.Extens
    * Limit how many bingo_card_series to delete.
    */
   limit?: number
+}
+
+/**
+ * bingo_card_series.live_cards
+ */
+export type bingo_card_series$live_cardsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the bingo_live_cards
+   */
+  select?: Prisma.bingo_live_cardsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the bingo_live_cards
+   */
+  omit?: Prisma.bingo_live_cardsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.bingo_live_cardsInclude<ExtArgs> | null
+  where?: Prisma.bingo_live_cardsWhereInput
+  orderBy?: Prisma.bingo_live_cardsOrderByWithRelationInput | Prisma.bingo_live_cardsOrderByWithRelationInput[]
+  cursor?: Prisma.bingo_live_cardsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Bingo_live_cardsScalarFieldEnum | Prisma.Bingo_live_cardsScalarFieldEnum[]
 }
 
 /**

@@ -161,3 +161,6 @@ AP2 ergänzt jetzt die isolierte Vorbereitung, Kartenpersistenz, manuelle
 Ausgabegesamtmenge und Druck-PDFs gemäß [Bingo preparation](bingo-preparation.md).
 Der AP1-Regelkern bleibt unverändert; dies integriert noch keinen Live-Ruf-,
 Ziehungs- oder Gewinnablauf.
+
+Die neue AP3-Integration ist getrennt in [Bingo Live](bingo-live.md) beschrieben.
+Die hier beschriebenen reinen AP1-Verträge bleiben ihre fachliche Grundlage.

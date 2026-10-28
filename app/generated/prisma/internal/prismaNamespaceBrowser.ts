@@ -118,7 +118,10 @@ export const ModelName = {
   bingo_cards: 'bingo_cards',
   bingo_round_series: 'bingo_round_series',
   bingo_issuance_changes: 'bingo_issuance_changes',
-  game_team_assignments: 'game_team_assignments'
+  game_team_assignments: 'game_team_assignments',
+  bingo_live_runs: 'bingo_live_runs',
+  bingo_live_cards: 'bingo_live_cards',
+  bingo_live_events: 'bingo_live_events'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1230,6 +1233,49 @@ export const Game_team_assignmentsScalarFieldEnum = {
 } as const
 
 export type Game_team_assignmentsScalarFieldEnum = (typeof Game_team_assignmentsScalarFieldEnum)[keyof typeof Game_team_assignmentsScalarFieldEnum]
+
+
+export const Bingo_live_runsScalarFieldEnum = {
+  id: 'id',
+  game_id: 'game_id',
+  round_id: 'round_id',
+  eventreihe_id: 'eventreihe_id',
+  status: 'status',
+  revision: 'revision',
+  started_at: 'started_at',
+  created_by: 'created_by',
+  round_snapshot: 'round_snapshot',
+  design_snapshot: 'design_snapshot',
+  visual_assets: 'visual_assets',
+  audience_key: 'audience_key',
+  start_request_id: 'start_request_id',
+  start_request_hash: 'start_request_hash'
+} as const
+
+export type Bingo_live_runsScalarFieldEnum = (typeof Bingo_live_runsScalarFieldEnum)[keyof typeof Bingo_live_runsScalarFieldEnum]
+
+
+export const Bingo_live_cardsScalarFieldEnum = {
+  run_id: 'run_id',
+  game_id: 'game_id',
+  card_id: 'card_id',
+  series_id: 'series_id'
+} as const
+
+export type Bingo_live_cardsScalarFieldEnum = (typeof Bingo_live_cardsScalarFieldEnum)[keyof typeof Bingo_live_cardsScalarFieldEnum]
+
+
+export const Bingo_live_eventsScalarFieldEnum = {
+  run_id: 'run_id',
+  revision: 'revision',
+  request_id: 'request_id',
+  request_hash: 'request_hash',
+  actor_id: 'actor_id',
+  occurred_at: 'occurred_at',
+  command: 'command'
+} as const
+
+export type Bingo_live_eventsScalarFieldEnum = (typeof Bingo_live_eventsScalarFieldEnum)[keyof typeof Bingo_live_eventsScalarFieldEnum]
 
 
 export const SortOrder = {

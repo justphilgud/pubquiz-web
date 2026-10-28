@@ -390,3 +390,18 @@ export type bingo_issuance_changes = Prisma.bingo_issuance_changesModel
  *
  */
 export type game_team_assignments = Prisma.game_team_assignmentsModel
+/**
+ * Model bingo_live_runs
+ * AP3 runtime identity is separate from immutable game-draft identity.
+ */
+export type bingo_live_runs = Prisma.bingo_live_runsModel
+/**
+ * Model bingo_live_cards
+ *
+ */
+export type bingo_live_cards = Prisma.bingo_live_cardsModel
+/**
+ * Model bingo_live_events
+ *
+ */
+export type bingo_live_events = Prisma.bingo_live_eventsModel

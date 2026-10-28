@@ -18,6 +18,8 @@ import { COLUMN_SQL, CATALOG_SQL } from "../operations/snapshot";
 import { auditColumns, inspectRow, type Column } from "../operations/acceptance-policy";
 import {sha256} from "../operations/snapshot";
 import { designHash } from "@/app/bingo/preparation/printSnapshot";
+import { exerciseBingoLive } from "./bingo-live.acceptance";
+import { verifyBingoRestore } from "./bingo-live.restore";
 
 const base = process.env.BINGO_PREPARATION_TEST_DATABASE_URL;
 test("AP2 additive empty/populated migration and actual PostgreSQL policies, concurrency and immutable cards", { skip: !base, timeout: 240000 }, async t => {
@@ -64,13 +66,13 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   assert.deepEqual((await db.query("SELECT * FROM pubquiz.benutzer_reihenrollen ORDER BY benutzer_id")).rows, roles);
   const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: target.toString() }) });
   t.after(async () => { await prisma.$disconnect(); });
-  const bundle = await build({ stdin: { contents: "export * from './app/bingo/preparation/repository.server'; export * as print from './app/bingo/preparation/printDesignRepository.server'; export * as games from './app/games/gameDraftRepository.server';", resolveDir: process.cwd() }, bundle: true, write: false, platform: "node", format: "cjs", packages: "external", plugins: [{ name: "database", setup(b) {
+  const bundle = await build({ stdin: { contents: "export * from './app/bingo/preparation/repository.server'; export * as live from './app/bingo/live/repository.server'; export * as print from './app/bingo/preparation/printDesignRepository.server'; export * as games from './app/games/gameDraftRepository.server';", resolveDir: process.cwd() }, bundle: true, write: false, platform: "node", format: "cjs", packages: "external", plugins: [{ name: "database", setup(b) {
     b.onResolve({ filter: /^(server-only|@\/app\/lib\/prisma|@\/app\/generated\/prisma\/client)$/ }, a => ({ path: a.path, namespace: "fixture" }));
     b.onLoad({ filter: /.*/, namespace: "fixture" }, a => ({ contents: a.path === "server-only" ? "" : a.path.includes("generated") ? "export const Prisma = globalThis.prismaRuntime;" : "export const prisma = globalThis.fixture;" }));
   } }] });
   const runtime = { exports: {} };
   runInNewContext(bundle.outputFiles[0].text, { module: runtime, exports: runtime.exports, require: createRequire(import.meta.url), fixture: prisma, prismaRuntime: Prisma, console, process, Date, Buffer, URL, fetch, AbortSignal, structuredClone, setTimeout, clearTimeout });
-  const api = runtime.exports as typeof import("@/app/bingo/preparation/repository.server") & { print: typeof import("@/app/bingo/preparation/printDesignRepository.server"); games: typeof import("@/app/games/gameDraftRepository.server") };
+  const api = runtime.exports as typeof import("@/app/bingo/preparation/repository.server") & { live: typeof import("@/app/bingo/live/repository.server"); print: typeof import("@/app/bingo/preparation/printDesignRepository.server"); games: typeof import("@/app/games/gameDraftRepository.server") };
   const game = await api.games.writeGameDraft(3, "BINGO", { seriesId: 10, title: "Bingo preparation QA", date: "", time: "" });
   const other = await api.games.writeGameDraft(5, "BINGO", { seriesId: 20, title: "Foreign Bingo", date: "", time: "" });
   const karaoke = await api.games.writeGameDraft(3, "POWERPOINT_KARAOKE", { seriesId: 10, title: "Karaoke", date: "", time: "" });
@@ -169,7 +171,15 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   assert.notEqual(historical.snapshot.body.sha256,'');assert.deepEqual(newPrint.cards,historical.cards);
   assert.equal(newPrint.snapshot.version,2);assert.notDeepEqual(newPrint.snapshot,historical.snapshot);
   assert.equal(newPrint.cards[0].shortCode,'A-001');assert.equal((await api.readCards(3,game.id,sid,1,'A-001')).count,1);
-  assert.equal((await api.readCards(3,game.id,large.seriesId!,1,'B-001')).count,1);
+  // AP2 deliberately searches substrings in both codes. B-001 also matches
+  // full codes for ordinals 10..19 when the random series prefix ends in B.
+  const shortOnly = await api.readCards(3,game.id,large.seriesId!,1,'B-500');
+  assert.equal(shortOnly.count,1); assert.deepEqual(shortOnly.cards.map(c=>c.id),[packages[499].id]);
+  const suffix = packages[0].code.split('-')[1].at(-1)!;
+  const collision = await api.readCards(3,game.id,large.seriesId!,1,suffix+'-001');
+  const expectedCollision = [...(suffix==='B'?[packages[0].id]:[]),...packages.slice(9,19).map(c=>c.id)];
+  assert.equal(collision.count,expectedCollision.length);
+  assert.deepEqual(collision.cards.map(c=>c.id),expectedCollision);
   await assert.rejects(db.query('UPDATE pubquiz.bingo_print_versions SET version=3 WHERE series_id=$1',[sid]),{code:'23514'});
   await assert.rejects(db.query('UPDATE pubquiz.bingo_series_labels SET prefix=99 WHERE series_id=$1',[sid]),{code:'23514'});
   await assert.rejects(api.readExport(3,game.id,sid,1,8,999));
@@ -240,5 +250,23 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   await db.query("ALTER FUNCTION pubquiz.bingo_valid_card(jsonb) SECURITY INVOKER");
   compareSnapshots(full,await snapshot());
   console.info("Full real collectSnapshot, all eight populated Bingo tables, frozen assets and integrity: PASS");
+  const liveMigration = readFileSync("prisma/migrations/20261028090000_bingo_live/migration.sql", "utf8");
+  assert.match(liveMigration, /COMMIT;\s*$/);
+  await db.query(liveMigration.replace(/COMMIT;\s*$/, "ROLLBACK;"));
+  assert.equal((await db.query("SELECT to_regclass('pubquiz.bingo_live_runs') t")).rows[0].t, null);
+  await db.query(liveMigration);
+  await exerciseBingoLive(db, api.live, api, api.games);
+  const withLive = await snapshot(); compareSnapshots(withLive, await snapshot());
+  assert.equal(withLive.archiveSchema?.bingoLiveMigrations?.length, 1);
+  for (const table of ["bingo_live_runs", "bingo_live_cards", "bingo_live_events"]) {
+    const item = withLive.tables.find(t => t.schema === "pubquiz" && t.table === table);
+    assert.ok(item && item.rows > 0, table);
+  }
+  await db.query("ALTER TABLE pubquiz.bingo_live_events DISABLE TRIGGER bingo_live_events_immutable");
+  await assert.rejects(snapshot(), /SCHEMA_SECURITY_REVIEW_REQUIRED/);
+  await db.query("ALTER TABLE pubquiz.bingo_live_events ENABLE TRIGGER bingo_live_events_immutable");
+  compareSnapshots(withLive, await snapshot());
+  console.info("AP3 full real collectSnapshot including populated runtime, AP2 print snapshots/fonts/logo and integrity: PASS");
+  await verifyBingoRestore(target, withLive);
   console.info("AP2 isolated PostgreSQL acceptance passed:", name);
 });

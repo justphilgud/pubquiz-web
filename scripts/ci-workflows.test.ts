@@ -246,6 +246,7 @@ test("Bingo preparation cannot enter the shared database migration workflow", ()
   const job = preview.slice(preview.indexOf("  deploy-preview:"));
   const gate = job.slice(job.indexOf("    if:"), job.indexOf("    runs-on:"));
   assert.ok(gate.includes("github.ref != 'refs/heads/codex/bingo-preparation' &&"));
+  assert.ok(gate.includes("github.ref != 'refs/heads/codex/bingo-live-run' &&"));
   assert.ok(preview.includes("node --import tsx scripts/deploy-vercel-git-preview.ts"), "existing targeted preview checks remain intact");
   assert.ok(preview.includes("node scripts/verify-preview-ci.ts"), "successful exact-head CI remains required");
 });

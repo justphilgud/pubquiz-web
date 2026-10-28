@@ -179,4 +179,5 @@ jobs:
       - name: PostgreSQL Bingo preparation, additive migration and immutable card series
         env:
           BINGO_PREPARATION_TEST_DATABASE_URL: ${{ env.EDITORIAL_IMPORT_TEST_DATABASE_URL }}
+          BINGO_PG_CONTAINER: ${{ job.services.postgres.id }}
         run: node --import tsx --test scripts/testing/bingo-preparation.integration.test.ts

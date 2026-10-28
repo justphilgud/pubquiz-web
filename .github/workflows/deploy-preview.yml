@@ -57,6 +57,7 @@ jobs:
     if: >-
       vars.ACTIONS_DEPLOYMENTS_ENABLED == 'true' &&
       github.ref != 'refs/heads/codex/bingo-preparation' &&
+      github.ref != 'refs/heads/codex/bingo-live-run' &&
       !inputs.editorial_dry_run_only && !inputs.editorial_repair_test_questions &&
       (github.ref != 'refs/heads/codex/shared-game-design' || inputs.isolated_shared_design) &&
       (!inputs.isolated_shared_design || github.ref == 'refs/heads/codex/shared-game-design') &&
