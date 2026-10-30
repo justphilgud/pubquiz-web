@@ -20,9 +20,9 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
     import React from 'react';import{createRoot}from'react-dom/client';import{flushSync}from'react-dom';
     import Board from './app/bingo/live/BingoBoard';import Audience from './app/bingo/live/AudienceClient';import{getPresentationTemplate}from'./app/rendering/templateRegistry';import{fetchLiveView}from'./app/bingo/live/useLivePolling';
     const root=createRoot(document.getElementById('app'));
-    window.show=(id='phil-gud',count=20,status='RUNNING',scaled=false)=>{
+    window.show=(id='phil-gud',count=20,status='RUNNING',scaled=false,colors={})=>{
       const t=getPresentationTemplate(id);
-      const data={id:'fixture',revision:count,startedAt:1,status,label:'Vorbereitete Bingo-Runde',target:30,draws:Array.from({length:count},(_,i)=>({id:String(i),position:i+1,number:i+1})),design:{version:1,templateId:id,name:id,config:{version:1,tokens:t.tokens,design:t.design,surfaces:{presentation:t.variant,answerForm:'BRANDED',moderation:'BRANDED'}}},assetBase:'/assets/'+id,claims:count?[{id:'call',stage:'BINGO',action:'CONFIRM',needsReview:false}]:[]};
+      const data={id:'fixture',revision:count,startedAt:1,status,label:'Vorbereitete Bingo-Runde',target:30,draws:Array.from({length:count},(_,i)=>({id:String(i),position:i+1,number:i+1})),design:{version:1,templateId:id,name:id,config:{version:1,tokens:{...t.tokens,colors:{...t.tokens.colors,...colors}},design:t.design,surfaces:{presentation:t.variant,answerForm:'BRANDED',moderation:'BRANDED'}}},assetBase:'/assets/'+id,claims:count?[{id:'call',stage:'BINGO',action:'CONFIRM',needsReview:false}]:[]};
       window.currentData=data;
       flushSync(()=>root.render(<div style={scaled?{width:1280,height:720,transform:'scale(.4)',transformOrigin:'top left'}:{height:'100dvh'}}><Board data={data}/></div>));
     };
@@ -108,6 +108,9 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
         }
       }
     }
+    await evaluate("window.show('phil-gud',20,'RUNNING',false,{background:'#ffffff',surface:'#faf8f2',text:'#171717',textMuted:'#625d55',primary:'#6a241c',secondary:'#f6c4dc'})");
+    assert.equal(await evaluate('document.querySelector("[data-bingo-brand]")'),null,"customized Phil Gud palette must not inherit default brand fills");
+    assert.deepEqual(await evaluate('(()=>{const s=getComputedStyle(document.querySelector("[data-number]"));return[s.backgroundColor,s.color]})()'),["rgb(250, 248, 242)","rgb(23, 23, 23)"],"customized palette values remain effective");
     await evaluate("window.show('phil-gud',20,'RUNNING',true)"); await new Promise(r => setTimeout(r, 150));
     assert.deepEqual((await evaluate("window.measure()") as { issues: string[] }).issues, []);
     await evaluate("window.show('phil-gud',20)");
