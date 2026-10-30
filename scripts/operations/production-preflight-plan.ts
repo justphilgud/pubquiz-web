@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 // Explicitly reviewed release pairs, never a caller-supplied SQL/delta allowlist.
 export const APPROVED_PREFLIGHT_PLANS = Object.freeze([
   { baselineSha: "2258c182e68c40a54fbdc4f0a855c9a7306d1a10", candidateSha: "b7666e1a3e4fcbe1aec4e7884a30b3603e25b151",
@@ -28,8 +29,18 @@ export const BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN = Object.freeze({
   candidateSha: "0c23f07ecb263805482ef9bd75277d94f0eac718",
 });
 
+// Separately human-approved PR149 pair; immutable complete 69-file manifest.
+export const ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN = Object.freeze({
+  "baselineSha": "1b025a78da4f3bc439bda0ac8510b377c1a4eb0f",
+  "candidateSha": "ed551d426de69c42eaea604c34176ede72305439",
+  "migrationCount": 69,
+  "lastMigration": "20261030150000_bingo_event_operation",
+  "manifestSha256": "e996d003df6d87260bbd3201e211e2eb11a419f6bf5c3b5cfa7def8ee1a6c498",
+  "schemaSha256": "8de3ef99975080831c86be36cae7f62bc4a3abe5e2181e92b1a65b8d590d4947"
+});
+
 export function approvedNoDeltaPreflightPlan(baseline: string, candidate: string) {
-  return [NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN]
+  return [NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN, ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN]
     .find(plan => baseline === plan.baselineSha && candidate === plan.candidateSha);
 }
 
@@ -43,14 +54,20 @@ export function assertNoDeltaManifest(baseline: string, candidate: string,
       JSON.stringify(before.map(({name,checksum}) => ({name,checksum}))) !== JSON.stringify(after.map(({name,checksum}) => ({name,checksum})))) {
     throw new Error("NO_DELTA_MANIFEST_UNVERIFIED");
   }
+  if ("manifestSha256" in plan) {
+    const hash = (value:string) => createHash("sha256").update(value).digest("hex");
+    if (hash(JSON.stringify(before.map(({name,checksum}) => ({name,checksum})))) !== plan.manifestSha256 ||
+        hash(baselineSchema) !== plan.schemaSha256) throw new Error("NO_DELTA_PINNED_BYTES_UNVERIFIED");
+  }
   return {kind: "NO_SCHEMA_MIGRATION_DELTA" as const, ...plan, manifest: after.map(({name,checksum}) => ({name,checksum}))};
 }
 
 export function hasCompleteNoDeltaHistory(result: {gate: {status: string}; applied?: readonly string[]; pending?: readonly string[]; expected?: readonly string[]},
-  manifest: readonly {name: string}[]) {
-  return result.gate.status === "PASS" && manifest.length === NO_DELTA_PREFLIGHT_PLAN.migrationCount &&
+  manifest: readonly {name: string}[], release?: {baselineSha:string;candidateSha:string}) {
+  const plan = release ? approvedNoDeltaPreflightPlan(release.baselineSha,release.candidateSha) : NO_DELTA_PREFLIGHT_PLAN;
+  return Boolean(plan && result.gate.status === "PASS" && manifest.length === plan.migrationCount &&
     result.applied?.length === manifest.length && new Set(result.applied).size === manifest.length &&
-    manifest.every(file => result.applied?.includes(file.name)) && result.pending?.length === 0 && result.expected?.length === 0;
+    manifest.every(file => result.applied?.includes(file.name)) && result.pending?.length === 0 && result.expected?.length === 0);
 }
 
 export function hasApprovedPendingDelta(plan: ApprovedPreflightPlan | undefined,

@@ -1,8 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import {execFileSync} from "node:child_process";
+import {migrationFiles,assessMigrations} from "./production-preflight";
 import { readFileSync } from "node:fs";
 import { APPROVED_PREFLIGHT_PLANS, approvedPreflightPlan, hasApprovedDeltaEvidence, hasApprovedPendingDelta,
-  NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN, approvedNoDeltaPreflightPlan, assertNoDeltaManifest, hasCompleteNoDeltaHistory } from "./production-preflight-plan";
+  NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN, ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN, approvedNoDeltaPreflightPlan, assertNoDeltaManifest, hasCompleteNoDeltaHistory } from "./production-preflight-plan";
 import { needsApplicationDeployment } from "./deployment-scope";
 
 test("only exact reviewed release pairs and SQL checksums are eligible", () => {
@@ -108,4 +110,30 @@ test("PR116 operations-only update never starts migration or application deploym
   assert.match(workflow, /environment: operations-backup/);
   assert.match(workflow, /github.ref == 'refs\/heads\/main'/);
   assert.doesNotMatch(workflow, /db:deploy|vercel.*deploy|acceptance-cli|workflow_run:/);
+});
+
+
+test("PR149 no-delta pair pins all 69 SQL files, both schema bytes and complete history without broadening old releases",()=>{
+ const p=ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN;
+ const before=migrationFiles(p.baselineSha),after=migrationFiles(p.candidateSha);
+ const schema=(sha:string)=>execFileSync("git",["show",`${sha}:prisma/schema.prisma`],{encoding:"utf8"});
+ const a=schema(p.baselineSha),b=schema(p.candidateSha);
+ const verify=(x=before,y=after,sa=a,sb=b,base:string=p.baselineSha,candidate:string=p.candidateSha)=>assertNoDeltaManifest(base,candidate,x,y,sa,sb);
+ assert.equal(approvedNoDeltaPreflightPlan(p.baselineSha,p.candidateSha),p);assert.equal(verify().migrationCount,69);
+ for(const [base,candidate]of [[p.candidateSha,p.baselineSha],[p.baselineSha,"a".repeat(40)],["b".repeat(40),p.candidateSha],[p.baselineSha,p.candidateSha.slice(0,8)],[NO_DELTA_PREFLIGHT_PLAN.baselineSha,p.candidateSha],[p.baselineSha,BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN.candidateSha]]){
+  assert.equal(approvedNoDeltaPreflightPlan(base,candidate),undefined);assert.throws(()=>verify(before,after,a,b,base,candidate));
+ }
+ for(const invalid of [after.slice(1),[...after,{name:"unexpected",checksum:"0".repeat(64)}],after.map((f,i)=>i===0?{...f,checksum:"0".repeat(64)}:f),after.map((f,i)=>i===68?after[0]:f)])assert.throws(()=>verify(before,invalid));
+ const changed=before.map((f,i)=>i===0?{...f,checksum:"0".repeat(64)}:f);assert.throws(()=>verify(changed,changed));
+ assert.throws(()=>verify(before,after,a+" ",b));assert.throws(()=>verify(before,after,a,b+" "));assert.throws(()=>verify(before,after,a+" ",b+" "));
+ const history={gate:{status:"PASS"},applied:before.map(f=>f.name),pending:[],expected:[]};
+ assert.equal(hasCompleteNoDeltaHistory(history,after,p),true);assert.equal(hasCompleteNoDeltaHistory(history,after),false);
+ assert.equal(hasCompleteNoDeltaHistory(history,after,{baselineSha:p.candidateSha,candidateSha:p.baselineSha}),false);
+ for(const invalid of [{...history,gate:{status:"BLOCKED"}},{...history,gate:{status:"FAIL"}},{...history,applied:history.applied.slice(1)},{...history,applied:[...history.applied,"extra"]},{...history,applied:history.applied.map((v,i)=>i===68?history.applied[0]:v)},{...history,pending:[p.lastMigration]},{...history,expected:["extra"]}])assert.equal(hasCompleteNoDeltaHistory(invalid,after,p),false);
+ const rows=before.map(f=>({migration_name:f.name,checksum:f.checksum,finished_at:"done",rolled_back_at:null}));
+ assert.equal(assessMigrations(after,before,rows).gate.status,"PASS");
+ assert.equal(assessMigrations(after,before,rows.slice(1)).gate.status,"FAIL");
+ assert.equal(assessMigrations(after,before,[...rows,{...rows[0],migration_name:"unknown"}]).gate.status,"FAIL");
+ const paths=["scripts/operations/production-preflight-plan.ts","scripts/operations/production-preflight-plan.test.ts","scripts/operations/production-preflight-cli.ts",".github/workflows/production-preflight-ci.yml","docs/operations/icons-ordering-release-preflight.md"];
+ assert.equal(needsApplicationDeployment(paths),false);for(const file of ["app/events/EventRow.tsx","prisma/schema.prisma"])assert.equal(needsApplicationDeployment([...paths,file]),true);
 });
