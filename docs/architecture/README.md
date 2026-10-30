@@ -8,6 +8,8 @@ Zentrale Module: Authentifizierung, Fragen, Quiz, Teams, Moderation, Präsentati
 
 ## Vertiefende Dokumente
 
+- [Gemeinsamer Bedienstandard für Eventarten](./event-operation-standard.md) – verbindlicher Rahmen für neue/geänderte Bedienabläufe; unterscheidet Bestand und geplante Anforderungen.
+
 - [Antwortformulare und Live-Interaction-Architektur](./answer-interaction.md)
 - [Verbindliche Quiz Runtime Contracts](./quiz-runtime-contracts.md)
 - [Öffentliche Frageneinreichung](./public-question-submissions.md)

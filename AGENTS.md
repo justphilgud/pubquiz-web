@@ -29,6 +29,8 @@ Bei Änderungen an Pixel-Fragen zusätzlich `docs/architecture/pixel-question.md
 
 ## Project architecture
 
+Before work on event-type navigation, event/series management, preparation, moderation or presentation entry points, read `docs/architecture/event-operation-standard.md`. Preserve its distinction between implemented contracts and planned UI requirements; document format-specific deviations.
+
 For work on the new Question Editor, Presentation, Moderation and future features, also read:
 
 docs/architecture/editor-principles.md

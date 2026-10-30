@@ -45,3 +45,14 @@ Isolierte Datenbank `pr130_review_20261025` am bestätigten Nonproduction-Host. 
 Automatische Tests prüfen Routengrenze, bestehende Defaults/LOVD-Asset, validierte optionale Displayfamilie, Original-Fonthash, Swap/Fallback sowie alle vorhandenen synthetischen Rendering-Szenarien im neuen Theme und fehlende Phil-Gud-Markierung in bisherigen Designwelten. Die Fontauswahl wird um genau die echte Originalschrift erweitert (14 statt 13 Einträge). Keine Testlockerung für Inhalts-/Berechtigungsregeln.
 
 Browsergeometrie, tatsächliche Kontraste, Rollen, Speichern/Abbrechen und finaler CI-/Deploymentstand werden im PR-Abnahmebericht mit konkreten Ergebnissen und verbleibenden Grenzen protokolliert. Laufende Prüfungen sind kein Erfolgsnachweis. Gehostete Preview benötigt die separate menschliche Freigabe des neuen Branches nach der bestehenden Medien-/Environment-Policy.
+
+
+## Ergänzung 30.10.2026: interner Bedienstandard und Bingo-Entwurf V3.1
+
+Verbindliche Farbquelle bleibt ausschließlich `PHIL_GUD.colors` in `app/branding/philGud.ts`: Gelb `#F0FC16`, Pink `#F6C4DC`, Ink `#171717`, Paper `#FAF8F2`, Schwarz `#000000`; Verwaltungsfokus `#A32661`. Keine neue Akzentpalette für eine Eventart. Der [gemeinsame Bedienstandard](../architecture/event-operation-standard.md) übernimmt Navigation, Position und Bedeutung wiederkehrender Aktionen; Formate unterscheiden Fachinhalte statt willkürlicher Bedienmuster.
+
+Die interne dunkle Bingo-Moderation im **statischen** Entwurf verwendet Gelb für Veröffentlichung/aktuelle Zahl, Pink für Ruftasten/gezogene Zahlen, Grau für Nebenaktionen/ungezogen. Auf hellen Markenflächen dunkle Beschriftung. Hover/gedrückt zusätzlich Kontur/Unterstreichung, Fokus Pink mit Abstand, deaktiviert neutral grau. Farbe allein reicht nicht: Zahlzustände mit Kontur, Gewicht, Zeichen und zugänglicher Bezeichnung. Warn-, Fehler- und Erfolgsaussagen bleiben semantisch eigenständig. Tatsächliche Textkontraste mindestens 4,5:1 (groß 3:1), notwendige Konturen/Markierungen 3:1 prüfen; keine weiße Schrift auf hellem Pink/Gelb.
+
+Die bisherige Quiz-Moderation verwendet weiterhin Cyan. Ihre Angleichung bleibt **separater Umfang**; in diesem Auftrag keine Quiz-/App-CSS-Änderung. Die helle Administration behält ihren vorhandenen Scope und Fokus. Interne Moderationsfarben überschreiben weder auswählbare Publikumstemplates noch Druckvorlagen, insbesondere keine LOVD-/ungegoogelt-/Storybook- oder bestehenden Phil-Gud-Zuweisungen. Es gibt keine allgemeine Farbübersteuerung des SharedDesign-/Druckvertrags.
+
+Dies ergänzt die Bedienrichtlinie, implementiert aber keine neuen Komponenten, Produktgates oder Fachbefehle. Spätere Umsetzung muss B05/B06/B10/B12 aus dem Bedienstandard mit gemessenen CSS-Zuständen, Tastatur-/Touch- und Scope-Regressionen abnehmen.
