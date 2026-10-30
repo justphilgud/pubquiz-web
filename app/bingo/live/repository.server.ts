@@ -1,4 +1,5 @@
 import "server-only";
+import {selectedRun,readEventModeration,readEventAudience,eventStorageAvailable} from "./eventRepository.server";
 import { randomUUID } from "node:crypto";
 import type { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
@@ -111,7 +112,7 @@ export async function commandLive(userId: number, input: { gameId: string; runId
     return { revision: row.revision + 1 };
   }, { timeout: 30000 });
 }
-export async function readLive(userId: number, gameId: string, runId?: string) {
+export async function readLegacyLive(userId: number, gameId: string, runId?: string) {
   assertUuid(gameId); if (runId) assertUuid(runId);
   return prisma.$transaction(async tx => {
     const { game, series } = await preparationContext(tx, userId, gameId);
@@ -132,6 +133,8 @@ export async function readLive(userId: number, gameId: string, runId?: string) {
 /** Match existing presentation access: fresh controller authorization, display projection only. */
 export async function readAudience(userId: number, key: string) {
   assertUuid(key);
+  if(await eventStorageAvailable()&&(await prisma.$queryRaw<{run_id:string}[]>`SELECT e.run_id FROM pubquiz.bingo_event_runs e JOIN pubquiz.bingo_live_runs r ON r.id=e.run_id WHERE r.audience_key=${key}::uuid`).length)return readEventAudience(userId,key);
+  assertUuid(key);
   return prisma.$transaction(async tx => {
     await tx.$executeRawUnsafe("SET TRANSACTION READ ONLY");
     const [row] = await tx.$queryRaw<RunRow[]>`SELECT r.id,r.game_id,r.round_id,r.eventreihe_id,r.status,r.revision,r.started_at,
@@ -147,8 +150,8 @@ export async function readAudience(userId: number, key: string) {
       claims: round.claims.map(c => ({ id: c.id, stage: c.stage, action: c.decisions.at(-1)?.action ?? null, needsReview: c.needsReview })) };
   }, { isolationLevel: "RepeatableRead" });
 }
-export type ModerationView = Awaited<ReturnType<typeof readLive>>;
-export type AudienceView = Omit<Awaited<ReturnType<typeof readAudience>>, "assetBase"> & { assetBase: string | null };
+export type ModerationView = Awaited<ReturnType<typeof readLegacyLive>>;
+export type AudienceView = Omit<Awaited<ReturnType<typeof readAudience>>, "assetBase"> & { assetBase: string | null; phase?:"BETWEEN" };
 /** Stable authenticated entry can already be opened before the conscious start. */
 export async function readGameAudience(userId: number, gameId: string): Promise<AudienceView> {
   assertUuid(gameId);
@@ -179,4 +182,11 @@ export async function readLiveAsset(userId: number, key: string, kind: string) {
   const fontTypes: Record<string, string> = { "774f4646": "font/woff", "774f4632": "font/woff2", "4f54544f": "font/otf", "00010000": "font/ttf" };
   return { bytes, contentType: kind === "logo" || kind === "background" ? "image/png" : fontTypes[bytes.subarray(0, 4).toString("hex")] };
   }, { isolationLevel: "RepeatableRead" });
+}
+
+export async function readLive(userId:number,gameId:string,runId?:string,prepareNew=false){
+ if(!await eventStorageAvailable())return {...await readLegacyLive(userId,gameId,runId),protocol:1 as const};
+ const row=await selectedRun(gameId,runId);
+ if(row&&!row.event_version&&!(prepareNew&&!runId&&row.status==="ENDED"))return {...await readLegacyLive(userId,gameId,runId),protocol:1 as const};
+ return readEventModeration(userId,gameId,runId,prepareNew);
 }

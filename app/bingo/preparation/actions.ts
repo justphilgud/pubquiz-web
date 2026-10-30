@@ -10,6 +10,8 @@ export async function savePreparation(input: unknown): Promise<{ success: true; 
     const result = await writePreparation(actor.userId, input);
     const id = (input as { gameId: string }).gameId;
     revalidatePath(`/bingo/${id}/vorbereitung`);
+    revalidatePath(`/bingo/${id}`);
+    revalidatePath(`/bingo/${id}/moderation`);
     revalidatePath(`/bingo/${id}/karten`);
     return { success: true, ...result };
   } catch (error) {

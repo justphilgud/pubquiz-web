@@ -5,6 +5,6 @@ export async function GET(request: Request, context: { params: Promise<{ gameId:
   if (!session?.user?.id) return Response.json({ error: "Nicht angemeldet." }, { status: 401 });
   try {
     const { gameId } = await context.params, runId = new URL(request.url).searchParams.get("run") ?? undefined;
-    return Response.json(await readLive(Number(session.user.id), gameId, runId), { headers: { "Cache-Control": "private, no-store" } });
+    return Response.json(await readLive(Number(session.user.id), gameId, runId,new URL(request.url).searchParams.get("new")==="1"), { headers: { "Cache-Control": "private, no-store" } });
   } catch { return Response.json({ error: "Kein Zugriff oder Stand nicht verfügbar." }, { status: 404 }); }
 }

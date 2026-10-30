@@ -31,3 +31,11 @@ export async function saveLive(input:
     return { success: false as const, message: messages[code] ?? "Nicht gespeichert. Bitte Rechte, Produktfreischaltung und aktuellen Stand prüfen. Deine Eingaben bleiben erhalten." };
   }
 }
+
+export async function saveEventRun(input:
+ |{operation:"start";gameId:string;requestId:string;expectedSeriesId:number;preparationRevision:number}
+ |{operation:"command";gameId:string;runId:string;requestId:string;revision:number;command:import("./eventRun").EventCommand}){
+ const {actor}=await requireActor();
+ try{if(input.operation!=="start"&&input.operation!=="command")throw Error("INVALID_COMMAND");const api=await import("./eventRepository.server");return {success:true as const,...(input.operation==="start"?await api.startEventRun(actor.userId,input):await api.commandEventRun(actor.userId,input))};}
+ catch(error){const code=error instanceof Error?error.message:"";return {success:false as const,code,message:code==="CALL_CONTEXT_CONFLICT"?"Der Ziehungsstand hat sich geändert. Der Ruf wurde nicht umgedeutet. Bitte den aktuellen Stand prüfen und den Konflikt klären.":code==="OPEN_CLAIMS"?"Bitte offene Rufe und erforderliche Nachprüfungen zuerst klären. Weitere Rufe können erfasst werden.":code==="ROUND_NOT_OPEN"?"Diese Runde ist geschlossen und kann nicht verändert werden.":messages[code]??"Nicht gespeichert. Bitte aktuellen Stand, Rechte und Karten prüfen. Deine Eingaben bleiben erhalten."};}
+}

@@ -39,7 +39,7 @@ export default function BingoBoard({ data }: { data: AudienceView }) {
     return () => { disposed = true; observer.disconnect(); document.fonts.removeEventListener("loadingdone", fit); document.removeEventListener("fullscreenchange", fit); };
   }, [currentNumber]);
   const current = data.draws.at(-1)?.number ?? null, drawn = new Set(data.draws.map(d => d.number));
-  const status = data.status === "PREPARED" ? "Vorbereitet · noch nicht gestartet" : data.status === "PAUSED" ? "Pause" : data.status === "ENDED" ? "Beendet" : data.draws.length ? "Läuft" : "Bereit für die erste Zahl";
+  const status = data.phase==="BETWEEN"?"Runde beendet · nächste Runde noch nicht gestartet":data.status === "PREPARED" ? "Vorbereitet · noch nicht gestartet" : data.status === "PAUSED" ? "Pause" : data.status === "ENDED" ? "Beendet" : data.draws.length ? "Läuft" : "Bereit für die erste Zahl";
   const feedback = data.claims.filter(c => c.action).at(-1);
   const style = { background: t.colors.background, color: t.colors.text, "--bingo-surface": t.colors.surface,
     "--bingo-primary": t.colors.primary, "--bingo-border": t.colors.border,

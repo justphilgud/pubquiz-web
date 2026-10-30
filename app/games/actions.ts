@@ -18,3 +18,9 @@ export async function saveGameDraft(type: unknown, input: unknown): Promise<{ su
     return { success: false, message: "Das Spiel konnte nicht gespeichert werden. Deine Eingaben bleiben erhalten. Bitte erneut versuchen." };
   }
 }
+
+export async function createBingoDraft(input:unknown){
+ const {actor}=await requireActor();
+ try{const {createBingoEvent}=await import("@/app/bingo/eventCreation.server");const game=await createBingoEvent(actor.userId,input);revalidatePath("/bingo");revalidatePath("/events");return {success:true as const,game};}
+ catch(error){return {success:false as const,retryable:!(error instanceof GameDraftError),message:error instanceof GameDraftError?error.message:"Speicherergebnis unbestätigt. Bitte dieselbe Anfrage wiederholen; Eingaben bleiben bis zur Klärung gesperrt."};}
+}

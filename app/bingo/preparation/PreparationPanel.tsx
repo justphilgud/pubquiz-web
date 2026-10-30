@@ -11,6 +11,7 @@ const subscribe = () => () => {};
 export default function PreparationPanel({ data }: { data: PreparationView }) {
   const router = useRouter(), [pending, start] = useTransition(), busy = useRef(false);
   const ready = useSyncExternalStore(subscribe, () => true, () => false);
+  const [expanded,setExpanded]=useState<Set<string>>(new Set());
   const [message, setMessage] = useState("");
   const [dirtyRounds, setDirtyRounds] = useState<Set<string>>(new Set());
   const [busyRounds, setBusyRounds] = useState<Set<string>>(new Set());
@@ -34,20 +35,22 @@ export default function PreparationPanel({ data }: { data: PreparationView }) {
     {message && <p role="alert">{message}</p>}
     <Button disabled={!ready || pending || data.archived || dirtyRounds.size > 0 || busyRounds.size > 0} onClick={() => run({ operation: "createRound" })}>Runde hinzufügen</Button>
     {!data.rounds.length && <p>Noch keine Runden vorhanden.</p>}
-    {data.rounds.map(r => <RoundEditor key={`${r.id}-${data.revision}`} round={r} data={data} onDirty={trackDirty} onBusy={trackBusy} externallyBlocked={pending || [...dirtyRounds, ...busyRounds].some(id => id !== r.id)} />)}
+    {data.rounds.map(r=><div key={r.id} data-round-id={r.id} className="rounded-xl border border-slate-300 bg-white p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-bold">{r.label}</h2><p className="text-sm text-slate-600">Zahlen-Bingo 75 · {r.target} geplante Ziehungen · {r.cardCount} Karten · Ausgabe: {r.issued===null?"nicht erfasst":r.issued} · {r.locked?"Gestartet · unveränderlich":r.cardCount?"Bereit":"Karten fehlen"}</p></div><button className="min-h-11 rounded-lg border px-3" onClick={()=>{if(expanded.has(r.id)&&dirtyRounds.has(r.id)&&!window.confirm("Ungespeicherte Änderungen verwerfen?"))return;setExpanded(current=>{const next=new Set(current);if(next.has(r.id))next.delete(r.id);else next.add(r.id);return next;});}}>{expanded.has(r.id)?"Schließen":r.locked?"Ansehen":"Bearbeiten"}</button></div>{expanded.has(r.id)&&<RoundEditor key={r.id} round={r} data={data} onDirty={trackDirty} onBusy={trackBusy} externallyBlocked={pending||[...dirtyRounds,...busyRounds].some(id=>id!==r.id)}/>}</div>)}
     <nav aria-label="Rundenseiten" className="flex flex-wrap gap-4">{data.page > 1 && <Link href={`?page=${data.page - 1}&seriesPage=${data.seriesPage}`}>Vorherige Runden</Link>}{data.page * 25 < data.roundCount && <Link href={`?page=${data.page + 1}&seriesPage=${data.seriesPage}`}>Weitere Runden</Link>}</nav>
   </div>;
 }
-function RoundEditor({ round, data, onDirty, onBusy, externallyBlocked }: { round: RoundView; data: PreparationView; onDirty: (id: string, dirty: boolean) => void; onBusy: (id: string, busy: boolean) => void; externallyBlocked: boolean }) {
+export function RoundEditor({ round, data, onDirty, onBusy, externallyBlocked }: { round: RoundView; data: PreparationView; onDirty: (id: string, dirty: boolean) => void; onBusy: (id: string, busy: boolean) => void; externallyBlocked: boolean }) {
   const router = useRouter(), [pending, start] = useTransition(), busy = useRef(false);
   const ready = useSyncExternalStore(subscribe, () => true, () => false);
   const initial = { label: round.label, target: String(round.target), strategy: round.strategy, issued: round.issued === null ? "" : String(round.issued) };
+  const [editRevision,setEditRevision]=useState<number|null>(null);
+  function changeFields(value:typeof initial){setEditRevision(current=>current??data.revision);setFields(value);}
   const [fields, setFields] = useState(initial), [message, setMessage] = useState<{ text: string; error: boolean; field?: string } | null>(null);
   const [count, setCount] = useState("100"), [selected, setSelected] = useState("");
   const request = useRef<{ count: string; id: string } | null>(null);
   const dirty = JSON.stringify(fields) !== JSON.stringify(initial), markSaved = useContentNavigationGuard(dirty);
   useEffect(() => { onDirty(round.id, dirty); return () => onDirty(round.id, false); }, [round.id, dirty, onDirty]);
-  const base = { gameId: data.gameId, expectedSeriesId: data.seriesId, revision: data.revision, roundId: round.id };
+  const base = { gameId: data.gameId, expectedSeriesId: data.seriesId, revision: editRevision??data.revision, roundId: round.id };
   type Extra = Record<string, unknown> & { operation: string };
   function run(extra: Extra, saving = false) {
     if (busy.current) return;
@@ -56,21 +59,21 @@ function RoundEditor({ round, data, onDirty, onBusy, externallyBlocked }: { roun
       try {
         const result = await savePreparation({ ...base, ...extra });
         if (!result.success) { setMessage({ text: result.message, error: true, field: result.field }); return; }
-        if (saving) markSaved();
+        if (saving) {markSaved();setEditRevision(null);}
         router.refresh(); setMessage({ text: "Gespeichert.", error: false });
       } catch { setMessage({ text: "Speichern fehlgeschlagen. Deine Eingaben bleiben erhalten. Bitte erneut versuchen.", error: true }); }
       finally { busy.current = false; onBusy(round.id, false); }
     });
   }
-  const blocked = !ready || pending || data.archived || externallyBlocked;
+  const blocked = !ready || pending || data.archived || Boolean(round.locked) || externallyBlocked;
   return <section aria-labelledby={`round-${round.id}`} className="min-w-0 space-y-4 rounded-xl border border-slate-200 bg-white p-4">
     <div className="flex flex-wrap items-center justify-between gap-2"><h2 id={`round-${round.id}`} className="text-lg">{round.label}</h2><div className="flex flex-wrap gap-2"><Button disabled={blocked || dirty || round.position === 1} onClick={() => run({ operation: "moveRound", direction: -1 })}>Nach oben</Button><Button disabled={blocked || dirty} onClick={() => run({ operation: "moveRound", direction: 1 })}>Nach unten</Button><Button disabled={blocked || dirty || round.series.length > 0 || round.issued !== null || round.history.length > 0} onClick={() => { if (window.confirm("Diese unreferenzierte Runde entfernen?")) run({ operation: "removeRound" }); }}>Runde entfernen</Button></div></div>
     <form className="space-y-3" onSubmit={e => { e.preventDefault(); run({ operation: "saveRound", label: fields.label, target: Number(fields.target), strategy: fields.strategy, issued: fields.issued === "" ? null : Number(fields.issued) }, true); }}>
       <fieldset disabled={blocked} className="grid min-w-0 gap-3 sm:grid-cols-2">
-        <FormField label="Bezeichnung" htmlFor={`label-${round.id}`}><Input id={`label-${round.id}`} required maxLength={80} value={fields.label} onChange={e => setFields({ ...fields, label: e.target.value })} /></FormField>
-        <FormField label="Geplante Ziehungen" htmlFor={`target-${round.id}`}><Input id={`target-${round.id}`} type="number" min={1} max={75} required list={`presets-${round.id}`} value={fields.target} onChange={e => setFields({ ...fields, target: e.target.value })} /><datalist id={`presets-${round.id}`}><option value="20" /><option value="30" /><option value="40" /></datalist></FormField>
-        <FormField label="Kartenstrategie" htmlFor={`strategy-${round.id}`}><Select id={`strategy-${round.id}`} value={fields.strategy} onChange={e => setFields({ ...fields, strategy: e.target.value as "NEW" | "EXISTING" })}><option value="NEW">Neue Karten je Runde</option><option value="EXISTING">Vorhandene Karten verwenden</option></Select></FormField>
-        <FormField label="Ausgegebene Karten gesamt" htmlFor={`issued-${round.id}`} hint={`Leer = nicht erfasst; 0 = ausdrücklich keine. Höchstens ${round.cardCount}.`}><Input id={`issued-${round.id}`} type="number" min={0} max={round.cardCount} value={fields.issued} onChange={e => setFields({ ...fields, issued: e.target.value })} /></FormField>
+        <FormField label="Bezeichnung" htmlFor={`label-${round.id}`}><Input id={`label-${round.id}`} required maxLength={80} value={fields.label} onChange={e => changeFields({ ...fields, label: e.target.value })} /></FormField>
+        <FormField label="Geplante Ziehungen" htmlFor={`target-${round.id}`}><Input id={`target-${round.id}`} type="number" min={1} max={75} required list={`presets-${round.id}`} value={fields.target} onChange={e => changeFields({ ...fields, target: e.target.value })} /><datalist id={`presets-${round.id}`}><option value="20" /><option value="30" /><option value="40" /></datalist></FormField>
+        <FormField label="Kartenstrategie" htmlFor={`strategy-${round.id}`}><Select id={`strategy-${round.id}`} value={fields.strategy} onChange={e => changeFields({ ...fields, strategy: e.target.value as "NEW" | "EXISTING" })}><option value="NEW">Neue Karten je Runde</option><option value="EXISTING">Vorhandene Karten verwenden</option></Select></FormField>
+        <FormField label="Ausgegebene Karten gesamt" htmlFor={`issued-${round.id}`} hint={`Leer = nicht erfasst; 0 = ausdrücklich keine. Höchstens ${round.cardCount}.`}><Input id={`issued-${round.id}`} type="number" min={0} max={round.cardCount} value={fields.issued} onChange={e => changeFields({ ...fields, issued: e.target.value })} /></FormField>
       </fieldset>
       <p className="text-xs text-slate-600">Die Gesamtmenge ist kein Nachweis, welche einzelne Karte spielberechtigt ist. PDF-Downloads verändern diese Angabe nicht.</p>
       {message && <p role={message.error ? "alert" : "status"} className={message.error ? "text-red-700" : "text-emerald-800"}>{message.text}</p>}

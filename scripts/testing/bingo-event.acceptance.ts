@@ -54,6 +54,9 @@ export async function exerciseBingoEvent(db:Client,api:typeof EventApi,creation:
  current=await view();await send({kind:"startRound",roundId:extra.id,preparationRevision:current.preparationRevision});await send({kind:"pause"});assert.equal((await view()).live!.state.run.status,"PAUSED");await send({kind:"resume"});await send({kind:"closeRound"});await send({kind:"end"});
  assert.equal((await view()).live!.summary.length,4);assert.equal((await view()).live!.state.run.status,"ENDED");assert.equal(JSON.stringify((await view()).live!.state.run.rounds[0]),history);
  await assert.rejects(send({kind:"resume"}),/RUN_ENDED/);
+ const newPreparation=await api.readEventModeration(1,game.id,undefined,true);assert.equal(newPreparation.live,null);assert.equal(newPreparation.runs.length,1);
+ const historicLabel=(await view()).live!.round.label;let editable=await prep.readPreparation(1,game.id);await prep.writePreparation(1,{gameId:game.id,expectedSeriesId:10,revision:editable.revision,operation:'saveRound',roundId:first,label:'Neue Vorbereitung',target:30,strategy:'NEW',issued:null});editable=await prep.readPreparation(1,game.id);
+ const restarted=await api.startEventRun(1,{gameId:game.id,expectedSeriesId:10,preparationRevision:editable.revision,requestId:randomUUID()});assert.notEqual(restarted.runId,runId);assert.equal((await view()).live!.round.label,historicLabel);assert.equal((await api.readEventModeration(1,game.id,restarted.runId)).live!.state.run.rounds[0].draws.length,0);
  const audience=await api.readEventAudience(1,(await view()).live!.audienceKey);assert.equal(audience.status,"ENDED");assert.equal(audience.draws.length,0);
  await assert.rejects(db.query("UPDATE pubquiz.bingo_event_rounds SET round_snapshot='{}' WHERE run_id=$1",[runId]));
 
