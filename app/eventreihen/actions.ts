@@ -215,7 +215,7 @@ export async function createEventSeries(
       ...buildEventSeriesPersistenceData(validated.value),
       eventarten: { create: [...new Set(enabledEventTypes)].map(eventart => ({ eventart, ist_freigeschaltet: true })) },
     },
-    select: { eventreihe_id: true },
+    include: { eventarten: true },
   });
   revalidatePath("/admin/eventreihen");
   revalidatePath("/quiz");
@@ -223,6 +223,8 @@ export async function createEventSeries(
     success: true,
     message: "Eventreihe wurde angelegt.",
     eventSeriesId: created.eventreihe_id,
+    settingsRevision:eventSeriesSettingsRevision(created.updated_at,created.eventarten,created.logo_url),
+    savedValue:validated.value,
   };
 }
 

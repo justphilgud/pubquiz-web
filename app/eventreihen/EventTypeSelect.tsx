@@ -28,6 +28,6 @@ export function EventTypeSelect({ enabled, onToggle, disabled = false, name }: P
       </div>}
     </div>
     {name && EVENT_TYPES.filter(type => enabled.includes(type.id)).map(type => <input key={type.id} type="hidden" name={name} value={type.id} />)}
-    <p className="mt-1 text-xs text-slate-500">Bingo und PowerPoint-Karaoke sind noch nicht spielbar.</p>
+    <p className="mt-1 text-xs text-slate-500">PowerPoint-Karaoke ist noch nicht spielbar.</p>
   </div>;
 }
