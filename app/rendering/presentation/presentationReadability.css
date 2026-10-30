@@ -21,6 +21,8 @@
 /* Ordering solutions keep natural line heights. Only this measured surface changes. */
 .presentation-template.presentation-readable[data-design-style]:has([data-ordering-fit]) .presentation-stage { padding-block: clamp(6px, 1vh, 16px) !important; }
 .presentation-template.presentation-readable[data-design-style]:has([data-ordering-fit]) :is(.presentation-editorial-header, .presentation-neon-header, .presentation-corporate-header) { height: clamp(48px, 8vh, 88px) !important; min-height: 0; margin-bottom: 0; }
+.presentation-template.presentation-readable[data-design-style]:has([data-ordering-fit]) .presentation-neon-header { height: 80px !important; }
+.presentation-template.presentation-readable[data-design-style]:has([data-ordering-fit]) .presentation-corporate-header { height: 64px !important; }
 .presentation-template.presentation-readable[data-design-style]:has([data-ordering-fit]) .presentation-editorial-header { height: clamp(72px, 10vh, 88px) !important; padding-block: 0; }
 .presentation-template.presentation-readable[data-design-style]:has([data-ordering-fit]) .presentation-editorial-header .presentation-editorial-logo { max-height: 100% !important; height: 100%; width: auto; object-fit: contain; box-sizing: border-box; margin: 0; }
 .presentation-template.presentation-readable[data-design-style]:has([data-ordering-fit]) :is(.presentation-corporate-header .presentation-corporate-logo img,.presentation-neon-header .presentation-neon-logo) { height: clamp(32px, 6vh, 56px); max-height: clamp(32px, 6vh, 56px); width: auto; object-fit: contain; }
@@ -47,6 +49,7 @@
 .presentation-template.presentation-readable[data-design-style] .presentation-ordering-solution[data-ordering-fit] .presentation-solution-answer {
   flex: 0 0 auto; min-height: min-content; padding: 4px 10px !important;
 }
+.presentation-template.presentation-readable:is([data-design-style="NEON"],[data-design-style="CORPORATE"]) .presentation-ordering-solution[data-ordering-fit] .presentation-solution-answer { padding-block: 2px !important; }
 .presentation-template.presentation-readable[data-design-style] .presentation-ordering-solution[data-ordering-fit] .presentation-correct-answer-value {
   font-size: var(--ordering-answer-size, 24px) !important; line-height: 1.25 !important; white-space: normal; overflow-wrap: anywhere;
 }

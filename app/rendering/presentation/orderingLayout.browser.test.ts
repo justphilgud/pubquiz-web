@@ -5,8 +5,8 @@ import postcss from "postcss";
 import tailwindcss from "@tailwindcss/postcss";
 import { createServer } from "node:http";
 import { spawn, execFileSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { existsSync, statSync, readFileSync, writeFileSync, mkdirSync, mkdtempSync, rmSync } from "node:fs";
+import { join, resolve, sep, extname } from "node:path";
 import { tmpdir } from "node:os";
 
 test("ordering solutions: complete canonical text, no overlap, fitting, resize and fallback", async () => {
@@ -36,7 +36,8 @@ test("ordering solutions: complete canonical text, no overlap, fitting, resize a
       for(let i=0;i<rects.length;i++)for(let j=i+1;j<rects.length;j++){const a=rects[i],b=rects[j];if(a.index!==b.index&&Math.min(a.right,b.right)>Math.max(a.left,b.left)+1&&Math.min(a.bottom,b.bottom)>Math.max(a.top,b.top)+1)issues.push('overlap '+a.index+':'+b.index);}
       for(const el of [region,fit,...cards].filter(Boolean))if(el.scrollHeight>el.clientHeight||el.scrollWidth>el.clientWidth)issues.push('overflow '+el.className);
       const q=document.querySelector('h2');if(q&&!contained(box(q),box(region)))issues.push('question outside stage');
-      for(const logo of document.querySelectorAll('header img'))if(!contained(box(logo),box(logo.closest('header'))))issues.push('logo outside header');
+      for(const header of document.querySelectorAll('header')){const walker=document.createTreeWalker(header,NodeFilter.SHOW_TEXT);let text;while(text=walker.nextNode()){if(!text.textContent.trim())continue;const range=document.createRange();range.selectNodeContents(text);for(const r of range.getClientRects())if(!contained(r,box(header)))issues.push('header text outside header');}}
+      for(const logo of document.querySelectorAll('header img')){if(!logo.complete||!logo.naturalWidth)issues.push('logo not loaded');if(!contained(box(logo),box(logo.closest('header'))))issues.push('logo outside header');}
       return {logos:[...document.querySelectorAll("header img")].map(i=>({logo:box(i),header:box(i.closest("header")),padding:getComputedStyle(i).padding,margin:getComputedStyle(i).margin,height:getComputedStyle(i).height,maxHeight:getComputedStyle(i).maxHeight})),issues,text:cards.map(e=>e.textContent),expected:window.expected,fit:fit?.dataset.orderingFit,layout:fit?.dataset.orderingLayout,sizes:cards.map(c=>getComputedStyle(c.firstElementChild).fontSize),scrollHeight:region.scrollHeight,clientHeight:region.clientHeight,hintVisible:getComputedStyle(document.querySelector('.presentation-overflow-hint')).visibility,debug:[fit,q,...cards].filter(Boolean).map(e=>({class:e.className,...box(e)}))};
     };
     window.show('ordering-odyssey-solution','EDITORIAL');
@@ -45,7 +46,13 @@ test("ordering solutions: complete canonical text, no overlap, fitting, resize a
   const server=createServer((req,res)=>{
     if(req.url==='/bundle.js'){res.setHeader('Content-Type','text/javascript');res.end(bundle.outputFiles[0].contents);}
     else if(req.url==='/medien/artwork-layout-test.svg'){res.setHeader('Content-Type','image/svg+xml');res.end(readFileSync('public/medien/artwork-layout-test.svg'));} else if(req.url==='/style.css'){res.setHeader('Content-Type','text/css');res.end(css);}
-    else if(req.url?.startsWith('/branding/')){const p=resolve('public','.'+req.url);if(p.startsWith(resolve('public'))&&existsSync(p)){res.end(readFileSync(p));}else{res.statusCode=404;res.end();}}
+    else if(req.url!=='/'){
+      const p=resolve('public','.'+new URL(req.url??'/', 'http://localhost').pathname);
+      if(p.startsWith(resolve('public')+sep)&&existsSync(p)&&statSync(p).isFile()){
+        const mime:Record<string,string>={'.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.woff':'font/woff','.woff2':'font/woff2','.ttf':'font/ttf'};
+        res.setHeader('Content-Type',mime[extname(p)]??'application/octet-stream');res.end(readFileSync(p));
+      }else{res.statusCode=404;res.end();}
+    }
     else{res.setHeader('Content-Type','text/html');res.end('<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="/style.css"><style>html,body{margin:0;width:100%;height:100%}#app{height:100dvh;padding:16px;box-sizing:border-box;background:black}</style><div id="app"></div><script>window.errors=[];window.onerror=(m)=>window.errors.push(m)</script><script src="/bundle.js"></script>');}
   });
   await new Promise<void>(r=>server.listen(process.env.ORDERING_SERVE ? 4320 : 0,'127.0.0.1',r));const address=server.address();assert.ok(address&&typeof address!=='string');
