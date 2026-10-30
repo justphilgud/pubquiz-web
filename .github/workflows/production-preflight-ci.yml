@@ -25,6 +25,8 @@ jobs:
             candidate: 834242e51f8d9819aaf05d3e006f50a5694b6345
           - baseline: 4f437c17d675cdf027b25cb2c2196f9ef19f5345
             candidate: 6381b8be4e74f47e0267fa8f542d1ac4661759ef
+          - baseline: 8fa60b68c0713dfe06e5dd6a203a369e1e73b961
+            candidate: 49350af73f6ceb69ff6d903701acd4f4d9ddd5c5
     services:
       postgres:
         image: postgres:17
@@ -43,7 +45,7 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: node --import tsx --test --test-concurrency=1 scripts/operations/production-preflight.test.ts scripts/operations/production-preflight-plan.test.ts scripts/operations/production-preflight-bingo.test.ts scripts/operations/production-preflight-bingo-live.test.ts scripts/operations/production-preflight.integration.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/production-preflight-schema.integration.test.ts
+      - run: node --import tsx --test --test-concurrency=1 scripts/operations/production-preflight.test.ts scripts/operations/production-preflight-plan.test.ts scripts/operations/production-preflight-bingo.test.ts scripts/operations/production-preflight-bingo-live.test.ts scripts/operations/production-preflight-bingo-event.test.ts scripts/operations/production-preflight.integration.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/production-preflight-schema.integration.test.ts
         env:
           CI: 'true'
           PREFLIGHT_TEST_DATABASE_URL: postgresql://preflight_ci:isolated-only@127.0.0.1:5432/preflight_ci
