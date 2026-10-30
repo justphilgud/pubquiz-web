@@ -18,6 +18,36 @@
 .presentation-overflow-region { display: grid; grid-template-rows: minmax(0, 1fr) 1.6rem; height: 100%; min-height: 0; }
 .presentation-content-viewport { min-height: 0; overflow: auto; scrollbar-gutter: stable; }
 .presentation-content-inner { height: 100%; min-height: 0; }
+/* Ordering solutions keep natural line heights. Only this measured surface changes. */
+.presentation-template:has([data-ordering-fit]) .presentation-stage { padding-block: clamp(6px, 1vh, 16px); }
+.presentation-template:has([data-ordering-fit]) :is(.presentation-editorial-header, .presentation-neon-header, .presentation-corporate-header) { height: clamp(48px, 9vh, 88px); min-height: 0; margin-bottom: 0; }
+.presentation-template:has([data-ordering-fit]) .presentation-editorial-logo { max-height: 100%; width: auto; }
+.presentation-template:has([data-ordering-fit]) .presentation-editorial-footer { height: clamp(22px, 4vh, 40px); }
+
+.presentation-ordering-solution { height: 100%; min-height: 0; }
+.presentation-template.presentation-readable[data-design-style] .presentation-ordering-solution > [data-presentation-layout] {
+  display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 10px;
+}
+.presentation-template.presentation-readable[data-design-style] .presentation-ordering-solution[data-ordering-layout="side"] > [data-presentation-layout] {
+  grid-template-columns: minmax(0, .65fr) minmax(0, 1.35fr); grid-template-rows: minmax(0, 1fr);
+}
+.presentation-template.presentation-readable[data-design-style] .presentation-ordering-solution :is(.presentation-solution-question, .presentation-solution-result) {
+  padding: 8px !important; justify-content: start;
+}
+.presentation-template.presentation-readable[data-design-style] .presentation-ordering-solution .presentation-solution-question > :first-child { display: none; }
+.presentation-template.presentation-readable[data-design-style] .presentation-ordering-solution .presentation-solution-question h2 {
+  font-size: var(--ordering-question-size, 26px) !important; max-width: none;
+}
+.presentation-template.presentation-readable[data-design-style] .presentation-ordering-solution .presentation-solution-result > :first-child { flex-shrink: 0; margin-bottom: 8px; }
+.presentation-template.presentation-readable[data-design-style] .presentation-ordering-solution .presentation-solution-result > .grid {
+  display: flex; flex-direction: column; justify-content: start; gap: 6px; overflow: visible;
+}
+.presentation-template.presentation-readable[data-design-style] .presentation-ordering-solution .presentation-solution-answer {
+  flex: 0 0 auto; min-height: min-content; padding: 4px 10px !important;
+}
+.presentation-template.presentation-readable[data-design-style] .presentation-ordering-solution .presentation-correct-answer-value {
+  font-size: var(--ordering-answer-size, 24px) !important; line-height: 1.25 !important; white-space: normal; overflow-wrap: anywhere;
+}
 .presentation-content-viewport:focus-visible { outline: 2px solid var(--brand-accent); outline-offset: -2px; }
 .presentation-overflow-hint { margin: 0; align-self: end; color: var(--brand-text); font-size: .9rem; text-align: center; }
 .presentation-readable {

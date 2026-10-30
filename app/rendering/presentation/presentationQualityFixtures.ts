@@ -11,7 +11,7 @@ import { toRuntimeAnswerFormTemplate, toRuntimePresentationTemplate } from "../p
 import { resolvePresentationLayout } from "./presentationLayoutResolver";
 import type { PresentationSlideDisplayState } from "./PresentationSlideRenderer";
 
-export const qualityScenarios = ["choice-extreme-solution", "choice-wrap-solution", "choice-long-question", "choice-tunnel-solution", "choice-freud-solution", "choice-short-solution", "short", "solution", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "true-false", "estimate", "image-long", "image-choice", "image-choice-solution", "artwork", "artwork-long", "structured-audio", "structured-empty", "ordering", "ordering-long", "ordering-long-solution", "story", "story-legacy", "poll", "solution-long", "pixel", "qr", "rules", "rules-legacy", "intro", "lovd-intro", "lovd-countdown", "lovd-ranking", "lovd-final", "lovd-outro", "booking", "sponsor-open", "sponsor-choice", "sponsor-intro", "facts2", "facts7", "facts7-long", "facts-choice"] as const;
+export const qualityScenarios = ["ordering-odyssey-solution", "choice-extreme-solution", "choice-wrap-solution", "choice-long-question", "choice-tunnel-solution", "choice-freud-solution", "choice-short-solution", "short", "solution", "normal", "long", "legacy", "choice2", "choice3", "choice4", "choice6", "choice-long", "choice-mixed", "true-false", "estimate", "image-long", "image-choice", "image-choice-solution", "artwork", "artwork-long", "structured-audio", "structured-empty", "ordering", "ordering-long", "ordering-long-solution", "story", "story-legacy", "poll", "solution-long", "pixel", "qr", "rules", "rules-legacy", "intro", "lovd-intro", "lovd-countdown", "lovd-ranking", "lovd-final", "lovd-outro", "booking", "sponsor-open", "sponsor-choice", "sponsor-intro", "facts2", "facts7", "facts7-long", "facts-choice"] as const;
 export const qualityRules = ["Teamname wählen", "Antworten rechtzeitig absenden", "Keine Suchmaschinen verwenden", "Die Entscheidung der Moderation gilt"];
 export type QualityScenario = typeof qualityScenarios[number];
 export const longQuestion = "Welche europäische Hauptstadt wird gesucht? Sie liegt an einem Fluss, war über viele Jahrzehnte politisch geteilt und wurde nach der Wiedervereinigung erneut zum Regierungssitz. Nennt die Stadt, in der heute auch das Brandenburger Tor und der Deutsche Bundestag zu finden sind.";
@@ -98,6 +98,19 @@ export function buildPresentationQualityFixture(scenario: QualityScenario, style
   question.antwort_reihenfolge = scenario.startsWith("ordering")
     ? [3, 1, 4, 2]
     : question.antworten.map((answer) => answer.antwort_id);
+  if (scenario === "ordering-odyssey-solution") {
+    question.frage = "Bringe die folgenden Ereignisse aus Homers Odyssee in die chronologisch richtige Reihenfolge.";
+    const items = [
+      { text: "Der erste Trojaner wird eingeschleust.", explanation: "Trojanische Pferd" },
+      { text: "Polyphem bekommt von Odysseus einen Sehtest.", explanation: "Der Zyklop Polyphem wird geblendet" },
+      { text: "Odysseus’ Crew lässt bei Kirke die Sau raus.", explanation: "Die Zauberin Kirke macht aus Odysseus’ Gefährten Schweine" },
+      { text: "Odysseus macht eine Schifffahrt an den Rand der Unterwelt.", explanation: "Odysseus besucht das Totenreich und holt sich Rat" },
+      { text: 'Odysseus steht auf "Sound of the Police".', explanation: "Odysseus lässt sich an den Mast binden, um den Sirenen zuzuhören" },
+    ].map((item, index) => ({ id: String(index + 1), ...item }));
+    question.templateConfig = { ...question.templateConfig!, templateData: { kind: "ORDERING", scoring: "EXACT", items } };
+    question.antworten = items.map((item, index) => ({ antwort_id: index + 1, antwort: item.text, ist_richtig: true, antworttyp: "Text", medien: [] }));
+    question.antwort_reihenfolge = [3, 1, 5, 2, 4];
+  }
   if (scenario === "image-long") {
     question.frage = "Welcher Wolkenkratzer ist auf diesem Bild zu sehen? Das Gebäude steht in der Hauptstadt Taiwans und gehörte bei seiner Eröffnung zu den höchsten Bauwerken der Welt. Seine gestuften Abschnitte erinnern an Bambus. Nennt den Namen dieses bekannten Wahrzeichens.";
     question.antworten[0].antwort = "Taipei 101";

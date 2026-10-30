@@ -313,3 +313,26 @@ separat im Änderungsbericht mit tatsächlich getesteten Ansichten geführt.
 ## Phil Gud als zusätzliche ausdrückliche Markenwelt (26.10.2026)
 
 `phil-gud` verwendet dieselbe vollständige Template-/Phasenmatrix und denselben Renderer. Optionales validiertes `tokens.typography.displayFamily` trennt echte Markenschrift für kurze Titel von der funktionalen Textschrift. Keine automatische Zuweisung, keine Migration, kein pauschales Styling bisheriger Liveflächen. Bestehende Templates ohne dieses Feld behalten ihren Vertrag. [Spezifikation und Referenz](../design/phil-gud-management-and-template.md).
+
+## Korrektur 30.10.2026: Reihenfolgenauflösung
+
+Der generische Auflösungszweig für ORDERING bekommt einen ausschließlich dort
+verwendeten Messrahmen. Kanonische `runtime.solutionLines`, Nummerierung und
+Erläuterungen bleiben vollständig und unverändert. Storybook behält seinen
+separaten Renderer. Fragephase, Teamformular, Reihenfolgenpersistenz und
+Bewertung ändern sich nicht.
+
+Natürliche Zeilenhöhen ersetzen zusammengedrückte Ergebnisfelder. Die begrenzte
+Messung wählt Frage oben oder links und eine gemeinsame Antwortschrift von
+24–64 logischen CSS-Pixeln anhand tatsächlicher Breite und Höhe. Sie läuft nur
+bei Inhalts-, Größen-, Schrift- und Vollbildwechseln; skalierte Vorschauen
+verwenden ihre logische Fläche. Header/Abstände werden nur auf dieser Fläche
+kompakter. Keine Polling- oder Datenänderung. Überlange Inhalte behalten bei
+24 px natürliche Zeilenhöhen und den bestehenden Scrollfallback statt Überlappung.
+
+`ordering-odyssey-solution` ist eine synthetische Regression anhand der fünf im
+Fehlerbild erkennbaren Einträge, kein Export des produktiven Datensatzes.
+`orderingLayout.browser.test.ts` prüft Volltext/kanonische Reihenfolge,
+Textgeometrie, 1280×600 bis 2560×1440, Größenwechsel, skalierte Vorschauen,
+Überlängenfallback und Rückwechsel. Die bisherigen Choice-/Renderer-Tests
+bleiben unverändert verpflichtend.
