@@ -219,6 +219,7 @@ export async function getQuizFixedSlideVisibility(quizId: number) {
 }
 
 export type QuizResult = {
+  live_status?: "Vorbereitung"|"Läuft"|"Beendet";
   quiz_id: number;
   eventreihe_id: number;
   eventreihe_name: string;
@@ -369,6 +370,7 @@ export async function getQuizListe(): Promise<QuizResult[]> {
     },
     include: {
       eventreihe: true,
+      praesentation_status:{select:{quiz_started_at:true,quiz_stopped_at:true}},
       _count: {
         select: {
           quiz_fragen: true,
@@ -378,6 +380,7 @@ export async function getQuizListe(): Promise<QuizResult[]> {
   });
 
   return sortQuizResults(quizze.map((quiz) => ({
+    live_status:quiz.praesentation_status?.quiz_stopped_at?"Beendet" as const:quiz.praesentation_status?.quiz_started_at?"Läuft" as const:"Vorbereitung" as const,
     quiz_id: quiz.quiz_id,
     eventreihe_id: quiz.eventreihe_id,
     eventreihe_name: quiz.eventreihe.name,

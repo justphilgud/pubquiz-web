@@ -1,0 +1,13 @@
+"use client";
+import {useState} from "react";
+import Link from "next/link";
+import {EventRow,type EventEntry} from "./EventRow";
+type Choice={seriesId:number;seriesName:string;type:string;label:string;href:string};
+export function EventCollection({entries,choices,fixedSeries=false}:{entries:EventEntry[];choices:Choice[];fixedSeries?:boolean}) {
+ const [series,setSeries]=useState(""),[type,setType]=useState(""),[status,setStatus]=useState("");
+ const [creating,setCreating]=useState(false),[selected,setSelected]=useState("");
+ return <section className="space-y-4"><div className="flex flex-wrap items-center justify-between gap-3"><h2 className="text-xl font-bold">Events</h2>{choices.length>0&&<button className="min-h-11 rounded-lg border px-4" onClick={()=>setCreating(!creating)}>Event anlegen</button>}</div>
+ {creating&&<div className="rounded-lg border p-4"><label>Eventart und Eventreihe<select className="ml-2 min-h-11 max-w-full rounded border p-2" value={selected} onChange={e=>setSelected(e.target.value)}><option value="">Bitte auswählen …</option>{choices.map(c=><option key={`${c.type}:${c.seriesId}`} value={`${c.type}:${c.seriesId}`}>{c.label}{fixedSeries?"":` · ${c.seriesName}`}</option>)}</select></label>{selected&&<Link className="ml-3 inline-flex min-h-11 items-center underline" href={choices.find(c=>`${c.type}:${c.seriesId}`===selected)!.href}>Weiter zur Anlage</Link>}<p className="text-sm text-slate-600">Nur freigeschaltete und berechtigte Eventarten. Es wird keine Eventart automatisch aktiviert.</p></div>}
+ <div className="flex flex-wrap gap-3">{!fixedSeries&&<label>Eventreihe<select className="ml-2 min-h-11 rounded border p-2" value={series} onChange={e=>setSeries(e.target.value)}><option value="">Alle erlaubten Reihen</option>{[...new Set(entries.map(e=>e.seriesName))].map(n=><option key={n}>{n}</option>)}</select></label>}<label>Eventart<select className="ml-2 min-h-11 rounded border p-2" value={type} onChange={e=>setType(e.target.value)}><option value="">Alle Eventarten</option>{[...new Set(entries.map(e=>e.typeLabel))].map(n=><option key={n}>{n}</option>)}</select></label><label>Spielstatus<select className="ml-2 min-h-11 rounded border p-2" value={status} onChange={e=>setStatus(e.target.value)}><option value="">Alle Spielstatus</option>{[...new Set(entries.map(e=>e.status))].map(n=><option key={n}>{n}</option>)}</select></label></div>
+ {entries.filter(e=>(!series||e.seriesName===series)&&(!type||e.typeLabel===type)&&(!status||e.status===status)).map(e=><EventRow key={e.id} entry={e}/>)}{entries.length===0&&<p role="status">Noch keine berechtigten Events in dieser Auswahl.</p>}</section>;
+}

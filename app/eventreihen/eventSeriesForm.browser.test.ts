@@ -36,7 +36,7 @@ test("event series: repeated browser saves preserve visibility, custom template 
 `;
 
   const mocks:Record<string,string>={
-    navigation:`export const useRouter=()=>({refresh:()=>{}});`,
+    navigation:`export const useSearchParams=()=>new URLSearchParams();export const useRouter=()=>({refresh:()=>{}});`,
     link:`import React from'react';export default function Link({children,...p}){return <a {...p}>{children}</a>}`,
     actions:`export async function updateEventSeries(id,input){await new Promise(r=>setTimeout(r,70));if(window.qa.reject)return{success:false,message:'Speichern abgelehnt'};window.qa.calls.push(input);window.qa.stored={...window.qa.stored,...input};return{success:true,message:'Gespeichert',savedValue:input}};export const createEventSeries=updateEventSeries;export async function archiveEventSeries(){};export async function restoreEventSeries(){}`,
     preview:`export const TemplatePreview=()=>null;`,upload:`export async function uploadEventSeriesLogo(){}`,save:`export async function saveEventSeriesLogo(){return{ok:true}}`,

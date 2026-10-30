@@ -75,6 +75,7 @@ export function activeNavigationSection(path: string) {
 /** Return targets are collections only: no external redirects or unrelated object IDs. */
 export function quizCollectionReturnHref(value: string | null | undefined, seriesId: number) {
   const fallback = `/quiz?series=${seriesId}`;
+  if(value==="/events"||value===`/admin/eventreihen/${seriesId}`)return value;
   if (!value || value.length > 5000 || /[\\\r\n]/.test(value)) return fallback;
   try {
     const url = new URL(value, "https://navigation.invalid");

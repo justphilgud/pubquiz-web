@@ -1,19 +1,5 @@
-"use client";
-import { useState, useTransition } from "react";
-import { EventTypeSelect } from "./EventTypeSelect";
-import { setEventTypeEnabled } from "@/app/roles/eventTypeActions";
-export function EventTypeProducts({ eventSeriesId, initialEnabled, canEdit }: { eventSeriesId: number; initialEnabled: string[]; canEdit: boolean }) {
-  const [enabled, setEnabled] = useState(initialEnabled);
-  const [message, setMessage] = useState("");
-  const [pending, startTransition] = useTransition();
-  return <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-    <EventTypeSelect enabled={enabled} disabled={!canEdit || pending} onToggle={(type, next) => {
-      startTransition(async () => { try {
-        const result = await setEventTypeEnabled(eventSeriesId, type, next); setMessage(result.message);
-        if (result.success) setEnabled(current => next ? [...current, type] : current.filter(id => id !== type));
-      } catch { setMessage("Produktfreischaltung konnte nicht gespeichert werden."); } });
-    }} />
-    <p className="mt-2 text-xs text-slate-600">Änderungen werden sofort gespeichert. Laufende Quizze schützen die Quizfreischaltung.</p>
-    {message && <p role="status" className="mt-3 text-sm">{message}</p>}
-  </section>;
+import Link from "next/link";
+import {EVENT_TYPES} from "@/app/roles/eventTypes";
+export function EventTypeProducts({eventSeriesId,initialEnabled,canEdit}:{eventSeriesId:number;initialEnabled:string[];canEdit:boolean}) {
+ return <section className="rounded-xl border border-slate-200 bg-white p-5"><h2 className="font-semibold">Freigeschaltete Eventarten</h2><p>{EVENT_TYPES.filter(t=>initialEnabled.includes(t.id)).map(t=>t.label).join(", ")||"Keine Eventarten ausgewählt"}</p>{canEdit&&<Link href={`/admin/eventreihen?edit=${eventSeriesId}`} className="inline-flex min-h-11 items-center underline">Reiheneinstellungen bearbeiten</Link>}<p className="text-sm text-slate-600">Freischaltung und Eventanlage sind getrennt. Änderungen werden in den Reiheneinstellungen gespeichert.</p></section>;
 }

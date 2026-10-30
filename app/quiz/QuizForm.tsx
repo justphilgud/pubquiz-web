@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useContentNavigationGuard } from "@/app/components/content/useContentNavigationGuard";
 import Link from "next/link";
+import {EventRow} from "@/app/events/EventRow";
 import EventSeriesPicker from "@/app/workspaces/EventSeriesPicker";
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import {
@@ -23,12 +24,8 @@ import {
   ArchiveBoxIcon,
   ChartBarIcon,
   LockOpenIcon,
-  MegaphoneIcon,
-  PlayIcon,
   TrashIcon,
   UsersIcon,
-  Cog6ToothIcon,
-  PencilSquareIcon,
 } from "@heroicons/react/24/outline";
 import type { RenderingMessages } from "@/app/i18n/renderingMessages";
 import { templateRegistry } from "@/app/rendering/templateRegistry";
@@ -373,17 +370,8 @@ export default function QuizForm({
 
         <div className="mt-5 grid gap-4 lg:grid-cols-2">
           {filteredQuizzes.map((quiz) => (
-            <article key={quiz.quiz_id} className={`min-w-0 rounded-2xl border p-4 ${quiz.temporal_status === "TODAY" ? "border-sky-300 bg-sky-50" : quiz.temporal_status === "MISSING_DATE" ? "border-amber-300 bg-amber-50" : "border-slate-200"}`}>
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="break-words text-xs font-semibold uppercase tracking-wide text-slate-500">{quiz.eventreihe_name}</p>
-                  <Link href={`/quiz/${quiz.quiz_id}?returnTo=${encodeURIComponent(returnTo)}`} className="mt-1 block break-words text-lg font-bold underline decoration-slate-300 underline-offset-4">{quiz.titel ?? `Quiz ${quiz.quiz_id}`}</Link>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-700 ring-1 ring-slate-200">{statusLabels[quiz.temporal_status]}</span>
-                  <button type="button" onClick={() => startEdit(quiz)} title="Quiz-Einstellungen" aria-label={`Einstellungen für ${quiz.titel ?? `Quiz ${quiz.quiz_id}`}`} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-slate-200 bg-white p-2 text-slate-600"><Cog6ToothIcon className="h-5 w-5" /></button>
-                </div>
-              </div>
+            <EventRow key={quiz.quiz_id} entry={{id:String(quiz.quiz_id),title:quiz.titel??`Quiz ${quiz.quiz_id}`,seriesName:quiz.eventreihe_name,typeLabel:"Quiz",date:quiz.quiz_datum,time:quiz.veranstaltungszeit,status:quiz.live_status??"Vorbereitung",prepareTitle:"Quizinhalt bearbeiten",prepareHref:`/quiz/${quiz.quiz_id}?returnTo=${encodeURIComponent(returnTo)}`,moderationHref:`/quiz/${quiz.quiz_id}/moderation`,presentationHref:`/quiz/${quiz.quiz_id}/praesentation`}}>
+              <p className="mt-3 text-sm text-slate-600">Terminstatus: {statusLabels[quiz.temporal_status]}</p>
               <dl className="mt-3 grid gap-1 text-sm text-slate-600 sm:grid-cols-2">
                 <div><dt className="inline font-semibold">Datum: </dt><dd className="inline">{quiz.quiz_datum ?? "Datum fehlt"}{quiz.veranstaltungszeit ? `, ${quiz.veranstaltungszeit}` : ""}</dd></div>
                 <div><dt className="inline font-semibold">Ort: </dt><dd className="inline">{quiz.veranstaltungsname ?? "–"}</dd></div>
@@ -391,8 +379,7 @@ export default function QuizForm({
                 <div><dt className="inline font-semibold">Teilnehmer: </dt><dd className="inline">{quiz.teilnehmer_anzahl ?? "–"}</dd></div>
               </dl>
               {quiz.temporal_status === "MISSING_DATE" && <p className="mt-3 text-sm font-semibold text-amber-900">Bestandsdatensatz: Vor dem nächsten Speichern muss ein Datum ergänzt werden.</p>}
-              <div className="mt-4 flex flex-wrap gap-2">
-                <Link href={`/quiz/${quiz.quiz_id}?returnTo=${encodeURIComponent(returnTo)}`} title="Quizinhalt bearbeiten" aria-label={`Inhalt von ${quiz.titel ?? `Quiz ${quiz.quiz_id}`} bearbeiten`} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl bg-slate-900 p-2 text-white"><PencilSquareIcon className="h-5 w-5" /></Link>
+              <div className="mt-4 flex flex-wrap gap-2"><button type="button" title="Quiz-Einstellungen" onClick={()=>startEdit(quiz)} className="min-h-11 rounded-lg border px-3">Einstellungen</button>
                 <QuizCopyDialog quizId={quiz.quiz_id} quizTitle={quiz.titel ?? `Quiz ${quiz.quiz_id}`} />
                 {quiz.ist_archiviert ? (
                   <button type="button" title="Wiederherstellen" onClick={async () => { await restoreQuiz(quiz.quiz_id); router.refresh(); }} className="min-h-11 min-w-11 rounded-xl border border-green-300 bg-green-50 p-2 text-green-700"><LockOpenIcon className="mx-auto h-5 w-5" /></button>
@@ -401,12 +388,10 @@ export default function QuizForm({
                 ) : (
                   <button type="button" title="Archivieren" onClick={() => handleArchive(quiz.quiz_id)} className="min-h-11 min-w-11 rounded-xl border border-orange-300 bg-orange-50 p-2 text-orange-700"><ArchiveBoxIcon className="mx-auto h-5 w-5" /></button>
                 )}
-                <Link href={`/quiz/${quiz.quiz_id}/praesentation`} target="_blank" title="Präsentieren" className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-cyan-300 bg-cyan-50 p-2 text-cyan-700"><PlayIcon className="h-5 w-5" /></Link>
-                <Link href={`/quiz/${quiz.quiz_id}/moderation`} target="_blank" title="Moderation" className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-violet-300 bg-violet-50 p-2 text-violet-700"><MegaphoneIcon className="h-5 w-5" /></Link>
                 <Link href={`/quiz/${quiz.quiz_id}/antworten`} target="_blank" title="Antwortformular" className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-emerald-300 bg-emerald-50 p-2 text-emerald-700"><UsersIcon className="h-5 w-5" /></Link>
                 <Link href={`/quiz/${quiz.quiz_id}/auswertung`} target="_blank" title="Auswertung" className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-yellow-300 bg-yellow-50 p-2 text-yellow-700"><ChartBarIcon className="h-5 w-5" /></Link>
               </div>
-            </article>
+            </EventRow>
           ))}
         </div>
         {filteredQuizzes.length === 0 && <p className="mt-5 text-sm text-slate-500">Keine Quizze für diesen Filter.</p>}

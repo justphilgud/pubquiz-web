@@ -20,7 +20,9 @@ import { getActorForSession } from "@/app/roles/roleAssignments.server";
 import { canManageEventSeries, canManageEventSeriesQuizzes, isAdministrator } from "@/app/roles/roleAssignmentPolicy";
 import { listAssignablePresentationTemplates } from "@/app/rendering/presentationTemplates/presentationTemplateRepository.server";
 import { isEventType, type EventType } from "@/app/roles/eventTypes";
-import { persistEventSeriesUpdate } from "./eventSeriesRepository";
+import { persistSeriesSettings, type SeriesSaveOptions } from "./settingsRepository.server";
+import { eventSeriesSettingsRevision } from "./settingsRevision";
+import { verifyEventSeriesLogo } from "./eventSeriesLogoValidation.server";
 
 async function getTemplateValidationOptions(additionallyAllowed: readonly string[] = []) {
   const { actor } = await requireActor();
@@ -55,6 +57,9 @@ export type EventSeriesListItem = EventSeriesOption & {
   createdAt: string;
   updatedAt: string;
   quizCount: number;
+  enabledEventTypes?: EventType[];
+  canManageProducts?: boolean;
+  settingsRevision?: string;
   canEdit: boolean;
   canChangeArchiveState: boolean;
 };
@@ -64,6 +69,7 @@ export type EventSeriesActionResult = {
   message: string;
   errors?: Record<string, string>;
   eventSeriesId?: number;
+  settingsRevision?: string;
   savedValue?: {
     name: string;
     publicName: string | null;
@@ -90,8 +96,9 @@ function toListItem(series: {
   archiviert_am: Date | null;
   created_at: Date;
   updated_at: Date;
+  eventarten?: {eventart:string;ist_freigeschaltet:boolean}[];
   _count: { quiz: number };
-}, capabilities: { canEdit: boolean; canChangeArchiveState: boolean }): EventSeriesListItem {
+}, capabilities: { canEdit: boolean; canChangeArchiveState: boolean; canManageProducts?:boolean }): EventSeriesListItem {
   return {
     id: series.eventreihe_id,
     logoUrl: series.logo_url,
@@ -108,6 +115,8 @@ function toListItem(series: {
     createdAt: series.created_at.toISOString(),
     updatedAt: series.updated_at.toISOString(),
     quizCount: series._count.quiz,
+    enabledEventTypes:(series.eventarten??[]).filter(p=>p.ist_freigeschaltet&&isEventType(p.eventart)).map(p=>p.eventart as EventType),
+    settingsRevision:eventSeriesSettingsRevision(series.updated_at,series.eventarten??[],series.logo_url),
     ...capabilities,
   };
 }
@@ -119,12 +128,12 @@ export async function getEventSeriesList(): Promise<EventSeriesListItem[]> {
   const editableIds = await getEventSeriesIdsForCapability("EDIT", session);
   const series = await prisma.eventreihen.findMany({
     where: visibleIds === null ? undefined : { eventreihe_id: { in: visibleIds } },
-    include: { _count: { select: { quiz: true } } },
+    include: { eventarten:true, _count: { select: { quiz: true } } },
     orderBy: [{ ist_archiviert: "asc" }, { name: "asc" }],
   });
   return series.map((entry) => toListItem({ ...entry, _count: { quiz: canManageEventSeriesQuizzes(actor, entry.eventreihe_id) ? entry._count.quiz : 0 } }, {
     canEdit: editableIds === null || editableIds.includes(entry.eventreihe_id),
-    canChangeArchiveState: isAdministrator(actor),
+    canChangeArchiveState: isAdministrator(actor),canManageProducts:isAdministrator(actor),
   }));
 }
 
@@ -220,6 +229,7 @@ export async function createEventSeries(
 export async function updateEventSeries(
   eventSeriesId: number,
   input: EventSeriesInput,
+  options?:SeriesSaveOptions,
 ): Promise<EventSeriesActionResult> {
   if (!Number.isInteger(eventSeriesId) || eventSeriesId <= 0) {
     return { success: false, message: "Ungültige Eventreihe." };
@@ -249,11 +259,11 @@ export async function updateEventSeries(
       errors: { name: "Name ist bereits vergeben." },
     };
   }
-  const saved = await persistEventSeriesUpdate(
-    prisma.eventreihen,
-    eventSeriesId,
-    validated.value,
-  );
+  if(!options)return {success:false,message:"Bitte die Reiheneinstellungen neu laden."};
+  if(options.logoUrl!==undefined&&options.logoUrl!==null)await verifyEventSeriesLogo(options.logoUrl,eventSeriesId);
+  let saved;
+  try { const {actor}=await requireActor(); saved=await persistSeriesSettings(actor.userId,eventSeriesId,validated.value,options); }
+  catch(error){return {success:false,message:error instanceof Error?error.message:"Nicht gespeichert. Bitte erneut versuchen."};}
   revalidatePath("/admin/eventreihen");
   revalidatePath(`/admin/eventreihen/${eventSeriesId}`);
   revalidatePath("/calendar/public.ics");
@@ -263,6 +273,7 @@ export async function updateEventSeries(
     success: true,
     message: "Eventreihe wurde aktualisiert.",
     eventSeriesId,
+    settingsRevision:saved.settingsRevision,
     savedValue: {
       name: saved.name,
       publicName: saved.oeffentlicher_name,

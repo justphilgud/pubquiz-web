@@ -1,3 +1,6 @@
+import {requireActor} from "@/app/lib/permissions";
+import {readEventCollection} from "@/app/events/readEvents.server";
+import {EventCollection} from "@/app/events/EventCollection";
 import { EventTypeProducts } from "@/app/eventreihen/EventTypeProducts";
 import { EventSeriesLogoEditor } from "@/app/eventreihen/EventSeriesLogoEditor";
 import { getMediaUploadEnvironmentPrefix } from "@/app/fragen/editor/mediaUploadEnvironment";
@@ -14,14 +17,6 @@ import { formatMessage } from "@/app/i18n/formatMessage";
 import { getCalendarRequestOrigin } from "@/app/calendar/calendarOrigin.server";
 import { buildEventSeriesCalendarSubscriptionUrl } from "@/app/calendar/publicCalendar";
 
-const statusLabels = {
-  UPCOMING: "Bevorstehend",
-  TODAY: "Heute",
-  PAST: "Vergangen",
-  ARCHIVED: "Archiviert",
-  MISSING_DATE: "Datum fehlt",
-} as const;
-
 export default async function EventSeriesDetailPage({
   params,
 }: {
@@ -31,6 +26,8 @@ export default async function EventSeriesDetailPage({
   const { eventSeriesId } = await params;
   const series = await getEventSeriesDetails(Number(eventSeriesId));
   if (!series) notFound();
+  const {actor}=await requireActor();
+  const events=await readEventCollection(actor.userId,series.id);
   const [managedPresentation, calendarOrigin] = await Promise.all([
     getManagedPresentationTemplate(series.defaultPresentationTemplateId),
     getCalendarRequestOrigin(),
@@ -103,21 +100,8 @@ export default async function EventSeriesDetailPage({
             )}
           </div>
         </section>
-        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div><h2 className="text-xl font-bold">Quizze</h2><p className="mt-1 text-sm text-slate-500">{series.quizCount} Termine in dieser Eventreihe.</p></div>
-            {series.canManageQuizzes && !series.isArchived && <Link href={`/quiz?eventreiheId=${series.id}`} className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-900 px-4 py-2 font-semibold text-white">Neues Quiz anlegen</Link>}
-          </div>
-          <div className="mt-5 grid gap-3">
-            {series.quizzes.map((quiz) => (
-              <article key={quiz.id} className="flex flex-col gap-3 rounded-2xl border border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="min-w-0"><Link href={`/quiz/${quiz.id}`} className="break-words font-bold underline">{quiz.title}</Link><p className="mt-1 text-sm text-slate-600">{quiz.date ?? "Datum fehlt"}{quiz.venueName ? ` · ${quiz.venueName}` : ""}</p></div>
-                <span className="self-start rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold sm:self-auto">{statusLabels[quiz.status]}</span>
-              </article>
-            ))}
-          </div>
-          {series.quizzes.length === 0 && <p className="mt-5 text-sm text-slate-500">{series.canManageQuizzes ? "Noch keine Quizze vorhanden." : "Keine Quizverwaltungsrechte. Vorhandene Quizze werden hier nicht angezeigt."}</p>}
-        </section>
+        <EventCollection {...events} fixedSeries/>
+
       </div>
     </main>
   );
