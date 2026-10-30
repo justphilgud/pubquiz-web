@@ -57,6 +57,7 @@ export default function EventModerationPanel({initial}:{initial:EventModerationV
     if(input.command.kind==='draw')setNumber('');
     if(input.command.kind==='correct'){setReplacement('');setCorrectionReason('');setSelectedDraw('');}
     if(input.command.kind==='target')setTarget('');
+    if(['closeRound','startRound','end'].includes(input.command.kind)){setNumber('');setTarget('');setSelectedDraw('');setReplacement('');setCorrectionReason('');setDrafts({});}
     if(input.command.kind==='identify'||input.command.kind==='decide'){const id=input.command.callId;setDrafts(old=>({...old,[id]:{card:'',reason:''}}));}
    }
    await refresh();
@@ -79,8 +80,8 @@ export default function EventModerationPanel({initial}:{initial:EventModerationV
    
     {!ended&&<section className={styles.panel}><div className={styles.actions}>
      <button disabled={disabled||busy.size>0||live.between} onClick={()=>confirm(active?'Runde pausieren?':'Runde fortsetzen?',{kind:active?'pause':'resume'})}>{active?'Pausieren':'Fortsetzen'}</button>
-     <button disabled={disabled||busy.size>0||live.between||live.blocked} onClick={()=>confirm('Aktuelle Runde abschließen? Abgeschlossene Runden sind nicht korrigierbar.',{kind:'closeRound'})}>Runde abschließen</button>
-     <button disabled={disabled||busy.size>0||live.blocked} onClick={()=>confirm('Event abschließen? Dieser Durchlauf wird endgültig beendet.',{kind:'end'})}>Event abschließen</button>
+     <button disabled={disabled||busy.size>0||live.between||live.blocked} onClick={()=>confirm('Aktuelle Runde abschließen? Abgeschlossene Runden sind nicht korrigierbar. Ungespeicherte Rundeneingaben werden verworfen.',{kind:'closeRound'})}>Runde abschließen</button>
+     <button disabled={disabled||busy.size>0||live.blocked||prepDirty.size>0||prepBusy.size>0} onClick={()=>confirm('Event abschließen? Dieser Durchlauf wird endgültig beendet. Ungespeicherte Rundeneingaben werden verworfen.',{kind:'end'})}>Event abschließen</button>
     </div></section>}
     {!ended&&!live.between&&<section className={`${styles.panel} ${styles.publishPanel}`}><h2>Zahl veröffentlichen</h2><form className={styles.publish} onSubmit={e=>{e.preventDefault();send({kind:'draw',number:Number(number)});}}><label>Neue Zahl<input value={number} onChange={e=>setNumber(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();e.currentTarget.form?.querySelector<HTMLButtonElement>('button[type="submit"]')?.focus();}}} type="number" min="1" max="75" required disabled={disabled||!active||busy.has('draw')||callPending||live.blocked}/></label><button className={styles.primary} type="submit" disabled={disabled||!active||busy.has('draw')||callPending||live.blocked||!validNumber}>Zahl veröffentlichen</button><div aria-live="polite" className={styles.current}><span>Aktuelle Zahl</span><strong>{last?.number??'–'}</strong></div></form>
      {number&&!validNumber&&<p role="alert">Bitte eine noch nicht gezogene ganze Zahl von 1 bis 75 eingeben.</p>}<p className={styles.hint}>Enter in der Zahleneingabe fokussiert „Zahl veröffentlichen“.</p>
