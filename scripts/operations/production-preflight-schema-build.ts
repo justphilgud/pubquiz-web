@@ -1,3 +1,5 @@
+import {approvedBingoEventPlan} from "./production-preflight-bingo-event-plan";
+import {testBingoEventDelta} from "./production-preflight-bingo-event-delta";
 import {approvedBingoLivePlan} from "./production-preflight-bingo-live-plan";
 import {testBingoLiveDelta} from "./production-preflight-bingo-live-delta";
 import {approvedBingoPlan,assertBingoManifest} from './production-preflight-bingo-plan';
@@ -24,7 +26,7 @@ async function main(){
  const reference=JSON.parse(readFileSync('scripts/operations/schema-reference/provenance.json','utf8'));
  const bingo=approvedBingoPlan(sha,candidate);
  if(bingo){const schema=(rev:string)=>execFileSync('git',['show',`${rev}:prisma/schema.prisma`],{encoding:'utf8'});assertBingoManifest(sha,candidate,migrationFiles(sha),migrationFiles(candidate),schema(sha),schema(candidate));}
- const approved=approvedPreflightPlan(sha,process.env.RELEASE_CANDIDATE_SHA??reference.candidateSha)??(bingo?{baselineSha:sha,candidateSha:candidate,delta:'',checksum:'',kind:approvedBingoLivePlan(sha,candidate)?'bingo-ap3':'bingo-ap2'}:undefined);
+ const approved=approvedPreflightPlan(sha,process.env.RELEASE_CANDIDATE_SHA??reference.candidateSha)??(bingo?{baselineSha:sha,candidateSha:candidate,delta:'',checksum:'',kind:approvedBingoEventPlan(sha,candidate)?'bingo-event':approvedBingoLivePlan(sha,candidate)?'bingo-ap3':'bingo-ap2'}:undefined);
  if(!approved)throw new Error('RELEASE_PLAN_UNAPPROVED');
  const plan={...reference,...approved};
  const bootstrap=readFileSync('scripts/operations/schema-reference/prehistory.sql');
@@ -46,7 +48,7 @@ async function main(){
   const columns=query(DIAGNOSTIC_COLUMNS_SQL),catalog=query(DIAGNOSTIC_CATALOG_SQL),objects=query(SCHEMA_OBJECTS_SQL);
   phase='DELTA_TEST';
   if(bingo){
-    const deltaTest=(approvedBingoLivePlan(sha,candidate)?testBingoLiveDelta:testBingoDelta)(sql,query,sha,candidate,manifest,columns,catalog,objects);
+    const deltaTest=(approvedBingoEventPlan(sha,candidate)?testBingoEventDelta:approvedBingoLivePlan(sha,candidate)?testBingoLiveDelta:testBingoDelta)(sql,query,sha,candidate,manifest,columns,catalog,objects);
     writeFileSync('delta-test.json',JSON.stringify(deltaTest,null,2),{flag:'wx'});
     phase='NEW_INSTALL_REPLAY';sql('CREATE DATABASE reinstall;');
     let replay;for(const file of manifest){try{docker(['exec','-i',name,'psql','--no-psqlrc','--set','ON_ERROR_STOP=1','-U','postgres','-d','reinstall','-At'],execFileSync('git',['show',`${sha}:prisma/migrations/${file.name}/migration.sql`]));}catch{replay={status:'FAIL',code:'HISTORICAL_BASELINE_OVERLAP',migration:file.name};break;}}
