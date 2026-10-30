@@ -21,11 +21,17 @@ export function OrderingSolutionLayout({ children, contentKey }: { children: Rea
         root.style.setProperty("--ordering-question-size", `${Math.min(48, Math.max(26, size * 1.1))}px`);
       };
       const fits = () => {
-        if (root.scrollHeight > root.clientHeight + 1 || root.scrollWidth > root.clientWidth + 1) return false;
+        if (root.scrollHeight > root.clientHeight || root.scrollWidth > root.clientWidth) return false;
         const bounds = root.getBoundingClientRect();
         return [...root.querySelectorAll<HTMLElement>("h2,.presentation-solution-answer,.presentation-correct-answer-value,.presentation-solution-label")].every(el => {
           const rect = el.getBoundingClientRect();
-          return rect.left >= bounds.left - 1 && rect.right <= bounds.right + 1 && rect.top >= bounds.top - 1 && rect.bottom <= bounds.bottom + 1 && el.scrollHeight <= el.clientHeight + 1 && el.scrollWidth <= el.clientWidth + 1;
+          if (!(rect.left >= bounds.left - 1 && rect.right <= bounds.right + 1 && rect.top >= bounds.top - 1 && rect.bottom <= bounds.bottom + 1)) return false;
+          // Font ink can round scrollHeight differently from fractional line boxes.
+          // Measure the actual text rectangles; never compress or clip their rows.
+          const range = document.createRange();
+          range.selectNodeContents(el);
+          return [...range.getClientRects()].every(text => text.left >= bounds.left - 1 && text.right <= bounds.right + 1 && text.top >= bounds.top - 1 && text.bottom <= bounds.bottom + 1) &&
+            (!el.classList.contains("presentation-solution-answer") || (el.scrollHeight <= el.clientHeight && el.scrollWidth <= el.clientWidth));
         });
       };
       let best = { size: 0, layout: "top" };
@@ -40,7 +46,7 @@ export function OrderingSolutionLayout({ children, contentKey }: { children: Rea
         }
         if (low > best.size + .5) best = { size: low, layout };
       }
-      write(best.size ? Math.max(24, best.size - .5) : 24, best.layout);
+      write(best.size ? Math.max(24, best.size) : 24, best.layout);
       root.dataset.orderingFit = best.size && fits() ? "fitted" : "overflow";
     };
     const schedule = () => { if (!pending) pending = requestAnimationFrame(fit); };

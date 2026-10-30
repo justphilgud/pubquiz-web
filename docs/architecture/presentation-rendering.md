@@ -330,9 +330,30 @@ verwenden ihre logische Fläche. Header/Abstände werden nur auf dieser Fläche
 kompakter. Keine Polling- oder Datenänderung. Überlange Inhalte behalten bei
 24 px natürliche Zeilenhöhen und den bestehenden Scrollfallback statt Überlappung.
 
-`ordering-odyssey-solution` ist eine synthetische Regression anhand der fünf im
-Fehlerbild erkennbaren Einträge, kein Export des produktiven Datensatzes.
+`ordering-odyssey-solution` bildet die fünf gespeicherten Einträge und vollständigen Erläuterungen der freigegebenen Production-Frage #1410 ab (rein lesend am 30.10.2026 abgeglichen, Quiz Oktober). Schreibweise und Interpunktion bleiben erhalten; keine Produktionsinhalte werden geändert. Die ebenfalls gelesene Entwurfsdublette #1411 ist nicht die Quizzuordnung.
 `orderingLayout.browser.test.ts` prüft Volltext/kanonische Reihenfolge,
 Textgeometrie, 1280×600 bis 2560×1440, Größenwechsel, skalierte Vorschauen,
 Überlängenfallback und Rückwechsel. Die bisherigen Choice-/Renderer-Tests
 bleiben unverändert verpflichtend.
+
+
+Nachprüfung des Korrekturvorschlags: allgemeine spätere Theme-Regeln und Corporate-
+`!important`-Höhen hatten den beabsichtigten kompakten Rahmen überschrieben.
+Die Geometrie hat deshalb nur innerhalb der Ordering-Auflösung ausdrücklich
+Vorrang; Farben, Schriften und Logo-Seitenverhältnis bleiben vom Theme.
+Die vorhandene Top-/Side-Messung nutzt eine lösungsbetonte Seitenspalte und
+natürliche Zeilenhöhen. Reale Textrechtecke ergänzen die Prüfung der verfügbaren
+Breite/Höhe. Der tatsächlich als passend gemessene Schriftwert wird übernommen:
+kein nachträglicher pauschaler Abschlag mit neuer Rundungs-/Glyphenabweichung.
+Unveränderte Grenzen: Antworten mindestens 24 px, Kernfrage im vorhandenen
+Ordering-Messvertrag mindestens 26 px. Keine neue Seitennavigation oder Laufzeitaktion.
+
+Der zusätzliche Storybook-Vergleich ist ausdrücklich menschlich freigegeben:
+bei 1280x600, 1280x720 und 1366x768 hat bereits der unveränderte Production-
+Renderer bei der kurzen Fixture Scrollbedarf. Der neue Test bestätigt exakt
+identische Zeilengeometrie gegenüber Main 1b025a78; bei 1920x1080 und 2560x1440
+passt sie. Der separate Storybook-Pfad bleibt unverändert. Dies ist eine bestehende
+Grenze außerhalb dieses Fixes, kein erfolgreicher Nachweis eines scrollfreien
+Storybook-Layouts. Alle ursprünglichen PR149-Prüfungen bleiben erhalten.
+Für die korrigierte generische Auflösung wurden die Überlaufprüfungen zusätzlich
+auf null Scrolltoleranz verschärft, damit keine Ein-Pixel-Scrollleiste durchgeht.

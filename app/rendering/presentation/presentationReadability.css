@@ -19,17 +19,19 @@
 .presentation-content-viewport { min-height: 0; overflow: auto; scrollbar-gutter: stable; }
 .presentation-content-inner { height: 100%; min-height: 0; }
 /* Ordering solutions keep natural line heights. Only this measured surface changes. */
-.presentation-template:has([data-ordering-fit]) .presentation-stage { padding-block: clamp(6px, 1vh, 16px); }
-.presentation-template:has([data-ordering-fit]) :is(.presentation-editorial-header, .presentation-neon-header, .presentation-corporate-header) { height: clamp(48px, 9vh, 88px); min-height: 0; margin-bottom: 0; }
-.presentation-template:has([data-ordering-fit]) .presentation-editorial-logo { max-height: 100%; width: auto; }
-.presentation-template:has([data-ordering-fit]) .presentation-editorial-footer { height: clamp(22px, 4vh, 40px); }
+.presentation-template.presentation-readable[data-design-style]:has([data-ordering-fit]) .presentation-stage { padding-block: clamp(6px, 1vh, 16px) !important; }
+.presentation-template.presentation-readable[data-design-style]:has([data-ordering-fit]) :is(.presentation-editorial-header, .presentation-neon-header, .presentation-corporate-header) { height: clamp(48px, 8vh, 88px) !important; min-height: 0; margin-bottom: 0; }
+.presentation-template.presentation-readable[data-design-style]:has([data-ordering-fit]) .presentation-editorial-header { height: clamp(72px, 10vh, 88px) !important; padding-block: 0; }
+.presentation-template.presentation-readable[data-design-style]:has([data-ordering-fit]) .presentation-editorial-header .presentation-editorial-logo { max-height: 100% !important; height: 100%; width: auto; object-fit: contain; box-sizing: border-box; margin: 0; }
+.presentation-template.presentation-readable[data-design-style]:has([data-ordering-fit]) :is(.presentation-corporate-header .presentation-corporate-logo img,.presentation-neon-header .presentation-neon-logo) { height: clamp(32px, 6vh, 56px); max-height: clamp(32px, 6vh, 56px); width: auto; object-fit: contain; }
+.presentation-template.presentation-readable[data-design-style]:has([data-ordering-fit]) :is(.presentation-editorial-footer,.presentation-corporate-footer) { height: clamp(22px, 4vh, 40px); margin-top: 0; }
 
 .presentation-ordering-solution[data-ordering-fit] { height: 100%; min-height: 0; }
 .presentation-template.presentation-readable[data-design-style] .presentation-ordering-solution[data-ordering-fit] > [data-presentation-layout] {
   display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 10px;
 }
 .presentation-template.presentation-readable[data-design-style] .presentation-ordering-solution[data-ordering-fit][data-ordering-layout="side"] > [data-presentation-layout] {
-  grid-template-columns: minmax(0, .65fr) minmax(0, 1.35fr); grid-template-rows: minmax(0, 1fr);
+  grid-template-columns: minmax(0, .4fr) minmax(0, 1.6fr); grid-template-rows: minmax(0, 1fr);
 }
 .presentation-template.presentation-readable[data-design-style] .presentation-ordering-solution[data-ordering-fit] :is(.presentation-solution-question, .presentation-solution-result) {
   padding: 8px !important; justify-content: start;
