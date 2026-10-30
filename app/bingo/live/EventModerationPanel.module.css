@@ -10,3 +10,5 @@
 @media(max-width:600px){.more summary span{display:none}.more summary::after{content:"•••";font-size:20px}.more summary{min-width:44px;text-align:center}.header nav{gap:8px}.header nav>a{font-size:12px}}
 
 .root .danger:not(:disabled){color:#fecaca;border-color:#f87171}
+
+.root .card .hit{background:var(--bingo-pink);color:var(--bingo-ink)}
