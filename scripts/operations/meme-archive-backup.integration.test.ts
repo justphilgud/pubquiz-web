@@ -45,11 +45,12 @@ test("real PostgreSQL17: archive dump/guarded restore retains encrypted PNG, key
       .replace(/model meme_archive_sources \{[\s\S]*?^\}/m, "").replace(/model meme_archive_entries \{[\s\S]*?^\}/m, "");
     // This is explicitly the historical pre-Bingo restore fixture. Current model
     // tables without their executable objects are not a valid historical schema.
-    const bingoModels=["bingo_preparations","bingo_rounds","bingo_card_series","bingo_cards","bingo_round_series","bingo_issuance_changes","bingo_series_labels","bingo_print_versions","bingo_live_runs","bingo_live_cards","bingo_live_events"];
+    const bingoModels=["bingo_preparations","bingo_rounds","bingo_card_series","bingo_cards","bingo_round_series","bingo_issuance_changes","bingo_series_labels","bingo_print_versions","bingo_live_runs","bingo_live_cards","bingo_live_events","bingo_event_creation_requests","bingo_event_runs","bingo_event_round_plan","bingo_event_rounds","bingo_event_round_cards"];
     for(const model of bingoModels){
       schema=schema.replace(new RegExp(`model ${model} \\{[\\s\\S]*?^\\}`,"m"),"");
       schema=schema.replace(new RegExp(`^.*\\s${model}(?:\\[\\]|\\?)?[^\\n]*$`,"gm"),"");
     }
+    assert.doesNotMatch(schema,/^model bingo_/m,"Historical pre-Bingo fixture must explicitly classify every current Bingo model");
     schema=schema.replace(/^.*bingo_print_config[^\n]*$/gm,"");
     const schemaPath = join(directory, "baseline.prisma"); await writeFile(schemaPath, schema);
     const ddl = execFileSync(process.execPath, [resolve("node_modules/prisma/build/index.js"), "migrate", "diff", "--from-empty", "--to-schema", schemaPath, "--script"],
@@ -75,7 +76,7 @@ test("real PostgreSQL17: archive dump/guarded restore retains encrypted PNG, key
     await source.query("UPDATE pubquiz.meme_archive_sources SET image_url='https://bix6h2j23vjzi240.public.blob.vercel-storage.com/deleted-original.png',image_bytes=$1", [png]);
     await source.query("UPDATE pubquiz.meme_archive_entries SET status='READY',blob_url=$1,encryption_key=$2,png_sha256=$3,png_size=$4", [blob, key, sha256(png), png.length]);
     const expected = await snapshot(source);
-    assert.ok(expected.archiveSchema); assert.deepEqual(expected.archiveSchema.roleGuardMigrations, roleGuards.migrations); assert.deepEqual(expected.media, [blob]);
+    assert.ok(expected.archiveSchema); assert.equal(expected.archiveSchema.bingoMigrations,undefined);assert.equal(expected.archiveSchema.bingoLiveMigrations,undefined);assert.equal(expected.archiveSchema.bingoEventMigrations,undefined);assert.equal(expected.columns.some(c=>c.table.startsWith("bingo_")),false); assert.deepEqual(expected.archiveSchema.roleGuardMigrations, roleGuards.migrations); assert.deepEqual(expected.media, [blob]);
     const records = await captureMedia(expected.media, directory, (async (url, options) => {
       assert.equal(url, blob); assert.equal(options?.redirect, "error"); return new Response(new Uint8Array(bytes));
     }) as typeof fetch);
