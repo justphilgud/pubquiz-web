@@ -10,6 +10,7 @@ import { mediaRemainingSeconds, formatMediaRemaining, introResumePosition } from
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import QRCode from "react-qr-code";
 import { ClassicalChoiceSlide } from "./ClassicalChoiceSlide";
+import { OrderingSolutionLayout } from "./OrderingSolutionLayout";
 import { FactsPresentation } from "./FactsPresentation";
 import { TeamJoinWelcome } from "./TeamJoinWelcome";
 import { SponsorMoment } from "./SponsorMoment";
@@ -1737,7 +1738,7 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
     );
   }
 
-  return (
+  const solutionContent = (
     <div data-presentation-layout={layoutVariant} className="grid h-full min-h-0 gap-4 lg:grid-cols-[0.8fr_1.2fr]">
       <div className="presentation-solution-question flex min-h-0 flex-col rounded-[1.5rem] border-4 border-pink-500 bg-slate-950/80 p-6 shadow-[8px_8px_0_#00e5ff]">
         <div className="mb-4 text-sm font-black uppercase tracking-[0.3em] text-pink-300">
@@ -1845,6 +1846,9 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
       </div>
     </div>
   );
+  return templateData?.kind === "ORDERING"
+    ? <OrderingSolutionLayout contentKey={JSON.stringify([frage.frage, runtime.solutionLines, frage.quelle, theme.design, theme.appearance])}>{solutionContent}</OrderingSolutionLayout>
+    : solutionContent;
 }
 
 function renderSchaetzfrageOverlay() {

@@ -122,3 +122,16 @@ Quiz-Farben werden weiterhin bewusst separat angeglichen. Gemeinsame Eventzeilen
 und Einstiege ersetzen weder seine Moderationslogik noch Publikumsvorlagen.
 Physische Smartphone-, Bildschirmtastatur- oder Beamertests werden durch diese
 Zuordnung nicht behauptet.
+
+## Korrektur 30.10.2026: bestehende Icon-Einstiege erhalten
+
+Die gemeinsame Eventzeile verwendet die vorherigen Quiz-Iconlinks unverändert in
+Bedeutung und Gestaltung: Stift (Vorbereitung), Megafon (Moderation) und Play
+(Präsentation). Quiz-Einstellungen behalten das Zahnrad. Moderation/Präsentation
+öffnen wie zuvor in einem separaten Tab; vorhandene Rückwege bleiben erhalten.
+Bingo übernimmt dieselben Icons. Tooltip und zugänglicher Name benennen Aktion
+und Kontext; Klickflächen bleiben mindestens 44×44 CSS-px. Keine Umwandlung in
+sichtbare Textbuttons ohne ausdrücklichen Auftrag. Nicht verfügbare Aktionen
+werden weiterhin vom vorhandenen Reader ausgeschlossen.
+Nachweis: gerenderter Eventzeilentest in `eventOperationArchitecture.test.ts`
+und Browsergeometrie in `orderingLayout.browser.test.ts`.

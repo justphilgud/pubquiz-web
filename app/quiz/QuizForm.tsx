@@ -23,6 +23,7 @@ import { isEventSeriesSelectable } from "@/app/eventreihen/eventSeriesPolicy";
 import {
   ArchiveBoxIcon,
   ChartBarIcon,
+  Cog6ToothIcon,
   LockOpenIcon,
   TrashIcon,
   UsersIcon,
@@ -379,7 +380,7 @@ export default function QuizForm({
                 <div><dt className="inline font-semibold">Teilnehmer: </dt><dd className="inline">{quiz.teilnehmer_anzahl ?? "–"}</dd></div>
               </dl>
               {quiz.temporal_status === "MISSING_DATE" && <p className="mt-3 text-sm font-semibold text-amber-900">Bestandsdatensatz: Vor dem nächsten Speichern muss ein Datum ergänzt werden.</p>}
-              <div className="mt-4 flex flex-wrap gap-2"><button type="button" title="Quiz-Einstellungen" onClick={()=>startEdit(quiz)} className="min-h-11 rounded-lg border px-3">Einstellungen</button>
+              <div className="mt-4 flex flex-wrap gap-2"><button type="button" title="Quiz-Einstellungen" aria-label={`Einstellungen für ${quiz.titel ?? `Quiz ${quiz.quiz_id}`}`} onClick={()=>startEdit(quiz)} className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-slate-200 bg-white p-2 text-slate-600"><Cog6ToothIcon aria-hidden="true" className="h-5 w-5" /></button>
                 <QuizCopyDialog quizId={quiz.quiz_id} quizTitle={quiz.titel ?? `Quiz ${quiz.quiz_id}`} />
                 {quiz.ist_archiviert ? (
                   <button type="button" title="Wiederherstellen" onClick={async () => { await restoreQuiz(quiz.quiz_id); router.refresh(); }} className="min-h-11 min-w-11 rounded-xl border border-green-300 bg-green-50 p-2 text-green-700"><LockOpenIcon className="mx-auto h-5 w-5" /></button>
