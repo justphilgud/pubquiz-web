@@ -3,7 +3,7 @@
 import { type EventType } from "@/app/roles/eventTypes";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   archiveEventSeries,
   createEventSeries,
@@ -27,7 +27,7 @@ import { eventSeriesInputFromFormData } from "@/app/eventreihen/eventSeriesForm"
 import { EventTypeSelect } from "@/app/eventreihen/EventTypeSelect";
 import { EventSeriesLogoField } from "@/app/eventreihen/EventSeriesLogoField";
 import { uploadEventSeriesLogo } from "@/app/eventreihen/uploadEventSeriesLogo";
-import { saveEventSeriesLogo } from "@/app/eventreihen/eventSeriesLogoActions";
+import { useContentNavigationGuard } from "@/app/components/content/useContentNavigationGuard";
 import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 
 const inputClass = "min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3";
@@ -54,17 +54,23 @@ const emptyForm: FormState = {
 
 export function EventSeriesManager({ series, canCreate, messages, presentationTemplates, canAssignPresentationTemplates, environmentPrefix }: { environmentPrefix: BlobEnvironmentPrefix; series: EventSeriesListItem[]; canCreate: boolean; messages: RenderingMessages; presentationTemplates: AssignablePresentationTemplate[]; canAssignPresentationTemplates: boolean }) {
   const router = useRouter();
+  const query=useSearchParams();
+  const initialEntry=series.find(e=>e.id===Number(query.get("edit"))&&e.canEdit&&!e.isArchived);
+  const initialForm:FormState=initialEntry?{name:initialEntry.name,publicName:initialEntry.publicName??"",description:initialEntry.description??"",internalNote:initialEntry.internalNote??"",reservationUrl:initialEntry.reservationUrl??"",isPublic:initialEntry.isPublic,defaultPresentationTemplateId:initialEntry.defaultPresentationTemplateId}:emptyForm;
+  const [expectedRevision,setExpectedRevision]=useState(initialEntry?.settingsRevision??"");
+  const [baseline,setBaseline]=useState(JSON.stringify({form:initialForm,products:initialEntry?.enabledEventTypes??[]}));
   const [filter, setFilter] = useState<"active" | "archived" | "all">("active");
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [newEventTypes, setNewEventTypes] = useState<EventType[]>([]);
-  const [form, setForm] = useState<FormState>(emptyForm);
-  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<number | null>(initialEntry?.id??null);
+  const [newEventTypes, setNewEventTypes] = useState<EventType[]>(initialEntry?.enabledEventTypes??[]);
+  const [form, setForm] = useState<FormState>(initialForm);
+  const [logoUrl, setLogoUrl] = useState<string | null>(initialEntry?.logoUrl??null);
   const [logoDraft, setLogoDraft] = useState<File | null | undefined>(undefined);
   const [saving, setSaving] = useState(false);
   const savingRef = useRef(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [message, setMessage] = useState("");
   const [archiveTarget, setArchiveTarget] = useState<EventSeriesListItem | null>(null);
+  const markSaved=useContentNavigationGuard(JSON.stringify({form,products:newEventTypes})!==baseline||logoDraft!==undefined);
   const customPresentationTemplates = presentationTemplates
     .filter((template) => !templateRegistry.presentation.some(({ id }) => id === template.id))
     .map(toRuntimePresentationTemplate);
@@ -85,6 +91,8 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
 
   function edit(entry: EventSeriesListItem) {
     setEditingId(entry.id);
+    setExpectedRevision(entry.settingsRevision??"");
+    setNewEventTypes(entry.enabledEventTypes??[]);
     setLogoUrl(entry.logoUrl);
     setLogoDraft(undefined);
     setForm({
@@ -96,6 +104,15 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
       isPublic: entry.isPublic,
       defaultPresentationTemplateId: entry.defaultPresentationTemplateId,
     });
+    setBaseline(JSON.stringify({form:{
+      name: entry.name,
+      publicName: entry.publicName ?? "",
+      description: entry.description ?? "",
+      internalNote: entry.internalNote ?? "",
+      reservationUrl: entry.reservationUrl ?? "",
+      isPublic: entry.isPublic,
+      defaultPresentationTemplateId: entry.defaultPresentationTemplateId,
+    },products:entry.enabledEventTypes??[]}));
     setErrors({});
     setMessage("");
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -106,28 +123,36 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
     savingRef.current = true; setSaving(true); setMessage("");
     try {
       const input = eventSeriesInputFromFormData(formData);
-      const result = editingId === null
-        ? await createEventSeries(input, formData.getAll("enabledEventTypes").map(String) as EventType[])
-        : await updateEventSeries(editingId, input);
-      setMessage(result.message);
-      setErrors(result.errors ?? {});
-      if (!result.success) return;
-      const savedId = editingId ?? result.eventSeriesId;
-      if (savedId !== undefined && savedId !== null && logoDraft !== undefined) {
-        // Keep the created ID on upload failure so retry cannot create a duplicate.
-        setEditingId(savedId);
-        try {
-          const nextUrl = logoDraft === null ? null : await uploadEventSeriesLogo(logoDraft, savedId, environmentPrefix);
-          const logoResult = await saveEventSeriesLogo(savedId, nextUrl, logoUrl);
-          if (!logoResult.ok) throw new Error(logoResult.message);
-          setLogoUrl(nextUrl); setLogoDraft(undefined);
-        } catch {
-          setMessage("Die Eventreihe ist gespeichert, das Logo noch nicht. Bitte erneut speichern oder die Seite bei einem zwischenzeitlich geänderten Logo neu laden.");
-          router.refresh();
-          return;
+      if(editingId===null){
+        const result=await createEventSeries(input,newEventTypes);
+        setMessage(result.message);setErrors(result.errors??{});
+        if (!result.success) return;
+        const savedId = editingId ?? result.eventSeriesId;
+        if(savedId===undefined||savedId===null)throw Error("Angelegte Eventreihe fehlt.");
+        // Logo paths require a persisted, authorized series. Preserve this ID on failure.
+        setEditingId(savedId);setExpectedRevision(result.settingsRevision??"");
+        setBaseline(JSON.stringify({form,products:newEventTypes}));
+        if (logoDraft !== undefined) {
+          try {
+            const nextUrl=logoDraft===null?null:await uploadEventSeriesLogo(logoDraft,savedId,environmentPrefix);
+            const linked=await updateEventSeries(savedId,input,{expectedRevision:result.settingsRevision??"",logoUrl:nextUrl,enabledEventTypes:newEventTypes});
+            if(!linked.success)throw Error(linked.message);
+            setExpectedRevision(linked.settingsRevision??"");setLogoUrl(nextUrl);setLogoDraft(undefined);
+          }catch{
+            setMessage("Die Eventreihe ist angelegt, das Logo noch nicht gespeichert. Bitte erneut speichern; dieselbe Eventreihe wird weiterverwendet.");router.refresh();return;
+          }
         }
+        markSaved();setMessage("Eventreihe angelegt. Weitere Änderungen werden an dieser Eventreihe gespeichert.");router.refresh();return;
       }
+      // Upload bytes first. A failed validation/conflict leaves database fields unchanged.
+      const nextLogo=logoDraft !== undefined?(logoDraft===null?null:await uploadEventSeriesLogo(logoDraft,editingId,environmentPrefix)):undefined;
+      const result = await updateEventSeries(editingId, input,{expectedRevision,...(canCreate?{enabledEventTypes:newEventTypes}:{}),...(nextLogo!==undefined?{logoUrl:nextLogo}:{})});
+      setMessage(result.message);setErrors(result.errors??{});if(!result.success)return;
+      if(result.settingsRevision)setExpectedRevision(result.settingsRevision);
+      if(nextLogo!==undefined)setLogoUrl(nextLogo);setLogoDraft(undefined);markSaved();
+      setBaseline(JSON.stringify({form,products:newEventTypes}));
       if (result.savedValue) {
+        setBaseline(JSON.stringify({form:{name:result.savedValue.name,publicName:result.savedValue.publicName??"",description:result.savedValue.description??"",internalNote:result.savedValue.internalNote??"",reservationUrl:result.savedValue.reservationUrl??"",isPublic:result.savedValue.isPublic,defaultPresentationTemplateId:result.savedValue.defaultPresentationTemplateId},products:newEventTypes}));
         setForm({
           name: result.savedValue.name,
           publicName: result.savedValue.publicName ?? "",
@@ -141,6 +166,7 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
         setEditingId(null);
         setForm(emptyForm);
         setNewEventTypes([]);
+        setBaseline(JSON.stringify({form:emptyForm,products:[]}));
         setLogoUrl(null); setLogoDraft(undefined);
       }
       setMessage("Änderungen gespeichert");
@@ -157,12 +183,12 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
         <p className="mt-1 text-sm text-slate-600">Der Slug wird bei der Anlage automatisch erzeugt und bleibt danach stabil.</p>
         <form onChange={() => setMessage("")} onSubmit={(event) => { event.preventDefault(); void submit(new FormData(event.currentTarget)); }} aria-busy={saving} className="mt-5">
           <fieldset disabled={saving} className="grid gap-4">
-          {editingId === null && <EventTypeSelect name="enabledEventTypes" enabled={newEventTypes} onToggle={(type, enabled) => setNewEventTypes(current => enabled ? [...current, type] : current.filter(id => id !== type))} />}
+          <EventTypeSelect name={canCreate?"enabledEventTypes":undefined} disabled={!canCreate} enabled={newEventTypes} onToggle={(type, enabled) => setNewEventTypes(current => enabled ? [...current, type] : current.filter(id => id !== type))} />
           <label><span className="mb-1 block text-sm font-semibold">Interner Name *</span><input name="name" required maxLength={150} value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? "event-series-name-error" : undefined} className={inputClass} />{errors.name && <span id="event-series-name-error" className="mt-1 block text-sm text-red-700">{errors.name}</span>}</label>
           <label><span className="mb-1 block text-sm font-semibold">Öffentlicher Name</span><input name="publicName" maxLength={150} value={form.publicName} onChange={(event) => setForm((current) => ({ ...current, publicName: event.target.value }))} className={inputClass} />{errors.publicName && <span className="mt-1 block text-sm text-red-700">{errors.publicName}</span>}</label>
           <label><span className="mb-1 block text-sm font-semibold">Öffentliche Beschreibung</span><textarea name="description" maxLength={2000} value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} className={`${inputClass} min-h-28`} />{errors.description && <span className="mt-1 block text-sm text-red-700">{errors.description}</span>}</label>
           <label><span className="mb-1 block text-sm font-semibold">Reservierungslink</span><input name="reservationUrl" type="url" maxLength={2048} value={form.reservationUrl} onChange={(event) => setForm((current) => ({ ...current, reservationUrl: event.target.value }))} className={inputClass} placeholder="https://…" />{errors.reservationUrl && <span role="alert" className="mt-1 block text-sm text-red-700">{errors.reservationUrl}</span>}</label>
-          <EventSeriesLogoField key={editingId ?? "new"} savedUrl={logoUrl} draft={logoDraft} onChange={setLogoDraft} />
+          <EventSeriesLogoField key={editingId??"new"} savedUrl={logoUrl} draft={logoDraft} onChange={setLogoDraft}/>
           <details className="rounded-xl border border-slate-200 p-3">
             <summary className="cursor-pointer font-semibold">Weitere Angaben</summary>
             <label className="mt-3 block"><span className="mb-1 block text-sm font-semibold">Interne Bemerkung</span><textarea name="internalNote" maxLength={2000} value={form.internalNote} onChange={(event) => setForm((current) => ({ ...current, internalNote: event.target.value }))} className={`${inputClass} min-h-24`} />{errors.internalNote && <span className="mt-1 block text-sm text-red-700">{errors.internalNote}</span>}</label>
@@ -183,7 +209,7 @@ export function EventSeriesManager({ series, canCreate, messages, presentationTe
           {message && <p role="status" className="rounded-xl bg-slate-100 p-3 text-sm">{message}</p>}
           <div className="flex flex-col gap-2 sm:flex-row">
             <button type="submit" className="min-h-11 rounded-xl bg-slate-900 px-5 py-2 font-semibold text-white">{saving ? "Wird gespeichert …" : editingId === null ? "Eventreihe anlegen" : "Änderungen speichern"}</button>
-            {editingId !== null && <button type="button" onClick={() => { setEditingId(null); setForm(emptyForm); setLogoUrl(null); setLogoDraft(undefined); setErrors({}); }} className="min-h-11 rounded-xl border border-slate-300 px-5 py-2 font-semibold">Abbrechen</button>}
+            {editingId !== null && <button type="button" onClick={() => { markSaved(); setEditingId(null); setForm(emptyForm); setNewEventTypes([]);setBaseline(JSON.stringify({form:emptyForm,products:[]})); setLogoUrl(null); setLogoDraft(undefined); setErrors({}); }} className="min-h-11 rounded-xl border border-slate-300 px-5 py-2 font-semibold">Abbrechen</button>}
           </div>
           </fieldset>
         </form>

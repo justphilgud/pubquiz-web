@@ -1,4 +1,5 @@
 "use server";
+import { assertBingoMayDeactivate } from "@/app/eventreihen/productSafety.server";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/app/lib/prisma";
 import { requireAdmin } from "@/app/lib/permissions";
@@ -32,6 +33,7 @@ export async function setEventTypeEnabled(eventSeriesId: number, eventType: Even
       } });
       if (running > 0) return { success: false, message: "Quiz kann während eines laufenden Quiz nicht deaktiviert werden. Bitte den Durchlauf zuerst regulär beenden." };
     }
+    if(eventType === "BINGO" && !enabled) await assertBingoMayDeactivate(tx,eventSeriesId);
     await tx.eventreihe_eventarten.upsert({ where: { eventreihe_id_eventart: { eventreihe_id: eventSeriesId, eventart: eventType } },
       create: { eventreihe_id: eventSeriesId, eventart: eventType, ist_freigeschaltet: enabled }, update: { ist_freigeschaltet: enabled } });
     if (eventType === "QUIZ") {

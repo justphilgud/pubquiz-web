@@ -44,8 +44,9 @@ test("legacy forms keep one choice; AP3 explicitly separates presentation and an
 
 test("quiz overview and editor expose compact, distinct settings and content actions", () => {
   assert.match(quizForm, /title="Quiz-Einstellungen"/);
-  assert.match(quizForm, /title="Quizinhalt bearbeiten"/);
-  assert.match(quizForm, /href=\{`\/quiz\/\$\{quiz\.quiz_id\}\?returnTo=\$\{encodeURIComponent\(returnTo\)\}`\}/);
+  assert.match(quizForm, /prepareTitle:"Quizinhalt bearbeiten"/);
+  assert.match(quizForm, /prepareHref:`\/quiz\/\$\{quiz\.quiz_id\}\?returnTo=\$\{encodeURIComponent\(returnTo\)\}`/);
+  assert.match(read("app/events/EventRow.tsx"), /title=\{entry.prepareTitle\?\?"Vorbereiten"\} href=\{entry.prepareHref\}/);
   assert.match(quizDetail, /quizCollectionReturnHref\(\(await searchParams\)\.returnTo, quiz\.eventreihe_id\)/);
   assert.match(quizDetail, /aria-label="Quiz-Einstellungen öffnen"/);
   assert.doesNotMatch(quizDetail, />Produktive Oberflächen</);

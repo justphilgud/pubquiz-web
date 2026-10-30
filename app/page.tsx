@@ -234,6 +234,7 @@ export default async function HomePage() {
 
   return (
     <><AppHeader /><main className="min-h-screen bg-slate-50 px-4 py-6 text-slate-900 md:px-8 md:py-10">
+<Link href="/events" className="inline-flex min-h-11 items-center rounded-lg border px-4">Alle Events</Link>
       <div className="mx-auto max-w-6xl space-y-7">
         {capabilities.canCreateQuestion ? <DashboardHero {...hero} /> : (
           <section className="rounded-3xl border border-slate-200 bg-white p-5">

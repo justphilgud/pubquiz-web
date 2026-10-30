@@ -27,5 +27,6 @@ export function parseGameFields(input: unknown): GameDraftFields & { id?: string
 /** Collection return links only; no user-provided origins or object routes. */
 export function gameReturnHref(type: GameType, value?: string) {
   const path = gameTypeInfo[type].path;
+  if(value==="/events"||value&&/^\/admin\/eventreihen\/[1-9]\d*$/.test(value)&&Number.isSafeInteger(Number(value.split("/").at(-1))))return value;
   return value && new RegExp(`^${path}(?:\\?series=[1-9]\\d*)?$`).test(value) ? value : path;
 }

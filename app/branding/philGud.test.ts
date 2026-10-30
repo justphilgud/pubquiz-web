@@ -12,7 +12,7 @@ import { buildPresentationQualityFixture, qualityScenarios } from "@/app/renderi
 import PresentationSlideRenderer from "@/app/rendering/presentation/PresentationSlideRenderer";
 
 test("admin appearance excludes every live/public route and the renderer reference", () => {
-  assert.equal(isAdministrationPath("/bingo/26000000-0000-4000-8000-000000000001/moderation"), true);
+  assert.equal(isAdministrationPath("/bingo/26000000-0000-4000-8000-000000000001/moderation"), false);
   assert.equal(isAdministrationPath("/bingo/praesentation/26000000-0000-4000-8000-000000000002"), false);
   for (const path of ["/", "/login", "/settings", "/hilfe", "/profil/passwort", "/content", "/admin/users", "/quiz", "/quiz/31", "/quiz/31/slides/intro", "/workspaces/117/quiz/new-question", "/templates"])
     assert.equal(isAdministrationPath(path), true, path);

@@ -67,7 +67,7 @@ export function exportRange(from: unknown, to: unknown, count: number): { from: 
 export function decodeCard(value: unknown): CardLayout {
   try { validateCard(value); return value; } catch { throw new BingoPreparationError("Die gespeicherte Karte ist ungültig. Bitte die Administration informieren."); }
 }
-export type RoundView = { id: string; position: number; label: string; target: number; strategy: CardStrategy; issued: number | null; cardCount: number; series: { id: string; code: string; count: number }[]; history: { actor: string; at: string; before: number | null; after: number | null }[] };
+export type RoundView = { locked?:boolean; id: string; position: number; label: string; target: number; strategy: CardStrategy; issued: number | null; cardCount: number; series: { id: string; code: string; count: number }[]; history: { actor: string; at: string; before: number | null; after: number | null }[] };
 export type SeriesView = { id: string; code: string; count: number; originRoundId: string; createdAt: string; designName: string; olderDesign: boolean };
 export type PreparationView = { gameId: string; title: string; seriesId: number; revision: number; archived: boolean; rounds: RoundView[]; roundCount: number; page: number; available: SeriesView[]; seriesPage: number; seriesCount: number };
 export type StoredCard = { id: string; code: string; shortCode?: string; ordinal: number; cells: CardLayout };

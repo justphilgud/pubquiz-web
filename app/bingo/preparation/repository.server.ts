@@ -29,6 +29,9 @@ export async function writePreparation(userId: number, input: unknown) {
     if (prep.revision !== command.revision) throw new BingoPreparationError("Die Vorbereitung wurde inzwischen geändert. Bitte neu laden; deine Eingaben bleiben erhalten.");
     const round = "roundId" in command ? await tx.bingo_rounds.findFirst({ where: { id: command.roundId, game_id: game.id }, include: { series: { include: { series: { select: { id: true, code: true, card_count: true, origin_round_id: true } } } } } }) : null;
     if ("roundId" in command && !round) throw denied();
+    if(round&&(await tx.$queryRaw<{present:string|null}[]>`SELECT to_regclass('pubquiz.bingo_event_rounds')::text present`)[0].present){
+      if((await tx.$queryRaw<{round_id:string}[]>`SELECT f.round_id FROM pubquiz.bingo_event_rounds f JOIN pubquiz.bingo_live_runs r ON r.id=f.run_id WHERE f.round_id=${round.id}::uuid AND f.game_id=${game.id}::uuid AND r.status IN ('RUNNING','PAUSED') LIMIT 1`).length)throw new BingoPreparationError("Diese Runde wurde bereits gestartet. Karten, Planung und Historie bleiben unverändert.");
+    }
     let result: { seriesId?: string; repeated?: boolean } = {};
     switch (command.operation) {
       case "createRound": {

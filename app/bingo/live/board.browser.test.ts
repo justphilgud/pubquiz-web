@@ -20,9 +20,9 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
     import React from 'react';import{createRoot}from'react-dom/client';import{flushSync}from'react-dom';
     import Board from './app/bingo/live/BingoBoard';import Audience from './app/bingo/live/AudienceClient';import{getPresentationTemplate}from'./app/rendering/templateRegistry';import{fetchLiveView}from'./app/bingo/live/useLivePolling';
     const root=createRoot(document.getElementById('app'));
-    window.show=(id='phil-gud',count=20,status='RUNNING',scaled=false)=>{
+    window.show=(id='phil-gud',count=20,status='RUNNING',scaled=false,colors={})=>{
       const t=getPresentationTemplate(id);
-      const data={id:'fixture',revision:count,startedAt:1,status,label:'Vorbereitete Bingo-Runde',target:30,draws:Array.from({length:count},(_,i)=>({id:String(i),position:i+1,number:i+1})),design:{version:1,templateId:id,name:id,config:{version:1,tokens:t.tokens,design:t.design,surfaces:{presentation:t.variant,answerForm:'BRANDED',moderation:'BRANDED'}}},assetBase:'/assets/'+id,claims:count?[{id:'call',stage:'BINGO',action:'CONFIRM',needsReview:false}]:[]};
+      const data={id:'fixture',revision:count,startedAt:1,status,label:'Vorbereitete Bingo-Runde',target:30,draws:Array.from({length:count},(_,i)=>({id:String(i),position:i+1,number:i+1})),design:{version:1,templateId:id,name:id,config:{version:1,tokens:{...t.tokens,colors:{...t.tokens.colors,...colors}},design:t.design,surfaces:{presentation:t.variant,answerForm:'BRANDED',moderation:'BRANDED'}}},assetBase:'/assets/'+id,claims:count?[{id:'call',stage:'BINGO',action:'CONFIRM',needsReview:false}]:[]};
       window.currentData=data;
       flushSync(()=>root.render(<div style={scaled?{width:1280,height:720,transform:'scale(.4)',transformOrigin:'top left'}:{height:'100dvh'}}><Board data={data}/></div>));
     };
@@ -40,7 +40,7 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
         if(r.width&&r.height&&(r.left<bound.left-1||r.right>bound.right+1||r.top<bound.top-1||r.bottom>bound.bottom+1))issues.push('outside '+e.tagName);
         if(e.scrollWidth>e.clientWidth+1||e.scrollHeight>e.clientHeight+1)issues.push('scroll '+e.tagName+' '+JSON.stringify({text:e.textContent,cw:e.clientWidth,sw:e.scrollWidth,ch:e.clientHeight,sh:e.scrollHeight,font:getComputedStyle(e).fontSize}));
       }
-      return{fit:stage.dataset.fit,issues,numbers:cells.map(c=>Number(c.dataset.number)),states:cells.map(c=>c.dataset.state),sizes:cells.map(c=>getComputedStyle(c).fontSize),positions:cells.map(c=>{const r=c.getBoundingClientRect();return[r.left,r.top,r.width,r.height]}),logo:[...stage.querySelectorAll('img')].every(i=>i.complete&&i.naturalWidth>0),font:[...document.fonts].filter(f=>f.family.includes('Bingo Live')).length===2&&[...document.fonts].filter(f=>f.family.includes('Bingo Live')).every(f=>f.status==='loaded'),errors:window.errors};
+      return{fit:stage.dataset.fit,issues,numbers:cells.map(c=>Number(c.dataset.number)),states:cells.map(c=>c.dataset.state),sizes:cells.map(c=>getComputedStyle(c).fontSize),fills:cells.map(c=>[getComputedStyle(c).backgroundColor,getComputedStyle(c).color]),positions:cells.map(c=>{const r=c.getBoundingClientRect();return[r.left,r.top,r.width,r.height]}),logo:[...stage.querySelectorAll('img')].every(i=>i.complete&&i.naturalWidth>0),font:[...document.fonts].filter(f=>f.family.includes('Bingo Live')).length===2&&[...document.fonts].filter(f=>f.family.includes('Bingo Live')).every(f=>f.status==='loaded'),errors:window.errors};
     };if(location.search==='?cold')window.slowFonts();else window.show();
   `;
   const bundle = await build({ stdin: { contents: source, resolveDir: process.cwd(), loader: "tsx" }, bundle: true, write: false, platform: "browser", format: "iife", outdir: "out", loader: { ".css": "local-css" }, define: { "process.env": "{}", "process.env.NODE_ENV": '"production"' } });
@@ -92,10 +92,12 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
       for (const [count, status] of [[0, "PREPARED"], [0, "RUNNING"], [20, "RUNNING"], [75, "PAUSED"], [20, "ENDED"]] as const) {
         await evaluate(`window.show('${brand}',${count},'${status}');document.fonts.ready`);
         await new Promise(r => setTimeout(r, 120));
-        const m = await evaluate("window.measure()") as { fit: string; issues: string[]; numbers: number[]; states: string[]; sizes: string[]; positions: unknown; logo: boolean; font: boolean; errors: unknown[] };
+        const m = await evaluate("window.measure()") as { fit: string; issues: string[]; numbers: number[]; states: string[]; sizes: string[]; positions: number[][]; fills:string[][]; logo: boolean; font: boolean; errors: unknown[] };
         assert.equal(m.fit, "fitted"); assert.deepEqual(m.issues, [], `${brand}/${width}x${height}: ${m.issues}`);
         assert.deepEqual(m.numbers, Array.from({ length: 75 }, (_, i) => i + 1)); assert.equal(new Set(m.sizes).size, 1);
         assert.equal(m.states.filter(s => s !== "unseen").length, count); assert.equal(m.states.filter(s => s === "current").length, count ? 1 : 0);
+        assert.ok(m.positions.every(r=>Math.abs(r[2]-r[3])<1.1), "board cells keep square proportions instead of tall strips");
+        if(brand==='phil-gud'&&count){assert.deepEqual(m.fills[count-1],["rgb(240, 252, 22)","rgb(0, 0, 0)"],"current number uses the selected Phil Gud yellow with dark ink");if(count>1)assert.deepEqual(m.fills[0],["rgb(246, 196, 220)","rgb(0, 0, 0)"],"drawn number uses the selected Phil Gud pink with dark ink");}
         assert.equal(m.logo, true); assert.equal(m.font, true); assert.deepEqual(m.errors, []);
         if (positions) assert.deepEqual(m.positions, positions, "cell positions remain stable"); positions = m.positions;
         results.push({ brand, width, height, count, status, fontSize: m.sizes[0] });
@@ -106,6 +108,9 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
         }
       }
     }
+    await evaluate("window.show('phil-gud',20,'RUNNING',false,{background:'#ffffff',surface:'#faf8f2',text:'#171717',textMuted:'#625d55',primary:'#6a241c',secondary:'#f6c4dc'})");
+    assert.equal(await evaluate('document.querySelector("[data-bingo-brand]")'),null,"customized Phil Gud palette must not inherit default brand fills");
+    assert.deepEqual(await evaluate('(()=>{const s=getComputedStyle(document.querySelector("[data-number]"));return[s.backgroundColor,s.color]})()'),["rgb(250, 248, 242)","rgb(23, 23, 23)"],"customized palette values remain effective");
     await evaluate("window.show('phil-gud',20,'RUNNING',true)"); await new Promise(r => setTimeout(r, 150));
     assert.deepEqual((await evaluate("window.measure()") as { issues: string[] }).issues, []);
     await evaluate("window.show('phil-gud',20)");
@@ -130,8 +135,8 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
     const loadingShot = await call("Page.captureScreenshot", { format: "png", clip: numberBox }, coldSession);
     const { data: pixels, info } = await sharp(Buffer.from(loadingShot.data!, "base64")).removeAlpha().raw().toBuffer({ resolveWithObject: true });
     let visible = 0;
-    for (let p = 0; p < pixels.length; p += info.channels) if (pixels[p] > 200 && pixels[p + 1] > 200 && pixels[p + 2] > 180) visible++;
-    assert.ok(visible > 100, "current number must already paint while original font is pending");
+    for (let p = 0; p < pixels.length; p += info.channels) if (Math.abs(pixels[p] - 240) < 45 && Math.abs(pixels[p + 1] - 252) < 45 && Math.abs(pixels[p + 2] - 22) < 45) visible++;
+    assert.ok(visible > 100, "yellow current number must already paint while original font is pending");
     await coldEvaluate("document.fonts.ready");
     assert.equal(await coldEvaluate('[...document.fonts].filter(f=>f.family.includes("Bingo Live")).length===2&&[...document.fonts].filter(f=>f.family.includes("Bingo Live")).every(f=>f.status==="loaded")'), true, "both original frozen faces actually loaded");
     await call("Target.closeTarget", { targetId: coldTarget.targetId });

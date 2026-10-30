@@ -1,3 +1,5 @@
+import {parseEventEnvelope} from "../../app/bingo/live/eventEnvelope";
+import {parseRoundSnapshot} from "../../app/bingo/live/roundSnapshot";
 import { parseQuizDesignSnapshot, parseSharedDesign } from "../../app/rendering/sharedDesign/sharedDesign";
 import { assertRestoreTarget, requireCondition } from "./guards";
 import { brandFontOptions } from "../../app/rendering/templateRegistry";
@@ -68,6 +70,8 @@ function exactKeys(value: unknown, keys: string): asserts value is Record<string
 // Only this persisted presentation field uses "tokens" for design, not authentication.
 // Check exact shape and bounded design values, then retain the ordinary recursive scan.
 export function inspectRow(value: Record<string, unknown>, media: Set<string>, schema: string, table: string) {
+  if(schema==="pubquiz"&&table==="bingo_event_rounds")parseRoundSnapshot(value.round_snapshot);
+  if(schema==="pubquiz"&&table==="bingo_live_events"&&value.event_round_id!=null)parseEventEnvelope(value.command);
   if (schema === "pubquiz" && table === "bingo_live_runs") {
     const design = parseSharedDesign(value.design_snapshot);
     requireCondition(design !== null, "DESIGN_TOKEN_STRUCTURE_REVIEW_REQUIRED");
