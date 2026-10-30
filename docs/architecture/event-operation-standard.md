@@ -100,3 +100,25 @@ Diese Entscheidungen werden in den späteren Umsetzungspaketen U1 (Produktgate),
 - [ ] Neue Eventinstanz nutzt bestehenden Artablauf; keine Sonderoberfläche pro Event?
 
 Dokumentation allein erzwingt keine Einhaltung. Der spätere PR muss pro betroffener Regel Codepfad, Reviewbefund und konkrete Testergebnisse liefern; fehlende Nachweise als Grenzen benennen. In diesem Dokumentationsauftrag wurden keine Tests oder CI geändert.
+
+
+## V3.1-Implementierungszuordnung
+
+Die Bestands-/Zielaussagen der Tabelle oben beschreiben die vor der Umsetzung
+geprüfte Main-Basis `8fa60b68`. Den tatsächlichen neuen Umfang beschreibt
+[Bingo-Eventbedienung](bingo-event-operation.md); der gehostete Prüfstand steht in
+[PR #147](https://github.com/justphilgud/pubquiz-web/pull/147). Daraus folgt keine
+Merge- oder Production-Freigabe.
+
+| Regeln | Verwendeter Code | Konkrete Prüfung |
+| --- | --- | --- |
+| B01–B04 | `EventRow`, `EventCollection`, `readEvents`, `readBingoStatuses`, bestehende Quiz-/Game-Rückwegpolicies | Gemeinsame Event-Architekturtests, bestehende Navigationstests, Quiz-Lifecycle-Einstiegstest und Browsernavigation |
+| B03/B07/B11 | `EventSeriesManager`, `settingsRepository`, `settingsRevision`, `productSafety` | Form-Browsertest einschließlich Logo-Fehler/ID-Erhalt; realer PostgreSQL-CAS-/Start-Deaktivierungs-Race; `event-settings.browser.mjs` |
+| B05/B06/B08–B10/B12 | `EventModerationPanel` und sein CSS-Modul; separate bestehende `BingoBoard`-/Publikumsrenderer | V3.1-Browserablauf, gemessene Laptop-/Mobilgrößen, Fokus-/Kontrast-/Touchprüfung; bestehender Board-/Polling-Browsertest |
+| B06/B07/B11 | `eventCreation`, `eventRepository`, `eventRun`, AP1 und AP2 | Regeltreue-/Kontexttests; drei Runden und Zusatzrunde in PostgreSQL und Browser; echte Retry-/Rollen-/Konfliktprüfung |
+| B11/B12 | alte AP3-Dispatchpfade, eingefrorene Rundendaten und AP2-Druckstände | Bestandslauf und vollständiger alter/neuer Snapshot mit echtem isolierten Dump/Restore |
+
+Quiz-Farben werden weiterhin bewusst separat angeglichen. Gemeinsame Eventzeilen
+und Einstiege ersetzen weder seine Moderationslogik noch Publikumsvorlagen.
+Physische Smartphone-, Bildschirmtastatur- oder Beamertests werden durch diese
+Zuordnung nicht behauptet.

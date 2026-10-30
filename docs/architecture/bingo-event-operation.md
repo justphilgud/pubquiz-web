@@ -30,9 +30,9 @@ führt zu sichtbarem Konflikt, niemals zu einer neuen Grenze/Client-Rufzeit.
 
 ## Liefergrenze
 
-Noch in Arbeit. Kein lokaler oder statischer Nachweis ersetzt die verlangte
+Implementierte Module und bisherige Nachweise stehen unten. Kein lokaler oder statischer Nachweis ersetzt die verlangte
 gehostete Abnahme, echten PostgreSQL-Nebenläufigkeitstest oder Snapshot/Restore.
-Der PR bleibt bis zur vollständigen Abnahme Draft. Fachliche Grundlage:
+Der jeweils aktuelle gehostete Prüfstand und die Reviewbereitschaft werden in [PR #147](https://github.com/justphilgud/pubquiz-web/pull/147) geführt; bis zur vollständigen Abnahme bleibt er Draft. Fachliche Grundlage:
 [event-operation-standard.md](event-operation-standard.md).
 
 ## Persistenz und vorbereitete Runden
@@ -88,3 +88,29 @@ Referenzdefinitionen. Dies ist keine vollständige Reparatur oder Replay-Abnahme
 aller historischen Bootstrap-Migrationen. Keine historischen Checksummen werden
 auf Production geändert. Der gehostete Prüfbericht wird vor Reviewbereitschaft
 mit tatsächlichem Commit, Alias und Ergebnissen ergänzt.
+
+## Konkrete Verantwortung und Grenzen
+
+- `app/events/EventRow.tsx`, `readEvents.server.ts` und `statusReader.server.ts`:
+  gemeinsame Zeile/formatübergreifende Reader; keine Start- oder Statusanlage.
+- `app/eventreihen/settingsRepository.server.ts`, `settingsRevision.ts` und
+  `productSafety.server.ts`: gemeinsame atomare Änderung, CAS und Start-/Produktgate.
+- `app/bingo/eventCreation.server.ts`: atomare/idempotente Event-/Rundenanlage;
+  `GameDraftForm` behält nach unklarem Ergebnis dieselbe Anfrage bis zur Klärung.
+- `PreparationPanel`/`RoundEditor`: kompakte Darstellung, ausdrückliche Kartenwahl,
+  eigener Entwurf und Revision beim Bearbeitungsbeginn; kein Polling-Draftverlust.
+- `EventModerationPanel`/CSS-Modul: V3.1-Oberfläche ausschließlich für V2-Runs;
+  `eventRepository.server.ts`/`eventRun.ts` verantworten Transaktion und Replay.
+- `scripts/testing/bingo-event.browser.mjs` und `event-settings.browser.mjs`:
+  wiederholbare Browserabnahme mit neu angelegten synthetischen Fällen.
+
+Ein Rundenschluss/Start/Ende verwirft nach ausdrücklicher Bestätigung nur lokale
+unveröffentlichte Rundeneingaben; niemals Rufe oder gespeicherte Daten. Ein
+noch nicht zugeordneter Ruf bleibt blockierend, bis eine zugeordnete Karte
+geprüft und entschieden ist. Es gibt keine stille Ruflöschung.
+
+Die bestehende Archivregel bleibt unverändert: archivierte Reihen sind
+schreibgeschützt. Diese Umsetzung erweitert die gesondert beauftragte
+Produktdeaktivierungssperre; sie führt keine neue allgemeine Archivpolitik ein.
+Bingo-/Quiz-Fragesteuerung, gemeinsame Publikum-/Drucktemplates, weitere Varianten,
+OCR/Pi/Offline und Team-Selbstanmeldung sind kein zusätzlicher Umfang.
