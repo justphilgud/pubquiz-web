@@ -114,3 +114,17 @@ schreibgeschützt. Diese Umsetzung erweitert die gesondert beauftragte
 Produktdeaktivierungssperre; sie führt keine neue allgemeine Archivpolitik ein.
 Bingo-/Quiz-Fragesteuerung, gemeinsame Publikum-/Drucktemplates, weitere Varianten,
 OCR/Pi/Offline und Team-Selbstanmeldung sind kein zusätzlicher Umfang.
+
+## Korrektur nach direktem V3.1-Vergleich (30.10.2026)
+
+Die frühere Preview war funktional geprüft, erfüllte aber die bestätigte visuelle Komposition nicht. Die fachliche Abnahme der Darstellung ist weiterhin offen; Offline/Reconnect wird erst danach wieder aufgenommen.
+
+Nachgewiesene Abweichungen und gezielte Korrektur:
+- Die Moderationsroute war entgegen der vorgesehenen Livegrenze in `isAdministrationPath` aufgenommen. Dadurch überschrieben globale Verwaltungstitel die funktionale V3.1-Typografie. Route wieder ausgeschlossen; ausdrücklicher Regressionstest.
+- Zentrale Arbeitsfläche, Kopf, Ruftastenleiste und rechte Runden-/Statusspalte waren voneinander abweichend angeordnet. `EventModerationPanel` ordnet ausschließlich die bestehenden Aktionen/Reader neu. Zahl/Board bilden eine Fläche; nichtmodale unabhängige Kartenprüfungen bleiben darunter erhalten. Die mobile Ruftastenleiste ist fixiert und hat reservierten Inhaltsabstand.
+- Das öffentliche Board dehnte Zellen zu hohen Streifen. Die bestehende beidimensionale Messung setzt zusätzlich eine gemeinsame quadratische Zellkante. Stabile Positionen, vollständige Zahlen, Originalschriften, Laden/Resize/Vollbild und alte Pollantwortsperren bleiben geprüft.
+- Gelb/Pink als Flächen mit dunkler Beschriftung nur im ausdrücklich ausgewählten Phil-Gud-Publikumstemplate. LOVD und andere Templates behalten ihre gespeicherten Farbwerte; keine Zuweisung, kein Standard, kein eingefrorenes Asset geändert.
+
+Die V3.1-Datei verweist als Präsentation auf `praesentation-entwurf.html`, einen ausdrücklich statischen V2-Platzhalter ohne Zahlenboard. Daraus wird keine vollständig bestätigte neue Publikums-Komposition behauptet. Die Korrektur erhält das vorhandene AP3-Zahlenboard und den getrennten Publikumstemplate-Vertrag.
+
+Zusätzliche Browserregressionen prüfen die tatsächliche zentrale Fläche, funktionale Schrift ohne Verwaltungswrapper, rechte Seitenleiste, Leiste unter dem Board und fixierte mobile Hauptaktionen. Karten sind auf dem Board wie im Entwurf reine Zustandsanzeige; frühere Ziehungen bleiben im separaten Korrektur-/Historienbereich auswählbar. Fachbefehle, CAS, Rufgrenzen, Speicherung und Rollen bleiben unverändert.
