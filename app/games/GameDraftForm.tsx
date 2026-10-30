@@ -28,7 +28,7 @@ export default function GameDraftForm({ type, initial, choices, canWrite, return
     if(saving.current)return;saving.current=true;
     try {
       const result = !game&&type==="BINGO"?await createBingoDraft({...fields,roundCount,requestId:creationId.current??(creationId.current=crypto.randomUUID())}):await saveGameDraft(type, { ...fields, ...(game ? { id: game.id, updatedAt: game.updatedAt } : {}) });
-      if (!result.success) { if("retryable" in result)setUnconfirmed(Boolean(result.retryable)); setMessage({ error: true, text: result.message }); return; }
+      if (!result.success) { if("retryable" in result)setUnconfirmed(current=>current||Boolean(result.retryable)); setMessage({ error: true, text: result.message }); return; }
       const saved = { seriesId: result.game.seriesId, title: result.game.title, date: result.game.date, time: result.game.time };
       setUnconfirmed(false); setGame(result.game); setFields(saved); setBaseline(JSON.stringify(saved)); markSaved();
       setMessage({ error: false, text: "Entwurf gespeichert." });
