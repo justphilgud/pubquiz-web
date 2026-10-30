@@ -18,8 +18,9 @@ export function BingoDrawVisual({data,connected=true,preview}:{data:AudienceView
  const finish=useCallback(()=>setActive(null),[]);
  useEffect(()=>{
   const next:Observation={view:data,connected:connected&&document.visibilityState==='visible'};
+  const retain=previous.current?.connected&&previous.current.view.status==="RUNNING"&&!previous.current.view.phase;
   const draw=newlyConfirmedDraw(previous.current,next);previous.current=next;
-  const frame=requestAnimationFrame(()=>setActive(old=>reduce||!next.connected?null:draw?{id:draw.id,number:draw.number,observedAt:performance.now()}:old&&data.draws.at(-1)?.id===old.id&&data.draws.at(-1)?.number===old.number?old:null));
+  const frame=requestAnimationFrame(()=>setActive(old=>reduce||!next.connected||data.status!=="RUNNING"||Boolean(data.phase)?null:draw?{id:draw.id,number:draw.number,observedAt:performance.now()}:retain&&old&&data.draws.at(-1)?.id===old.id&&data.draws.at(-1)?.number===old.number?old:null));
   return()=>cancelAnimationFrame(frame);
  },[data,connected,reduce]);
  useEffect(()=>{const hide=()=>{if(previous.current)previous.current={...previous.current,connected:false};finish();};document.addEventListener('visibilitychange',hide);return()=>document.removeEventListener('visibilitychange',hide);},[finish]);

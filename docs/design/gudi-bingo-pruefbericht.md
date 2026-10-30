@@ -38,3 +38,9 @@ Nach dieser Freigabe fehlen noch: exakt diesen Branch aufnehmen, eigene isoliert
 6. Ereignisprüfung öffnen: doppelte Nachricht, erneut öffnen, Wiederverbindung und Korrektur dürfen keine historische Szene starten.
 
 Kein Merge, kein Production-Deployment, keine produktiven Daten-, Rechte- oder Sessionänderungen.
+
+Abschließender Randfall: Eine unterbrochene visuelle Szene wird bei Pause/Phase verworfen. Auch sofortiges Fortsetzen darf dieselbe Ziehung nicht erneut animieren; dies ist zusätzlich im echten Browser abgesichert. Die aufgezeichneten 75 Choreografien bleiben davon unverändert.
+
+Finale Aufnahmen: 11.470 native Browserframes, 81 Kombinationen aus Szene/Marke (75 Phil Gud, sechs LOVD), zwölf MP4-Dateien. Frameabstand im Lauf: 95. Perzentil 35 ms, Maximum 37 ms. Alle 75 finalen Aufnahmefolgen wurden zusätzlich in zwölf zeitbeschrifteten Phasen pro Szene durchgesehen. Ein Einzelclip wurde im In-App-Browser tatsächlich abgespielt. Keine pauschale menschliche Echtzeit-Gesamtabnahme behauptet.
+
+Der neue schnelle Pause-/Fortsetzen-Browsertest scheitert gegen den vorherigen visuellen Adapter gezielt mit 'quick resume never replays the interrupted draw' und besteht mit der Korrektur. Alle sechs Gudi-Tests bestehen danach erneut; die 1.890 Geometriefälle bleiben erhalten. Die finalen Video-Choreografien entsprechen 62df6a66; die nachfolgende Adapterkorrektur ändert ausschließlich das Verwerfen unterbrochener Szenen, keine Bewegungsspur.

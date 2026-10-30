@@ -826,4 +826,3 @@ Quelle: verbindlicher Motivkatalog des Auftrags. Alle Szenen sind implementiert;
 - Zahlenabschluss: Kugel zur festen Zahlenposition führen; Requisiten und Gudi abblenden, bestätigte Zahl ruhig halten.
 - Requisiten: cannon, confetti, ribbon.
 - Dauer: 5.0 Sekunden.
-
