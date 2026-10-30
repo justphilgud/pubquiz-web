@@ -1,0 +1,92 @@
+{
+  "migrations": [
+    {
+      "name": "20261030150000_bingo_event_operation",
+      "sha256": "5c5b12ce13e0c637444626b681ce7da86a4bd3278dc5491b0f5d1bb4379df3d4"
+    }
+  ],
+  "tables": [
+    "bingo_event_creation_requests",
+    "bingo_event_round_cards",
+    "bingo_event_round_plan",
+    "bingo_event_rounds",
+    "bingo_event_runs"
+  ],
+  "triggers": [
+    {
+      "schema": "pubquiz",
+      "name": "bingo_event_cards_immutable",
+      "table": "bingo_event_round_cards",
+      "functionSchema": "pubquiz",
+      "functionName": "bingo_immutable_record",
+      "type": 27,
+      "enabled": "O",
+      "deferrable": false,
+      "deferred": false,
+      "constraint": false,
+      "columns": "",
+      "arguments": "",
+      "condition": null
+    },
+    {
+      "schema": "pubquiz",
+      "name": "bingo_event_creation_immutable",
+      "table": "bingo_event_creation_requests",
+      "functionSchema": "pubquiz",
+      "functionName": "bingo_immutable_record",
+      "type": 27,
+      "enabled": "O",
+      "deferrable": false,
+      "deferred": false,
+      "constraint": false,
+      "columns": "",
+      "arguments": "",
+      "condition": null
+    },
+    {
+      "schema": "pubquiz",
+      "name": "bingo_event_plan_immutable",
+      "table": "bingo_event_round_plan",
+      "functionSchema": "pubquiz",
+      "functionName": "bingo_immutable_record",
+      "type": 27,
+      "enabled": "O",
+      "deferrable": false,
+      "deferred": false,
+      "constraint": false,
+      "columns": "",
+      "arguments": "",
+      "condition": null
+    },
+    {
+      "schema": "pubquiz",
+      "name": "bingo_event_rounds_immutable",
+      "table": "bingo_event_rounds",
+      "functionSchema": "pubquiz",
+      "functionName": "bingo_immutable_record",
+      "type": 27,
+      "enabled": "O",
+      "deferrable": false,
+      "deferred": false,
+      "constraint": false,
+      "columns": "",
+      "arguments": "",
+      "condition": null
+    },
+    {
+      "schema": "pubquiz",
+      "name": "bingo_event_runs_immutable",
+      "table": "bingo_event_runs",
+      "functionSchema": "pubquiz",
+      "functionName": "bingo_immutable_record",
+      "type": 27,
+      "enabled": "O",
+      "deferrable": false,
+      "deferred": false,
+      "constraint": false,
+      "columns": "",
+      "arguments": "",
+      "condition": null
+    }
+  ]
+}

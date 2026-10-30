@@ -25,7 +25,7 @@ test("three rounds and an extra use empty independent draws; closed history and 
  const historic=structuredClone(f.state.run.rounds[0]);assert.equal(activeElapsedMs(f.state.run,9000),2000);
  assert.throws(()=>f.send({kind:"correct",drawId:historic.draws[0].id,number:4,reason:"geschlossen"},9000),/ROUND_NOT_OPEN/);
  for(let i=2;i<=4;i++){
-  const r={...frozen,id:id(i+100),label:`Runde ${i}`};f.send({kind:"startRound",roundId:r.id},i*10000,r);
+  const r={...frozen,id:id(i+100),label:`Runde ${i}`};f.send({kind:"startRound",roundId:r.id,preparationRevision:0},i*10000,r);
   assert.equal(currentEventRound(f.state).draws.length,0);assert.deepEqual(f.state.run.rounds[0],historic);
   f.send({kind:"draw",number:i},i*10000+1000);f.send({kind:"closeRound"},i*10000+2000);
  }
@@ -34,4 +34,8 @@ test("three rounds and an extra use empty independent draws; closed history and 
 });
 test("V2 rejects forged context, round identifiers and legacy last-draw correction syntax",()=>{
  for(const value of [{kind:"call",stage:"BINGO"},{kind:"call",stage:"BINGO",context:"a"},{kind:"startRound",roundId:"../31"},{kind:"closeRound",now:1},{kind:"correct",number:3,reason:"x"}])assert.throws(()=>parseEventCommand(value));
+});
+
+test("context cannot return to an old boundary after pause/resume or target backtracking",()=>{
+ const f=fixture(),before=callContextData(f.state);f.send({kind:"pause"});f.send({kind:"resume"});assert.notDeepEqual(callContextData(f.state),before);const second=callContextData(f.state);f.send({kind:"target",number:40});f.send({kind:"target",number:30});assert.notDeepEqual(callContextData(f.state),second);
 });

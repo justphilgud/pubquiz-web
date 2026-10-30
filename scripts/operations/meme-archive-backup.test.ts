@@ -199,3 +199,12 @@ test("AP3 exact immutable bindings preserve AP2 and reject missing, disabled, ch
   ];
   for (const mutate of changes) { const value = fixture(); mutate(value); assert.throws(() => reviewMemeArchiveExecutables(value), /SCHEMA_SECURITY_REVIEW_REQUIRED/); }
 });
+
+
+test("V3.1 exact migration-bound trigger set accepts only the complete event extension",async()=>{
+ const {default:ref}=await import("./schema-reference/bingo-event-routines.json");
+ const fixture=()=>{const old=bingoFixture();return {...old,bingoLiveTables:[...bingoLive.tables],bingoEventTables:[...ref.tables],triggers:[...old.triggers,...structuredClone(bingoLive.triggers),...structuredClone(ref.triggers)]};};
+ const f=fixture();assert.deepEqual(reviewMemeArchiveExecutables(f)!.bingoEventMigrations,ref.migrations);
+ for(const m of ref.migrations)assert.equal(hash(readFileSync(new URL(`../../prisma/migrations/${m.name}/migration.sql`,import.meta.url),"utf8").replaceAll("\r\n","\n")),m.sha256);
+ for(const mutate of [(v:ReturnType<typeof fixture>)=>{v.bingoEventTables.pop();},(v:ReturnType<typeof fixture>)=>{v.bingoEventTables.push("unknown");},(v:ReturnType<typeof fixture>)=>{v.triggers.pop();},(v:ReturnType<typeof fixture>)=>{v.triggers.at(-1)!.enabled="D";},(v:ReturnType<typeof fixture>)=>{v.triggers.at(-1)!.functionName="unknown";},(v:ReturnType<typeof fixture>)=>{v.triggers.at(-1)!.table="quiz";},(v:ReturnType<typeof fixture>)=>{v.triggers.push({...v.triggers.at(-1)!,name:"unknown"});}]){const v=fixture();mutate(v);assert.throws(()=>reviewMemeArchiveExecutables(v),/SCHEMA_SECURITY_REVIEW_REQUIRED/);}
+});

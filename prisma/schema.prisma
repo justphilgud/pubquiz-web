@@ -1405,6 +1405,8 @@ enum LivePollPublicationMode {
 }
 
 model users {
+  bingo_event_creations bingo_event_creation_requests[]
+
   bingo_live_runs bingo_live_runs[]
   bingo_live_events bingo_live_events[]
   bingo_print_versions bingo_print_versions[]
@@ -1581,6 +1583,8 @@ model benutzer_reihenrollen {
 
 /// Standalone non-playable game instances. No Quiz identity or live state.
 model game_drafts {
+  event_creation bingo_event_creation_requests?
+
   bingo_live_runs bingo_live_runs[]
   bingo_print_config Json?
   bingo_series_labels bingo_series_labels[]
@@ -1611,6 +1615,8 @@ model bingo_preparations {
   @@schema("pubquiz")
 }
 model bingo_rounds {
+  event_plan bingo_event_round_plan[]
+
   live_runs bingo_live_runs[]
   id String @id @default(uuid()) @db.Uuid
   game_id String @db.Uuid
@@ -1629,6 +1635,8 @@ model bingo_rounds {
   @@schema("pubquiz")
 }
 model bingo_card_series {
+  event_round_cards bingo_event_round_cards[]
+
   live_cards bingo_live_cards[]
   short_label bingo_series_labels?
   print_versions bingo_print_versions[]
@@ -1676,6 +1684,8 @@ model bingo_print_versions {
   @@schema("pubquiz")
 }
 model bingo_cards {
+  event_round_cards bingo_event_round_cards[]
+
   live_runs bingo_live_cards[]
   id String @id @default(uuid()) @db.Uuid
   series_id String @db.Uuid
@@ -1726,6 +1736,9 @@ model game_team_assignments {
 
 /// AP3 runtime identity is separate from immutable game-draft identity.
 model bingo_live_runs {
+  event_protocol bingo_event_runs?
+  event_plan bingo_event_round_plan[]
+
   id String @id @db.Uuid
   game_id String @db.Uuid
   round_id String @db.Uuid
@@ -1764,6 +1777,9 @@ model bingo_live_cards {
   @@schema("pubquiz")
 }
 model bingo_live_events {
+  event_round_id String? @db.Uuid
+  event_round bingo_event_rounds? @relation(fields:[run_id,event_round_id],references:[run_id,round_id],onDelete:Restrict,onUpdate:NoAction,map:"bingo_event_round_reference")
+
   run_id String @db.Uuid
   revision Int
   request_id String @db.Uuid
@@ -1776,4 +1792,60 @@ model bingo_live_events {
   @@id([run_id,revision])
   @@unique([run_id,request_id])
   @@schema("pubquiz")
+}
+
+model bingo_event_creation_requests {
+ request_id String @id @db.Uuid
+ game_id String @unique @db.Uuid
+ created_by Int
+ request_hash String @db.Char(64)
+ game game_drafts @relation(fields:[game_id],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ actor users @relation(fields:[created_by],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ @@schema("pubquiz")
+}
+model bingo_event_runs {
+ run_id String @id @db.Uuid
+ version Int @db.SmallInt
+ run bingo_live_runs @relation(fields:[run_id],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ plan bingo_event_round_plan[]
+ @@schema("pubquiz")
+}
+model bingo_event_round_plan {
+ run_id String @db.Uuid
+ game_id String @db.Uuid
+ round_id String @db.Uuid
+ position Int
+ run bingo_live_runs @relation(fields:[run_id,game_id],references:[id,game_id],onDelete:Restrict,onUpdate:NoAction)
+ protocol bingo_event_runs @relation(fields:[run_id],references:[run_id],onDelete:Restrict,onUpdate:NoAction)
+ round bingo_rounds @relation(fields:[round_id,game_id],references:[id,game_id],onDelete:Restrict,onUpdate:NoAction)
+ frozen bingo_event_rounds?
+ @@id([run_id,round_id])
+ @@unique([run_id,position])
+ @@unique([run_id,round_id,game_id])
+ @@schema("pubquiz")
+}
+model bingo_event_rounds {
+ run_id String @db.Uuid
+ round_id String @db.Uuid
+ game_id String @db.Uuid
+ round_snapshot Json
+ opened_at DateTime @db.Timestamptz(3)
+ plan bingo_event_round_plan @relation(fields:[run_id,round_id,game_id],references:[run_id,round_id,game_id],onDelete:Restrict,onUpdate:NoAction)
+ cards bingo_event_round_cards[]
+ events bingo_live_events[]
+ @@id([run_id,round_id])
+ @@unique([run_id,round_id,game_id])
+ @@schema("pubquiz")
+}
+model bingo_event_round_cards {
+ run_id String @db.Uuid
+ round_id String @db.Uuid
+ game_id String @db.Uuid
+ card_id String @db.Uuid
+ series_id String @db.Uuid
+ round bingo_event_rounds @relation(fields:[run_id,round_id,game_id],references:[run_id,round_id,game_id],onDelete:Restrict,onUpdate:NoAction)
+ series bingo_card_series @relation(fields:[series_id,game_id],references:[id,game_id],onDelete:Restrict,onUpdate:NoAction)
+ card bingo_cards @relation(fields:[card_id,series_id],references:[id,series_id],onDelete:Restrict,onUpdate:NoAction)
+ @@id([run_id,round_id,card_id])
+ @@schema("pubquiz")
 }

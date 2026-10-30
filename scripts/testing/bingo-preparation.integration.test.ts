@@ -18,6 +18,7 @@ import { COLUMN_SQL, CATALOG_SQL } from "../operations/snapshot";
 import { auditColumns, inspectRow, type Column } from "../operations/acceptance-policy";
 import {sha256} from "../operations/snapshot";
 import { designHash } from "@/app/bingo/preparation/printSnapshot";
+import {exerciseBingoEvent} from "./bingo-event.acceptance";
 import { exerciseBingoLive } from "./bingo-live.acceptance";
 import { verifyBingoRestore } from "./bingo-live.restore";
 
@@ -66,13 +67,13 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   assert.deepEqual((await db.query("SELECT * FROM pubquiz.benutzer_reihenrollen ORDER BY benutzer_id")).rows, roles);
   const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: target.toString() }) });
   t.after(async () => { await prisma.$disconnect(); });
-  const bundle = await build({ stdin: { contents: "export * from './app/bingo/preparation/repository.server'; export * as live from './app/bingo/live/repository.server'; export * as print from './app/bingo/preparation/printDesignRepository.server'; export * as games from './app/games/gameDraftRepository.server';", resolveDir: process.cwd() }, bundle: true, write: false, platform: "node", format: "cjs", packages: "external", plugins: [{ name: "database", setup(b) {
+  const bundle = await build({ stdin: { contents: "export * from './app/bingo/preparation/repository.server'; export * as live from './app/bingo/live/repository.server'; export * as print from './app/bingo/preparation/printDesignRepository.server'; export * as games from './app/games/gameDraftRepository.server'; export * as eventRun from './app/bingo/live/eventRepository.server'; export * as creation from './app/bingo/eventCreation.server'; export * as settings from './app/eventreihen/settingsRepository.server';", resolveDir: process.cwd() }, bundle: true, write: false, platform: "node", format: "cjs", packages: "external", plugins: [{ name: "database", setup(b) {
     b.onResolve({ filter: /^(server-only|@\/app\/lib\/prisma|@\/app\/generated\/prisma\/client)$/ }, a => ({ path: a.path, namespace: "fixture" }));
     b.onLoad({ filter: /.*/, namespace: "fixture" }, a => ({ contents: a.path === "server-only" ? "" : a.path.includes("generated") ? "export const Prisma = globalThis.prismaRuntime;" : "export const prisma = globalThis.fixture;" }));
   } }] });
   const runtime = { exports: {} };
   runInNewContext(bundle.outputFiles[0].text, { module: runtime, exports: runtime.exports, require: createRequire(import.meta.url), fixture: prisma, prismaRuntime: Prisma, console, process, Date, Buffer, URL, fetch, AbortSignal, structuredClone, setTimeout, clearTimeout });
-  const api = runtime.exports as typeof import("@/app/bingo/preparation/repository.server") & { live: typeof import("@/app/bingo/live/repository.server"); print: typeof import("@/app/bingo/preparation/printDesignRepository.server"); games: typeof import("@/app/games/gameDraftRepository.server") };
+  const api = runtime.exports as typeof import("@/app/bingo/preparation/repository.server") & { live: typeof import("@/app/bingo/live/repository.server"); print: typeof import("@/app/bingo/preparation/printDesignRepository.server"); games: typeof import("@/app/games/gameDraftRepository.server");eventRun:typeof import("@/app/bingo/live/eventRepository.server");creation:typeof import("@/app/bingo/eventCreation.server");settings:typeof import("@/app/eventreihen/settingsRepository.server") };
   const game = await api.games.writeGameDraft(3, "BINGO", { seriesId: 10, title: "Bingo preparation QA", date: "", time: "" });
   const other = await api.games.writeGameDraft(5, "BINGO", { seriesId: 20, title: "Foreign Bingo", date: "", time: "" });
   const karaoke = await api.games.writeGameDraft(3, "POWERPOINT_KARAOKE", { seriesId: 10, title: "Karaoke", date: "", time: "" });
@@ -268,5 +269,14 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   compareSnapshots(withLive, await snapshot());
   console.info("AP3 full real collectSnapshot including populated runtime, AP2 print snapshots/fonts/logo and integrity: PASS");
   await verifyBingoRestore(target, withLive);
+  const eventMigration=readFileSync("prisma/migrations/20261030150000_bingo_event_operation/migration.sql","utf8");
+  const beforeEvent=(await db.query("SELECT to_jsonb(r) data FROM pubquiz.bingo_live_runs r ORDER BY id")).rows;
+  await db.query(eventMigration.replace(/COMMIT;\s*$/,"ROLLBACK;"));assert.equal((await db.query("SELECT to_regclass('pubquiz.bingo_event_runs') t")).rows[0].t,null);
+  await db.query(eventMigration);assert.deepEqual((await db.query("SELECT to_jsonb(r) data FROM pubquiz.bingo_live_runs r ORDER BY id")).rows,beforeEvent);
+  await exerciseBingoEvent(db,api.eventRun,api.creation,api,api.settings);
+  const withEvents=await snapshot();assert.equal(withEvents.archiveSchema?.bingoEventMigrations?.length,1);
+  for(const table of ["bingo_event_creation_requests","bingo_event_runs","bingo_event_round_plan","bingo_event_rounds","bingo_event_round_cards"])assert.ok(withEvents.tables.find(t=>t.table===table)!.rows>0);
+  await verifyBingoRestore(target,withEvents);
+  console.info("V3.1 populated legacy/new snapshot and full isolated dump/restore: PASS");
   console.info("AP2 isolated PostgreSQL acceptance passed:", name);
 });

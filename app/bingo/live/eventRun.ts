@@ -5,17 +5,18 @@ import { applyLiveEvent, assertUuid, initialState, parseLiveCommand, type Call, 
 
 /** V2 is opt-in. AP3 replay and its one-round histories are deliberately unchanged. */
 export type EventCall = Call & { roundId: string; recordedAt: number };
-export type EventRunState = { version: 2; run: BingoRun; calls: readonly EventCall[]; frozen: readonly FrozenRound[] };
+export type EventRunState = { version: 2; contextRevision:number; run: BingoRun; calls: readonly EventCall[]; frozen: readonly FrozenRound[] };
 export type EventCommand = Exclude<LiveCommand, { kind: "call" } | { kind: "correct" }> |
   { kind: "call"; stage: Stage; context: string } |
   { kind: "correct"; drawId: string; number: number; reason: string } |
-  { kind: "closeRound" } | { kind: "startRound"; roundId: string };
+  { kind: "closeRound" } | { kind: "startRound"; roundId: string; preparationRevision:number } | {kind:"appendRound";label:string;target:number;preparationRevision:number};
 export type EventRunEvent = Omit<LiveEvent, "command"> & { command: EventCommand; frozen?: FrozenRound };
 export function parseEventCommand(value: unknown): EventCommand {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw Error("INVALID_COMMAND");
   const r = value as Record<string, unknown>;
   if (r.kind === "closeRound") { if (Object.keys(r).join() !== "kind") throw Error("INVALID_COMMAND"); return {kind:"closeRound"}; }
-  if (r.kind === "startRound") { assertUuid(r.roundId); if(Object.keys(r).sort().join()!=="kind,roundId")throw Error("INVALID_COMMAND");return {kind:"startRound",roundId:r.roundId}; }
+  if(r.kind==="appendRound") {if(Object.keys(r).sort().join()!=="kind,label,preparationRevision,target"||typeof r.label!=="string"||!r.label.trim()||r.label.length>80||!Number.isSafeInteger(r.preparationRevision)||Number(r.preparationRevision)<0||!Number.isInteger(r.target)||Number(r.target)<1||Number(r.target)>75)throw Error("INVALID_COMMAND");return r as EventCommand;}
+  if (r.kind === "startRound") { assertUuid(r.roundId); if(Object.keys(r).sort().join()!=="kind,preparationRevision,roundId"||!Number.isSafeInteger(r.preparationRevision)||Number(r.preparationRevision)<0)throw Error("INVALID_COMMAND");return {kind:"startRound",roundId:r.roundId,preparationRevision:Number(r.preparationRevision)}; }
   if (r.kind === "call") {
     if (Object.keys(r).sort().join() !== "context,kind,stage" || typeof r.context !== "string" || !/^[a-f0-9]{64}$/.test(r.context)) throw Error("INVALID_CALL_CONTEXT");
     parseLiveCommand({kind:"call",stage:r.stage}); return r as EventCommand;
@@ -27,7 +28,7 @@ export function parseEventCommand(value: unknown): EventCommand {
   return parseLiveCommand(value) as EventCommand;
 }
 export function initialEventRun(runId: string, gameId: string, round: FrozenRound, at: number): EventRunState {
-  return {version:2,...initialState(runId,gameId,round,at),calls:[],frozen:[round]};
+  return {version:2,contextRevision:0,...initialState(runId,gameId,round,at),calls:[],frozen:[round]};
 }
 export function currentEventRound(state: EventRunState) { return state.run.rounds.find(r=>r.status==="OPEN") ?? state.run.rounds.at(-1)!; }
 export function blockingCalls(state: EventRunState): boolean {
@@ -40,14 +41,15 @@ export function blockingCalls(state: EventRunState): boolean {
 /** Pure context, subsequently hashed by the service. Calls/identifications/decisions do not move a draw boundary. */
 export function callContextData(state: EventRunState) {
   const r=currentEventRound(state);
-  return {runId:state.run.id,status:state.run.status,roundId:r.id,roundStatus:r.status,target:r.plannedDraws,draws:r.draws,corrections:r.corrections};
+  return {contextRevision:state.contextRevision,runId:state.run.id,status:state.run.status,roundId:r.id,roundStatus:r.status,target:r.plannedDraws,draws:r.draws,corrections:r.corrections};
 }
-export function applyEventRunEvent(state: EventRunState, event: EventRunEvent, cards: readonly BingoCard[]): EventRunState {
+function applyEventRunEventInner(state: EventRunState, event: EventRunEvent, cards: readonly BingoCard[]): EventRunState {
   const c=parseEventCommand(event.command),run=state.run,round=currentEventRound(state);
   assertUuid(event.id);
   if (!Number.isSafeInteger(event.at)||event.at<run.lastTransitionAt||!Number.isSafeInteger(event.actorId)||event.actorId<1)throw Error("INVALID_EVENT");
   if(run.status==="ENDED")throw Error("RUN_ENDED");
   const replace=(next:typeof round):EventRunState=>({...state,run:{...run,rounds:run.rounds.map(r=>r.id===round.id?next:r)}});
+  if(c.kind==="appendRound")return state;
   if(c.kind==="startRound") {
     if(run.rounds.some(r=>r.status==="OPEN")||run.status!=="PAUSED")throw Error("ROUND_STILL_OPEN");
     const frozen=event.frozen;
@@ -90,4 +92,9 @@ export function applyEventRunEvent(state: EventRunState, event: EventRunEvent, c
   // Existing AP3 adapter is reused only for single-current-round arithmetic/clock commands.
   const partial=applyLiveEvent({run:{...run,rounds:[round]},calls:[]},{...event,command:c},cards);
   return {...state,run:{...partial.run,rounds:run.rounds.map(r=>r.id===round.id?partial.run.rounds[0]:r)}};
+}
+
+export function applyEventRunEvent(state:EventRunState,event:EventRunEvent,cards:readonly BingoCard[]):EventRunState {
+ const next=applyEventRunEventInner(state,event,cards);
+ return {...next,contextRevision:["call","identify","decide"].includes(event.command.kind)?state.contextRevision:state.contextRevision+1};
 }
