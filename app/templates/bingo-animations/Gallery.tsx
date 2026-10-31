@@ -32,7 +32,7 @@ export default function Gallery(){
  const reconnect=()=>{setConnected(false);setNotice('Unterbrochen · Wiederverbindung überspringt historische Szenen');clearTimeout(pending.current);pending.current=setTimeout(()=>{const old=latest.current;const n=SCENES.find(s=>!old.draws.some(d=>d.number===s.number))?.number??number;setData({...old,revision:old.revision+1,draws:[...old.draws,{id:`synthetic-${++serial.current}`,number:n,position:old.draws.length+1}]});setConnected(true);setNotice('Wiederverbunden · neuer bestätigter Stand ruhig übernommen');},500);};
  const scene=sceneFor(number);
  return <main className={styles.gallery} data-quiz-theme-version="1">
-  <header className={styles.toolbar}><strong>Gudi · 75 Szenen · Arbeitsstand V1.1</strong><span>Nur lokale Referenzdaten · stumm · keine Speicherung</span>
+  <header className={styles.toolbar}><strong>Gudi · 75 Szenen · Arbeitsstand V1.2</strong><span>Nur lokale Referenzdaten · stumm · keine Speicherung</span>
    <label>Zahl<select aria-label="Szene auswählen" value={number} onChange={e=>choose(Number(e.target.value))}>{SCENES.map(s=><option key={s.number} value={s.number}>{s.number} · {s.motif}</option>)}</select></label>
    <label>Design<select aria-label="Galeriedesign" value={brand} onChange={e=>changeBrand(e.target.value)}><option value="phil-gud">Phil Gud</option><option value="lovd-ungegoogelt">LOVD</option></select></label>
    <button onClick={()=>choose(number-1)} disabled={number===1}>Vorherige</button><button onClick={()=>choose(number)}>Wiederholen</button><button onClick={()=>choose(number+1)} disabled={number===75}>Nächste</button>

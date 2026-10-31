@@ -75,7 +75,7 @@ Siehe [Figurenmodell und Stil](../design/gudi-bingo-animation.md) und
 
 Flug- und Fahrzeugspuren verwenden formtreue kubische Interpolation mit durchgehender Geschwindigkeit und ohne Überschwingen. Fahrerpositionen bei 18/66 leiten sich aus denselben Fahrzeugmarken ab. Antizipation und Schauspiel bleiben gesonderte, bewusst gehaltene Posen.
 
-## V1.1 – freigegebenes Präsentationsoverlay (31.10.2026)
+## V1.2 – blickdichtes Präsentationsoverlay (31.10.2026)
 
 Die Nutzerfreigabe ersetzt ausdrücklich die frühere Begrenzung auf den aktuellen
 Zahlenbereich. Das Overlay darf die Zahlenübersicht temporär überlagern. Alle 75
@@ -87,7 +87,7 @@ dieser Fläche; kein Portal in den Dokument-Body und kein browserweites fixed-El
 Damit bleibt eine skalierte Moderationsreferenz auf ihre eigene Fläche begrenzt.
 Die Galerie-Steuerleiste und andere Verwaltungsflächen werden nicht abgedunkelt.
 
-Die Ebene deckt die vollständige Fläche mit Schwarz bei 35 % Deckkraft ab; das SVG
+Die Ebene deckt die vollständige Fläche blickdicht in der eingefrorenen Design-Hintergrundfarbe ab; das SVG
 nutzt die größtmögliche zentrierte quadratische Bühne mit erhaltener Proportion.
 Die unabhängige aktuelle Zahl und das gesamte Board bleiben unverändert darunter
 vorhanden und zugänglich. Nur Overlay und Szene blenden am Ende gemeinsam über die
@@ -101,6 +101,14 @@ Bei Pause, Abbruch, Korrektur oder Verbindungsverlust wird es mit der Szene entf
 
 Regressionen: 1.890 bestehende Szenen-/Phasenfälle prüfen nun die ausdrücklich
 freigegebene vollständige Präsentationsgrenze statt der überholten Zahlenspurgrenze.
-Zusätzlich werden exakte Overlaygrenzen, 35-%-Fläche, Eingabedurchlässigkeit,
+Zusätzlich werden exakte Overlaygrenzen, blickdichte Designfläche, Eingabedurchlässigkeit,
 ARIA-Ausblendung, Erhalt der ruhigen Zahl, skalierte Einbettung und unveränderte
 Board-/Kopf-/Fußgeometrie geprüft. Die bestehenden Boardtests bleiben unverändert.
+
+Die ergänzende Freigabe vom 31.10.2026 ersetzt die ursprüngliche 35-%-Abdunklung:
+Während der Handlung sind Header, normale Zahl und Board vollständig verdeckt.
+Erst beim bestehenden abschließenden Ausblenden kehrt das Board zurück. Die
+unveränderten Originalelemente bleiben im DOM zugänglich; keine zweite Zahlenansicht
+wird gespeichert. Ein Pixeltest in Phil Gud und LOVD prüft während der Hauptaktion,
+dass selbst der vorhandene Headertext vollständig von der Designfläche überdeckt ist.
+Frühere V1.1-Mitschnitte dokumentieren die halbtransparente Vorversion.
