@@ -1,4 +1,4 @@
-# Gudi – Bingo-Zahleninszenierung V1
+# Gudi – Bingo-Zahleninszenierung V1.1
 
 ## Figurenmodell und Stil
 
@@ -64,3 +64,16 @@ zeitaufgelöste Sichtprüfung, Echtzeitmitschnitte und menschliche gestalterisch
 Ein erfolgreiches Skript ist kein Beweis, dass jede Pointe hochwertig oder lustig wirkt.
 Keine physische Beamer-/Geräteprüfung behaupten. Hosting nur mit der getrennten
 Branch-Vertrauensfreigabe und isolierter Umgebung; kein Production-Release.
+
+## Präsentationsweite Bühne V1.1
+
+Freigegebene Weiterentwicklung vom 31.10.2026: dieselben Szenen laufen groß und
+zentriert über der gesamten Präsentation. Eine schwarze Fläche mit 35 % Deckkraft
+trennt den kurzen neuen Ziehungsmoment vom weiterhin vorhandenen Zahlenboard.
+Anordnung, Markenfarben und Quellen bleiben erhalten; kein Wechsel des Templates.
+Szene und Abdunklung verschwinden gemeinsam, anschließend gilt wieder die normale
+Zahlenansicht. Die alte Begrenzung auf die linke Zahlenspur ist bewusst aufgehoben.
+
+Das bleibt eine kurze, ursächlich an die bestätigte Veröffentlichung gebundene
+Inszenierung im Sinne des Manifests, kein Dauerhintergrund. Reduzierte Bewegung
+überspringt sowohl Szene als auch Abdunklung.

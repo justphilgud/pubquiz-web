@@ -37,8 +37,7 @@ fachliche Ereignishistorie und benötigt keine neuen API-Daten.
 ## Darstellung und Ausfallsicherheit
 
 Ganze Zahlenübersicht, Kopf und Fuß bleiben an ihren vorhandenen Positionen. Die
-Animationsspur nutzt nur den bestehenden aktuellen Zahlenbereich, einschließlich
-seines freien Randes, und darf nicht in das Board ragen. Styles sind CSS-Module,
+Animationsspur liegt als temporäres Overlay über der gesamten Präsentationsfläche. Styles sind CSS-Module,
 keine globalen Quiz-/Templateänderungen. Die Originalschriften und geprüften Logos
 kommen weiterhin aus dem bestehenden eingefrorenen Design-/Assetvertrag.
 
@@ -75,3 +74,33 @@ Siehe [Figurenmodell und Stil](../design/gudi-bingo-animation.md) und
 [alle Storyboards](../design/gudi-bingo-storyboards.md). Kein Merge/Deployment freigegeben.
 
 Flug- und Fahrzeugspuren verwenden formtreue kubische Interpolation mit durchgehender Geschwindigkeit und ohne Überschwingen. Fahrerpositionen bei 18/66 leiten sich aus denselben Fahrzeugmarken ab. Antizipation und Schauspiel bleiben gesonderte, bewusst gehaltene Posen.
+
+## V1.1 – freigegebenes Präsentationsoverlay (31.10.2026)
+
+Die Nutzerfreigabe ersetzt ausdrücklich die frühere Begrenzung auf den aktuellen
+Zahlenbereich. Das Overlay darf die Zahlenübersicht temporär überlagern. Alle 75
+Choreografien und der Beobachtungsvertrag bleiben unverändert.
+
+Verantwortung: BingoBoard definiert ausschließlich die relative, isolierte
+Präsentationsfläche. GudiScene erzeugt die absolute, dekorative Ebene innerhalb
+dieser Fläche; kein Portal in den Dokument-Body und kein browserweites fixed-Element.
+Damit bleibt eine skalierte Moderationsreferenz auf ihre eigene Fläche begrenzt.
+Die Galerie-Steuerleiste und andere Verwaltungsflächen werden nicht abgedunkelt.
+
+Die Ebene deckt die vollständige Fläche mit Schwarz bei 35 % Deckkraft ab; das SVG
+nutzt die größtmögliche zentrierte quadratische Bühne mit erhaltener Proportion.
+Die unabhängige aktuelle Zahl und das gesamte Board bleiben unverändert darunter
+vorhanden und zugänglich. Nur Overlay und Szene blenden am Ende gemeinsam über die
+letzten acht Prozent der vorhandenen Dauer aus. Danach sind beide DOM-Ebenen entfernt.
+Es gibt keine neue Wartephase, Persistenz, Spielaktion oder Fokusverlagerung.
+Das Overlay ist aria-hidden und lässt Zeigerereignisse durch.
+
+Das Overlay entsteht erst mit dem erfolgreich geladenen Szenenmodul. Fehlender oder
+verspäteter Code, reduzierte Bewegung und Erstöffnung erzeugen keine Abdunklung.
+Bei Pause, Abbruch, Korrektur oder Verbindungsverlust wird es mit der Szene entfernt.
+
+Regressionen: 1.890 bestehende Szenen-/Phasenfälle prüfen nun die ausdrücklich
+freigegebene vollständige Präsentationsgrenze statt der überholten Zahlenspurgrenze.
+Zusätzlich werden exakte Overlaygrenzen, 35-%-Fläche, Eingabedurchlässigkeit,
+ARIA-Ausblendung, Erhalt der ruhigen Zahl, skalierte Einbettung und unveränderte
+Board-/Kopf-/Fußgeometrie geprüft. Die bestehenden Boardtests bleiben unverändert.

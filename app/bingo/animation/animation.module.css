@@ -1,6 +1,6 @@
-.visual{position:relative;display:grid;place-items:center;flex:1;min-height:0;width:100%;isolation:isolate}
-.visual>strong{opacity:var(--gudi-number-opacity,1)}
+.visual{display:grid;place-items:center;flex:1;min-height:0;width:100%}
+.overlay{position:absolute;inset:0;z-index:1;pointer-events:none;background:rgb(0 0 0 / 35%)}
 .scene{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;max-width:100%;max-height:100%}
-@media(prefers-reduced-motion:reduce){.scene{display:none}.visual>strong{opacity:1!important;transition:none}}
+@media(prefers-reduced-motion:reduce){.overlay{display:none}}
 
 .scene [data-gudi-prop] [fill="none"]:not([stroke]){stroke:var(--gudi-line)}
