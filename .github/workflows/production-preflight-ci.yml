@@ -31,6 +31,8 @@ jobs:
             candidate: ed551d426de69c42eaea604c34176ede72305439
           - baseline: f0a5b0643312b33a4387ad09872e358d8dab8ccd
             candidate: 94f442cedad38f67973f3f4e1714758e1c4f99bd
+          - baseline: 192f27848f723559e3e18a0b9fdbbeb169a10ed3
+            candidate: 1ff5854dd716d5fb2559e3d5f4cf970e5f5d1696
     services:
       postgres:
         image: postgres:17
