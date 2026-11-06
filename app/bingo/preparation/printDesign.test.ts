@@ -5,7 +5,7 @@ import {createRequire} from 'node:module';
 import {mkdirSync,writeFileSync,readFileSync} from 'node:fs';
 import {PDFDocument,PDFArray,PDFRawStream,decodePDFRawStream} from 'pdf-lib';
 import {getPresentationTemplate} from '@/app/rendering/templateRegistry';
-import {defaultBingoPrint,parseBingoPrint,printContrastIssues,shortCardCode,printFonts} from '@/app/bingo/preparation/bingoPrint';
+import {defaultBingoPrint,newBingoPrint,parseBingoPrint,printContrastIssues,shortCardCode,printFonts} from '@/app/bingo/preparation/bingoPrint';
 import type {SharedDesign} from '@/app/rendering/sharedDesign/sharedDesign';
 import type {StoredCard} from './policy';
 import {resolveBingoPrint} from './printDesign';
@@ -13,7 +13,7 @@ import {parsePresentationTemplateConfig,validatePresentationTemplateDraft,toRunt
 test('strict versioned print settings, inheritance, contrast and stable game-scoped labels',()=>{
  const t=getPresentationTemplate('phil-gud')!,d:SharedDesign={version:1,templateId:t.id,name:'Phil Gud',config:{version:1,tokens:t.tokens,design:t.design,surfaces:{presentation:t.variant,moderation:'BRANDED',answerForm:'BRANDED'}}};
  const c=defaultBingoPrint(d);assert.equal(c.headerFont,'PHIL_GUD');assert.equal(c.numberFont,'ARIMO');assert.equal(c.backLogos.length,1);assert.ok(parseBingoPrint(c));assert.equal(parseBingoPrint({...c,secret:'x'}),null);assert.equal(parseBingoPrint({...c,backLogos:[]}),null);assert.equal(parseBingoPrint({...c,numberFont:'PHIL_GUD'}),null);assert.equal(parseBingoPrint({...c,colors:{...c.colors,background:'red'}}),null);assert.ok(printContrastIssues({...c,colors:{...c.colors,numbers:c.colors.background}}).length);
- const override={...c,headerFont:'ARIMO' as const};assert.deepEqual(resolveBingoPrint(d,override,null),override);assert.deepEqual(resolveBingoPrint(d,override,c),c);assert.deepEqual(resolveBingoPrint(d,null,null),c);
+ const override={...c,headerFont:'ARIMO' as const};assert.deepEqual(resolveBingoPrint(d,override,null),override);assert.deepEqual(resolveBingoPrint(d,override,c),c);assert.deepEqual(resolveBingoPrint(d,null,null),newBingoPrint(d));assert.deepEqual(resolveBingoPrint({...d,config:{...d.config,bingoPrint:c}},null,null),c);
  assert.equal(shortCardCode(1,1),'A-001');assert.equal(shortCardCode(26,500),'Z-500');assert.equal(shortCardCode(27,1),'AA-001');assert.equal(new Set(Array.from({length:100},(_,i)=>shortCardCode(i+1,1))).size,100);assert.throws(()=>shortCardCode(0,1));
  const withPrint={...d.config,bingoPrint:c};assert.deepEqual(parsePresentationTemplateConfig(withPrint)?.bingoPrint,c);assert.equal(parsePresentationTemplateConfig({...d.config,bingoPrint:{...c,secret:'rejected'}}),null);
  const plain={id:'test-template',name:'Test',config:d.config},configured={...plain,config:withPrint};assert.deepEqual(toRuntimePresentationTemplate(configured),toRuntimePresentationTemplate(plain));assert.deepEqual(toRuntimeAnswerFormTemplate(configured),toRuntimeAnswerFormTemplate(plain));

@@ -1,9 +1,10 @@
+import type { TermSet } from './termSet';
 import { isGameId } from "@/app/games/gameDraft";
 import { validateCard, type CardLayout } from "../core/cards";
 
 export const ROUND_PAGE_SIZE = 25;
 export const CARD_PAGE_SIZE = 50;
-export const MAX_GENERATE = 500;
+export const MAX_GENERATE = 1000;
 export const MAX_EXPORT = 200;
 export type CardStrategy = "NEW" | "EXISTING";
 export class BingoPreparationError extends Error {
@@ -67,7 +68,7 @@ export function exportRange(from: unknown, to: unknown, count: number): { from: 
 export function decodeCard(value: unknown): CardLayout {
   try { validateCard(value); return value; } catch { throw new BingoPreparationError("Die gespeicherte Karte ist ungültig. Bitte die Administration informieren."); }
 }
-export type RoundView = { locked?:boolean; id: string; position: number; label: string; target: number; strategy: CardStrategy; issued: number | null; cardCount: number; series: { id: string; code: string; count: number }[]; history: { actor: string; at: string; before: number | null; after: number | null }[] };
+export type RoundView = { terms?:TermSet|null; locked?:boolean; id: string; position: number; label: string; target: number; strategy: CardStrategy; issued: number | null; cardCount: number; series: { id: string; code: string; count: number;duplex?:boolean }[]; history: { actor: string; at: string; before: number | null; after: number | null }[] };
 export type SeriesView = { id: string; code: string; count: number; originRoundId: string; createdAt: string; designName: string; olderDesign: boolean };
-export type PreparationView = { gameId: string; title: string; seriesId: number; revision: number; archived: boolean; rounds: RoundView[]; roundCount: number; page: number; available: SeriesView[]; seriesPage: number; seriesCount: number };
+export type PreparationView = { termSets?:{id:string;config:TermSet;createdAt?:string}[]; gameId: string; title: string; seriesId: number; revision: number; archived: boolean; rounds: RoundView[]; roundCount: number; page: number; available: SeriesView[]; seriesPage: number; seriesCount: number };
 export type StoredCard = { id: string; code: string; shortCode?: string; ordinal: number; cells: CardLayout };

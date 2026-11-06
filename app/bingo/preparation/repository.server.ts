@@ -1,3 +1,6 @@
+import { validateModernTerms } from './pdfModern.server';
+import { parseTermSet } from './termSet';
+import { parsePrintSnapshot } from './printSnapshot';
 import "server-only";
 import { randomBytes, randomInt, randomUUID } from "node:crypto";
 import type { Prisma } from "@/app/generated/prisma/client";
@@ -7,7 +10,7 @@ import { generateCard } from "../core/cards";
 import { preparationContext as context } from "./access.server";
 export { readExport } from "./readExport.server";
 export { readPreparation, readCards } from "./readPreparation.server";
-import { capturePrintSnapshot } from "./printAssets.server";
+import { captureNewPrintSnapshot } from "./printAssets.server";
 import { canonical, sha256 } from "./printSnapshot";
 import { BingoPreparationError, denied, parseCommand } from "./policy";
 import { resolveBingoPrint } from "./printDesign";
@@ -62,6 +65,8 @@ export async function writePreparation(userId: number, input: unknown) {
         const selected = await tx.bingo_card_series.findFirst({ where: { id: command.seriesId, game_id: game.id } });
         if (!selected) throw denied();
         if (command.operation === "attach") {
+          const selectedPrint=parsePrintSnapshot(selected.print_snapshot);
+          if(canonical(round!.term_snapshot)!==canonical(selectedPrint.version===3?selectedPrint.terms:null))throw new BingoPreparationError('Karten und Runde müssen dieselbe eingefrorene Begriffszuordnung verwenden.');
           if (round!.strategy === "NEW" && selected.origin_round_id !== round!.id) throw new BingoPreparationError("Bitte zuerst „Vorhandene Karten verwenden“ auswählen.");
           await tx.bingo_round_series.upsert({ where: { round_id_series_id: { round_id: round!.id, series_id: selected.id } }, create: { round_id: round!.id, series_id: selected.id, game_id: game.id }, update: {} });
         } else {
@@ -73,20 +78,30 @@ export async function writePreparation(userId: number, input: unknown) {
       case "generate": {
         if (round!.strategy !== "NEW") throw new BingoPreparationError("Diese Runde verwendet vorhandene Karten. Bitte eine Serie ausdrücklich zuordnen.");
         const design = (await resolveSharedDesign(tx, game.shared_design_template_id, series)).design;
-        const snapshot = await capturePrintSnapshot(design, game.titel, round!.label,resolveBingoPrint(design,series.bingo_print_config,game.bingo_print_config));
-        const seriesId = randomUUID(), code = `BG-${randomBytes(6).toString("hex").toUpperCase()}`, hashes = new Set<string>();
-        const cards: Prisma.bingo_cardsCreateManyInput[] = [];
-        for (let attempt = 0; cards.length < command.count && attempt < command.count * 20; attempt++) {
-          const card = generateCard(randomUUID(), () => randomInt(0x100000000) / 0x100000000), hash = sha256(canonical(card.cells));
-          if (hashes.has(hash)) continue;
-          hashes.add(hash); const ordinal = cards.length + 1;
-          cards.push({ id: card.id, series_id: seriesId, ordinal, printed_code: `${code}-${String(ordinal).padStart(4, "0")}`, cells: card.cells as Prisma.InputJsonValue, layout_hash: hash });
+        let snapshot = await captureNewPrintSnapshot(design, game.titel, round!.label,resolveBingoPrint(design,series.bingo_print_config,game.bingo_print_config));
+        if(round!.term_snapshot!==null){if(snapshot.version!==3)throw new BingoPreparationError('Für Textkarten bitte ein neues V3-Druckformat auswählen.');snapshot=parsePrintSnapshot({...snapshot,terms:parseTermSet(round!.term_snapshot)});}
+        validateModernTerms(snapshot);
+        // Game lock serializes generation. Include existing game layouts, not just this request.
+        const hashes=new Set((await tx.bingo_cards.findMany({where:{series:{game_id:game.id}},select:{layout_hash:true}})).map(card=>card.layout_hash));
+        let firstSeriesId:string|undefined;
+        for(let offset=0;offset<command.count;offset+=500){
+          const count=Math.min(500,command.count-offset),seriesId=randomUUID(),code=`BG-${randomBytes(6).toString('hex').toUpperCase()}`;
+          const cards:Prisma.bingo_cardsCreateManyInput[]=[];
+          for(let attempt=0;cards.length<count&&attempt<count*20;attempt++){
+            const card=generateCard(randomUUID(),()=>randomInt(0x100000000)/0x100000000),hash=sha256(canonical(card.cells));
+            if(hashes.has(hash))continue;hashes.add(hash);const ordinal=cards.length+1;
+            cards.push({id:card.id,series_id:seriesId,ordinal,printed_code:`${code}-${String(ordinal).padStart(4,'0')}`,cells:card.cells as Prisma.InputJsonValue,layout_hash:hash});
+          }
+          if(cards.length!==count)throw new BingoPreparationError('Es konnten nicht genug unterschiedliche Karten erzeugt werden. Es wurde keine Teilserie gespeichert.');
+          // Root request is sufficient for atomic idempotence; derived IDs never escape this transaction.
+          const suffix=sha256(command.requestId+':'+offset);
+          const requestId=offset===0?command.requestId:`${suffix.slice(0,8)}-${suffix.slice(8,12)}-4${suffix.slice(13,16)}-a${suffix.slice(17,20)}-${suffix.slice(20,32)}`;
+          await tx.bingo_card_series.create({data:{id:seriesId,game_id:game.id,origin_round_id:round!.id,code,card_count:count,request_id:requestId,request_hash:requestHash,print_snapshot:snapshot as unknown as Prisma.InputJsonValue,created_by:userId}});
+          await tx.bingo_cards.createMany({data:cards});
+          await tx.bingo_round_series.create({data:{game_id:game.id,round_id:round!.id,series_id:seriesId}});
+          firstSeriesId??=seriesId;
         }
-        if (cards.length !== command.count) throw new BingoPreparationError("Es konnten nicht genug unterschiedliche Karten erzeugt werden. Es wurde keine Serie gespeichert.");
-        await tx.bingo_card_series.create({ data: { id: seriesId, game_id: game.id, origin_round_id: round!.id, code, card_count: command.count, request_id: command.requestId, request_hash: requestHash, print_snapshot: snapshot as unknown as Prisma.InputJsonValue, created_by: userId } });
-        await tx.bingo_cards.createMany({ data: cards });
-        await tx.bingo_round_series.create({ data: { game_id: game.id, round_id: round!.id, series_id: seriesId } });
-        result = { seriesId, repeated: false }; break;
+        result={seriesId:firstSeriesId,repeated:false};break;
       }
     }
     await tx.bingo_preparations.update({ where: { game_id: game.id }, data: { revision: { increment: 1 } } });

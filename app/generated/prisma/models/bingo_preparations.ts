@@ -192,12 +192,14 @@ export type bingo_preparationsWhereInput = {
   NOT?: Prisma.bingo_preparationsWhereInput | Prisma.bingo_preparationsWhereInput[]
   game_id?: Prisma.UuidFilter<"bingo_preparations"> | string
   revision?: Prisma.IntFilter<"bingo_preparations"> | number
+  term_sets?: Prisma.Bingo_term_setsListRelationFilter
   game?: Prisma.XOR<Prisma.Game_draftsScalarRelationFilter, Prisma.game_draftsWhereInput>
 }
 
 export type bingo_preparationsOrderByWithRelationInput = {
   game_id?: Prisma.SortOrder
   revision?: Prisma.SortOrder
+  term_sets?: Prisma.bingo_term_setsOrderByRelationAggregateInput
   game?: Prisma.game_draftsOrderByWithRelationInput
 }
 
@@ -207,6 +209,7 @@ export type bingo_preparationsWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.bingo_preparationsWhereInput[]
   NOT?: Prisma.bingo_preparationsWhereInput | Prisma.bingo_preparationsWhereInput[]
   revision?: Prisma.IntFilter<"bingo_preparations"> | number
+  term_sets?: Prisma.Bingo_term_setsListRelationFilter
   game?: Prisma.XOR<Prisma.Game_draftsScalarRelationFilter, Prisma.game_draftsWhereInput>
 }, "game_id">
 
@@ -230,22 +233,26 @@ export type bingo_preparationsScalarWhereWithAggregatesInput = {
 
 export type bingo_preparationsCreateInput = {
   revision?: number
+  term_sets?: Prisma.bingo_term_setsCreateNestedManyWithoutPreparationInput
   game: Prisma.game_draftsCreateNestedOneWithoutBingo_preparationInput
 }
 
 export type bingo_preparationsUncheckedCreateInput = {
   game_id: string
   revision?: number
+  term_sets?: Prisma.bingo_term_setsUncheckedCreateNestedManyWithoutPreparationInput
 }
 
 export type bingo_preparationsUpdateInput = {
   revision?: Prisma.IntFieldUpdateOperationsInput | number
+  term_sets?: Prisma.bingo_term_setsUpdateManyWithoutPreparationNestedInput
   game?: Prisma.game_draftsUpdateOneRequiredWithoutBingo_preparationNestedInput
 }
 
 export type bingo_preparationsUncheckedUpdateInput = {
   game_id?: Prisma.StringFieldUpdateOperationsInput | string
   revision?: Prisma.IntFieldUpdateOperationsInput | number
+  term_sets?: Prisma.bingo_term_setsUncheckedUpdateManyWithoutPreparationNestedInput
 }
 
 export type bingo_preparationsCreateManyInput = {
@@ -290,6 +297,11 @@ export type bingo_preparationsSumOrderByAggregateInput = {
   revision?: Prisma.SortOrder
 }
 
+export type Bingo_preparationsScalarRelationFilter = {
+  is?: Prisma.bingo_preparationsWhereInput
+  isNot?: Prisma.bingo_preparationsWhereInput
+}
+
 export type bingo_preparationsCreateNestedOneWithoutGameInput = {
   create?: Prisma.XOR<Prisma.bingo_preparationsCreateWithoutGameInput, Prisma.bingo_preparationsUncheckedCreateWithoutGameInput>
   connectOrCreate?: Prisma.bingo_preparationsCreateOrConnectWithoutGameInput
@@ -322,12 +334,28 @@ export type bingo_preparationsUncheckedUpdateOneWithoutGameNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.bingo_preparationsUpdateToOneWithWhereWithoutGameInput, Prisma.bingo_preparationsUpdateWithoutGameInput>, Prisma.bingo_preparationsUncheckedUpdateWithoutGameInput>
 }
 
+export type bingo_preparationsCreateNestedOneWithoutTerm_setsInput = {
+  create?: Prisma.XOR<Prisma.bingo_preparationsCreateWithoutTerm_setsInput, Prisma.bingo_preparationsUncheckedCreateWithoutTerm_setsInput>
+  connectOrCreate?: Prisma.bingo_preparationsCreateOrConnectWithoutTerm_setsInput
+  connect?: Prisma.bingo_preparationsWhereUniqueInput
+}
+
+export type bingo_preparationsUpdateOneRequiredWithoutTerm_setsNestedInput = {
+  create?: Prisma.XOR<Prisma.bingo_preparationsCreateWithoutTerm_setsInput, Prisma.bingo_preparationsUncheckedCreateWithoutTerm_setsInput>
+  connectOrCreate?: Prisma.bingo_preparationsCreateOrConnectWithoutTerm_setsInput
+  upsert?: Prisma.bingo_preparationsUpsertWithoutTerm_setsInput
+  connect?: Prisma.bingo_preparationsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.bingo_preparationsUpdateToOneWithWhereWithoutTerm_setsInput, Prisma.bingo_preparationsUpdateWithoutTerm_setsInput>, Prisma.bingo_preparationsUncheckedUpdateWithoutTerm_setsInput>
+}
+
 export type bingo_preparationsCreateWithoutGameInput = {
   revision?: number
+  term_sets?: Prisma.bingo_term_setsCreateNestedManyWithoutPreparationInput
 }
 
 export type bingo_preparationsUncheckedCreateWithoutGameInput = {
   revision?: number
+  term_sets?: Prisma.bingo_term_setsUncheckedCreateNestedManyWithoutPreparationInput
 }
 
 export type bingo_preparationsCreateOrConnectWithoutGameInput = {
@@ -348,18 +376,87 @@ export type bingo_preparationsUpdateToOneWithWhereWithoutGameInput = {
 
 export type bingo_preparationsUpdateWithoutGameInput = {
   revision?: Prisma.IntFieldUpdateOperationsInput | number
+  term_sets?: Prisma.bingo_term_setsUpdateManyWithoutPreparationNestedInput
 }
 
 export type bingo_preparationsUncheckedUpdateWithoutGameInput = {
   revision?: Prisma.IntFieldUpdateOperationsInput | number
+  term_sets?: Prisma.bingo_term_setsUncheckedUpdateManyWithoutPreparationNestedInput
 }
 
+export type bingo_preparationsCreateWithoutTerm_setsInput = {
+  revision?: number
+  game: Prisma.game_draftsCreateNestedOneWithoutBingo_preparationInput
+}
+
+export type bingo_preparationsUncheckedCreateWithoutTerm_setsInput = {
+  game_id: string
+  revision?: number
+}
+
+export type bingo_preparationsCreateOrConnectWithoutTerm_setsInput = {
+  where: Prisma.bingo_preparationsWhereUniqueInput
+  create: Prisma.XOR<Prisma.bingo_preparationsCreateWithoutTerm_setsInput, Prisma.bingo_preparationsUncheckedCreateWithoutTerm_setsInput>
+}
+
+export type bingo_preparationsUpsertWithoutTerm_setsInput = {
+  update: Prisma.XOR<Prisma.bingo_preparationsUpdateWithoutTerm_setsInput, Prisma.bingo_preparationsUncheckedUpdateWithoutTerm_setsInput>
+  create: Prisma.XOR<Prisma.bingo_preparationsCreateWithoutTerm_setsInput, Prisma.bingo_preparationsUncheckedCreateWithoutTerm_setsInput>
+  where?: Prisma.bingo_preparationsWhereInput
+}
+
+export type bingo_preparationsUpdateToOneWithWhereWithoutTerm_setsInput = {
+  where?: Prisma.bingo_preparationsWhereInput
+  data: Prisma.XOR<Prisma.bingo_preparationsUpdateWithoutTerm_setsInput, Prisma.bingo_preparationsUncheckedUpdateWithoutTerm_setsInput>
+}
+
+export type bingo_preparationsUpdateWithoutTerm_setsInput = {
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+  game?: Prisma.game_draftsUpdateOneRequiredWithoutBingo_preparationNestedInput
+}
+
+export type bingo_preparationsUncheckedUpdateWithoutTerm_setsInput = {
+  game_id?: Prisma.StringFieldUpdateOperationsInput | string
+  revision?: Prisma.IntFieldUpdateOperationsInput | number
+}
+
+
+/**
+ * Count Type Bingo_preparationsCountOutputType
+ */
+
+export type Bingo_preparationsCountOutputType = {
+  term_sets: number
+}
+
+export type Bingo_preparationsCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  term_sets?: boolean | Bingo_preparationsCountOutputTypeCountTerm_setsArgs
+}
+
+/**
+ * Bingo_preparationsCountOutputType without action
+ */
+export type Bingo_preparationsCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Bingo_preparationsCountOutputType
+   */
+  select?: Prisma.Bingo_preparationsCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * Bingo_preparationsCountOutputType without action
+ */
+export type Bingo_preparationsCountOutputTypeCountTerm_setsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.bingo_term_setsWhereInput
+}
 
 
 export type bingo_preparationsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   game_id?: boolean
   revision?: boolean
+  term_sets?: boolean | Prisma.bingo_preparations$term_setsArgs<ExtArgs>
   game?: boolean | Prisma.game_draftsDefaultArgs<ExtArgs>
+  _count?: boolean | Prisma.Bingo_preparationsCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["bingo_preparations"]>
 
 export type bingo_preparationsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -381,7 +478,9 @@ export type bingo_preparationsSelectScalar = {
 
 export type bingo_preparationsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"game_id" | "revision", ExtArgs["result"]["bingo_preparations"]>
 export type bingo_preparationsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  term_sets?: boolean | Prisma.bingo_preparations$term_setsArgs<ExtArgs>
   game?: boolean | Prisma.game_draftsDefaultArgs<ExtArgs>
+  _count?: boolean | Prisma.Bingo_preparationsCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type bingo_preparationsIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   game?: boolean | Prisma.game_draftsDefaultArgs<ExtArgs>
@@ -393,6 +492,7 @@ export type bingo_preparationsIncludeUpdateManyAndReturn<ExtArgs extends runtime
 export type $bingo_preparationsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "bingo_preparations"
   objects: {
+    term_sets: Prisma.$bingo_term_setsPayload<ExtArgs>[]
     game: Prisma.$game_draftsPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -792,6 +892,7 @@ readonly fields: bingo_preparationsFieldRefs;
  */
 export interface Prisma__bingo_preparationsClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  term_sets<T extends Prisma.bingo_preparations$term_setsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.bingo_preparations$term_setsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$bingo_term_setsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   game<T extends Prisma.game_draftsDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.game_draftsDefaultArgs<ExtArgs>>): Prisma.Prisma__game_draftsClient<runtime.Types.Result.GetResult<Prisma.$game_draftsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1222,6 +1323,30 @@ export type bingo_preparationsDeleteManyArgs<ExtArgs extends runtime.Types.Exten
    * Limit how many bingo_preparations to delete.
    */
   limit?: number
+}
+
+/**
+ * bingo_preparations.term_sets
+ */
+export type bingo_preparations$term_setsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the bingo_term_sets
+   */
+  select?: Prisma.bingo_term_setsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the bingo_term_sets
+   */
+  omit?: Prisma.bingo_term_setsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.bingo_term_setsInclude<ExtArgs> | null
+  where?: Prisma.bingo_term_setsWhereInput
+  orderBy?: Prisma.bingo_term_setsOrderByWithRelationInput | Prisma.bingo_term_setsOrderByWithRelationInput[]
+  cursor?: Prisma.bingo_term_setsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Bingo_term_setsScalarFieldEnum | Prisma.Bingo_term_setsScalarFieldEnum[]
 }
 
 /**

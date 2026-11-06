@@ -25,6 +25,7 @@ const nextConfig: NextConfig = {
     "/*": ["./public/medien/**/*.{mp4,webm,mov,mp3,wav,ogg,m4a,flac}"],
   },
   outputFileTracingIncludes: {
+    "/bingo/pdf-worker/*": ["./node_modules/pdfjs-dist/build/pdf.worker.min.mjs"],
     "/*": ["./assets/fonts/arimo/Arimo.ttf"],
     "/bingo/*/vorbereitung": ["./assets/fonts/bingo/*.ttf", "./public/branding/phil-gud/phil-gud.woff"],
     "/bingo/*/moderation": ["./assets/fonts/bingo/*.ttf", "./public/branding/phil-gud/phil-gud.woff"],

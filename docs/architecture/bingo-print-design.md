@@ -149,3 +149,10 @@ Tampered trigger state and SECURITY DEFINER are rejected; restoring exact state
 passes again. Model DDL plus explicit reviewed executables is a representative
 fixture, not a full chronological historical migration replay. This is neither a
 Production weekly-backup result nor a historical PRIVATE_READBACK_FAILED fix.
+
+
+## Kartenweiterentwicklung V3 (6. November 2026)
+
+Für neue Karten, ausdrücklich bestätigte Neugestaltung, Begriffssets und deren
+Veröffentlichung gilt ergänzend [Bingo-Karten und Druck V3](bingo-card-design-v3.md).
+Historische Druckstände und numerische Laufdaten behalten ihren bisherigen Vertrag.
