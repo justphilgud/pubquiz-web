@@ -45,6 +45,9 @@ wirkliche PDF in Canvas, einschließlich Originalglyphen und Logos. Der Worker
 wird lokal und versionsgebunden unter `/bingo/pdf-worker/6.5.438` ausgeliefert,
 ohne CDN. Dokumente, Renderaufgaben und Object-URLs werden wieder freigegeben.
 Seitenwahl, Seiteneinpassung und Zoom sind reine Ansicht; PDF-Öffnen bleibt verfügbar.
+Die Druckversionsauswahl bleibt auch mit langen historischen Bezeichnungen innerhalb
+der verfügbaren Mobilbreite. Der Druckhinweis folgt dem gespeicherten Papierformat,
+nicht einem pauschalen A4-Standard.
 
 ## Formate und Typografie
 
