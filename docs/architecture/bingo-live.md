@@ -151,3 +151,6 @@ werden im Prüfbericht und PR dokumentiert. Kein Preview-Erfolg vor Nachweis
 von READY, Alias, Runtime und echtem gehosteten Ablauf.
 Kein physischer Beamertest; kein OCR, Offline/Pi, digitale Karten, Teambeitritt,
 Statistikmodell oder Mehr-Runden-Komfort.
+
+## Begrenzte Gudi-Inszenierung
+Die rein visuelle Erweiterung für bestätigte Ziehungen ist in [Gudi-Animationsvertrag](bingo-gudi-animation.md) dokumentiert. Sie ändert keine Fachbefehle, Snapshots oder Gewinnregeln und löst beim Öffnen, Reload oder Reconnect keine historischen Szenen aus.
