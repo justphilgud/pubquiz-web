@@ -5,15 +5,16 @@ import { applyLiveEvent, assertUuid, initialState, parseLiveCommand, type Call, 
 
 /** V2 is opt-in. AP3 replay and its one-round histories are deliberately unchanged. */
 export type EventCall = Call & { roundId: string; recordedAt: number };
-export type EventRunState = { version: 2; contextRevision:number; run: BingoRun; calls: readonly EventCall[]; frozen: readonly FrozenRound[] };
+export type EventRunState = { revealed?:readonly string[]; version: 2; contextRevision:number; run: BingoRun; calls: readonly EventCall[]; frozen: readonly FrozenRound[] };
 export type EventCommand = Exclude<LiveCommand, { kind: "call" } | { kind: "correct" }> |
-  { kind: "call"; stage: Stage; context: string } |
+  { kind: "call"; stage: Stage; context: string } | {kind:"reveal";drawId:string} |
   { kind: "correct"; drawId: string; number: number; reason: string } |
   { kind: "closeRound" } | { kind: "startRound"; roundId: string; preparationRevision:number } | {kind:"appendRound";label:string;target:number;preparationRevision:number};
 export type EventRunEvent = Omit<LiveEvent, "command"> & { command: EventCommand; frozen?: FrozenRound };
 export function parseEventCommand(value: unknown): EventCommand {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw Error("INVALID_COMMAND");
   const r = value as Record<string, unknown>;
+  if(r.kind==='reveal'){assertUuid(r.drawId);if(Object.keys(r).sort().join()!=='drawId,kind')throw Error('INVALID_COMMAND');return r as EventCommand;}
   if (r.kind === "closeRound") { if (Object.keys(r).join() !== "kind") throw Error("INVALID_COMMAND"); return {kind:"closeRound"}; }
   if(r.kind==="appendRound") {if(Object.keys(r).sort().join()!=="kind,label,preparationRevision,target"||typeof r.label!=="string"||!r.label.trim()||r.label.length>80||!Number.isSafeInteger(r.preparationRevision)||Number(r.preparationRevision)<0||!Number.isInteger(r.target)||Number(r.target)<1||Number(r.target)>75)throw Error("INVALID_COMMAND");return r as EventCommand;}
   if (r.kind === "startRound") { assertUuid(r.roundId); if(Object.keys(r).sort().join()!=="kind,preparationRevision,roundId"||!Number.isSafeInteger(r.preparationRevision)||Number(r.preparationRevision)<0)throw Error("INVALID_COMMAND");return {kind:"startRound",roundId:r.roundId,preparationRevision:Number(r.preparationRevision)}; }
@@ -67,6 +68,7 @@ function applyEventRunEventInner(state: EventRunState, event: EventRunEvent, car
     const closed=closeRound(run,round.id);
     return {...state,run:closed.status==="RUNNING"?pauseRun(closed,event.at):closed};
   }
+  if(c.kind==='reveal'){if(!round.draws.some(d=>d.id===c.drawId)||!state.frozen.find(f=>f.id===round.id)?.terms)throw Error('DRAW_NOT_FOUND');if(state.revealed?.includes(c.drawId))throw Error('ALREADY_REVEALED');return {...state,revealed:[...(state.revealed??[]),c.drawId]};}
   if(c.kind==="resume" && !run.rounds.some(r=>r.status==="OPEN"))throw Error("ROUND_NOT_OPEN");
   if(c.kind==="draw"&&blockingCalls(state))throw Error("OPEN_CLAIMS");
   if(c.kind==="call") {
@@ -87,7 +89,7 @@ function applyEventRunEventInner(state: EventRunState, event: EventRunEvent, car
   }
   if(c.kind==="correct") {
     if(run.status!=="RUNNING"&&run.status!=="PAUSED")throw Error("RUN_NOT_ACTIVE");
-    return replace(correctDraw(round,c.drawId,c.number,{id:event.id,reason:c.reason},cards).round);
+    return {...replace(correctDraw(round,c.drawId,c.number,{id:event.id,reason:c.reason},cards).round),...(state.revealed?{revealed:state.revealed.filter(id=>id!==c.drawId)}:{})};
   }
   // Existing AP3 adapter is reused only for single-current-round arithmetic/clock commands.
   const partial=applyLiveEvent({run:{...run,rounds:[round]},calls:[]},{...event,command:c},cards);
@@ -96,5 +98,5 @@ function applyEventRunEventInner(state: EventRunState, event: EventRunEvent, car
 
 export function applyEventRunEvent(state:EventRunState,event:EventRunEvent,cards:readonly BingoCard[]):EventRunState {
  const next=applyEventRunEventInner(state,event,cards);
- return {...next,contextRevision:["call","identify","decide"].includes(event.command.kind)?state.contextRevision:state.contextRevision+1};
+ return {...next,contextRevision:["call","identify","decide","reveal"].includes(event.command.kind)?state.contextRevision:state.contextRevision+1};
 }

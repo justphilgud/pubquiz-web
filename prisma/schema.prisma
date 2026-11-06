@@ -1609,12 +1609,14 @@ model game_drafts {
 }
 
 model bingo_preparations {
+  term_sets bingo_term_sets[]
   game_id String @id @db.Uuid
   revision Int @default(0)
   game game_drafts @relation(fields:[game_id],references:[id],onDelete:Restrict)
   @@schema("pubquiz")
 }
 model bingo_rounds {
+  term_snapshot Json?
   event_plan bingo_event_round_plan[]
 
   live_runs bingo_live_runs[]
@@ -1847,5 +1849,17 @@ model bingo_event_round_cards {
  series bingo_card_series @relation(fields:[series_id,game_id],references:[id,game_id],onDelete:Restrict,onUpdate:NoAction)
  card bingo_cards @relation(fields:[card_id,series_id],references:[id,series_id],onDelete:Restrict,onUpdate:NoAction)
  @@id([run_id,round_id,card_id])
+ @@schema("pubquiz")
+}
+
+model bingo_term_sets {
+ id String @id @db.Uuid
+ game_id String @db.Uuid
+ config Json
+ revision Int @default(0)
+ created_at DateTime @default(now()) @db.Timestamptz(3)
+ updated_at DateTime @default(now()) @db.Timestamptz(3)
+ preparation bingo_preparations @relation(fields:[game_id],references:[game_id],onDelete:Restrict)
+ @@index([game_id],map:"bingo_term_sets_game")
  @@schema("pubquiz")
 }

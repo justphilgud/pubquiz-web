@@ -8,18 +8,25 @@ export const printFonts = [
   { id: "ARIMO", name: "Arimo Regular (Arial-kompatibel)", family: "Arial, Helvetica, sans-serif" },
 ] as const;
 export type PrintFont = typeof printFonts[number]["id"];
+import { printFormat, type PrintFormat } from "./printFormats";
 export type BingoPrint = {
   version: 1;
   frontLogo: string;
   backLogos: string[];
   headerFont: PrintFont;
-  numberFont: Exclude<PrintFont,"PHIL_GUD">;
+  numberFont: PrintFont;
+  layout?: { version: 3; format: PrintFormat; textFont: PrintFont };
   colors: { background: string; header: string; grid: string; heading: string; numbers: string; back: string };
 };
 const object = (v:unknown):v is Record<string,unknown> => !!v && typeof v==='object' && !Array.isArray(v);
 const exact=(v:Record<string,unknown>,keys:string)=>Object.keys(v).sort().join(',')===keys.split(',').sort().join(',');
 export function parseBingoPrint(value:unknown):BingoPrint|null {
-  if(!object(value)||!exact(value,'version,frontLogo,backLogos,headerFont,numberFont,colors')||value.version!==1||typeof value.frontLogo!=='string'||!isSafeTemplateAssetReference(value.frontLogo)||!Array.isArray(value.backLogos)||value.backLogos.length<1||value.backLogos.length>2||!value.backLogos.every(x=>typeof x==='string'&&isSafeTemplateAssetReference(x))||new Set(value.backLogos).size!==value.backLogos.length||!printFonts.some(f=>f.id===value.headerFont)||!['ARIMO','MONTSERRAT'].includes(String(value.numberFont))||!object(value.colors)||!exact(value.colors,'background,header,grid,heading,numbers,back')||!Object.values(value.colors).every(c=>typeof c==='string'&&/^#[0-9a-fA-F]{6}$/.test(c)))return null;
+  if(!object(value)||!exact(value, Object.hasOwn(value,'layout')?'version,frontLogo,backLogos,headerFont,numberFont,colors,layout':'version,frontLogo,backLogos,headerFont,numberFont,colors')||value.version!==1||typeof value.frontLogo!=='string'||!isSafeTemplateAssetReference(value.frontLogo)||!Array.isArray(value.backLogos)||value.backLogos.length<1||value.backLogos.length>2||!value.backLogos.every(x=>typeof x==='string'&&isSafeTemplateAssetReference(x))||new Set(value.backLogos).size!==value.backLogos.length||!printFonts.some(f=>f.id===value.headerFont)||!(value.layout?printFonts.map(f=>f.id):['ARIMO','MONTSERRAT']).includes(String(value.numberFont))||!object(value.colors)||!exact(value.colors,'background,header,grid,heading,numbers,back')||!Object.values(value.colors).every(c=>typeof c==='string'&&/^#[0-9a-fA-F]{6}$/.test(c)))return null;
+  if (value.layout !== undefined) {
+    const layout=value.layout;
+    if (!object(layout) || !exact(layout,'version,format,textFont') || layout.version !== 3 || !printFonts.some(f=>f.id===layout.textFont)) return null;
+    try { printFormat(layout.format); } catch { return null; }
+  }
   return structuredClone(value) as BingoPrint;
 }
 export function defaultBingoPrint(design:{templateId:string;config:{tokens:{assets:{logo:string|null};colors:{primary:string};typography:{family:string;displayFamily?:string}};bingoPrint?:BingoPrint}}):BingoPrint {
@@ -37,4 +44,11 @@ export function shortCardCode(prefix:number,ordinal:number){
   if(!Number.isSafeInteger(prefix)||prefix<1||!Number.isSafeInteger(ordinal)||ordinal<1||ordinal>500)throw Error('SHORT_CODE_INVALID');
   let letters='';for(let n=prefix;n>0;n=Math.floor((n-1)/26))letters=String.fromCharCode(65+(n-1)%26)+letters;
   return `${letters}-${String(ordinal).padStart(3,'0')}`;
+}
+
+/** Only absent configurations receive the new defaults. Explicit saved font choices stay untouched. */
+export function newBingoPrint(design: Parameters<typeof defaultBingoPrint>[0]): BingoPrint {
+  const settings=defaultBingoPrint(design);
+  if (design.config.bingoPrint) return settings;
+  return {...settings,headerFont:'PHIL_GUD',numberFont:'PHIL_GUD',layout:{version:3,format:'A4_FOUR',textFont:'ARIMO'}};
 }

@@ -1,3 +1,4 @@
+import type { TermSet } from '../preparation/termSet';
 import { type BingoCard, type Stage, validateCard } from "../core/cards";
 import { addRound, createRun, drawNumber, endRun, pauseRun, resumeRun, startRun, type BingoRun } from "../core/run";
 import { correctDraw, decideClaim, recordClaim, setTarget, type Draw } from "../core/round";
@@ -13,7 +14,7 @@ export type LiveCommand =
 export type LiveEvent = { id: string; at: number; actorId: number; command: LiveCommand };
 export type Call = { id: string; stage: Stage; throughPosition: number; cardId: string | null; draws: readonly Draw[] };
 export type LiveState = { run: BingoRun; calls: readonly Call[] };
-export type FrozenRound = { id: string; label: string; target: number; issued: number | null; seriesIds: string[] };
+export type FrozenRound = { terms?:TermSet; id: string; label: string; target: number; issued: number | null; seriesIds: string[] };
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export function assertUuid(value: unknown): asserts value is string {
   if (typeof value !== "string" || !uuid.test(value)) throw Error("INVALID_ID");

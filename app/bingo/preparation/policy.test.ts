@@ -10,8 +10,8 @@ test("commands reject forged scope, extra fields, invalid integers and invalid c
   const valid = { ...base, operation: "saveRound", roundId: randomUUID(), label: " Runde 1 ", target: 30, strategy: "NEW", issued: null };
   assert.equal((parseCommand(valid) as { label: string }).label, "Runde 1");
   for (const change of [{ gameId: "../../quiz/1" }, { expectedSeriesId: 0 }, { revision: -1 }, { revision: 0.1 }, { target: 0 }, { target: 76 }, { target: "30" }, { strategy: "LIVE" }, { label: " " }, { issued: -1 }, { issued: 1.5 }, { secret: "forbidden" }]) assert.throws(() => parseCommand({ ...valid, ...change }));
-  for (const count of [0, 501, 1.5, "100"]) assert.throws(() => parseCommand({ ...base, operation: "generate", roundId: randomUUID(), requestId: randomUUID(), count }));
-  for (const count of [1, 100, 500]) assert.equal((parseCommand({ ...base, operation: "generate", roundId: randomUUID(), requestId: randomUUID(), count }) as { count: number }).count, count);
+  for (const count of [0, 1001, 1.5, "100"]) assert.throws(() => parseCommand({ ...base, operation: "generate", roundId: randomUUID(), requestId: randomUUID(), count }));
+  for (const count of [1, 100, 500, 501, 1000]) assert.equal((parseCommand({ ...base, operation: "generate", roundId: randomUUID(), requestId: randomUUID(), count }) as { count: number }).count, count);
 });
 test("range packages cover every card exactly once and reject silent truncation", () => {
   const ordinals = [];

@@ -1,3 +1,4 @@
+import { parsePrintSnapshot } from './printSnapshot';
 import "server-only";
 import { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
@@ -5,7 +6,7 @@ import { sharedDesignContext, resolveSharedDesign, validateTarget } from "@/app/
 import { parseBingoPrint, printContrastIssues, shortCardCode, PHIL_LOGO, LOVD_LOGO, type BingoPrint } from "@/app/bingo/preparation/bingoPrint";
 import { preparationContext } from "./access.server";
 import { resolveBingoPrint } from "./printDesign";
-import { capturePrintSnapshot } from "./printAssets.server";
+import { capturePrintSnapshot,captureNewPrintSnapshot } from "./printAssets.server";
 import { canonical, sha256 } from "./printSnapshot";
 import { storedCard } from "./readExport.server";
 import { BingoPreparationError, denied } from "./policy";
@@ -57,10 +58,10 @@ export async function previewPrintDesign(userId:number,input:unknown){
   return prisma.$transaction(async tx=>{const c=await designContext(tx,userId,r.target);if(!c.canWrite)throw denied();
     const settings=r.config===undefined?c.settings:r.config===null?c.inherited:parseBingoPrint(r.config);if(!settings)throw new BingoPreparationError('Ungültige Druckeinstellungen.');
     existingLogosOnly(settings,c);
-    const snapshot=await capturePrintSnapshot(c.design,'Druckvorschau','Vorschau',settings);
-    let card;
-    if(r.seriesId!==undefined){if(c.target.kind!=='BINGO'||typeof r.seriesId!=='string')throw denied();const series=await tx.bingo_card_series.findFirst({where:{id:r.seriesId,game_id:c.target.id},include:{short_label:true}});if(!series?.short_label)throw denied();const row=await tx.bingo_cards.findFirstOrThrow({where:{series_id:series.id},orderBy:{ordinal:'asc'}});card={...storedCard(row),shortCode:shortCardCode(series.short_label.prefix,row.ordinal)};}
-    return {snapshot,card,hash:sha256(canonical(snapshot)),stateHash:c.stateHash};
+    let snapshot=await (r.seriesId===undefined?capturePrintSnapshot:captureNewPrintSnapshot)(c.design,'Druckvorschau','Vorschau',settings);
+    let card;let cards;
+    if(r.seriesId!==undefined){if(c.target.kind!=='BINGO'||typeof r.seriesId!=='string')throw denied();const series=await tx.bingo_card_series.findFirst({where:{id:r.seriesId,game_id:c.target.id},include:{short_label:true}});if(!series?.short_label)throw denied();const row=await tx.bingo_cards.findFirstOrThrow({where:{series_id:series.id},orderBy:{ordinal:'asc'}});card={...storedCard(row),shortCode:shortCardCode(series.short_label.prefix,row.ordinal)};const rows=await tx.bingo_cards.findMany({where:{series_id:series.id},orderBy:{ordinal:'asc'},take:7});cards=rows.map(row=>({...storedCard(row),shortCode:shortCardCode(series.short_label!.prefix,row.ordinal)}));const original=parsePrintSnapshot(series.print_snapshot);if(snapshot.version===3&&original.version===3)snapshot=parsePrintSnapshot({...snapshot,terms:original.terms});}
+    return {snapshot,card,cards,hash:sha256(canonical(snapshot)),stateHash:c.stateHash};
   },{timeout:30000,isolationLevel:'RepeatableRead'});
 }
 export async function redesignSeries(userId:number,input:unknown){
@@ -68,7 +69,8 @@ export async function redesignSeries(userId:number,input:unknown){
   if(Object.keys(r).sort().join(',')!=='confirmed,expectedRevision,gameId,previewHash,seriesId'||r.confirmed!==true||typeof r.gameId!=='string'||typeof r.seriesId!=='string'||typeof r.previewHash!=='string'||!Number.isSafeInteger(r.expectedRevision))throw denied();
   return prisma.$transaction(async tx=>{const {game,series}=await preparationContext(tx,userId,r.gameId as string,true);const prep=await tx.bingo_preparations.findUniqueOrThrow({where:{game_id:game.id}});if(prep.revision!==r.expectedRevision)throw new BingoPreparationError('Die Vorbereitung wurde inzwischen geändert. Bitte neu laden.');const selected=await tx.bingo_card_series.findFirst({where:{id:r.seriesId as string,game_id:game.id}});if(!selected)throw denied();
     const design=(await resolveSharedDesign(tx,game.shared_design_template_id,series)).design;
-    const snapshot=await capturePrintSnapshot(design,'Druckvorschau','Vorschau',resolveBingoPrint(design,series.bingo_print_config,game.bingo_print_config));
+    let snapshot=await captureNewPrintSnapshot(design,'Druckvorschau','Vorschau',resolveBingoPrint(design,series.bingo_print_config,game.bingo_print_config));
+    const original=parsePrintSnapshot(selected.print_snapshot);if(snapshot.version===3&&original.version===3)snapshot=parsePrintSnapshot({...snapshot,terms:original.terms});
     if(sha256(canonical(snapshot))!==r.previewHash)throw new BingoPreparationError('Die Druckgestaltung wurde seit der Vorschau geändert. Bitte Vorschau erneut öffnen.');
     const version=((await tx.bingo_print_versions.aggregate({where:{series_id:selected.id},_max:{version:true}}))._max.version??1)+1;
     await tx.bingo_print_versions.create({data:{series_id:selected.id,version,snapshot:snapshot as unknown as Prisma.InputJsonValue,created_by:userId}});

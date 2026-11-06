@@ -1,3 +1,4 @@
+import { parseTermSet } from './termSet';
 import "server-only";
 import { prisma } from "@/app/lib/prisma";
 import { isGameId } from "@/app/games/gameDraft";
@@ -14,15 +15,15 @@ export async function readPreparation(userId: number, gameId: string, page = 1, 
     const { game, series } = await context(tx, userId, gameId);
     const prep = await tx.bingo_preparations.findUnique({ where: { game_id: gameId } });
     const rounds = await tx.bingo_rounds.findMany({ where: { game_id: gameId }, orderBy: { position: "asc" }, skip: (page - 1) * ROUND_PAGE_SIZE, take: ROUND_PAGE_SIZE,
-      include: { series: { include: { series: { select: { id: true, code: true, card_count: true, origin_round_id: true } } } }, issuance_changes: { orderBy: [{ created_at: "desc" }, { id: "desc" }], take: 20, include: { actor: { select: { name: true } } } } } });
+      include: { series: { include: { series: { select: { id: true, code: true, card_count: true, origin_round_id: true,print_snapshot:true } } } }, issuance_changes: { orderBy: [{ created_at: "desc" }, { id: "desc" }], take: 20, include: { actor: { select: { name: true } } } } } });
     const available = await tx.bingo_card_series.findMany({ where: { game_id: gameId }, orderBy: [{ created_at: "desc" }, { id: "asc" }], skip: (seriesPage - 1) * ROUND_PAGE_SIZE, take: ROUND_PAGE_SIZE });
     const frozen=(await tx.$queryRaw<{present:string|null}[]>`SELECT to_regclass('pubquiz.bingo_event_rounds')::text present`)[0].present?await tx.$queryRaw<{round_id:string}[]>`SELECT f.round_id FROM pubquiz.bingo_event_rounds f JOIN pubquiz.bingo_live_runs r ON r.id=f.run_id WHERE f.game_id=${gameId}::uuid AND r.status IN ('RUNNING','PAUSED')`:[];
     let currentHash: string | null = null;
     try {const d=(await resolveSharedDesign(tx,game.shared_design_template_id,series)).design;d.config.bingoPrint=resolveBingoPrint(d,series.bingo_print_config,game.bingo_print_config);currentHash=designHash(d);} catch { /* Old exports remain usable independently of the current template. */ }
-    return { gameId, title: game.titel, seriesId: game.eventreihe_id, revision: prep?.revision ?? 0, archived: series.ist_archiviert,
+    return { termSets:(await tx.bingo_term_sets.findMany({where:{game_id:gameId},orderBy:{created_at:'desc'}})).map(s=>({id:s.id,config:parseTermSet(s.config),createdAt:s.created_at.toISOString()})),gameId, title: game.titel, seriesId: game.eventreihe_id, revision: prep?.revision ?? 0, archived: series.ist_archiviert,
       page, seriesPage, roundCount: await tx.bingo_rounds.count({ where: { game_id: gameId } }), seriesCount: await tx.bingo_card_series.count({ where: { game_id: gameId } }),
-      rounds: rounds.map(r => ({ locked:frozen.some(f=>f.round_id===r.id), id: r.id, position: r.position, label: r.label, target: r.planned_draws, strategy: r.strategy as "NEW" | "EXISTING", issued: r.issued_count,
-        cardCount: r.series.reduce((n, s) => n + s.series.card_count, 0), series: r.series.map(s => ({ id: s.series_id, code: s.series.code, count: s.series.card_count })),
+      rounds: rounds.map(r => ({ terms:r.term_snapshot===null?null:parseTermSet(r.term_snapshot),locked:frozen.some(f=>f.round_id===r.id), id: r.id, position: r.position, label: r.label, target: r.planned_draws, strategy: r.strategy as "NEW" | "EXISTING", issued: r.issued_count,
+        cardCount: r.series.reduce((n, s) => n + s.series.card_count, 0), series: r.series.map(s => ({ id: s.series_id, code: s.series.code, count: s.series.card_count,duplex:parsePrintSnapshot(s.series.print_snapshot).version!==1 })),
         history: r.issuance_changes.map(h => ({ actor: h.actor.name ?? "Benutzer", at: h.created_at.toISOString(), before: h.previous_count, after: h.new_count })) })),
       available: available.map(s => { const snapshot = parsePrintSnapshot(s.print_snapshot); return { id: s.id, code: s.code, count: s.card_count, originRoundId: s.origin_round_id, createdAt: s.created_at.toISOString(), designName: snapshot.design.name, olderDesign: snapshot.designHash !== currentHash }; }) };
   }, { isolationLevel: "RepeatableRead" });

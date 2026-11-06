@@ -128,3 +128,10 @@ No manual backup or restore is required or executed for AP2 acceptance.
 The core/card and persisted contracts require neither a camera nor Vercel. Node,
 PostgreSQL and bundled fonts can support a future offline deployment; Raspberry Pi,
 OCR, synchronization, draw state and live operation are deliberately outside AP2.
+
+
+## Kartenweiterentwicklung V3 (6. November 2026)
+
+Für neue Karten, ausdrücklich bestätigte Neugestaltung, Begriffssets und deren
+Veröffentlichung gilt ergänzend [Bingo-Karten und Druck V3](bingo-card-design-v3.md).
+Historische Druckstände und numerische Laufdaten behalten ihren bisherigen Vertrag.

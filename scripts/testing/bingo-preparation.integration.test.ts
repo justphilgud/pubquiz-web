@@ -1,3 +1,4 @@
+import { seedLegacyPrintFixture } from './bingo-card-v3-migration-fixture';
 import assert from "node:assert/strict";
 import test from "node:test";
 import { randomUUID } from "node:crypto";
@@ -63,17 +64,23 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   assert.equal((await db.query("SELECT to_regclass('pubquiz.bingo_print_versions') t")).rows[0].t,null);
   await db.query(printMigration);
   await db.query(readFileSync('prisma/migrations/20261027213000_bingo_label_allocation/migration.sql','utf8'));
+  const v3Migration=readFileSync('prisma/migrations/20261106180000_bingo_card_design_v3/migration.sql','utf8');
+  await db.query(v3Migration.replace(/COMMIT;\s*$/,'ROLLBACK;'));assert.equal((await db.query("SELECT to_regclass('pubquiz.bingo_term_sets') t")).rows[0].t,null);
+  const legacyV2=await seedLegacyPrintFixture(db);
+  await db.query(v3Migration);
+  assert.deepEqual(await legacyV2.read(),legacyV2.before,"V3 migration preserves genuine pre-existing card IDs, cells, print snapshot, round and prefix");
   assert.deepEqual((await db.query("SELECT to_jsonb(q) data FROM pubquiz.quiz q WHERE quiz_id=11")).rows[0].data, before);
   assert.deepEqual((await db.query("SELECT * FROM pubquiz.benutzer_reihenrollen ORDER BY benutzer_id")).rows, roles);
   const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: target.toString() }) });
   t.after(async () => { await prisma.$disconnect(); });
-  const bundle = await build({ stdin: { contents: "export * from './app/bingo/preparation/repository.server'; export * as live from './app/bingo/live/repository.server'; export * as print from './app/bingo/preparation/printDesignRepository.server'; export * as games from './app/games/gameDraftRepository.server'; export * as eventRun from './app/bingo/live/eventRepository.server'; export * as creation from './app/bingo/eventCreation.server'; export * as settings from './app/eventreihen/settingsRepository.server';", resolveDir: process.cwd() }, bundle: true, write: false, platform: "node", format: "cjs", packages: "external", plugins: [{ name: "database", setup(b) {
+  const bundle = await build({ stdin: { contents: "export * from './app/bingo/preparation/repository.server'; export * as live from './app/bingo/live/repository.server'; export * as print from './app/bingo/preparation/printDesignRepository.server'; export * as games from './app/games/gameDraftRepository.server'; export * as eventRun from './app/bingo/live/eventRepository.server'; export * as creation from './app/bingo/eventCreation.server'; export * as settings from './app/eventreihen/settingsRepository.server';export * as terms from './app/bingo/preparation/termRepository.server';", resolveDir: process.cwd() }, bundle: true, write: false, platform: "node", format: "cjs", packages: "external", plugins: [{ name: "database", setup(b) {
     b.onResolve({ filter: /^(server-only|@\/app\/lib\/prisma|@\/app\/generated\/prisma\/client)$/ }, a => ({ path: a.path, namespace: "fixture" }));
     b.onLoad({ filter: /.*/, namespace: "fixture" }, a => ({ contents: a.path === "server-only" ? "" : a.path.includes("generated") ? "export const Prisma = globalThis.prismaRuntime;" : "export const prisma = globalThis.fixture;" }));
   } }] });
   const runtime = { exports: {} };
   runInNewContext(bundle.outputFiles[0].text, { module: runtime, exports: runtime.exports, require: createRequire(import.meta.url), fixture: prisma, prismaRuntime: Prisma, console, process, Date, Buffer, URL, fetch, AbortSignal, structuredClone, setTimeout, clearTimeout });
-  const api = runtime.exports as typeof import("@/app/bingo/preparation/repository.server") & { live: typeof import("@/app/bingo/live/repository.server"); print: typeof import("@/app/bingo/preparation/printDesignRepository.server"); games: typeof import("@/app/games/gameDraftRepository.server");eventRun:typeof import("@/app/bingo/live/eventRepository.server");creation:typeof import("@/app/bingo/eventCreation.server");settings:typeof import("@/app/eventreihen/settingsRepository.server") };
+  const api = runtime.exports as typeof import("@/app/bingo/preparation/repository.server") & { live: typeof import("@/app/bingo/live/repository.server"); print: typeof import("@/app/bingo/preparation/printDesignRepository.server"); games: typeof import("@/app/games/gameDraftRepository.server");eventRun:typeof import("@/app/bingo/live/eventRepository.server");creation:typeof import("@/app/bingo/eventCreation.server");settings:typeof import("@/app/eventreihen/settingsRepository.server");terms:typeof import("@/app/bingo/preparation/termRepository.server") };
+  assert.equal((await api.readExport(1,legacyV2.gameId,legacyV2.seriesId,1,1)).snapshot.version,2);
   const game = await api.games.writeGameDraft(3, "BINGO", { seriesId: 10, title: "Bingo preparation QA", date: "", time: "" });
   const other = await api.games.writeGameDraft(5, "BINGO", { seriesId: 20, title: "Foreign Bingo", date: "", time: "" });
   const karaoke = await api.games.writeGameDraft(3, "POWERPOINT_KARAOKE", { seriesId: 10, title: "Karaoke", date: "", time: "" });
@@ -131,7 +138,8 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   await assert.rejects(command({ operation: "generate", roundId: first, count: 8, requestId: randomUUID() }));
   assert.equal((await current()).revision, beforeFailure);
   assert.equal(await prisma.bingo_card_series.count({ where: { game_id: game.id } }), 1);
-  assert.equal(await prisma.bingo_cards.count(), 8);
+  assert.equal(await prisma.bingo_cards.count({where:{series:{game_id:game.id}}}),8);
+  assert.equal(await prisma.bingo_cards.count(),9,"eight test cards plus the unchanged pre-migration V2 card; no failed-generation remnants");
   await db.query("DROP TRIGGER ap2_test_fail_card ON pubquiz.bingo_cards; DROP FUNCTION pubquiz.ap2_test_fail_card()");
   const large = await command({ operation: "generate", roundId: first, count: 500, requestId: randomUUID() });
   assert.equal((await api.readCards(3, game.id, large.seriesId!)).total, 500);
@@ -170,7 +178,7 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   assert.deepEqual(await prisma.bingo_rounds.findMany({where:{game_id:game.id},orderBy:{position:'asc'}}),originalRound);
   const historical=await api.readExport(3,game.id,sid,1,8,1),newPrint=await api.readExport(3,game.id,sid,1,8,2);
   assert.notEqual(historical.snapshot.body.sha256,'');assert.deepEqual(newPrint.cards,historical.cards);
-  assert.equal(newPrint.snapshot.version,2);assert.notDeepEqual(newPrint.snapshot,historical.snapshot);
+  assert.equal(newPrint.snapshot.version,3);assert.notDeepEqual(newPrint.snapshot,historical.snapshot);
   assert.equal(newPrint.cards[0].shortCode,'A-001');assert.equal((await api.readCards(3,game.id,sid,1,'A-001')).count,1);
   // AP2 deliberately searches substrings in both codes. B-001 also matches
   // full codes for ordinals 10..19 when the random series prefix ends in B.
@@ -203,10 +211,10 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   await assert.rejects(api.writePreparation(3, generation)); await assert.rejects(api.readCards(3, game.id, sid));
   await assert.rejects(print.readPrintDesign(3,printTarget));await assert.rejects(print.redesignSeries(3,versionCommand));
   const columns = (await db.query(COLUMN_SQL)).rows[0].coalesce as Column[]; auditColumns(columns);
-  assert.equal(new Set(columns.filter(c => c.table.startsWith("bingo_")).map(c => c.table)).size, 8);
+  assert.equal(new Set(columns.filter(c => c.table.startsWith("bingo_")).map(c => c.table)).size, 9);
   const catalog = (await db.query(CATALOG_SQL)).rows[0].json_build_object as { constraints: { table: string }[] };
   assert.ok(catalog.constraints.filter(c => c.table.startsWith("bingo_")).length > 20);
-  for (const table of ["bingo_preparations", "bingo_rounds", "bingo_card_series", "bingo_cards", "bingo_round_series", "bingo_issuance_changes", "bingo_print_versions", "bingo_series_labels"]) {
+  for (const table of ["bingo_term_sets", "bingo_preparations", "bingo_rounds", "bingo_card_series", "bingo_cards", "bingo_round_series", "bingo_issuance_changes", "bingo_print_versions", "bingo_series_labels"]) {
     for (const row of (await db.query(`SELECT to_jsonb(t) data FROM pubquiz.${table} t`)).rows) assert.doesNotThrow(() => inspectRow(row.data, new Set(), "pubquiz", table));
   }
   const stored = (await db.query("SELECT to_jsonb(s) data FROM pubquiz.bingo_card_series s WHERE id=$1", [sid])).rows[0].data;
@@ -274,6 +282,19 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   await db.query(eventMigration.replace(/COMMIT;\s*$/,"ROLLBACK;"));assert.equal((await db.query("SELECT to_regclass('pubquiz.bingo_event_runs') t")).rows[0].t,null);
   await db.query(eventMigration);assert.deepEqual((await db.query("SELECT to_jsonb(r) data FROM pubquiz.bingo_live_runs r ORDER BY id")).rows,beforeEvent);
   await exerciseBingoEvent(db,api.eventRun,api.creation,api,api.settings);
+  const textGame=await api.creation.createBingoEvent(1,{seriesId:10,title:'V3 1,000 text cards',date:'',time:'',roundCount:1,requestId:randomUUID()});
+  let textPrep=await api.readPreparation(1,textGame.id);const textRound=textPrep.rounds[0].id;
+  const terms={version:1,name:'Music QA',publication:'HIDDEN',entries:Array.from({length:75},(_,i)=>({number:i+1,text:`Artist ${i+1}`}))};
+  const termInput={gameId:textGame.id,roundId:textRound,revision:textPrep.revision,config:terms};
+  for(const user of [2,4,5,6])await assert.rejects(api.terms.writeRoundTerms(user,termInput));
+  await api.terms.writeRoundTerms(1,termInput);textPrep=await api.readPreparation(1,textGame.id);
+  const request={gameId:textGame.id,expectedSeriesId:10,revision:textPrep.revision,operation:'generate',roundId:textRound,count:1000,requestId:randomUUID()};
+  const generated=await api.writePreparation(1,request);await api.writePreparation(1,request);
+  textPrep=await api.readPreparation(1,textGame.id);assert.equal(textPrep.rounds[0].cardCount,1000);assert.equal(textPrep.rounds[0].series.length,2);
+  const allText=(await db.query('SELECT c.layout_hash,c.cells,c.id FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_card_series s ON s.id=c.series_id WHERE s.game_id=$1',[textGame.id])).rows;assert.equal(allText.length,1000);assert.equal(new Set(allText.map(c=>c.layout_hash)).size,1000);
+  const textExport=await api.readExport(1,textGame.id,generated.seriesId!,1,200);assert.equal(textExport.snapshot.version,3);if(textExport.snapshot.version!==3)throw Error('snapshot');assert.deepEqual(JSON.parse(JSON.stringify(textExport.snapshot.terms)),terms);
+  await assert.rejects(api.terms.writeRoundTerms(1,{...termInput,revision:textPrep.revision}),/bereits Karten/);
+  console.info('V3: 1,000 unique text cards in two atomic immutable series, retry, frozen terms and role checks PASS');
   const withEvents=await snapshot();assert.equal(withEvents.archiveSchema?.bingoEventMigrations?.length,1);
   for(const table of ["bingo_event_creation_requests","bingo_event_runs","bingo_event_round_plan","bingo_event_rounds","bingo_event_round_cards"])assert.ok(withEvents.tables.find(t=>t.table===table)!.rows>0);
   await verifyBingoRestore(target,withEvents);

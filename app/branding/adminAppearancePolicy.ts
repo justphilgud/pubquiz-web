@@ -2,6 +2,7 @@
 export function isAdministrationPath(path: string): boolean {
   if (path === "/templates/presentation-quality") return false;
   if (/^\/bingo\/[0-9a-f-]{36}\/moderation$/i.test(path)) return false;
+  if (/^\/bingo\/[0-9a-f-]{36}\/(?:vorbereitung|design(?:\/druck)?|karten(?:\/[0-9a-f-]{36}\/druckgestaltung)?)$/i.test(path)) return true;
   if (/^\/(?:bingo|karaoke)\/(?:new|[0-9a-f-]{36})$/i.test(path)) return true;
   if (["/events", "/", "/login", "/logout", "/quiz", "/bingo", "/karaoke", "/settings", "/hilfe"].includes(path)) return true;
   if (/^\/(?:admin|content|fragen|story-elemente|templates|profil)(?:\/|$)/.test(path)) return true;

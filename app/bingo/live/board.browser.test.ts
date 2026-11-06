@@ -26,6 +26,7 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
       window.currentData=data;
       flushSync(()=>root.render(<div style={scaled?{width:1280,height:720,transform:'scale(.4)',transformOrigin:'top left'}:{height:'100dvh'}}><Board data={data}/></div>));
     };
+    window.showTerms=(term)=>{window.show('phil-gud',1);const data={...window.currentData,termMode:true,labels:term===null?{}:{1:term}};flushSync(()=>root.render(<div style={{height:'100dvh'}}><Board data={data}/></div>));};
     window.mountPolling=()=>flushSync(()=>root.render(<Audience initial={{...window.currentData,id:'polling',revision:0,draws:[]}} audienceKey="fixture"/>));
     window.slowFonts=()=>{
       const t=getPresentationTemplate('phil-gud');
@@ -106,6 +107,15 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
           const shot = await call("Page.captureScreenshot", { format: "png", captureBeyondViewport: false }, sessionId);
           writeFileSync(join(process.env.BINGO_ARTIFACT_DIR, `board-${brand}-${width}x${height}.png`), Buffer.from(shot.data!, "base64"));
         }
+      }
+    }
+    for(const [width,height] of [[1280,600],[1920,1080]]){
+      await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},sessionId);
+      for(const term of [null,'Bob Dylan','Münchner Freiheit','Sehr langer mehrteiliger Begriff im Bingo']){
+        await evaluate(`window.showTerms(${JSON.stringify(term)})`);await new Promise(r=>setTimeout(r,100));
+        const measured=await evaluate('window.measure()') as {issues:string[]};assert.deepEqual(measured.issues,[],`text Bingo ${width}x${height}: ${term}`);
+        assert.equal(await evaluate('document.querySelector("[data-current-number]").textContent'),term??'Verdeckt');
+        assert.ok(await evaluate('parseFloat(getComputedStyle(document.querySelector("[data-current-number]")).fontSize)>=24'));
       }
     }
     await evaluate("window.show('phil-gud',20,'RUNNING',false,{background:'#ffffff',surface:'#faf8f2',text:'#171717',textMuted:'#625d55',primary:'#6a241c',secondary:'#f6c4dc'})");

@@ -151,7 +151,7 @@ export async function readAudience(userId: number, key: string) {
   }, { isolationLevel: "RepeatableRead" });
 }
 export type ModerationView = Awaited<ReturnType<typeof readLegacyLive>>;
-export type AudienceView = Omit<Awaited<ReturnType<typeof readAudience>>, "assetBase"> & { assetBase: string | null; phase?:"BETWEEN" };
+export type AudienceView = {termMode?:boolean;labels?:Record<string,string|null>} & Omit<Awaited<ReturnType<typeof readAudience>>, "assetBase"> & { assetBase: string | null; phase?:"BETWEEN" };
 /** Stable authenticated entry can already be opened before the conscious start. */
 export async function readGameAudience(userId: number, gameId: string): Promise<AudienceView> {
   assertUuid(gameId);

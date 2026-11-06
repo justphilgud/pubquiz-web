@@ -51,5 +51,12 @@ export async function capturePrintSnapshot(input: SharedDesign, title: string, r
   const font=(id:string)=>printFonts.find(f=>f.id===id)!;
   const [display,body,logo,...backLogos]=await Promise.all([printFont(font(settings.headerFont).family),printFont(font(settings.numberFont).family),loadPrintLogo(settings.frontLogo).then(b=>asset('Vorderes Logo',b)),...settings.backLogos.map((ref,i)=>loadPrintLogo(ref).then(b=>asset(`Rückseitenlogo ${i+1}`,b)))]);
   display.name=font(settings.headerFont).name;body.name=font(settings.numberFont).name;
-  return parsePrintSnapshot({version:2,title,roundLabel,design,designHash:designHash(design),display,body,logo,settings,backLogos});
+  const common={title,roundLabel,design,designHash:designHash(design),display,body,logo,settings,backLogos};
+  if(settings.layout){const text=await printFont(font(settings.layout.textFont).family);text.name=font(settings.layout.textFont).name;return parsePrintSnapshot({...common,version:3,text,terms:null});}
+  return parsePrintSnapshot({...common,version:2});
+}
+
+/** Only called by new-card generation or an explicitly selected redesign, never by old exports. */
+export function captureNewPrintSnapshot(input:SharedDesign,title:string,roundLabel:string,settings:BingoPrint){
+ return capturePrintSnapshot(input,title,roundLabel,settings.layout?settings:{...settings,layout:{version:3,format:'A4_FOUR',textFont:'ARIMO'}});
 }

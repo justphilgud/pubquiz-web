@@ -1,3 +1,4 @@
+import { parseTermSet, publishedTerm } from '../preparation/termSet';
 import "server-only";
 import {randomUUID} from "node:crypto";
 import type {Prisma} from "@/app/generated/prisma/client";
@@ -58,7 +59,7 @@ async function load(tx:Tx,row:Row){
 async function freeze(tx:Tx,gameId:string,runId:string,roundId:string,at:number){
  const round=await tx.bingo_rounds.findFirst({where:{id:roundId,game_id:gameId},include:{series:true}});
  if(!round||!round.series.length)throw Error("NO_ASSIGNED_CARDS");
- const snapshot=parseRoundSnapshot({id:round.id,label:round.label,target:round.planned_draws,issued:round.issued_count,seriesIds:round.series.map(s=>s.series_id).sort()});
+ const snapshot=parseRoundSnapshot({id:round.id,label:round.label,target:round.planned_draws,issued:round.issued_count,seriesIds:round.series.map(s=>s.series_id).sort(),...(round.term_snapshot?{terms:parseTermSet(round.term_snapshot)}:{})});
  await tx.$executeRaw`INSERT INTO pubquiz.bingo_event_rounds(run_id,round_id,game_id,round_snapshot,opened_at) VALUES(${runId}::uuid,${roundId}::uuid,${gameId}::uuid,${JSON.stringify(snapshot)}::jsonb,${new Date(at)})`;
  await tx.$executeRaw`INSERT INTO pubquiz.bingo_event_round_cards(run_id,round_id,game_id,card_id,series_id) SELECT ${runId}::uuid,${roundId}::uuid,${gameId}::uuid,c.id,c.series_id FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_round_series rs ON rs.series_id=c.series_id WHERE rs.round_id=${roundId}::uuid AND rs.game_id=${gameId}::uuid`;
  const count=(await tx.$queryRaw<{n:number}[]>`SELECT count(*)::int n FROM pubquiz.bingo_event_round_cards WHERE run_id=${runId}::uuid AND round_id=${roundId}::uuid`)[0].n;
@@ -75,7 +76,7 @@ export async function startEventRun(userId:number,input:{gameId:string;requestId
   if((await tx.bingo_preparations.findUnique({where:{game_id:game.id}}))?.revision!==input.preparationRevision)throw Error("PREPARATION_CHANGED");
   const plan=await tx.bingo_rounds.findMany({where:{game_id:game.id},orderBy:{position:"asc"},include:{series:true}}),first=plan[0];
   if(!first?.series.length)throw Error("NO_ASSIGNED_CARDS");
-  const snapshot=parseRoundSnapshot({id:first.id,label:first.label,target:first.planned_draws,issued:first.issued_count,seriesIds:first.series.map(s=>s.series_id).sort()});
+  const snapshot=parseRoundSnapshot({id:first.id,label:first.label,target:first.planned_draws,issued:first.issued_count,seriesIds:first.series.map(s=>s.series_id).sort(),...(first.term_snapshot?{terms:parseTermSet(first.term_snapshot)}:{})});
   const design=(await resolveSharedDesign(tx,game.shared_design_template_id,series)).design,assets=await captureLiveAssets(design);
   const previous=(await tx.$queryRaw<{at:Date|null}[]>`SELECT max(started_at) at FROM pubquiz.bingo_live_runs WHERE game_id=${game.id}::uuid`)[0].at;
   const at=Math.max(await clock(tx),(previous?.getTime()??-1)+1),id=randomUUID(),key=randomUUID();
@@ -154,6 +155,7 @@ export async function readEventAudience(userId:number,key:string){
   if(!row)throw Error("RUN_NOT_FOUND");await preparationContext(tx,userId,row.game_id);
   const {state}=await load(tx,row),round=currentEventRound(state);
   return {id:row.id,revision:row.revision,startedAt:row.started_at.getTime(),status:state.run.status,label:state.frozen.find(f=>f.id===round.id)!.label,
+   termMode:Boolean(state.frozen.find(f=>f.id===round.id)?.terms),labels:Object.fromEntries(round.draws.map(draw=>{const terms=state.frozen.find(f=>f.id===round.id)?.terms;return [draw.number,terms?publishedTerm(terms,draw.number,true,state.revealed?.includes(draw.id)??false):null];}).filter(([,text])=>text!==null)),
    target:round.plannedDraws,draws:round.draws,design:row.design_snapshot,assetBase:`/api/bingo/presentation/${key}/assets`,
    phase:round.status==="CLOSED"&&state.run.status!=="ENDED"?"BETWEEN" as const:undefined,
    claims:round.claims.map(c=>({id:c.id,stage:c.stage,action:c.decisions.at(-1)?.action??null,needsReview:c.needsReview}))};

@@ -132,3 +132,10 @@ Zusätzliche Browserregressionen prüfen die tatsächliche zentrale Fläche, fun
 Vorbereitung, Rundenpause und Abschluss verwenden ebenfalls die zentrale V3.1-Zustandsfläche: bewusster Erststart im Kopf, keine aktive Zahlenarbeitsfläche zwischen oder nach Runden. Runden-/Ergebnisdaten bleiben in der Seitenübersicht lesbar. Die Browserabnahme prüft ausdrücklich, dass dort kein aktives Board angeboten wird. Die öffentliche Präsentation behält ihren davon getrennten vollständigen Zahlenboardvertrag.
 
 Gestalterische Nutzerabnahme 30.10.2026: Der korrigierte Aufbau gefällt; der kleine Haken in rosa Zahlenfeldern wird ausdrücklich entfernt. Gezogene Zahlen bleiben über Fläche, Schriftgewicht und zugängliche Zustandsbezeichnung unterscheidbar; die aktuelle Zahl behält ihre eigene Kontur. Keine zusätzliche Symbolbelegung der Zahlenfelder.
+
+
+## Kartenweiterentwicklung V3 (6. November 2026)
+
+Für neue Karten, ausdrücklich bestätigte Neugestaltung, Begriffssets und deren
+Veröffentlichung gilt ergänzend [Bingo-Karten und Druck V3](bingo-card-design-v3.md).
+Historische Druckstände und numerische Laufdaten behalten ihren bisherigen Vertrag.

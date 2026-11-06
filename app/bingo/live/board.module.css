@@ -24,3 +24,6 @@
 .stage[data-bingo-brand="phil-gud"] .board li[data-state="drawn"]{background:var(--bingo-secondary);color:var(--bingo-ink);border:2px solid var(--bingo-secondary)}
 .stage[data-bingo-brand="phil-gud"] .board li[data-state="current"]{background:var(--bingo-primary);color:var(--bingo-ink);border:3px double var(--bingo-ink);outline:2px solid var(--bingo-primary);outline-offset:1px}
 .stage[data-bingo-brand="phil-gud"] .current strong{color:var(--bingo-primary)}
+
+/* Text labels use the same two-dimensional measurement, without changing numeric boards. */
+.stage[data-term-mode="true"] .current strong {overflow-wrap:anywhere;text-align:center;max-width:100%;}
