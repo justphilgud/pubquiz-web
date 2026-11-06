@@ -139,3 +139,11 @@ Gestalterische Nutzerabnahme 30.10.2026: Der korrigierte Aufbau gefällt; der kl
 Für neue Karten, ausdrücklich bestätigte Neugestaltung, Begriffssets und deren
 Veröffentlichung gilt ergänzend [Bingo-Karten und Druck V3](bingo-card-design-v3.md).
 Historische Druckstände und numerische Laufdaten behalten ihren bisherigen Vertrag.
+
+
+## Statusabrufe und Transfergrenze (6. November 2026)
+
+[Bingo-Polling](bingo-polling-transfer.md) ergänzt den vorhandenen Replayvertrag
+um explizite SQL-Projektionen und frisch autorisierte bedingte Statusabrufe.
+Fachdaten, Laufzustände und Speicherung bleiben unverändert; kein globaler
+Zustands-/Rechtecache und keine Migration.

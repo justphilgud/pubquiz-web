@@ -1,0 +1,260 @@
+{
+  "phase": "after",
+  "baselineCommit": "192f27848f723559e3e18a0b9fdbbeb169a10ed3",
+  "identity": {
+    "name": "bingo_ap2_qa_1793997287473",
+    "runs": 4,
+    "asset_bytes": "8156356"
+  },
+  "fingerprint": "ae3ccaf03c1d783720d981b93863878d",
+  "durationMs": 13584.3854,
+  "intervalMs": 1500,
+  "pollsPerEndpoint": 10,
+  "measurements": [
+    {
+      "endpoint": "moderation",
+      "status": 304,
+      "pgServerBytes": 2179,
+      "queries": 14,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 261
+    },
+    {
+      "endpoint": "presentation",
+      "status": 304,
+      "pgServerBytes": 1931,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "gamePresentation",
+      "status": 304,
+      "pgServerBytes": 1930,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "moderation",
+      "status": 304,
+      "pgServerBytes": 2179,
+      "queries": 14,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 261
+    },
+    {
+      "endpoint": "presentation",
+      "status": 304,
+      "pgServerBytes": 1931,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "gamePresentation",
+      "status": 304,
+      "pgServerBytes": 1931,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "moderation",
+      "status": 304,
+      "pgServerBytes": 2179,
+      "queries": 14,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 261
+    },
+    {
+      "endpoint": "presentation",
+      "status": 304,
+      "pgServerBytes": 1931,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "gamePresentation",
+      "status": 304,
+      "pgServerBytes": 1930,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "moderation",
+      "status": 304,
+      "pgServerBytes": 2179,
+      "queries": 14,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 261
+    },
+    {
+      "endpoint": "presentation",
+      "status": 304,
+      "pgServerBytes": 1931,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "gamePresentation",
+      "status": 304,
+      "pgServerBytes": 1931,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "moderation",
+      "status": 304,
+      "pgServerBytes": 2179,
+      "queries": 14,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 261
+    },
+    {
+      "endpoint": "presentation",
+      "status": 304,
+      "pgServerBytes": 1931,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "gamePresentation",
+      "status": 304,
+      "pgServerBytes": 1931,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "moderation",
+      "status": 304,
+      "pgServerBytes": 2179,
+      "queries": 14,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 261
+    },
+    {
+      "endpoint": "presentation",
+      "status": 304,
+      "pgServerBytes": 1931,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "gamePresentation",
+      "status": 304,
+      "pgServerBytes": 1931,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "moderation",
+      "status": 304,
+      "pgServerBytes": 2179,
+      "queries": 14,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 261
+    },
+    {
+      "endpoint": "presentation",
+      "status": 304,
+      "pgServerBytes": 1931,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "gamePresentation",
+      "status": 304,
+      "pgServerBytes": 1931,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "moderation",
+      "status": 304,
+      "pgServerBytes": 2179,
+      "queries": 14,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 261
+    },
+    {
+      "endpoint": "presentation",
+      "status": 304,
+      "pgServerBytes": 1931,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "gamePresentation",
+      "status": 304,
+      "pgServerBytes": 1931,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "moderation",
+      "status": 304,
+      "pgServerBytes": 2179,
+      "queries": 14,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 261
+    },
+    {
+      "endpoint": "presentation",
+      "status": 304,
+      "pgServerBytes": 1931,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "gamePresentation",
+      "status": 304,
+      "pgServerBytes": 1931,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "moderation",
+      "status": 304,
+      "pgServerBytes": 2178,
+      "queries": 14,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 261
+    },
+    {
+      "endpoint": "presentation",
+      "status": 304,
+      "pgServerBytes": 1931,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    },
+    {
+      "endpoint": "gamePresentation",
+      "status": 304,
+      "pgServerBytes": 1931,
+      "queries": 12,
+      "httpBodyBytes": 0,
+      "httpWireBytes": 291
+    }
+  ],
+  "pgServerBytes": 60407,
+  "queryCount": 380,
+  "httpWireBytes": 8430,
+  "httpBodyBytes": 0,
+  "notes": "Actual PostgreSQL TCP server-to-client bytes (including protocol framing, excluding warm-up/login); actual HTTP server socket bytes plus uncompressed body bytes; route authentication stubbed to synthetic Admin 1; no TLS, no Neon traffic."
+}
