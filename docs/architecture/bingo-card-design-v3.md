@@ -124,8 +124,9 @@ Vorschlags-/Freigabeweg bedienen, keine eigene Veröffentlichung oder Gewinnlogi
 Zeichenobergrenzen sind 40 pro Begriff für A4-vier/A6 und 36 für A4-sechs.
 Das sind Vorgrenzen, keine Passgarantie. Maßgeblich sind die eingefrorene Schrift,
 tatsächliche Glyphenbreite, Feldkante, Zeilenumbrüche und vertikale Metriken.
-Der Renderer bricht Wörter/zu lange Einzelwörter um und prüft 14 bis mindestens
-10 pt in halben Schritten, Zeilenhöhe 1,2. Auch die vollständige Ober-/Unterlänge
+Der Renderer bevorzugt vollständige Wörter und prüft dafür 14 bis mindestens
+10 pt in halben Schritten. Erst wenn ein Einzelwort selbst bei 10 pt zu breit
+ist, wird es zusätzlich innerhalb des Wortes umgebrochen. Zeilenhöhe ist 1,2. Auch die vollständige Ober-/Unterlänge
 muss passen. Alle 75 Begriffe werden vor Kartenpersistenz und jedem PDF geprüft,
 nicht nur die zufällig auf den ausgewählten Karten vorkommenden.
 Zu lange oder nicht unterstützte Begriffe erzeugen einen verständlichen Fehler;

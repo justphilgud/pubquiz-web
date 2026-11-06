@@ -14,7 +14,7 @@ const ink=(hex:string)=>rgb(...[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255)
 export function fitTerm(value:string,face:Face,width:number,height:number,initial=14,minimum=10){
   if([...value].length>120)throw new BingoPreparationError('Der Begriff überschreitet 120 Zeichen.');
   if([...value].some(c=>!face.hasGlyphForCodePoint(c.codePointAt(0)!)))throw new BingoPreparationError(`Die Textschrift unterstützt nicht alle Zeichen in „${value}“.`);
-  for(let size=initial;size>=minimum;size-=.5){
+  for(const breakLongWords of [false,true]){sizeCandidate:for(let size=initial;size>=minimum;size-=.5){
     const lines:string[]=[];let line='';
     for(const paragraph of value.split('\n')){
       for(const word of paragraph.trim().split(/\s+/)){
@@ -23,6 +23,7 @@ export function fitTerm(value:string,face:Face,width:number,height:number,initia
         if(glyphGeometry(face,next,size).width<=width){line=next;continue;}
         if(line){lines.push(line);line='';}
         if(glyphGeometry(face,word,size).width<=width){line=word;continue;}
+        if(!breakLongWords)continue sizeCandidate;
         for(const char of word){if(line&&glyphGeometry(face,line+char,size).width>width){lines.push(line);line='';}line+=char;}
       }
       if(line){lines.push(line);line='';}
@@ -31,7 +32,7 @@ export function fitTerm(value:string,face:Face,width:number,height:number,initia
     // Full face ascent/descent protects accents and descenders, not just an estimated line count.
     const inkHeight=(face.ascent-face.descent)/face.unitsPerEm*size;
     if(lines.length&&lines.every(line=>glyphGeometry(face,line,size).width<=width)&&inkHeight+(lines.length-1)*lineHeight<=height)return {lines,size,lineHeight,inkHeight};
-  }
+  }}
   throw new BingoPreparationError(`„${value}“ passt bei mindestens ${minimum} pt nicht in das gewählte Kartenformat. Bitte Begriff kürzen, Schrift oder Format ändern.`);
 }
 function draw(page:PDFPage,value:string,f:Font,size:number,x:number,y:number,width:number,color:ReturnType<typeof rgb>,right=false){
