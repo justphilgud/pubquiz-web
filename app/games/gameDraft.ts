@@ -1,3 +1,4 @@
+import {validBingoCollectionHref} from './bingoOverviewPolicy';
 import { hasEventTypeAccess, type AuthorizationActor } from "@/app/roles/roleAssignmentPolicy";
 
 export type GameType = "BINGO" | "POWERPOINT_KARAOKE";
@@ -7,7 +8,7 @@ export function isGameId(value: unknown): value is string { return typeof value 
 export class GameDraftError extends Error {}
 export type GameDraftFields = { seriesId: number; title: string; date: string; time: string };
 export type GameDraftView = GameDraftFields & { id: string; type: GameType; status: "DRAFT"; createdAt: string; updatedAt: string };
-export type GameSeries = { id: number; name: string; canWrite: boolean; canCreate: boolean };
+export type GameSeries = { id: number; name: string; canWrite: boolean; canCreate: boolean; isArchived?:boolean };
 export function canAccessGame(actor: AuthorizationActor, seriesId: number, type: GameType, enabled: boolean, write = false) {
   return enabled && hasEventTypeAccess(actor, seriesId, type, write ? "EVENT_MANAGER" : "EDITOR");
 }
@@ -28,5 +29,6 @@ export function parseGameFields(input: unknown): GameDraftFields & { id?: string
 export function gameReturnHref(type: GameType, value?: string) {
   const path = gameTypeInfo[type].path;
   if(value==="/events"||value&&/^\/admin\/eventreihen\/[1-9]\d*$/.test(value)&&Number.isSafeInteger(Number(value.split("/").at(-1))))return value;
+  if(type==="BINGO")return value&&validBingoCollectionHref(value)?value:path;
   return value && new RegExp(`^${path}(?:\\?series=[1-9]\\d*)?$`).test(value) ? value : path;
 }

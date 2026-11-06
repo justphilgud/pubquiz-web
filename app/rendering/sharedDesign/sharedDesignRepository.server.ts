@@ -74,7 +74,7 @@ export async function readDesign(userId:number,input:unknown) {
   },{isolationLevel:'RepeatableRead'});
   const managed=(await listManagedPresentationTemplates()).templates;
   const templates=managed.filter(t=>(t.status==='SYSTEM'||t.status==='ACTIVE')&&supportsSharedDesign(t.config)).map(t=>({id:t.id,name:t.name}));
-  return {...data,templates,answerTemplates:[...templateRegistry.answerForm.filter(t=>t.selectable).map(t=>({id:t.id,name:managed.find(m=>m.id===t.id)?.name??('displayName'in t?t.displayName:t.id)})),...managed.filter(t=>t.source==='USER'&&t.status==='ACTIVE').map(t=>({id:t.id,name:t.name}))]};
+  return {...data,templates,answerTemplates:[...templateRegistry.answerForm.filter(t=>t.selectable).map(t=>({id:t.id,name:managed.find(m=>m.id===t.id)?.name??('displayName'in t?t.displayName:t.id)})),...managed.filter(t=>t.source==='USER'&&t.status==='ACTIVE'&&!t.config.purpose).map(t=>({id:t.id,name:t.name}))]};
 }
 export async function writeDesign(userId:number,input:unknown) {
   if(!input||typeof input!=='object'||Array.isArray(input))return deny();
@@ -118,7 +118,7 @@ export async function freezeQuizDesign(tx:Prisma.TransactionClient,quizId:number
   const {design}=await resolveSharedDesign(tx,quiz.shared_design_template_id,quiz.eventreihe);
   const ids=[quiz.answer_form_template_id,quiz.eventreihe.default_answer_form_template_id].filter((v):v is string=>!!v);
   const stored=await tx.presentation_templates.findMany({where:{presentation_template_id:{in:ids}},select:{presentation_template_id:true,name:true,theme_config_json:true}});
-  const additionalAnswerFormTemplates=stored.flatMap(t=>{const config=parsePresentationTemplateConfig(t.theme_config_json);return config?[toRuntimeAnswerFormTemplate({id:t.presentation_template_id,name:t.name,config})]:[];});
+  const additionalAnswerFormTemplates=stored.flatMap(t=>{const config=parsePresentationTemplateConfig(t.theme_config_json);return config&&!config.purpose?[toRuntimeAnswerFormTemplate({id:t.presentation_template_id,name:t.name,config})]:[];});
   const answer=resolveAnswerFormTemplate({quizTemplateId:quiz.answer_form_template_id,eventSeriesTemplateId:quiz.eventreihe.default_answer_form_template_id,additionalAnswerFormTemplates}).template;
   const snapshot={version:1,design,answerForm:{id:answer.id,name:answer.displayName??answer.id,config:{version:1,tokens:answer.tokens,design:answer.design,surfaces:{presentation:'DARK',moderation:'BRANDED',answerForm:answer.variant}}}};
   await tx.quiz.update({where:{quiz_id:quizId},data:{shared_design_snapshot:JSON.parse(JSON.stringify(snapshot)) as Prisma.InputJsonValue}});

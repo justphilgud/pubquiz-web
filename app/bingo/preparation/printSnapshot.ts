@@ -8,7 +8,8 @@ type LegacyPrintSnapshot = { version: 1; title: string; roundLabel: string; desi
 import { parseTermSet, type TermSet } from './termSet';
 type SquareSnapshot = Omit<LegacyPrintSnapshot,"version"|"logo"> & {version:2;settings:BingoPrint;logo:EmbeddedAsset;backLogos:EmbeddedAsset[]};
 export type ModernPrintSnapshot = Omit<SquareSnapshot,'version'> & {version:3;text:EmbeddedAsset;terms:TermSet|null};
-export type PrintSnapshot = LegacyPrintSnapshot | SquareSnapshot | ModernPrintSnapshot;
+export type ReferencePrintSnapshot = Omit<ModernPrintSnapshot,"version"> & {version:4;codeFont:EmbeddedAsset;templateSource?:{id:string;name:string}};
+export type PrintSnapshot = LegacyPrintSnapshot | SquareSnapshot | ModernPrintSnapshot | ReferencePrintSnapshot;
 export const sha256 = (bytes: Uint8Array | string) => createHash("sha256").update(bytes).digest("hex");
 export function canonical(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
@@ -33,14 +34,17 @@ function decodeAsset(value: unknown, kind: "font" | "logo"): EmbeddedAsset {
 }
 export function parsePrintSnapshot(value: unknown): PrintSnapshot {
   try {
-    const v3=!!value&&typeof value==='object'&&'version'in value&&value.version===3;
+    const v4=!!value&&typeof value==='object'&&'version'in value&&value.version===4;
+    const hasSource=v4&&!!value&&typeof value==='object'&&Object.hasOwn(value,'templateSource');
+    if(hasSource){const source=(value as Record<string,unknown>).templateSource;if(!keys(source,'id,name')||typeof source.id!=='string'||!/^[a-z0-9-]{1,64}$/.test(source.id)||typeof source.name!=='string'||!source.name.trim()||source.name.length>200)throw Error('PRINT_SOURCE');}
+    const v3=v4||!!value&&typeof value==='object'&&'version'in value&&value.version===3;
     const v2=v3||!!value&&typeof value==='object'&&'version'in value&&value.version===2;
-    if (!keys(value, v3?"version,title,roundLabel,design,designHash,display,body,logo,settings,backLogos,text,terms":v2?"version,title,roundLabel,design,designHash,display,body,logo,settings,backLogos":"version,title,roundLabel,design,designHash,display,body,logo") || (!v2&&value.version !== 1) || typeof value.title !== "string" || !value.title || value.title.length > 150 || typeof value.roundLabel !== "string" || !value.roundLabel || value.roundLabel.length > 80) throw new Error("PRINT_STRUCTURE");
+    if (!keys(value, v4?"version,title,roundLabel,design,designHash,display,body,logo,settings,backLogos,text,terms,codeFont"+(hasSource?",templateSource":""):v3?"version,title,roundLabel,design,designHash,display,body,logo,settings,backLogos,text,terms":v2?"version,title,roundLabel,design,designHash,display,body,logo,settings,backLogos":"version,title,roundLabel,design,designHash,display,body,logo") || (!v2&&value.version !== 1) || typeof value.title !== "string" || !value.title || value.title.length > 150 || typeof value.roundLabel !== "string" || !value.roundLabel || value.roundLabel.length > 80) throw new Error("PRINT_STRUCTURE");
     const design = parseSharedDesign(value.design);
     if (!design || value.designHash !== designHash(design)) throw new Error("PRINT_DESIGN");
     if (!v2 && (design.config.tokens.assets.logo === null) !== (value.logo === null)) throw new Error("PRINT_LOGO_REQUIRED");
     const common={title:value.title,roundLabel:value.roundLabel,design,designHash:designHash(design),display:decodeAsset(value.display,'font'),body:decodeAsset(value.body,'font')};
-    if(v2){const settings=parseBingoPrint(value.settings);if(!settings||canonical(settings)!==canonical(design.config.bingoPrint)||!Array.isArray(value.backLogos)||value.backLogos.length!==settings.backLogos.length)throw Error('PRINT_SETTINGS');const square={...common,settings,logo:decodeAsset(value.logo,'logo'),backLogos:value.backLogos.map(v=>decodeAsset(v,'logo'))};if(v3){if(!settings.layout)throw Error('PRINT_LAYOUT');return {...square,version:3,text:decodeAsset(value.text,'font'),terms:value.terms===null?null:parseTermSet(value.terms)};}if(settings.layout)throw Error('PRINT_LAYOUT_VERSION');return {...square,version:2};}
+    if(v2){const settings=parseBingoPrint(value.settings);if(!settings||canonical(settings)!==canonical(design.config.bingoPrint)||!Array.isArray(value.backLogos)||value.backLogos.length!==settings.backLogos.length)throw Error('PRINT_SETTINGS');const square={...common,settings,logo:decodeAsset(value.logo,'logo'),backLogos:value.backLogos.map(v=>decodeAsset(v,'logo'))};if(v3){if(!settings.layout||settings.layout.version!==(v4?4:3))throw Error('PRINT_LAYOUT');const modern={...square,text:decodeAsset(value.text,'font'),terms:value.terms===null?null:parseTermSet(value.terms)};return v4?{...modern,version:4,codeFont:decodeAsset(value.codeFont,'font'),...(hasSource?{templateSource:structuredClone(value.templateSource) as {id:string;name:string}}:{})}:{...modern,version:3};}if(settings.layout)throw Error('PRINT_LAYOUT_VERSION');return {...square,version:2};}
     return { ...common,version:1,logo:value.logo===null?null:decodeAsset(value.logo,'logo') };
   } catch { throw new BingoPreparationError("Das gespeicherte Druckdesign ist ungültig. Bitte die Administration informieren."); }
 }

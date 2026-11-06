@@ -1,6 +1,8 @@
 import { isSafeTemplateAssetReference } from "@/app/rendering/presentationTemplates/presentationTemplateAssets";
 
 export const PHIL_LOGO = "/branding/phil-gud/website-logo.jpg";
+export const PHIL_PRINT_LOGO = "/branding/bingo-print/phil-gud.png";
+export const LOVD_PRINT_LOGO = "/branding/bingo-print/lovd.png";
 export const LOVD_LOGO = "/branding/lovd/lovd-stelp.png";
 export const printFonts = [
   { id: "PHIL_GUD", name: "Phil Gud Display Regular", family: '"Phil Gud Display", sans-serif' },
@@ -15,7 +17,7 @@ export type BingoPrint = {
   backLogos: string[];
   headerFont: PrintFont;
   numberFont: PrintFont;
-  layout?: { version: 3; format: PrintFormat; textFont: PrintFont };
+  layout?: { version: 3 | 4; format: PrintFormat; textFont: PrintFont };
   colors: { background: string; header: string; grid: string; heading: string; numbers: string; back: string };
 };
 const object = (v:unknown):v is Record<string,unknown> => !!v && typeof v==='object' && !Array.isArray(v);
@@ -24,7 +26,7 @@ export function parseBingoPrint(value:unknown):BingoPrint|null {
   if(!object(value)||!exact(value, Object.hasOwn(value,'layout')?'version,frontLogo,backLogos,headerFont,numberFont,colors,layout':'version,frontLogo,backLogos,headerFont,numberFont,colors')||value.version!==1||typeof value.frontLogo!=='string'||!isSafeTemplateAssetReference(value.frontLogo)||!Array.isArray(value.backLogos)||value.backLogos.length<1||value.backLogos.length>2||!value.backLogos.every(x=>typeof x==='string'&&isSafeTemplateAssetReference(x))||new Set(value.backLogos).size!==value.backLogos.length||!printFonts.some(f=>f.id===value.headerFont)||!(value.layout?printFonts.map(f=>f.id):['ARIMO','MONTSERRAT']).includes(String(value.numberFont))||!object(value.colors)||!exact(value.colors,'background,header,grid,heading,numbers,back')||!Object.values(value.colors).every(c=>typeof c==='string'&&/^#[0-9a-fA-F]{6}$/.test(c)))return null;
   if (value.layout !== undefined) {
     const layout=value.layout;
-    if (!object(layout) || !exact(layout,'version,format,textFont') || layout.version !== 3 || !printFonts.some(f=>f.id===layout.textFont)) return null;
+    if (!object(layout) || !exact(layout,'version,format,textFont') || ![3,4].includes(Number(layout.version)) || !printFonts.some(f=>f.id===layout.textFont)) return null;
     try { printFormat(layout.format); } catch { return null; }
   }
   return structuredClone(value) as BingoPrint;

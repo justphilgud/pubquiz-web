@@ -24,7 +24,7 @@ export default function GameDraftForm({ type, initial, choices, canWrite, return
   const [pending, startTransition] = useTransition();
   const markSaved = useContentNavigationGuard(canWrite && (JSON.stringify(fields) !== baseline||(!initial&&type==="BINGO"&&roundCount!==3)));
   function change<K extends keyof GameDraftFields>(key: K, value: GameDraftFields[K]) { setFields(current => ({ ...current, [key]: value })); setMessage(null); creationId.current=null; }
-  return <><form onSubmit={event => { event.preventDefault(); startTransition(async () => {
+  return <><form id={type==='BINGO'?'bingo-settings':undefined} onSubmit={event => { event.preventDefault(); startTransition(async () => {
     if(saving.current)return;saving.current=true;
     try {
       const result = !game&&type==="BINGO"?await createBingoDraft({...fields,roundCount,requestId:creationId.current??(creationId.current=crypto.randomUUID())}):await saveGameDraft(type, { ...fields, ...(game ? { id: game.id, updatedAt: game.updatedAt } : {}) });
@@ -50,5 +50,5 @@ export default function GameDraftForm({ type, initial, choices, canWrite, return
     {message && <p role={message.error ? "alert" : "status"} className={message.error ? "text-sm text-red-700" : "text-sm text-emerald-800"}>{message.text}</p>}
     <div className="flex flex-wrap items-center gap-3"><Link href={returnHref} className="inline-flex min-h-11 items-center rounded-lg border px-4 py-2">{canWrite ? "Abbrechen" : "Zurück zur Übersicht"}</Link>{canWrite && <Button type="submit" disabled={!ready || pending || teamBusy}>{!ready ? "Wird geladen …" : pending ? "Wird gespeichert …" : unconfirmed ? "Dieselbe Anfrage erneut senden" : "Entwurf speichern"}</Button>}</div>
     {game && <p className="break-all text-xs text-slate-600">Spiel-ID: {game.id} · Erstellt: {new Date(game.createdAt).toLocaleString("de-DE", { timeZone: "Europe/Berlin" })} · Geändert: {new Date(game.updatedAt).toLocaleString("de-DE", { timeZone: "Europe/Berlin" })} (Europe/Berlin)</p>}
-  </form>{game && teams && <GameTeamsPanel type={type} gameId={game.id} seriesId={game.seriesId} updatedAt={game.updatedAt} initial={teams} blocked={!ready || pending || JSON.stringify(fields) !== baseline} onBusy={setTeamBusy} />}</>;
+  </form>{game && teams && <div id="game-teams"><GameTeamsPanel type={type} gameId={game.id} seriesId={game.seriesId} updatedAt={game.updatedAt} initial={teams} blocked={!ready || pending || JSON.stringify(fields) !== baseline} onBusy={setTeamBusy} /></div>}</>;
 }

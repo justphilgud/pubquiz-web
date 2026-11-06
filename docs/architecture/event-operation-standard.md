@@ -135,3 +135,21 @@ sichtbare Textbuttons ohne ausdrücklichen Auftrag. Nicht verfügbare Aktionen
 werden weiterhin vom vorhandenen Reader ausgeschlossen.
 Nachweis: gerenderter Eventzeilentest in `eventOperationArchitecture.test.ts`
 und Browsergeometrie in `orderingLayout.browser.test.ts`.
+
+
+## Bingo-Verwaltung und zentrale Druckvorlagen V4
+
+Auf `codex/bingo-print-templates-ui` wird die unveränderte Quizübersicht als
+konkrete Verwaltungsreferenz wiederverwendet: gleiche EventRow, tatsächliche
+Heroicons/Aktionsgrößen, Reihenpicker, 2-Spalten-Filter und Kartenraster. Der neue
+`EventActionLink` erhält das vollständige bisherige Quiz-Markup; keine neue Quiz-
+Bedienung oder Livegestaltung. Der Terminfilter bleibt lokal, validierte Rückwege
+führen durch Vorbereitung, Karten und Druck zurück zur gefilterten Sammlung.
+
+Belegte Bingo-Werte sind Runden, eindeutige zugeordnete Karten und ausdrücklich
+benannte erfasste Rundenausgabe; unbekannt und Null bleiben verschieden. Keine
+Teilnehmerzahl oder nicht implementierte Duplizier-/Archiv-/Lösch-/Auswertungsaktion
+vortäuschen. Die bestehende Templateverwaltung trennt globale Bearbeitung von
+zulässiger Druckauswahl: nur Admin bearbeitet, berechtigter Bingo-Manager liest
+System/aktive Druckvorlagen und wählt sie für eigene Events. Live-/Antwortvorlagen
+bleiben separat. Vertrag und Versionierung: [Bingo-Druckvorlagen V4](bingo-print-templates-v4.md).

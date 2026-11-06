@@ -12,7 +12,7 @@ function view(row: game_drafts): GameDraftView {
 async function gameContext(tx: Prisma.TransactionClient, userId: number, type: GameType) {
   const actor = await getActorPermissions(userId, tx);
   const rows = await tx.eventreihen.findMany({ where: { eventarten: { some: { eventart: type, ist_freigeschaltet: true } } }, select: { eventreihe_id: true, name: true, ist_archiviert: true }, orderBy: [{ name: "asc" }, { eventreihe_id: "asc" }] });
-  const choices: GameSeries[] = rows.filter(row => canAccessGame(actor, row.eventreihe_id, type, true)).map(row => ({ id: row.eventreihe_id, name: row.name, canWrite: canAccessGame(actor, row.eventreihe_id, type, true, true), canCreate: !row.ist_archiviert && canAccessGame(actor, row.eventreihe_id, type, true, true) }));
+  const choices: GameSeries[] = rows.filter(row => canAccessGame(actor, row.eventreihe_id, type, true)).map(row => ({ id: row.eventreihe_id, name: row.name, isArchived:row.ist_archiviert, canWrite: canAccessGame(actor, row.eventreihe_id, type, true, true), canCreate: !row.ist_archiviert && canAccessGame(actor, row.eventreihe_id, type, true, true) }));
   return { actor, choices };
 }
 export async function gameSeriesForActor(tx: Prisma.TransactionClient, userId: number, type: GameType): Promise<GameSeries[]> { return (await gameContext(tx, userId, type)).choices; }

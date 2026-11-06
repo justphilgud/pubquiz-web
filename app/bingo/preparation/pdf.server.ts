@@ -1,3 +1,4 @@
+import { createReferenceCardsPdf } from './pdfReference.server';
 import { createModernCardsPdf } from './pdfModern.server';
 import "server-only";
 import fontkit from "@pdf-lib/fontkit";
@@ -50,6 +51,7 @@ function color(value: string) {
 /** Pure export of stored cards and frozen bytes. No repository writes or asset fetches. */
 export async function createCardsPdf(input: PrintSnapshot, cards: readonly StoredCard[], mode: PrintMode = 'front'): Promise<Uint8Array> {
   const snapshot = parsePrintSnapshot(input);
+  if(snapshot.version===4)return createReferenceCardsPdf(snapshot,cards,mode);
   if(snapshot.version===3)return createModernCardsPdf(snapshot,cards,mode);
   if(snapshot.version===2)return createSquareCardsPdf(snapshot,cards,mode);
   if(mode!=='front')throw new BingoPreparationError('Dieses historische Druckdesign hat keine Rückseite. Bitte eine neue Druckdesign-Version anlegen.');

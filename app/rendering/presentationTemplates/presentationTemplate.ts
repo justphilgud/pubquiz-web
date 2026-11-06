@@ -25,6 +25,7 @@ export type PresentationTemplateStatus =
 
 export type PresentationTemplateConfig = {
   bingoPrint?: BingoPrint;
+  purpose?: "BINGO_PRINT";
   version: typeof PRESENTATION_TEMPLATE_CONTRACT_VERSION;
   tokens: BrandTokens;
   surfaces: {
@@ -307,7 +308,8 @@ function validateConfig(value: unknown) {
   if (!isRecord(value)) {
     return { errors: [{ field: "config", message: "Theme-Konfiguration fehlt." }] };
   }
-  rejectUnknownFields(value, ["version", "tokens", "surfaces", "design", "bingoPrint"], "config", errors);
+  rejectUnknownFields(value, ["version", "tokens", "surfaces", "design", "bingoPrint", "purpose"], "config", errors);
+  if (Object.hasOwn(value,"purpose") && (value.purpose!=="BINGO_PRINT" || !parseBingoPrint(value.bingoPrint) || parseBingoPrint(value.bingoPrint)?.layout?.version!==4)) errors.push({field:"config.purpose",message:"Ungültiger Druckvorlagenvertrag."});
   if (Object.hasOwn(value,"bingoPrint") && !parseBingoPrint(value.bingoPrint)) errors.push({field:"config.bingoPrint",message:"Ungültige Bingo-Druckeinstellungen."});
   if (value.version !== PRESENTATION_TEMPLATE_CONTRACT_VERSION) {
     errors.push({ field: "config.version", message: "Unbekannte Vertragsversion." });
@@ -489,6 +491,7 @@ export function parsePresentationTemplateConfig(
 export function toRuntimePresentationTemplate(
   template: Pick<ManagedPresentationTemplate, "id" | "name" | "config">,
 ): PresentationTemplate {
+  if(template.config.purpose)throw new Error("Druckvorlagen sind keine Präsentationsvorlagen.");
   return {
     id: template.id,
     kind: "PRESENTATION",
@@ -507,6 +510,7 @@ export function toRuntimePresentationTemplate(
 export function toRuntimeAnswerFormTemplate(
   template: Pick<ManagedPresentationTemplate, "id" | "name" | "config">,
 ): AnswerFormTemplate {
+  if(template.config.purpose)throw new Error("Druckvorlagen sind keine Antwortformularvorlagen.");
   return {
     id: template.id,
     kind: "ANSWER_FORM",
