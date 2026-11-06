@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Input, Select, ConfirmDialog } from "@/components/ui";
 import { useContentNavigationGuard } from "@/app/components/content/useContentNavigationGuard";
 import { evaluateClaim } from "../core/round";
@@ -10,7 +10,7 @@ import type { LiveCommand } from "./live";
 import type { AudienceView, ModerationView } from "./repository.server";
 import { saveLive } from "./actions";
 import BingoBoard from "./BingoBoard";
-import { fetchLiveView } from "./useLivePolling";
+import { createLiveViewReader } from "./liveViewReader";
 const lineName = (line: string) => line.startsWith("ROW_") ? `Zeile ${line.slice(4)}` : line.startsWith("COL_") ? `Spalte ${line.slice(4)}` : line === "DIAGONAL_DOWN" ? "Diagonale links oben → rechts unten" : "Diagonale links unten → rechts oben";
 
 export default function ModerationPanel({ initial }: { initial: ModerationView }) {
@@ -26,8 +26,10 @@ export default function ModerationPanel({ initial }: { initial: ModerationView }
   const current = useRef(initial);
   useContentNavigationGuard(Boolean(number || reason || target || cardCode || Object.values(decisionReasons).some(Boolean)));
   const runId = initial.live?.id;
+  const url=`/api/bingo/live/${initial.gameId}${runId ? `?run=${runId}` : ""}`;
+  const reader=useMemo(()=>createLiveViewReader<ModerationView>(url),[url]);
   async function refresh() {
-    const next = await fetchLiveView<ModerationView>(`/api/bingo/live/${initial.gameId}${runId ? `?run=${runId}` : ""}`);
+    const next = await reader.read();
     if (!current.current.live || next.live?.id !== current.current.live.id || (next.live?.revision ?? -1) >= current.current.live.revision) {
       current.current = next; setData(next);
     }
@@ -38,7 +40,7 @@ export default function ModerationPanel({ initial }: { initial: ModerationView }
     const controller = new AbortController();
     const poll = async () => {
       try {
-        const next = await fetchLiveView<ModerationView>(`/api/bingo/live/${initial.gameId}${runId ? `?run=${runId}` : ""}`, controller.signal);
+        const next = await reader.read(controller.signal);
         if (!disposed) {
           if (!current.current.live || next.live?.id !== current.current.live.id || (next.live?.revision ?? -1) >= current.current.live.revision) { current.current = next; setData(next); }
           setConnected(true);
@@ -47,8 +49,8 @@ export default function ModerationPanel({ initial }: { initial: ModerationView }
       if (!disposed) timer = setTimeout(poll, 1500);
     };
     void poll();
-    return () => { disposed = true; controller.abort(); clearTimeout(timer); };
-  }, [initial.gameId, runId]);
+    return () => { disposed = true; controller.abort(); reader.cancel(); clearTimeout(timer); };
+  }, [reader]);
   async function submit(input: Parameters<typeof saveLive>[0]) {
     if (pending.current) return;
     pending.current = true; setBusy(true); setCanRetry(false); retry.current = input; setMessage("Wird gespeichert …");

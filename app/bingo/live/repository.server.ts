@@ -116,10 +116,12 @@ export async function readLegacyLive(userId: number, gameId: string, runId?: str
   assertUuid(gameId); if (runId) assertUuid(runId);
   return prisma.$transaction(async tx => {
     const { game, series } = await preparationContext(tx, userId, gameId);
-    const runs = await tx.$queryRaw<RunRow[]>`SELECT id,game_id,round_id,eventreihe_id,status,revision,started_at,
-      round_snapshot,design_snapshot,audience_key,start_request_hash
+    const runs = await tx.$queryRaw<{id:string;status:string;started_at:Date}[]>`SELECT id,status,started_at
       FROM pubquiz.bingo_live_runs WHERE game_id=${gameId}::uuid ORDER BY started_at DESC,id DESC`;
-    const row = runId ? runs.find(r => r.id === runId) : runs[0];
+    const [row] = await tx.$queryRaw<RunRow[]>`SELECT id,game_id,round_id,eventreihe_id,status,revision,started_at,
+      round_snapshot,design_snapshot,audience_key,start_request_hash FROM pubquiz.bingo_live_runs
+      WHERE game_id=${gameId}::uuid AND (${runId??null}::uuid IS NULL OR id=${runId??null}::uuid)
+      ORDER BY started_at DESC,id DESC LIMIT 1`;
     if (runId && !row) fail("RUN_NOT_FOUND");
     const data = row ? await load(tx, row) : null;
     const at = Math.max(await now(tx), data?.events.at(-1)?.at ?? row?.started_at.getTime() ?? 0);

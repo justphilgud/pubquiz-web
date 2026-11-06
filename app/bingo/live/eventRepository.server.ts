@@ -24,7 +24,7 @@ async function clock(tx:Tx){return (await tx.$queryRaw<{at:Date}[]>`SELECT clock
 export async function eventStorageAvailable(){return Boolean((await prisma.$queryRaw<{present:string|null}[]>`SELECT to_regclass('pubquiz.bingo_event_runs')::text present`)[0].present);}
 export async function selectedRun(gameId:string,runId?:string){
  assertUuid(gameId);if(runId)assertUuid(runId);
- return (await prisma.$queryRaw<(Row&{event_version:number|null})[]>`SELECT r.*,e.version AS event_version FROM pubquiz.bingo_live_runs r LEFT JOIN pubquiz.bingo_event_runs e ON e.run_id=r.id WHERE r.game_id=${gameId}::uuid AND (${runId??null}::uuid IS NULL OR r.id=${runId??null}::uuid) ORDER BY r.started_at DESC,r.id DESC LIMIT 1`)[0]??null;
+ return (await prisma.$queryRaw<{id:string;status:string;event_version:number|null}[]>`SELECT r.id,r.status,e.version AS event_version FROM pubquiz.bingo_live_runs r LEFT JOIN pubquiz.bingo_event_runs e ON e.run_id=r.id WHERE r.game_id=${gameId}::uuid AND (${runId??null}::uuid IS NULL OR r.id=${runId??null}::uuid) ORDER BY r.started_at DESC,r.id DESC LIMIT 1`)[0]??null;
 }
 async function load(tx:Tx,row:Row){
  const first=parseRoundSnapshot(row.round_snapshot,row.round_id);
@@ -37,7 +37,7 @@ async function load(tx:Tx,row:Row){
   return [f.round_id,rows.map(c=>({...storedCard(c),shortCode:shortCardCode(c.prefix,c.ordinal)}))] as const;
  }));
  if(!frozenRows.length||frozenRows[0].opened_at.getTime()!==row.started_at.getTime()||canonical(frozenRows[0].round_snapshot)!==canonical(first))throw Error("INVALID_FROZEN_ROUND");
- const events=await tx.$queryRaw<{request_id:string;request_hash:string;revision:number;actor_id:number;occurred_at:Date;command:unknown;event_round_id:string}[]>`SELECT * FROM pubquiz.bingo_live_events WHERE run_id=${row.id}::uuid ORDER BY revision`;
+ const events=await tx.$queryRaw<{request_id:string;request_hash:string;revision:number;actor_id:number;occurred_at:Date;command:unknown;event_round_id:string}[]>`SELECT request_id,request_hash,revision,actor_id,occurred_at,command,event_round_id FROM pubquiz.bingo_live_events WHERE run_id=${row.id}::uuid ORDER BY revision`;
  if(events.length!==row.revision)throw Error("INVALID_EVENT_HISTORY");
  let state=initialEventRun(row.id,row.game_id,first,row.started_at.getTime()),previousAt=row.started_at.getTime();
  const starts=new Map([[first.id,0]]),durations=new Map<string,number>();
@@ -125,13 +125,13 @@ export async function readEventModeration(userId:number,gameId:string,runId?:str
  const result=await prisma.$transaction(async tx=>{
   await tx.$executeRawUnsafe("SET TRANSACTION READ ONLY");
   const {game,series}=await preparationContext(tx,userId,gameId);
-  const rows=await tx.$queryRaw<Row[]>`SELECT * FROM pubquiz.bingo_live_runs WHERE game_id=${gameId}::uuid ORDER BY started_at DESC,id DESC`;
-  const selected=runId?rows.find(r=>r.id===runId):rows[0];const row=prepareNew&&!runId&&selected?.status==="ENDED"?undefined:selected;if(runId&&!row)throw Error("RUN_NOT_FOUND");
+  const rows=await tx.$queryRaw<{id:string;status:string;started_at:Date}[]>`SELECT id,status,started_at FROM pubquiz.bingo_live_runs WHERE game_id=${gameId}::uuid ORDER BY started_at DESC,id DESC`;
+  const [selected]=await tx.$queryRaw<Row[]>`SELECT id,game_id,round_id,eventreihe_id,status,revision,started_at,round_snapshot,design_snapshot,audience_key,start_request_hash FROM pubquiz.bingo_live_runs WHERE game_id=${gameId}::uuid AND (${runId??null}::uuid IS NULL OR id=${runId??null}::uuid) ORDER BY started_at DESC,id DESC LIMIT 1`;const row=prepareNew&&!runId&&selected?.status==="ENDED"?undefined:selected;if(runId&&!row)throw Error("RUN_NOT_FOUND");
   if(row&&!(await tx.$queryRaw<{run_id:string}[]>`SELECT run_id FROM pubquiz.bingo_event_runs WHERE run_id=${row.id}::uuid`).length)throw Error("LEGACY_RUN");
   const loaded=row?await load(tx,row):null,round=loaded?currentEventRound(loaded.state):null;
   const at=Math.max(await clock(tx),loaded?.previousAt??0);
   const plan=row?await tx.$queryRaw<{round_id:string;position:number}[]>`SELECT round_id,position FROM pubquiz.bingo_event_round_plan WHERE run_id=${row.id}::uuid ORDER BY position`:[];
-  const rounds=await tx.bingo_rounds.findMany({where:{game_id:gameId},orderBy:{position:"asc"},include:{series:{include:{series:{select:{code:true,card_count:true}}}}}});
+  const rounds=await tx.bingo_rounds.findMany({where:{game_id:gameId},orderBy:{position:"asc"},select:{id:true,position:true,label:true,series:{select:{series_id:true,series:{select:{code:true,card_count:true}}}}}});
   const next=plan.find(p=>!loaded?.state.frozen.some(r=>r.id===p.round_id));
   const pageRound=rounds.find(r=>r.id===next?.round_id)??rounds.find(r=>!loaded?.state.frozen.some(f=>f.id===r.id));
   return {protocol:2 as const,prepareNew,gameId,title:game.titel,seriesId:game.eventreihe_id,archived:series.ist_archiviert,
@@ -144,14 +144,14 @@ export async function readEventModeration(userId:number,gameId:string,runId?:str
     blocked:blockingCalls(loaded.state),callContext:sha256(canonical(callContextData(loaded.state))),between:round.status==="CLOSED"&&loaded.state.run.status!=="ENDED",
     summary:loaded.state.run.rounds.map(r=>({id:r.id,label:loaded.state.frozen.find(f=>f.id===r.id)!.label,draws:r.draws.length,confirmed:r.claims.filter(c=>c.decisions.at(-1)?.action==="CONFIRM").length,activeMs:loaded.durations.get(r.id)??activeElapsedMs(loaded.state.run,at)-(loaded.starts.get(r.id)??0)}))}:null};
  },{isolationLevel:"RepeatableRead"});
- const preparation=await readPreparation(userId,gameId,result.preparationPage);
+ const preparation=await readPreparation(userId,gameId,result.preparationPage,1,true);
  return {...result,preparation};
 }
 export type EventModerationView=Awaited<ReturnType<typeof readEventModeration>>;
 export async function readEventAudience(userId:number,key:string){
  assertUuid(key);return prisma.$transaction(async tx=>{
   await tx.$executeRawUnsafe("SET TRANSACTION READ ONLY");
-  const [row]=await tx.$queryRaw<Row[]>`SELECT r.* FROM pubquiz.bingo_live_runs r JOIN pubquiz.bingo_event_runs e ON e.run_id=r.id WHERE r.audience_key=${key}::uuid`;
+  const [row]=await tx.$queryRaw<Row[]>`SELECT r.id,r.game_id,r.round_id,r.eventreihe_id,r.status,r.revision,r.started_at,r.round_snapshot,r.design_snapshot,r.audience_key,r.start_request_hash FROM pubquiz.bingo_live_runs r JOIN pubquiz.bingo_event_runs e ON e.run_id=r.id WHERE r.audience_key=${key}::uuid`;
   if(!row)throw Error("RUN_NOT_FOUND");await preparationContext(tx,userId,row.game_id);
   const {state}=await load(tx,row),round=currentEventRound(state);
   return {id:row.id,revision:row.revision,startedAt:row.started_at.getTime(),status:state.run.status,label:state.frozen.find(f=>f.id===round.id)!.label,

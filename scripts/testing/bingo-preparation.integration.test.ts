@@ -1,3 +1,4 @@
+import { exerciseBingoPolling } from "./bingo-polling.acceptance";
 import { seedLegacyPrintFixture } from './bingo-card-v3-migration-fixture';
 import assert from "node:assert/strict";
 import test from "node:test";
@@ -71,14 +72,15 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   assert.deepEqual(await legacyV2.read(),legacyV2.before,"V3 migration preserves genuine pre-existing card IDs, cells, print snapshot, round and prefix");
   assert.deepEqual((await db.query("SELECT to_jsonb(q) data FROM pubquiz.quiz q WHERE quiz_id=11")).rows[0].data, before);
   assert.deepEqual((await db.query("SELECT * FROM pubquiz.benutzer_reihenrollen ORDER BY benutzer_id")).rows, roles);
-  const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: target.toString() }) });
+  const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: target.toString() }), log:[{emit:"event",level:"query"}] });
+  const pollingQueries:string[]=[];prisma.$on("query",e=>pollingQueries.push(e.query));
   t.after(async () => { await prisma.$disconnect(); });
-  const bundle = await build({ stdin: { contents: "export * from './app/bingo/preparation/repository.server'; export * as live from './app/bingo/live/repository.server'; export * as print from './app/bingo/preparation/printDesignRepository.server'; export * as games from './app/games/gameDraftRepository.server'; export * as eventRun from './app/bingo/live/eventRepository.server'; export * as creation from './app/bingo/eventCreation.server'; export * as settings from './app/eventreihen/settingsRepository.server';export * as terms from './app/bingo/preparation/termRepository.server';", resolveDir: process.cwd() }, bundle: true, write: false, platform: "node", format: "cjs", packages: "external", plugins: [{ name: "database", setup(b) {
-    b.onResolve({ filter: /^(server-only|@\/app\/lib\/prisma|@\/app\/generated\/prisma\/client)$/ }, a => ({ path: a.path, namespace: "fixture" }));
-    b.onLoad({ filter: /.*/, namespace: "fixture" }, a => ({ contents: a.path === "server-only" ? "" : a.path.includes("generated") ? "export const Prisma = globalThis.prismaRuntime;" : "export const prisma = globalThis.fixture;" }));
+  const bundle = await build({ stdin: { contents: "export * from './app/bingo/preparation/repository.server'; export * as live from './app/bingo/live/repository.server'; export * as print from './app/bingo/preparation/printDesignRepository.server'; export * as games from './app/games/gameDraftRepository.server'; export * as eventRun from './app/bingo/live/eventRepository.server'; export * as creation from './app/bingo/eventCreation.server'; export * as settings from './app/eventreihen/settingsRepository.server';export * as terms from './app/bingo/preparation/termRepository.server';export * as polling from './app/bingo/live/pollVersion.server';export * as pollRoute from './app/api/bingo/live/[gameId]/route';", resolveDir: process.cwd() }, bundle: true, write: false, platform: "node", format: "cjs", packages: "external", plugins: [{ name: "database", setup(b) {
+    b.onResolve({ filter: /^(server-only|@\/auth|@\/app\/lib\/prisma|@\/app\/generated\/prisma\/client)$/ }, a => ({ path: a.path, namespace: "fixture" }));
+    b.onLoad({ filter: /.*/, namespace: "fixture" }, a => ({ contents: a.path === "server-only" ? "" : a.path === "@/auth" ? 'export async function auth(){return {user:{id:"1"}}}' : a.path.includes("generated") ? "export const Prisma = globalThis.prismaRuntime;" : "export const prisma = globalThis.fixture;" }));
   } }] });
   const runtime = { exports: {} };
-  runInNewContext(bundle.outputFiles[0].text, { module: runtime, exports: runtime.exports, require: createRequire(import.meta.url), fixture: prisma, prismaRuntime: Prisma, console, process, Date, Buffer, URL, fetch, AbortSignal, structuredClone, setTimeout, clearTimeout });
+  runInNewContext(bundle.outputFiles[0].text, { module: runtime, exports: runtime.exports, require: createRequire(import.meta.url), fixture: prisma, prismaRuntime: Prisma, console, process, Date, Buffer, URL, fetch, AbortSignal, structuredClone, setTimeout, clearTimeout, Response, Request });
   const api = runtime.exports as typeof import("@/app/bingo/preparation/repository.server") & { live: typeof import("@/app/bingo/live/repository.server"); print: typeof import("@/app/bingo/preparation/printDesignRepository.server"); games: typeof import("@/app/games/gameDraftRepository.server");eventRun:typeof import("@/app/bingo/live/eventRepository.server");creation:typeof import("@/app/bingo/eventCreation.server");settings:typeof import("@/app/eventreihen/settingsRepository.server");terms:typeof import("@/app/bingo/preparation/termRepository.server") };
   assert.equal((await api.readExport(1,legacyV2.gameId,legacyV2.seriesId,1,1)).snapshot.version,2);
   const game = await api.games.writeGameDraft(3, "BINGO", { seriesId: 10, title: "Bingo preparation QA", date: "", time: "" });
@@ -282,6 +284,7 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   await db.query(eventMigration.replace(/COMMIT;\s*$/,"ROLLBACK;"));assert.equal((await db.query("SELECT to_regclass('pubquiz.bingo_event_runs') t")).rows[0].t,null);
   await db.query(eventMigration);assert.deepEqual((await db.query("SELECT to_jsonb(r) data FROM pubquiz.bingo_live_runs r ORDER BY id")).rows,beforeEvent);
   await exerciseBingoEvent(db,api.eventRun,api.creation,api,api.settings);
+  await exerciseBingoPolling(db,runtime.exports as Parameters<typeof exerciseBingoPolling>[1],pollingQueries);
   const textGame=await api.creation.createBingoEvent(1,{seriesId:10,title:'V3 1,000 text cards',date:'',time:'',roundCount:1,requestId:randomUUID()});
   let textPrep=await api.readPreparation(1,textGame.id);const textRound=textPrep.rounds[0].id;
   const terms={version:1,name:'Music QA',publication:'HIDDEN',entries:Array.from({length:75},(_,i)=>({number:i+1,text:`Artist ${i+1}`}))};
