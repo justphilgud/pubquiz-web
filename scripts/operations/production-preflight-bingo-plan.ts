@@ -1,3 +1,4 @@
+import {approvedBingoCardPlan,assertBingoCardManifest,bingoCardDeltaEvidence} from "./production-preflight-bingo-card-plan";
 import {approvedBingoEventPlan,assertBingoEventManifest,bingoEventDeltaEvidence} from "./production-preflight-bingo-event-plan";
 import {approvedBingoLivePlan,assertBingoLiveManifest,bingoLiveDeltaEvidence} from "./production-preflight-bingo-live-plan";
 import {createHash} from 'node:crypto';
@@ -12,9 +13,10 @@ export const BINGO_AP2_PLAN=Object.freeze({
  {name:'20261027213000_bingo_label_allocation',checksum:'09a5d228854865c5712779bdd007b5d165a52d650afd62637769e8b3412b82e6'},
  ] as readonly File[],
 });
-export function approvedBingoPlan(baseline:string,candidate:string){return approvedBingoEventPlan(baseline,candidate)??approvedBingoLivePlan(baseline,candidate)??(baseline===BINGO_AP2_PLAN.baselineSha&&candidate===BINGO_AP2_PLAN.candidateSha?BINGO_AP2_PLAN:undefined);}
+export function approvedBingoPlan(baseline:string,candidate:string){return approvedBingoCardPlan(baseline,candidate)??approvedBingoEventPlan(baseline,candidate)??approvedBingoLivePlan(baseline,candidate)??(baseline===BINGO_AP2_PLAN.baselineSha&&candidate===BINGO_AP2_PLAN.candidateSha?BINGO_AP2_PLAN:undefined);}
 const hash=(v:string)=>createHash('sha256').update(v).digest('hex');
 export function assertBingoManifest(baseline:string,candidate:string,before:readonly File[],after:readonly File[],beforeSchema:string,afterSchema:string){
+ if(approvedBingoCardPlan(baseline,candidate))return assertBingoCardManifest(baseline,candidate,before,after,beforeSchema,afterSchema);
  if(approvedBingoEventPlan(baseline,candidate))return assertBingoEventManifest(baseline,candidate,before,after,beforeSchema,afterSchema);
  if(approvedBingoLivePlan(baseline,candidate))return assertBingoLiveManifest(baseline,candidate,before,after,beforeSchema,afterSchema);
  const plan=approvedBingoPlan(baseline,candidate);
@@ -29,6 +31,7 @@ export function bingoPendingDelta(baseline:string,candidate:string,expected:read
  const p=approvedBingoPlan(baseline,candidate);return Boolean(p&&JSON.stringify(expected)===JSON.stringify(p.migrations.map(m=>m.name))&&JSON.stringify(pending)===JSON.stringify(expected)&&p.migrations.every(m=>files.some(f=>f.name===m.name&&f.checksum===m.checksum)));
 }
 export function bingoDeltaEvidence(baseline:string,candidate:string,value:unknown){
+ if(approvedBingoCardPlan(baseline,candidate))return bingoCardDeltaEvidence(baseline,candidate,value);
  if(approvedBingoEventPlan(baseline,candidate))return bingoEventDeltaEvidence(baseline,candidate,value);
  if(approvedBingoLivePlan(baseline,candidate))return bingoLiveDeltaEvidence(baseline,candidate,value);
  if(!approvedBingoPlan(baseline,candidate)||!value||typeof value!=='object')return false;const v=value as Record<string,unknown>;
