@@ -39,8 +39,18 @@ export const ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN = Object.freeze({
   "schemaSha256": "8de3ef99975080831c86be36cae7f62bc4a3abe5e2181e92b1a65b8d590d4947"
 });
 
+// Explicit 06 Nov 2026 authorization: polling-only release, no design migration.
+export const BINGO_POLLING_NO_DELTA_PREFLIGHT_PLAN = Object.freeze({
+  baselineSha: "192f27848f723559e3e18a0b9fdbbeb169a10ed3",
+  candidateSha: "1ff5854dd716d5fb2559e3d5f4cf970e5f5d1696",
+  migrationCount: 70,
+  lastMigration: "20261106180000_bingo_card_design_v3",
+  manifestSha256: "069b34755e9e5eb309c770ffcd17783e1f5bd8ca914096e803ac7d007d5325de",
+  schemaSha256: "df7cd584585ca2fab7fab2926a63f5c90790d461bbc1ac7270733efdc4dab7e8",
+});
+
 export function approvedNoDeltaPreflightPlan(baseline: string, candidate: string) {
-  return [NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN, ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN]
+  return [NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN, ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN, BINGO_POLLING_NO_DELTA_PREFLIGHT_PLAN]
     .find(plan => baseline === plan.baselineSha && candidate === plan.candidateSha);
 }
 
