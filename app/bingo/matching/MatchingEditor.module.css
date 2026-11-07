@@ -98,3 +98,29 @@
  .saveBar { bottom: 0; padding: 12px; } .saveActions { width: 100%; justify-content: space-between; gap: 8px; } .saveState { font-size: 12px; }
  .footnote { padding: 16px 18px; } .saveButton { font-size: 12px; }
 }
+/* Matching-only source dialog; preserve the shared Modal and Quiz surfaces. */
+.keepHint { padding: 0 24px 14px; margin: 0; color: #625d55; font-size: 13px; line-height: 1.5; }
+.editor :is(input,select,button,a,summary) { scroll-margin-block: 110px 160px; }
+.picker.picker > [role=dialog] { max-width: 760px; }
+.picker.picker { color: #171717; }
+.sourceFilters { display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 12px 16px; }
+.sourceFilters > label, .sourceDetails > label { display: grid; gap: 5px; min-width: 0; font-size: 14px; }
+.sourceFilters > :is(p,div[role=alert]) { grid-column: 1 / -1; }
+.sourceFilters > button { align-self: end; }
+.sourceHint { color: #625d55; font-size: 13px; line-height: 1.5; margin: 0; overflow-wrap: anywhere; }
+.sourceResults { display: grid; gap: 8px; margin-block: 16px 12px; }
+.sourceResults > button { display: block; text-align: left; border: 1px solid #827b70; border-radius: 7px; padding: 10px 12px; min-height: 44px; overflow-wrap: anywhere; }
+.sourceResults > button[aria-pressed=true] { background: #f6c4dc; color: #171717; }
+.sourceResults > button span { display: block; margin-top: 4px; font-size: 12px; color: #625d55; }
+.sourcePages { display: flex; gap: 8px; }
+.sourceDetails { display: grid; gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid #c9c2b5; overflow-wrap: anywhere; }
+.sourceDetails h3 { margin: 0; font-size: 19px; }
+.sourceDetails > button { justify-self: start; }
+.selectedTemplate { font-size: 12px; line-height: 1.5; margin: 6px 0 0; overflow-wrap: anywhere; }
+.sourceMessage { padding: 10px 12px; border: 1px solid #991b1b; border-radius: 7px; color: #991b1b; margin-top: 12px; }
+.picker.picker button { min-height: 44px; }
+@media(max-width:700px) {
+ .sourceFilters { grid-template-columns: 1fr; }
+ .keepHint { padding-inline: 18px; }
+ .editor :is(input,select,button,a,summary) { scroll-margin-block: 100px 210px; }
+}

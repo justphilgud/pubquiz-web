@@ -1,0 +1,110 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
+import { spawn,execFileSync } from 'node:child_process';
+const origin='http://127.0.0.1:3058',fixture=JSON.parse(fs.readFileSync('.artifacts/matching-ux-fixture.json')),accounts=JSON.parse(fs.readFileSync('.env.bingo-matching-accounts.json'));
+if (!accounts.every(a => /^matching\.[a-z]+@example\.invalid$/.test(a.email)))
+    throw Error('SYNTHETIC_ACCOUNTS_ONLY');
+const out = path.resolve('.artifacts/bingo-matching-ux-after');
+fs.mkdirSync(out, { recursive: true });
+const chrome = ['C:/Program Files/Google/Chrome/Application/chrome.exe', '/usr/bin/google-chrome', '/usr/bin/chromium'].find(p => fs.existsSync(p));
+if (!chrome)
+    throw Error('CHROME_REQUIRED');
+const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'bingo-matching-browser-')), browser = spawn(chrome, ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-background-networking','--disable-background-timer-throttling','--disable-renderer-backgrounding', '--no-first-run', `--user-data-dir=${profile}`, '--remote-debugging-port=0', 'about:blank'], { stdio: 'ignore' });
+const network=[],idleWindows=[];let watch=false;
+let ws, id = 0, dialog = false, allowNavigation = false, closing = false;
+const retiredSessions = new Set(),targets=new Map();
+const requests = new Map(), passed = [];
+const appendProgress=passed.push.bind(passed);passed.push=(...items)=>{const count=appendProgress(...items);fs.writeFileSync(path.join(out,'progress.json'),JSON.stringify({origin,passed},null,2));return count;};
+const delay = ms => new Promise(r => setTimeout(r, ms));
+async function idle(label){const start=Date.now(),before=network.filter(n=>n.method==='POST').length;await delay(10000);const count=network.filter(n=>n.method==='POST').length-before;idleWindows.push({label,durationMs:Date.now()-start,sourcePosts:count});assert.equal(count,0,label+' has no repeated source requests');}
+async function until(f, m, timeout = 60000) { const end = Date.now() + timeout; while (Date.now() < end) {
+    if (await f())
+        return;
+    await delay(120);
+} throw Error(m); }
+function call(method, params = {}, sessionId) { return new Promise((resolve, reject) => { const key = ++id, timer = setTimeout(() => { requests.delete(key); reject(Error('CDP timeout ' + method)); }, 30000); requests.set(key, { resolve: r => { clearTimeout(timer); resolve(r); }, reject: e => { clearTimeout(timer); reject(e); } }); ws.send(JSON.stringify({ id: key, method, params, sessionId })); }); }
+async function evaluate(s, expression) { const r = await call('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true, userGesture: true }, s); if (r.exceptionDetails)
+    throw Error(r.exceptionDetails.exception?.description || r.exceptionDetails.text); return r.result?.value; }
+async function tab(context) { const t = await call('Target.createTarget', { url: 'about:blank', browserContextId: context }); const s = (await call('Target.attachToTarget', { targetId: t.targetId, flatten: true })).sessionId; targets.set(s,t.targetId);await call('Page.enable', {}, s);await call('Network.enable',{},s);return s; }
+async function goto(s, p) { const token = 'navigation-' + Date.now() + '-' + Math.random(); await evaluate(s, 'window.__matchingNavigationToken=' + JSON.stringify(token)); allowNavigation = true; try {
+    await call('Page.navigate', { url: origin + p }, s);
+    await until(() => evaluate(s, 'window.__matchingNavigationToken!==' + JSON.stringify(token) + '&&document.readyState==="complete"'), 'new document ready');
+}
+finally {
+    allowNavigation = false;
+} }
+async function query(s, selector, tail = '') { return evaluate(s, 'document.querySelector(' + JSON.stringify(selector) + ')' + tail); }
+async function text(s) { return evaluate(s, 'document.body?.innerText??""'); }
+async function button(s, label) { await call('Target.activateTarget',{targetId:targets.get(s)}); await until(() => evaluate(s, `[...(document.querySelector('[role=dialog]')??document).querySelectorAll('button')].some(e=>(e.textContent.trim()===${JSON.stringify(label)}||e.getAttribute('aria-label')===${JSON.stringify(label)})&&!e.matches(':disabled'))`), 'button ready ' + label); await evaluate(s, `(()=>{const e=[...(document.querySelector('[role=dialog]')??document).querySelectorAll('button')].find(e=>e.textContent.trim()===${JSON.stringify(label)}||e.getAttribute('aria-label')===${JSON.stringify(label)});if(!e||e.matches(':disabled'))throw Error('Unavailable button '+${JSON.stringify(label)});e.focus();e.click()})()`); await delay(100); }
+async function set(s, selector, value) { await call('Target.activateTarget',{targetId:targets.get(s)}); await until(() => query(s, selector, "!==null&&!document.querySelector("+JSON.stringify(selector)+").matches(':disabled')"), "input ready " + selector); await evaluate(s, `(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)throw Error('Missing input '+${JSON.stringify(selector)});e.focus();Object.getOwnPropertyDescriptor(e.tagName==='SELECT'?HTMLSelectElement.prototype:HTMLInputElement.prototype,'value').set.call(e,${JSON.stringify(value)});e.dispatchEvent(new Event(e.tagName==='SELECT'?'change':'input',{bubbles:true}))})()`); await delay(120); }
+async function selectLabel(s, label, value) { await evaluate(s, `(()=>{const label=[...document.querySelectorAll('[role=dialog] label')].find(l=>l.textContent.startsWith(${JSON.stringify(label)})),e=label?.querySelector('select');if(!e)throw Error('Missing dialog select');Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,'value').set.call(e,${JSON.stringify(value)});e.dispatchEvent(new Event('change',{bubbles:true}))})()`); await delay(150); }
+async function saveUi(s){const count=await query(s,'select','.options.length');await button(s,'Zuordnungssatz speichern');await until(()=>query(s,'select','.options.length>'+count),'new immutable version loaded');}
+async function check(s, selector, checked) { await evaluate(s, `(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)throw Error('Missing checkbox');if(e.checked!==${checked})e.click()})()`); await delay(120); }
+async function login(s, a) { await goto(s, '/login'); await until(() => evaluate(s, '!!document.querySelector("[name=email]")'), 'login ready'); await set(s, '[name=email]', a.email); await set(s, '[name=password]', a.password); await evaluate(s, 'document.querySelector("button[type=submit]").click()'); await until(() => evaluate(s, 'location.pathname!=="/login"'), 'fresh password login'); }
+async function screenshot(s, name, w, h) { await call('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile: w < 500 }, s); await delay(300); await evaluate(s, 'document.fonts.ready.then(()=>true)'); const r = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false }, s); fs.writeFileSync(path.join(out, name + '.png'), Buffer.from(r.data, 'base64')); assert.equal(await evaluate(s, 'document.documentElement.scrollWidth<=innerWidth'), true, 'page overflow ' + name); }
+try {
+    let endpoint;
+    await until(() => { try {
+        endpoint = fs.readFileSync(path.join(profile, 'DevToolsActivePort'), 'utf8').trim().split(/\r?\n/);
+        return endpoint.length === 2;
+    }
+    catch {
+        return false;
+    } }, 'Chrome start');
+    ws = new WebSocket(`ws://127.0.0.1:${endpoint[0]}${endpoint[1]}`);
+    await new Promise((r, j) => { ws.onopen = r; ws.onerror = j; });
+    ws.onmessage = e => { const m = JSON.parse(String(e.data));if(watch&&m.method==='Network.requestWillBeSent'&&m.params.request.url.startsWith(origin+'/bingo/'))network.push({path:new URL(m.params.request.url).pathname,method:m.params.request.method,action:m.params.request.headers['Next-Action']??m.params.request.headers['next-action']??null,time:Date.now()});if (m.method === 'Page.javascriptDialogOpening') {
+        dialog = true;
+        void call('Page.handleJavaScriptDialog', { accept: allowNavigation }, m.sessionId);
+        return;
+    } if (!m.id)
+        return; const p = requests.get(m.id); requests.delete(m.id); if (m.error)
+        p?.reject(Error(m.error.message));
+    else
+        p?.resolve(m.result || {}); };
+    const context = (await call('Target.createBrowserContext')).browserContextId, s = await tab(context);
+    await login(s, accounts.find(a => a.role === 'admin'));
+    passed.push('fresh synthetic Admin login');
+    const termPrefix='UX '+Date.now(),route='/bingo/'+fixture.gameId+'/matching?round='+fixture.rounds[0];
+    await goto(s,route);await until(()=>query(s,'[data-matching-number="1"]','!==null'),'actual Next page');await delay(500);
+    assert(await query(s,'header','!==null'),'real global AppHeader mounted');
+    watch=true;await idle('page before opening dialog');passed.push('actual AppHeader and idle page without source/template POST polling');
+    for(const [w,h] of [[1366,768],[1280,720],[390,844]]){await evaluate(s,'scrollTo(0,0)');await screenshot(s,'page-'+w,w,h);await query(s,'[data-matching-number="1"]','.scrollIntoView({block:"center"})');await screenshot(s,'rows-'+w,w,h);}
+    await call('Emulation.setDeviceMetricsOverride',{width:1366,height:768,deviceScaleFactor:1,mobile:false},s);
+    const savedName='UX lokale Abnahme '+Date.now();await set(s,'input[maxlength="80"]',savedName);await saveUi(s);await goto(s,route);await until(()=>query(s,'input[maxlength="80"]','?.value==='+JSON.stringify(savedName)),'actual DB save and full reload');passed.push('actual save immutable version and full document reload');
+    await set(s,'input[maxlength="80"]','Ungespeicherter Entwurf');dialog=false;await evaluate(s,'[...document.querySelectorAll("a")].find(a=>a.textContent==="Abbrechen").click()');await until(()=>dialog,'native unsaved dialog');assert.equal(await query(s,'input[maxlength="80"]','.value'),'Ungespeicherter Entwurf');assert.equal(await evaluate(s,'location.pathname'),'/bingo/'+fixture.gameId+'/matching');passed.push('native browser cancellation preserves page and actual unsaved input');
+    await goto(s,route);const retainedBefore=await query(s,'[data-matching-number="1"] [class*=printed]','.innerText');await set(s,'[aria-label="Bereich von"]','15');await set(s,'[aria-label="Bereich bis"]','26');assert.equal(await evaluate(s,'document.querySelectorAll("[data-matching-number]").length'),12);await button(s,'Bereich auswählen');await button(s,'Zahl beibehalten deaktivieren');for(let n=15;n<=26;n++)await set(s,'[aria-label="Präsentationstext Kugel '+n+'"]',termPrefix+' '+n);await saveUi(s);await goto(s,route);await until(()=>query(s,'[aria-label="Präsentationstext Kugel 15"]','?.value==='+JSON.stringify(termPrefix+' 15')),'range retained');assert.equal(await query(s,'[data-matching-number="1"] [class*=printed]','.innerText'),retainedBefore,'hidden original card text retained');
+    await button(s,'1–90');assert.equal(await evaluate(s,'document.querySelectorAll("[data-matching-number]").length'),90);assert(await query(s,'[data-matching-number="90"]','?.innerText.includes("Außerhalb 75er-Modus")'));await check(s,'[aria-label="Kugel 15: Zahl beibehalten"]',true);assert.equal(await query(s,'[aria-label="Präsentationstext Kugel 15"]','.value'),termPrefix+' 15');await check(s,'[aria-label="Kugel 15: Zahl beibehalten"]',false);passed.push('15–26 bulk assignment persists, all90 retained, hidden original and inactive alternatives preserved');
+    // Two independent windows edit the same real revision; no mocked actions.
+    const other=await tab(context);await goto(other,route);await until(()=>query(other,'input[maxlength="80"]','!==null'),'second editor');await set(s,'input[maxlength="80"]','Erste tatsächliche Fassung '+Date.now());await saveUi(s);await set(other,'input[maxlength="80"]','Zweiter Entwurf bleibt');await button(other,'Zuordnungssatz speichern');await until(()=>text(other).then(t=>t.includes('inzwischen geändert')),'actual CAS conflict');assert.equal(await query(other,'input[maxlength="80"]','.value'),'Zweiter Entwurf bleibt');passed.push('actual two-window PostgreSQL CAS conflict preserves second draft');
+    // Row errors remain visible in summary even when their rows are filtered out.
+    await goto(s,route);await check(s,'[aria-label="Kugel 2: Zahl beibehalten"]',false);await set(s,'[aria-label="Präsentationstext Kugel 2"]',termPrefix+' 15');await set(s,'[aria-label="Bereich von"]','30');await set(s,'[aria-label="Bereich bis"]','35');assert((await text(s)).includes('auch außerhalb des sichtbaren Bereichs'));assert.equal(await evaluate(s,'[...document.querySelectorAll("button")].find(e=>e.textContent.includes("Zuordnungssatz speichern")).disabled'),true);await goto(s,route);passed.push('duplicate validation blocks save with hidden-row error summary');
+    await button(s,'Kugel 1: Aus Quizbestand auswählen');await until(()=>query(s,'[role=combobox]','!==null&&!document.querySelector("[role=combobox]").disabled'),'real authorized template options');await set(s,'[role=dialog] input[maxlength="120"]',fixture.sourcePrefix);await selectLabel(s,'Medientyp','AUDIO');await until(()=>evaluate(s,'[...document.querySelectorAll("[role=dialog] button")].filter(b=>b.textContent.startsWith("UX-Suchprüfung")).length===20'),'filtered first audio page');
+    await idle('open dialog with settled filters');await button(s,'Weitere Quellen');await until(()=>text(s).then(t=>t.includes('UX-Suchprüfung 231')),'second filtered page');await button(s,'Weitere Quellen');await until(()=>evaluate(s,'[...document.querySelectorAll("[role=dialog] button")].filter(b=>b.textContent.startsWith("UX-Suchprüfung")).length===10'),'partial last page');assert.equal(await evaluate(s,'[...document.querySelectorAll("[role=dialog] button")].some(b=>b.textContent==="Weitere Quellen")'),false);passed.push('actual 50 audio results beyond210images: pages20/20/10 with no false empty page');
+    await query(s,'[role=combobox]','.click()');await set(s,'[role=combobox]','Originalquellen');await call('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowDown',code:'ArrowDown',windowsVirtualKeyCode:40},s);await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',windowsVirtualKeyCode:13},s);await until(()=>evaluate(s,'[...document.querySelectorAll("[role=dialog] button")].filter(b=>b.textContent.startsWith("UX-Suchprüfung")).length===20'),'template resets to first page');assert((await text(s)).includes('Gewählte Vorlage: '+fixture.templates[1].name));
+    await screenshot(s,'dialog-1366',1366,768);await screenshot(s,'dialog-390',390,844);await screenshot(s,'dialog-1280',1280,720);await call('Emulation.setDeviceMetricsOverride',{width:1366,height:768,deviceScaleFactor:1,mobile:false},s);
+    await query(s,'[role=combobox]','.click()');await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27},s);assert.equal(await query(s,'[role=combobox]','.getAttribute("aria-expanded")'),'false');assert(await query(s,'[role=dialog]','!==null'));await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27},s);await until(()=>query(s,'[role=dialog]','===null'),'outer dialog closes');assert.equal(await evaluate(s,'document.activeElement.getAttribute("aria-label")'),'Kugel 1: Aus Quizbestand auswählen');passed.push('real template keyboard selection, complete long-name context, nested Escape and focus restoration');
+    // Six media/answer combinations are independently selected, applied, saved and reloaded.
+    for(const variant of ['music_original_audio','music_reverse_audio'])for(const answerLabel of ['Interpret','Titel','Interpret + Titel']){
+      await button(s,'Kugel 1: Aus Quizbestand auswählen');await until(()=>query(s,'[role=combobox]','!==null&&!document.querySelector("[role=combobox]").disabled'),'dialog ready');await set(s,'[role=dialog] input[maxlength="120"]','Matching QA Musik:');await until(()=>evaluate(s,'[...document.querySelectorAll("[role=dialog] button")].some(b=>b.textContent.startsWith("Matching QA Musik:"))'),'music source');await evaluate(s,'[...document.querySelectorAll("[role=dialog] button")].find(b=>b.textContent.startsWith("Matching QA Musik:")).click()');await until(()=>query(s,'[role=dialog] h3','!==null'),'source details');
+      const values=await evaluate(s,`(()=>{const labels=[...document.querySelectorAll('[role=dialog] label')],medium=labels.find(l=>l.textContent.startsWith('Medium und Variante')).querySelector('select'),answer=labels.find(l=>l.textContent.startsWith('Bingokarte')).querySelector('select');return {media:[...medium.options].find(o=>o.textContent.startsWith(${JSON.stringify(variant==='music_original_audio'?'Originalaufnahme':'Rückwärtsaufnahme')})).value,answer:[...answer.options].find(o=>o.textContent.startsWith(${JSON.stringify(answerLabel+' —')})).value,text:[...answer.options].find(o=>o.textContent.startsWith(${JSON.stringify(answerLabel+' —')})).textContent.split(' — ')[1]}})()`);
+      await selectLabel(s,'Medium und Variante',values.media);await selectLabel(s,'Bingokarte',values.answer);await button(s,'Zuordnung übernehmen');await until(()=>query(s,'[role=dialog]','===null'),'fresh source applied');assert((await query(s,'[data-matching-number="1"]','.innerText')).includes(values.text));await saveUi(s);await goto(s,route);await until(()=>query(s,'[data-matching-number="1"]','?.innerText.includes('+JSON.stringify(values.text)+')'),'six combinations persisted');
+    }
+    passed.push('six actual source combinations Original/Reverse × artist/title/combined; fresh authorization, immutable save and reload');
+    // Own text, source filters and no idle requests after close.
+    await button(s,'Kugel 1: Aus Quizbestand auswählen');await set(s,'[role=dialog] input[maxlength="120"]','Matching QA Musik:');await until(()=>evaluate(s,'[...document.querySelectorAll("[role=dialog] button")].some(b=>b.textContent.startsWith("Matching QA Musik:"))'),'custom source');await evaluate(s,'[...document.querySelectorAll("[role=dialog] button")].find(b=>b.textContent.startsWith("Matching QA Musik:")).click()');await until(()=>query(s,'[role=dialog] h3','!==null'),'custom source details');await selectLabel(s,'Bingokarte','custom');const ownText='Eigener UX-Kartentext '+Date.now();await evaluate(s,`(()=>{const label=[...document.querySelectorAll('[role=dialog] label')].find(l=>l.textContent.startsWith('Eigener Text')),e=label.querySelector('input');e.focus();Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(e,${JSON.stringify(ownText)});e.dispatchEvent(new Event('input',{bubbles:true}))})()`);const originalId=await evaluate(s,`[...document.querySelectorAll('[role=dialog] select')][1].options[1].value`);await selectLabel(s,'Medium und Variante',originalId);await button(s,'Zuordnung übernehmen');await until(()=>query(s,'[role=dialog]','===null'),'custom source apply');await saveUi(s);await goto(s,route);await until(()=>query(s,'[data-matching-number="1"]','?.innerText.includes('+JSON.stringify(ownText)+')'),'custom text persisted');passed.push('own card text independently selected, freshly verified, saved and reloaded');await idle('page after closing dialog');
+    // Focused controls and final row must clear the sticky toolbar at all viewports.
+    for(const[w,h]of[[1366,768],[1280,720],[390,844]]){await call('Emulation.setDeviceMetricsOverride',{width:w,height:h,deviceScaleFactor:1,mobile:w<500},s);await button(s,'1–75');await query(s,'[aria-label="Präsentationstext Kugel 75"]','.focus()');await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Tab',code:'Tab',windowsVirtualKeyCode:9},s);await delay(150);const rect=await evaluate(s,`(()=>{const a=document.activeElement,r=a.getBoundingClientRect(),bar=document.querySelector('[class*=saveBar]').getBoundingClientRect();return {label:a.getAttribute('aria-label'),top:r.top,bottom:r.bottom,bar:bar.top,height:innerHeight}})()`);assert(rect.top>=0&&rect.bottom<=rect.bar,'focused last-row control hidden at '+w+': '+JSON.stringify(rect));await screenshot(s,'last-row-'+w,w,h);}
+    passed.push('native Tab, visible focus and last row clear save toolbar at1366×768/1280×720/390×844');
+    // Fresh, separate authenticated contexts exercise the real routed authorization gates.
+    for(const role of ['manager','editor','management','none']){
+      const ctx=(await call('Target.createBrowserContext')).browserContextId,t=await tab(ctx);await login(t,accounts.find(a=>a.role===role));await goto(t,route);
+      if(role==='manager'){await until(()=>query(t,'[data-matching-number="1"]','!==null'),'manager matching');await button(t,'Kugel 1: Aus Quizbestand auswählen');await until(()=>query(t,'[role=combobox]','!==null&&!document.querySelector("[role=combobox]").disabled'),'manager template metadata');await button(t,'Schließen');}
+      else{await until(()=>text(t).then(value=>/404|not be found|nicht gefunden/i.test(value)),'denied role '+role);assert.equal(await query(t,'[data-matching-number]','===null'),true);}
+      passed.push('actual fresh '+role+' routed permission check');retiredSessions.add(t);await call('Target.disposeBrowserContext',{browserContextId:ctx});
+    }
+    await goto(s,'/bingo/'+fixture.lockedGameId+'/matching?round='+fixture.lockedRoundId);await until(()=>text(s).then(t=>t.includes('schreibgeschützt')),'locked round explained above table');assert.equal(await query(s,'input[maxlength="80"]',".matches(':disabled')"),true);await screenshot(s,'locked-1366',1366,768);passed.push('used-card round visibly explained and read-only');
+    fs.writeFileSync(path.join(out,'results.json'),JSON.stringify({gitHead:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),origin,fixture,passed,network,idleWindows,productionTouched:false,realServerActions:true},null,2));console.log(JSON.stringify({passed}));
+}catch(e){console.error(e.stack);process.exitCode=1;}finally{closing=true;if(ws?.readyState===1){await call('Browser.close').catch(()=>{});ws.close();}browser.kill();}

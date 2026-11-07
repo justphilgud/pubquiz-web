@@ -14,7 +14,7 @@ export default function MatchingTemplateSelect({options,value,onChange,disabled}
  return <div ref={containerRef} className={styles.templatePicker}>
   <label htmlFor={id}>Fragevorlage</label>
   <div className={styles.comboInput}>
-   <input ref={triggerRef} id={id} role="combobox" aria-autocomplete="list" aria-expanded={open} aria-controls={`${id}-list`} aria-activedescendant={open&&choices[active]?`${id}-option-${active}`:undefined} disabled={disabled}
+   <input ref={triggerRef} id={id} role="combobox" aria-describedby={value?`${id}-selected`:undefined} aria-autocomplete="list" aria-expanded={open} aria-controls={`${id}-list`} aria-activedescendant={open&&choices[active]?`${id}-option-${active}`:undefined} disabled={disabled}
     value={open?query:options.find(o=>o.code===value)?.name??'Alle Vorlagen'} placeholder="Vorlage suchen …"
     onClick={()=>{setOpen(true);setQuery('');setActive(0);}}
     onChange={e=>{setQuery(e.target.value);setOpen(true);setActive(0);}}
@@ -23,6 +23,7 @@ export default function MatchingTemplateSelect({options,value,onChange,disabled}
      else if(e.key==='Enter'&&open){e.preventDefault();if(choices[active])choose(choices[active].code);}}}/>
    <ChevronDownIcon aria-hidden="true"/>
   </div>
+  {value&&<p id={`${id}-selected`} className={styles.selectedTemplate}>Gewählte Vorlage: <strong>{options.find(o=>o.code===value)?.name??'Nicht mehr verfügbar'}</strong></p>}
   {open&&<div id={`${id}-list`} role="listbox" aria-label="Fragevorlagen" className={styles.options}>
    {choices.map((o,i)=><button key={o.code} type="button" role="option" tabIndex={-1} id={`${id}-option-${i}`} aria-selected={value===o.code} data-active={i===active} onMouseDown={e=>e.preventDefault()} onClick={()=>choose(o.code)}>{o.name}{value===o.code&&<CheckIcon aria-hidden="true"/>}</button>)}
    {!choices.length&&<p>Keine passende Vorlage.</p>}

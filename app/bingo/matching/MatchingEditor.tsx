@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import {useState,useTransition,type SetStateAction} from 'react';
+import {useRef,useState,useTransition,type SetStateAction} from 'react';
 import {useRouter} from 'next/navigation';
 import {MagnifyingGlassIcon,CheckIcon,ArrowDownTrayIcon} from '@heroicons/react/24/outline';
 import {Button,Input,Select,IconButton} from '@/components/ui';
@@ -15,14 +15,22 @@ type Data=Awaited<ReturnType<typeof readMatchingEditor>>;
 export default function MatchingEditor({data}:{data:Data}){
  const router=useRouter(),initial={name:data.current?.name??'Zuordnung 1',publication:data.current?.publication??'DIRECT',entries:initialMatchingEntries(data.current)};
  const [draft,setDraftState]=useState(initial),[baseline,setBaseline]=useState(JSON.stringify(initial)),[from,setFrom]=useState('1'),[to,setTo]=useState('75'),[selected,setSelected]=useState<Set<number>>(new Set()),[sourceNumber,setSourceNumber]=useState<number|null>(null),[answers,setAnswers]=useState<Record<number,SourceAnswer[]>>({}),[message,setMessage]=useState(''),[pending,start]=useTransition();
+ const loadingAnswers=useRef(new Set<number>());
  const dirty=JSON.stringify(draft)!==baseline,markSaved=useContentNavigationGuard(dirty),errors=matchingErrors(draft.entries),blocked=data.locked||pending;
  function setDraft(next:SetStateAction<typeof initial>){setMessage('');setDraftState(next);}
  function update(n:number,change:Partial<MatchingEntry>){setDraft(d=>({...d,entries:d.entries.map(e=>e.number===n?{...e,...change}:e)}));}
- async function loadAnswers(entry:MatchingEntry){if(entry.presentation.kind!=='MEDIA'||!entry.presentation.source||answers[entry.number])return;const q=await getMatchingSource(data.gameId,entry.presentation.source.questionId,entry.presentation.source.assetId);if(q.success)setAnswers(a=>({...a,[entry.number]:q.item.answers}));}
+ async function loadAnswers(entry:MatchingEntry){
+  if(entry.presentation.kind!=='MEDIA'||!entry.presentation.source||answers[entry.number]||loadingAnswers.current.has(entry.number))return;
+  loadingAnswers.current.add(entry.number);
+  try{const q=await getMatchingSource(data.gameId,entry.presentation.source.questionId,entry.presentation.source.assetId);if(q.success)setAnswers(a=>({...a,[entry.number]:q.item.answers}));else setMessage('Kartenantworten konnten nicht geladen werden. Deine Eingaben bleiben erhalten.');}
+  catch{setMessage('Kartenantworten konnten nicht geladen werden. Bitte das Feld erneut öffnen.');}
+  finally{loadingAnswers.current.delete(entry.number);}
+ }
  const validRange=/^\d+$/.test(from)&&/^\d+$/.test(to)&&Number(from)>=1&&Number(to)<=90&&Number(from)<=Number(to),visible=validRange?draft.entries.filter(e=>e.number>=Number(from)&&e.number<=Number(to)):[];
  const changedCount=draft.entries.filter(e=>e.number<=75&&!e.keepNumber).length;
  return <div className={styles.editor}>
   <form onSubmit={e=>{e.preventDefault();start(async()=>{const result=await saveMatching({gameId:data.gameId,roundId:data.roundId,revision:data.revision,config:{version:2,...draft}});if(!result.success){setMessage(result.message);return;}markSaved();setBaseline(JSON.stringify(draft));setMessage('Neue Zuordnungsfassung gespeichert.');router.refresh();});}}>
+   {data.locked&&<p className={styles.notice}>Diese Runde ist schreibgeschützt: Bereits verwendete Karten und Durchläufe bleiben unverändert. Zum Ändern eine neue Runde anlegen.</p>}
    <section className={styles.settings} aria-labelledby="matching-settings-title">
     <div className={styles.sectionTitle}><h2 id="matching-settings-title">Deine Zuordnung</h2><span>{data.label} · 75er-Bingo</span></div>
     <fieldset disabled={blocked} className={styles.settingsGrid}>
@@ -36,13 +44,14 @@ export default function MatchingEditor({data}:{data:Data}){
      <div><h2 id="matching-table-title">Zahlen & Inhalte</h2><p>Was sieht das Publikum – und was steht auf der Karte?</p></div>
      <span className={styles.count}>{changedCount} von 75 individuell belegt</span>
     </div>
+    <p className={styles.keepHint}>„Zahl beibehalten“ lässt die Kugelnummer wirksam. Vorbereitete alternative Inhalte bleiben gespeichert und werden erst nach dem Ausschalten verwendet.</p>
     <div className={styles.rangeBar}>
      <div className={styles.presets} aria-label="Sichtbarer Zahlenbereich"><Button variant="secondary" type="button" aria-pressed={from==='1'&&to==='75'} onClick={()=>{setFrom('1');setTo('75');}}>1–75</Button><Button variant="secondary" type="button" aria-pressed={from==='1'&&to==='90'} onClick={()=>{setFrom('1');setTo('90');}}>1–90</Button></div>
      <div className={styles.rangeInputs}><label>Von<Input aria-label="Bereich von" type="number" min={1} max={90} value={from} onChange={e=>setFrom(e.target.value)}/></label><span aria-hidden="true">–</span><label>Bis<Input aria-label="Bereich bis" type="number" min={1} max={90} value={to} onChange={e=>setTo(e.target.value)}/></label></div>
      <Button variant="secondary" type="button" disabled={blocked||!visible.length} onClick={()=>setSelected(new Set(visible.map(e=>e.number)))}>Bereich auswählen</Button>
      <span className={styles.rangeHint}>Der Bereich filtert nur diese Ansicht.</span>
     </div>
-    {selected.size>0&&<div className={styles.bulkBar} aria-label="Aktionen für ausgewählte Kugeln"><strong>{selected.size} ausgewählt</strong><Button variant="secondary" type="button" disabled={blocked} onClick={()=>setDraft(d=>({...d,entries:d.entries.map(e=>selected.has(e.number)?{...e,keepNumber:true}:e)}))}>Zahl beibehalten aktivieren</Button><Button variant="secondary" type="button" disabled={blocked} onClick={()=>setDraft(d=>({...d,entries:d.entries.map(e=>selected.has(e.number)?{...e,keepNumber:false}:e)}))}>Zahl beibehalten deaktivieren</Button><Button variant="ghost" type="button" onClick={()=>setSelected(new Set())}>Auswahl aufheben</Button></div>}
+    {selected.size>0&&<div className={styles.bulkBar} aria-label="Aktionen für ausgewählte Kugeln"><strong>{selected.size} ausgewählt{[...selected].some(n=>!visible.some(e=>e.number===n))?' – einschließlich ausgeblendeter Zeilen':''}</strong><Button variant="secondary" type="button" disabled={blocked} onClick={()=>setDraft(d=>({...d,entries:d.entries.map(e=>selected.has(e.number)?{...e,keepNumber:true}:e)}))}>Zahl beibehalten aktivieren</Button><Button variant="secondary" type="button" disabled={blocked} onClick={()=>setDraft(d=>({...d,entries:d.entries.map(e=>selected.has(e.number)?{...e,keepNumber:false}:e)}))}>Zahl beibehalten deaktivieren</Button><Button variant="ghost" type="button" onClick={()=>setSelected(new Set())}>Auswahl aufheben</Button></div>}
     {!validRange&&<p role="alert" className={styles.notice}>Bitte einen Bereich zwischen 1 und 90 angeben.</p>}
     <table className={styles.table} aria-label="Bingo-Matching-Tabelle">
      <thead><tr><th>Auswahl / Zahl</th><th>Zahl beibehalten</th><th>Präsentation</th><th>Bingokarte</th></tr></thead>

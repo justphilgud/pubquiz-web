@@ -210,3 +210,38 @@ keine unterschiedlichen Codes. Kein neuer Pollingpfad, Schema- oder Laufzeitvert
 Automatische Nachweise: `sourceQuery.test.ts`, `sourceOptions.test.ts` und die echte
 PostgreSQL-Abnahme mit 210 Bild- und 50 Audioquellen (20/20/10), Vorlagen jenseits
 200, Produkt-/Quellenentzug und Kontrolle der tatsächlichen SQL-Projektion.
+
+### Dialog, Entwurf und lokale Bedienung (PR #160)
+
+`SourcePicker` verwendet die bestehende durchsuchbare Vorlagenauswahl und den
+vorhandenen Modal-/Medienplayer-Vertrag. Matching-eigene Request-Lanes lassen pro
+Leseweg nur eine Anfrage gleichzeitig laufen, ersetzen wartende überholte Suchen
+und ignorieren verspätete Antworten. Filterwechsel invalidieren Ergebnisse sofort,
+setzen die Seite zurück und suchen nach 250 ms Ruhe neu. Explizites Suchen bzw.
+Wiederholen bleibt möglich. Schließen invalidiert ausstehende UI-Aktualisierungen;
+bereits laufende serverseitige Leseanfragen werden dadurch nicht rückgängig gemacht.
+Es gibt kein zeitgesteuertes Quellenpolling.
+
+Laden, technischer Fehler mit Wiederholen, keine berechtigten Vorlagen und keine
+Suchtreffer sind getrennte sichtbare Zustände. Lange ausgewählte Vorlagennamen
+stehen zusätzlich vollständig unter der Auswahl; Variante und tatsächlich
+wirksamer Drucktext bleiben im Kontext sichtbar. Escape schließt zuerst die offene
+Vorlagenliste, danach den Dialog; der Fokus kehrt zur Medien-Lupe zurück.
+Unmittelbar vor Übernahme werden Quelle, Revision, Antworten und tatsächliche
+Dateiverfügbarkeit erneut über den vorhandenen autorisierten Detailweg geprüft.
+Entzug, Änderung oder Fehler übernehmen nichts und erhalten Auswahl und Entwurf.
+
+Der Editor behält seinen 90-Zeilen-Entwurf, CAS und Navigationsschutz. „Zahl
+beibehalten“ erklärt ausdrücklich die weiterhin gespeicherten Alternativen.
+Ausgeblendete ausgewählte Zeilen zählen sichtbar zu Sammelaktionen; Validierungsfehler
+außerhalb des Bereichs bleiben zusammengefasst. Schreibgeschützte Runden werden vor
+der Tabelle erklärt. Bestehende Zuordnungen/Karten werden nicht still neu erzeugt.
+Nur Matching-CSS ergänzt Scrollabstände für fokussierte Felder über der Speicherleiste.
+Vorhandene gemeinsame Quiz-/Modal-/Navigationskomponenten werden nicht verändert.
+
+Regressionen: `sourceRequests.test.ts`, `SourcePicker.browser.test.ts`, bestehender
+Combobox-Browsertest und `scripts/testing/bingo-matching-ux.browser.mjs` für die volle
+Next-Seite mit echtem AppHeader, realer Datenbank, frischen getrennten Rollensitzungen,
+nativem Abbruch/Tab/Escape, echtem Zwei-Fenster-CAS, Save/Reload und allen drei Viewports.
+Komponententests mit simulierten Actions sind getrennt von diesen lokalen echten
+Serveraktionen und der weiterhin offenen gehosteten Abnahme auszuweisen.
