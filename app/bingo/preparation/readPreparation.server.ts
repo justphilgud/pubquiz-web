@@ -8,7 +8,7 @@ import { storedCard } from "./readExport.server";
 import { designHash, parsePrintSnapshot } from "./printSnapshot";
 import { CARD_PAGE_SIZE, ROUND_PAGE_SIZE, denied, type PreparationView } from "./policy";
 import { shortCardCode } from "@/app/bingo/preparation/bingoPrint";
-import { resolveBingoPrint } from "./printDesign";
+import { resolveSelectedPrint } from "./printTemplateRepository.server";
 
 export async function readPreparation(userId: number, gameId: string, page = 1, seriesPage = 1, moderation = false): Promise<PreparationView> {
   return prisma.$transaction(async tx => {
@@ -30,9 +30,9 @@ export async function readPreparation(userId: number, gameId: string, page = 1, 
       const originals=await tx.$queryRaw<{print_snapshot:unknown}[]>`SELECT print_snapshot FROM pubquiz.bingo_card_series WHERE game_id=${gameId}::uuid AND id=ANY(${ids}::uuid[])`;
       originals.forEach(s=>parsePrintSnapshot(s.print_snapshot));
     }
-    const printMetadata=(id:string)=>{const value=printRows.find(s=>s.id===id);if(!value||![1,2,3].includes(value.version)||typeof value.name!=="string"||typeof value.design_hash!=="string")throw denied();return value;};
+    const printMetadata=(id:string)=>{const value=printRows.find(s=>s.id===id);if(!value||![1,2,3,4].includes(value.version)||typeof value.name!=="string"||typeof value.design_hash!=="string")throw denied();return value;};
     let currentHash: string | null = null;
-    try {const d=(await resolveSharedDesign(tx,game.shared_design_template_id,series)).design;d.config.bingoPrint=resolveBingoPrint(d,series.bingo_print_config,game.bingo_print_config);currentHash=designHash(d);} catch { /* Old exports remain usable independently of the current template. */ }
+    try {const d=(await resolveSharedDesign(tx,game.shared_design_template_id,series)).design;d.config.bingoPrint=await resolveSelectedPrint(tx,d,series.bingo_print_config,game.bingo_print_config);currentHash=designHash(d);} catch { /* Old exports remain usable independently of the current template. */ }
     return { termSets:(await tx.bingo_term_sets.findMany({where:{game_id:gameId},orderBy:{created_at:'desc'}})).map(s=>({id:s.id,config:parseTermSet(s.config),createdAt:s.created_at.toISOString()})),gameId, title: game.titel, seriesId: game.eventreihe_id, revision: prep?.revision ?? 0, archived: series.ist_archiviert,
       page, seriesPage, roundCount: await tx.bingo_rounds.count({ where: { game_id: gameId } }), seriesCount: await tx.bingo_card_series.count({ where: { game_id: gameId } }),
       rounds: rounds.map(r => ({ terms:r.term_snapshot===null?null:parseTermSet(r.term_snapshot),locked:frozen.some(f=>f.round_id===r.id), id: r.id, position: r.position, label: r.label, target: r.planned_draws, strategy: r.strategy as "NEW" | "EXISTING", issued: r.issued_count,

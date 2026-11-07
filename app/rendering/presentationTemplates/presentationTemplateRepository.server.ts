@@ -1,3 +1,4 @@
+import { systemPrintTemplates, parsePrintSelection } from '@/app/bingo/preparation/printTemplates';
 import "server-only";
 
 import { Prisma } from "@/app/generated/prisma/client";
@@ -15,9 +16,9 @@ import {
 } from "./presentationTemplate";
 
 function systemTemplates(): ManagedPresentationTemplate[] {
-  return templateRegistry.presentation
+  return [...systemPrintTemplates(), ...templateRegistry.presentation
     .filter((template) => template.selectable)
-    .map((template) => {
+    .map((template):ManagedPresentationTemplate => {
       const runtimeTemplate: PresentationTemplate = template;
       return {
         id: template.id,
@@ -60,7 +61,7 @@ function systemTemplates(): ManagedPresentationTemplate[] {
         updatedAt: null,
         usageCount: 0,
       };
-    });
+    })];
 }
 
 function isMissingTable(error: unknown) {
@@ -85,7 +86,7 @@ export async function listAssignablePresentationTemplates(): Promise<
 > {
   const { templates } = await listManagedPresentationTemplates();
   return templates
-    .filter((template) => template.status === "SYSTEM" || template.status === "ACTIVE")
+    .filter((template) => !template.config.purpose && (template.status === "SYSTEM" || template.status === "ACTIVE"))
     .map(({ id, name, config }) => ({ id, name, config }));
 }
 
@@ -100,7 +101,7 @@ export async function listManagedPresentationTemplates(): Promise<PresentationTe
         select: {
           default_presentation_template_id: true,
           default_answer_form_template_id: true,
-          shared_design_template_id:true,
+          shared_design_template_id:true,bingo_print_config:true,
         },
       }),
       prisma.quiz.findMany({
@@ -110,7 +111,7 @@ export async function listManagedPresentationTemplates(): Promise<PresentationTe
           shared_design_template_id:true,
         },
       }),
-      prisma.game_drafts.findMany({select:{shared_design_template_id:true}}),
+      prisma.game_drafts.findMany({select:{shared_design_template_id:true,bingo_print_config:true}}),
     ]);
 
     const usage = new Map<string, number>();
@@ -118,6 +119,7 @@ export async function listManagedPresentationTemplates(): Promise<PresentationTe
       if (id && id!=="INHERIT") usage.set(id, (usage.get(id) ?? 0) + 1);
     };
     for (const series of eventSeries) {
+      count(parsePrintSelection(series.bingo_print_config)?.templateId??null);
       if(series.shared_design_template_id!==series.default_presentation_template_id&&series.shared_design_template_id!==series.default_answer_form_template_id)count(series.shared_design_template_id);
       count(series.default_presentation_template_id);
       if (series.default_answer_form_template_id !== series.default_presentation_template_id) {
@@ -132,7 +134,7 @@ export async function listManagedPresentationTemplates(): Promise<PresentationTe
       }
     }
 
-    for(const game of games)count(game.shared_design_template_id);
+    for(const game of games){count(game.shared_design_template_id);count(parsePrintSelection(game.bingo_print_config)?.templateId??null);}
 
     const userTemplates = stored.flatMap((template) => {
       const config = parsePresentationTemplateConfig(template.theme_config_json);
@@ -219,7 +221,7 @@ export async function loadStoredPresentationTemplateConfigs(ids: readonly string
     return new Map(
       rows.flatMap((row) => {
         const config = parsePresentationTemplateConfig(row.theme_config_json);
-        return config ? [[row.presentation_template_id, config] as const] : [];
+        return config && !config.purpose ? [[row.presentation_template_id, config] as const] : [];
       }),
     );
   } catch (error) {

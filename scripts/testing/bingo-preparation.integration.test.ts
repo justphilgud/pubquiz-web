@@ -1,4 +1,5 @@
 import { exerciseBingoPolling } from "./bingo-polling.acceptance";
+import {exercisePrintTemplates,verifyEmptyPrintMigration} from './bingo-print-template.acceptance';
 import { seedLegacyPrintFixture } from './bingo-card-v3-migration-fixture';
 import assert from "node:assert/strict";
 import test from "node:test";
@@ -302,5 +303,9 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   for(const table of ["bingo_event_creation_requests","bingo_event_runs","bingo_event_round_plan","bingo_event_rounds","bingo_event_round_cards"])assert.ok(withEvents.tables.find(t=>t.table===table)!.rows>0);
   await verifyBingoRestore(target,withEvents);
   console.info("V3.1 populated legacy/new snapshot and full isolated dump/restore: PASS");
+  await verifyEmptyPrintMigration(target);
+  await exercisePrintTemplates(db,api);
+  const withPrintTemplates=await snapshot();compareSnapshots(withPrintTemplates,await snapshot());
+  await verifyBingoRestore(target,withPrintTemplates);
   console.info("AP2 isolated PostgreSQL acceptance passed:", name);
 });

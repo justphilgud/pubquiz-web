@@ -1,3 +1,4 @@
+import { validateReferenceTerms } from './pdfReference.server';
 import { validateModernTerms } from './pdfModern.server';
 import { parseTermSet } from './termSet';
 import { parsePrintSnapshot } from './printSnapshot';
@@ -13,7 +14,7 @@ export { readPreparation, readCards } from "./readPreparation.server";
 import { captureNewPrintSnapshot } from "./printAssets.server";
 import { canonical, sha256 } from "./printSnapshot";
 import { BingoPreparationError, denied, parseCommand } from "./policy";
-import { resolveBingoPrint } from "./printDesign";
+import { resolveSelectedPrint,selectedPrintSource } from "./printTemplateRepository.server";
 
 export async function writePreparation(userId: number, input: unknown) {
   const command = parseCommand(input);
@@ -66,7 +67,7 @@ export async function writePreparation(userId: number, input: unknown) {
         if (!selected) throw denied();
         if (command.operation === "attach") {
           const selectedPrint=parsePrintSnapshot(selected.print_snapshot);
-          if(canonical(round!.term_snapshot)!==canonical(selectedPrint.version===3?selectedPrint.terms:null))throw new BingoPreparationError('Karten und Runde müssen dieselbe eingefrorene Begriffszuordnung verwenden.');
+          if(canonical(round!.term_snapshot)!==canonical((selectedPrint.version===3||selectedPrint.version===4)?selectedPrint.terms:null))throw new BingoPreparationError('Karten und Runde müssen dieselbe eingefrorene Begriffszuordnung verwenden.');
           if (round!.strategy === "NEW" && selected.origin_round_id !== round!.id) throw new BingoPreparationError("Bitte zuerst „Vorhandene Karten verwenden“ auswählen.");
           await tx.bingo_round_series.upsert({ where: { round_id_series_id: { round_id: round!.id, series_id: selected.id } }, create: { round_id: round!.id, series_id: selected.id, game_id: game.id }, update: {} });
         } else {
@@ -78,9 +79,9 @@ export async function writePreparation(userId: number, input: unknown) {
       case "generate": {
         if (round!.strategy !== "NEW") throw new BingoPreparationError("Diese Runde verwendet vorhandene Karten. Bitte eine Serie ausdrücklich zuordnen.");
         const design = (await resolveSharedDesign(tx, game.shared_design_template_id, series)).design;
-        let snapshot = await captureNewPrintSnapshot(design, game.titel, round!.label,resolveBingoPrint(design,series.bingo_print_config,game.bingo_print_config));
-        if(round!.term_snapshot!==null){if(snapshot.version!==3)throw new BingoPreparationError('Für Textkarten bitte ein neues V3-Druckformat auswählen.');snapshot=parsePrintSnapshot({...snapshot,terms:parseTermSet(round!.term_snapshot)});}
-        validateModernTerms(snapshot);
+        let snapshot = await captureNewPrintSnapshot(design, game.titel, round!.label,await resolveSelectedPrint(tx,design,series.bingo_print_config,game.bingo_print_config),await selectedPrintSource(tx,game.bingo_print_config??series.bingo_print_config));
+        if(round!.term_snapshot!==null){if(snapshot.version!==3&&snapshot.version!==4)throw new BingoPreparationError('Für Textkarten bitte ein neues V3-Druckformat auswählen.');snapshot=parsePrintSnapshot({...snapshot,terms:parseTermSet(round!.term_snapshot)});}
+        validateModernTerms(snapshot);validateReferenceTerms(snapshot);
         // Game lock serializes generation. Include existing game layouts, not just this request.
         const hashes=new Set((await tx.bingo_cards.findMany({where:{series:{game_id:game.id}},select:{layout_hash:true}})).map(card=>card.layout_hash));
         let firstSeriesId:string|undefined;

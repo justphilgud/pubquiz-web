@@ -1,4 +1,10 @@
 "use server";
+import {printContrastIssues} from '@/app/bingo/preparation/bingoPrint';
+import {capturePrintSnapshot} from '@/app/bingo/preparation/printAssets.server';
+import {getPresentationTemplate} from '@/app/rendering/templateRegistry';
+import {printTemplateIds} from '@/app/bingo/preparation/printTemplates';
+import {parsePresentationTemplateConfig} from './presentationTemplate';
+
 
 import { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
@@ -26,7 +32,7 @@ function errorsByField(
 }
 
 function isSystemId(id: string) {
-  return templateRegistry.presentation.some((template) => template.id === id);
+  return (printTemplateIds as readonly string[]).includes(id) || templateRegistry.presentation.some((template) => template.id === id);
 }
 
 function slugifyTemplateName(name: string) {
@@ -80,6 +86,11 @@ export async function savePresentationTemplate(
     return { success: false, message: "Die stabile Template-ID kann nach der Erstellung nicht geändert werden." };
   }
 
+  if(result.value.config.purpose==='BINGO_PRINT'){
+    const settings=result.value.config.bingoPrint!;
+    const issues=printContrastIssues(settings);if(issues.length)return {success:false,message:issues.join(' ')};
+    try{const base=getPresentationTemplate('phil-gud')!;await capturePrintSnapshot({version:1,templateId:base.id,name:result.value.name,config:{version:1,tokens:base.tokens,design:base.design,surfaces:{presentation:base.variant,moderation:'BRANDED',answerForm:'BRANDED'}}},'Synthetische Prüfung','Vorschau',settings);}catch{return {success:false,message:'Schriften oder Logos der Druckvorlage konnten nicht sicher eingebettet werden.'};}
+  }
   const data = {
     name: result.value.name,
     beschreibung: result.value.description || null,
@@ -97,9 +108,10 @@ export async function savePresentationTemplate(
         select: {
           ist_systemtemplate: true,
           status: true,
-          updated_at: true,
+          updated_at: true,theme_config_json:true,
         },
       });
+      if(existing && parsePresentationTemplateConfig(existing.theme_config_json)?.purpose!==result.value.config.purpose)return {success:false,message:"Die Vorlagenart kann nicht geändert werden. Bitte eine passende Vorlage kopieren."};
       if (!existing) return { success: false, message: "Template wurde nicht gefunden." };
       if (existing.ist_systemtemplate) return { success: false, message: "Systemtemplates können nicht verändert werden." };
       if (existing.status !== "DRAFT") {
@@ -234,9 +246,9 @@ export async function setPresentationTemplateArchived(id: string, archived: bool
     await tx.$queryRaw`SELECT presentation_template_id FROM pubquiz.presentation_templates WHERE presentation_template_id=${id} FOR UPDATE`;
     if(archived){
       const [series,quizzes,games]=await Promise.all([
-        tx.eventreihen.count({where:{OR:[{default_presentation_template_id:id},{default_answer_form_template_id:id},{shared_design_template_id:id}]}}),
+        tx.eventreihen.count({where:{OR:[{default_presentation_template_id:id},{default_answer_form_template_id:id},{shared_design_template_id:id},{bingo_print_config:{path:["templateId"],equals:id}}]}}),
         tx.quiz.count({where:{OR:[{presentation_template_id:id},{answer_form_template_id:id},{shared_design_template_id:id}]}}),
-        tx.game_drafts.count({where:{shared_design_template_id:id}}),
+        tx.game_drafts.count({where:{OR:[{shared_design_template_id:id},{bingo_print_config:{path:["templateId"],equals:id}}]}}),
       ]);
       if(series+quizzes+games>0)return;
     }

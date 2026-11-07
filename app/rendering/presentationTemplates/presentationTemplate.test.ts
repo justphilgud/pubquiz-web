@@ -951,9 +951,11 @@ test("AP2 branding has two reset semantics and curated self-hosted font choices"
 });
 
 test("routes and writes enforce admin authorization and migration remains additive", () => {
-  for (const file of ["app/templates/page.tsx", "app/templates/new/page.tsx", "app/templates/[templateId]/page.tsx", "app/rendering/presentationTemplates/actions.ts"]) {
+  for (const file of ["app/templates/new/page.tsx", "app/templates/[templateId]/page.tsx", "app/rendering/presentationTemplates/actions.ts"]) {
     assert.match(readFileSync(file, "utf8"), /requireAdmin/);
   }
+  const overview=readFileSync('app/templates/page.tsx','utf8');assert.match(overview,/requirePrintTemplateReader/);assert.match(overview,/admin&&|admin &&/);assert.match(overview,/t.config.purpose==="BINGO_PRINT"/);
+  const access=readFileSync('app/bingo/preparation/printTemplateAccess.server.ts','utf8');assert.match(access,/requireActor/);assert.match(access,/a.role==='EVENT_MANAGER'&&a.enabled/);assert.match(access,/notFound/);
   const migration = readFileSync("prisma/migrations/20260731120000_add_presentation_template_management/migration.sql", "utf8");
   assert.match(migration, /CREATE TABLE "pubquiz"\."presentation_templates"/);
   assert.match(migration, /CHECK \("status" IN \('DRAFT', 'ACTIVE', 'ARCHIVED'\)\)/);

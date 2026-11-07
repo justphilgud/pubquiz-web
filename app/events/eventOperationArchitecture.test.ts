@@ -7,7 +7,7 @@ import {readFileSync} from "node:fs";
 const read=(path:string)=>readFileSync(path,"utf8");
 test("shared event entries keep distinct runtime/date and ordered opt-in view links",()=>{
  const row=read("app/events/EventRow.tsx");assert.match(row,/Termin:/);assert.match(row,/entry.status/);
- assert.ok(row.indexOf('<PencilSquareIcon')<row.indexOf('<MegaphoneIcon'));assert.ok(row.indexOf('<MegaphoneIcon')<row.indexOf('<PlayIcon'));
+ assert.ok(row.indexOf('kind="prepare"')<row.indexOf('kind="moderation"'));assert.ok(row.indexOf('kind="moderation"')<row.indexOf('kind="presentation"'));
  for(const file of ['app/events/readEvents.server.ts','app/events/statusReader.server.ts'])assert.doesNotMatch(read(file),/\.create\(|\.upsert\(|\.update\(|ensureQuiz|\binitialize\w*\(|\bstartLive\(/);
  assert.match(read('app/events/readEvents.server.ts'),/hasEventTypeAccess/);
 });
@@ -25,6 +25,8 @@ test("Quiz and Bingo retain icon-only view links with accessible names and exist
   for(const link of links){assert.match(link[1],/aria-label="[^"]*Testevent"/);assert.match(link[2],/^<svg/);assert.match(link[1],/min-h-11 min-w-11/);}
   assert.match(links[0][1],/href="\/prepare\?returnTo=%2Fquiz"/);
   assert.match(links[1][1],/href="\/moderation"/);assert.match(links[2][1],/href="\/presentation"/);
+  for(const link of links)assert.match(link[2],/class="h-5 w-5"/);
+  assert.match(links[0][1],/bg-slate-900 p-2 text-white/);assert.match(links[1][1],/border-violet-300 bg-violet-50/);assert.match(links[2][1],/border-cyan-300 bg-cyan-50/);
   for(const link of links.slice(1))assert.match(link[1],/target="_blank"/);
  }
  const unavailable=renderToStaticMarkup(createElement(EventRow,{entry:{id:"2",title:"Entwurf",seriesName:"Reihe",typeLabel:"Karaoke",date:null,status:"Vorbereitung",prepareHref:"/prepare"}}));

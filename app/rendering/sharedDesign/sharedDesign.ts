@@ -4,7 +4,7 @@ export const SHARED_DESIGN_VERSION = 1 as const;
 export const SHARED_DESIGN_SURFACES = ["QUIZ_QUESTION", "QUIZ_SOLUTION", "BINGO_NUMBER", "BINGO_PHRASE", "KARAOKE_TITLE", "KARAOKE_CONTENT"] as const;
 export type SharedDesign = { version: 1; templateId: string; name: string; config: PresentationTemplateConfig };
 export function sharedDesignTokens(template: Pick<PresentationTemplate,"tokens">): BrandTokens { return template.tokens; }
-export function supportsSharedDesign(config: PresentationTemplateConfig) { return ["EDITORIAL","CORPORATE"].includes(config.design.stylePreset) && config.design.storybook === null; }
+export function supportsSharedDesign(config: PresentationTemplateConfig) { return !config.purpose && ["EDITORIAL","CORPORATE"].includes(config.design.stylePreset) && config.design.storybook === null; }
 export function parseSharedDesign(value: unknown): SharedDesign | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const r=value as Record<string,unknown>;

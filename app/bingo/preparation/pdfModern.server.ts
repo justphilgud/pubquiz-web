@@ -35,7 +35,7 @@ export function fitTerm(value:string,face:Face,width:number,height:number,initia
   }}
   throw new BingoPreparationError(`„${value}“ passt bei mindestens ${minimum} pt nicht in das gewählte Kartenformat. Bitte Begriff kürzen, Schrift oder Format ändern.`);
 }
-function draw(page:PDFPage,value:string,f:Font,size:number,x:number,y:number,width:number,color:ReturnType<typeof rgb>,right=false){
+export function draw(page:PDFPage,value:string,f:Font,size:number,x:number,y:number,width:number,color:ReturnType<typeof rgb>,right=false){
   if([...value].some(c=>!f.face.hasGlyphForCodePoint(c.codePointAt(0)!)))throw new BingoPreparationError('Die Druckschrift unterstützt nicht alle Zeichen.');
   const run=glyphGeometry(f.face,value,size);
   if(run.width>width)throw new BingoPreparationError('Der Text passt nicht in das Druckfeld.');
@@ -45,7 +45,7 @@ function draw(page:PDFPage,value:string,f:Font,size:number,x:number,y:number,wid
   for(const g of run.glyphs){const path=g.glyph.path.toSVG();if(path.trim())page.drawSvgPath(path,{x:left+g.x,y:-y-g.y,scale:run.scale,color});}
   page.pushOperators(popGraphicsState());
 }
-function logo(page:PDFPage,image:PDFImage,cx:number,cy:number,width:number,height:number){const scale=Math.min(width/image.width,height/image.height);page.drawImage(image,{x:cx-image.width*scale/2,y:cy-image.height*scale/2,width:image.width*scale,height:image.height*scale});}
+export function logo(page:PDFPage,image:PDFImage,cx:number,cy:number,width:number,height:number){const scale=Math.min(width/image.width,height/image.height);page.drawImage(image,{x:cx-image.width*scale/2,y:cy-image.height*scale/2,width:image.width*scale,height:image.height*scale});}
 export function validateModernTerms(input:PrintSnapshot){
  const snap=parsePrintSnapshot(input);if(snap.version!==3||!snap.settings.layout||!snap.terms)return;
  const g=geometry(snap.settings.layout.format),face=regularFace(Buffer.from(snap.text.bytes,'base64')),cell=(g.side-36)/5;

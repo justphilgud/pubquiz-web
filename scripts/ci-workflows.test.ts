@@ -250,3 +250,10 @@ test("Bingo preparation cannot enter the shared database migration workflow", ()
   assert.ok(preview.includes("node --import tsx scripts/deploy-vercel-git-preview.ts"), "existing targeted preview checks remain intact");
   assert.ok(preview.includes("node scripts/verify-preview-ci.ts"), "successful exact-head CI remains required");
 });
+
+
+test('Bingo print template Preview never migrates the shared development database',()=>{
+ assert.match(preview,/github.ref != 'refs\/heads\/codex\/bingo-print-templates-ui' &&/);
+ assert.equal(JSON.parse(readFileSync('vercel.json','utf8')).git.deploymentEnabled,false);
+ assert.match(preview,/TRUSTED_PREVIEW_BRANCHES/);
+});

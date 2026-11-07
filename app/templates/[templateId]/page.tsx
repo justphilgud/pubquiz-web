@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 
 import AppHeader from "@/app/components/AppHeader";
 import { requireAdmin } from "@/app/lib/permissions";
+import {requirePrintTemplateReader} from "@/app/bingo/preparation/printTemplateAccess.server";
+import PrintTemplateEditor from "@/app/bingo/preparation/PrintTemplateEditor";
 import { DuplicatePresentationTemplateButton } from "@/app/rendering/presentationTemplates/DuplicatePresentationTemplateButton";
 import { PresentationTemplateGenerator } from "@/app/rendering/presentationTemplates/PresentationTemplateGenerator";
 import {
@@ -18,13 +20,14 @@ import { getPresentationTemplateUploadContext } from "@/app/rendering/presentati
 type Props = { params: Promise<{ templateId: string }> };
 
 export default async function PresentationTemplateDetailPage({ params }: Props) {
-  await requireAdmin();
+  const {admin}=await requirePrintTemplateReader();
   const { templateId } = await params;
   const [template, repository] = await Promise.all([
     getManagedPresentationTemplate(templateId),
     listManagedPresentationTemplates(),
   ]);
-  if (!template) notFound();
+  if (!template || (!admin&&(template.config.purpose!=="BINGO_PRINT"||!["SYSTEM","ACTIVE"].includes(template.status)))) notFound();
+  if(template.config.purpose!=="BINGO_PRINT")await requireAdmin();
 
   const pageMode = getPresentationTemplatePageMode(template);
   const uploadContext = getPresentationTemplateUploadContext();
@@ -55,7 +58,7 @@ export default async function PresentationTemplateDetailPage({ params }: Props) 
                   : `Eigenes Template · ${template.status}`}
               </p>
             </div>
-            {repository.persistenceAvailable && (
+            {admin && repository.persistenceAvailable && (
               <DuplicatePresentationTemplateButton
                 sourceId={template.id}
                 label={duplicateLabel}
@@ -93,7 +96,7 @@ export default async function PresentationTemplateDetailPage({ params }: Props) 
             </p>
           )}
 
-          <PresentationTemplateGenerator
+          {template.config.purpose==='BINGO_PRINT'?<PrintTemplateEditor key={template.updatedAt?.toISOString()??template.id} template={template} editable={admin&&template.status==='DRAFT'&&repository.persistenceAvailable}/>:<PresentationTemplateGenerator
             initialTemplate={template}
             originalId={template.isSystem ? null : template.id}
             pageMode={pageMode}
@@ -102,7 +105,7 @@ export default async function PresentationTemplateDetailPage({ params }: Props) 
             templateUploadsEnabled={uploadContext.enabled}
             templateUploadDisabledReason={uploadContext.disabledReason}
             availableTags={availableTags}
-          />
+          />}
         </div>
       </main>
     </>

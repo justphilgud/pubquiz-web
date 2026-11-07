@@ -146,3 +146,23 @@ test("reads the Vercel environment file instead of an inherited GitHub URL", () 
     rmSync(directory, { recursive: true, force: true });
   }
 });
+
+test("isolated print preview binds only its exact approved branch, host, database and endpoint", () => {
+  const review = {
+    ...previewInput,
+    deploymentRef: "refs/heads/codex/bingo-print-templates-ui",
+    expectedDatabaseHost: "ep-holy-term-baa881iq-pooler.c-8.eu-central-1.aws.neon.tech",
+    expectedDatabaseName: "bingo_print_v4_review",
+    expectedDatabaseBranch: "ep-holy-term-baa881iq",
+    databaseUrl: "postgresql://synthetic:fixture@ep-holy-term-baa881iq-pooler.c-8.eu-central-1.aws.neon.tech/bingo_print_v4_review?sslmode=verify-full",
+  };
+  assert.equal(validateDeploymentEnvironment(review).databaseBranchVerified, true);
+  const direct = review.expectedDatabaseHost.replace("-pooler.", ".");
+  assert.equal(validateDeploymentEnvironment({ ...review, expectedDatabaseHost: direct, databaseUrl: review.databaseUrl.replace("-pooler.", ".") }).databaseHost, direct);
+  assertValidationCode({ ...previewInput, deploymentRef: review.deploymentRef }, "BINGO_PRINT_REVIEW_IDENTITY_MISMATCH");
+  assertValidationCode({ ...review, expectedDatabaseBranch: undefined }, "BINGO_PRINT_REVIEW_IDENTITY_MISMATCH");
+  assertValidationCode({ ...review, expectedDatabaseName: "foreign", databaseUrl: review.databaseUrl.replace("bingo_print_v4_review", "foreign") }, "BINGO_PRINT_REVIEW_IDENTITY_MISMATCH");
+  assertValidationCode({ ...productionInput, deploymentEnvironment: "preview", deploymentRef: review.deploymentRef }, "BINGO_PRINT_REVIEW_IDENTITY_MISMATCH");
+  assertValidationCode({ ...review, deploymentRef: "refs/heads/feature/other" }, "ISOLATED_PREVIEW_SCOPE_MISMATCH");
+  assertValidationCode({ ...review, deploymentEnvironment: "production", deploymentRef: "refs/heads/main" }, "ISOLATED_PREVIEW_SCOPE_MISMATCH");
+});

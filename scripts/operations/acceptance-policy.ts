@@ -91,7 +91,8 @@ export function inspectRow(value: Record<string, unknown>, media: Set<string>, s
     void _snapshot;
     inspectValue(rest, media);
     inspectValue({ title: snapshot.title, roundLabel: snapshot.roundLabel, name: snapshot.design.name, templateId: snapshot.design.templateId, displayName: snapshot.display.name, bodyName: snapshot.body.name, logoName: snapshot.logo?.name ?? null }, media);
-    if(snapshot.version===3)inspectValue({textFont:snapshot.text.name,terms:snapshot.terms},media);
+    if(snapshot.version===4)inspectValue({codeFont:snapshot.codeFont.name,templateSource:snapshot.templateSource??null},media);
+    if(snapshot.version===3||snapshot.version===4)inspectValue({textFont:snapshot.text.name,terms:snapshot.terms},media);
     // Exact version/shape, canonical base64 and checksums have been checked above.
     // Frozen binary assets are carried in the dump itself; design references retain
     // the existing media inventory rules rather than granting arbitrary URL access.
