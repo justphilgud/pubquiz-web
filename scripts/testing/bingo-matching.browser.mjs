@@ -16,7 +16,8 @@ const chrome = ['C:/Program Files/Google/Chrome/Application/chrome.exe', '/usr/b
 if (!chrome)
     throw Error('CHROME_REQUIRED');
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'bingo-matching-browser-')), browser = spawn(chrome, ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-background-networking', '--no-first-run', `--user-data-dir=${profile}`, '--remote-debugging-port=0', 'about:blank'], { stdio: 'ignore' });
-let ws, id = 0, dialog = false, allowNavigation = false;
+let ws, id = 0, dialog = false, allowNavigation = false, closing = false;
+const retiredSessions = new Set();
 const requests = new Map(), passed = [];
 const appendProgress=passed.push.bind(passed);passed.push=(...items)=>{const count=appendProgress(...items);fs.writeFileSync(path.join(out,'progress-'+(process.argv.includes('--live-only')?'live':process.argv.includes('--editor-only')?'editor':'other')+'.json'),JSON.stringify({origin,passed},null,2));return count;};
 const delay = ms => new Promise(r => setTimeout(r, ms));
@@ -56,7 +57,7 @@ try {
     } }, 'Chrome start');
     ws = new WebSocket(`ws://127.0.0.1:${endpoint[0]}${endpoint[1]}`);
     await new Promise((r, j) => { ws.onopen = r; ws.onerror = j; });
-    ws.onmessage = e => { const m = JSON.parse(String(e.data));if(m.method==='Fetch.requestPaused'){const q=m.params;if(new URL(q.request.url).origin!==origin)throw Error('Foreign origin interception forbidden');const headers=Object.entries(q.request.headers).map(([name,value])=>({name,value:String(value)}));headers.push({name:'x-vercel-protection-bypass',value:process.env.VERCEL_AUTOMATION_BYPASS_SECRET});void call('Fetch.continueRequest',{requestId:q.requestId,headers},m.sessionId).catch(()=>{process.exitCode=1});return;} if (m.method === 'Page.javascriptDialogOpening') {
+    ws.onmessage = e => { const m = JSON.parse(String(e.data));if(m.method==='Fetch.requestPaused'){const q=m.params;if(new URL(q.request.url).origin!==origin)throw Error('Foreign origin interception forbidden');const headers=Object.entries(q.request.headers).map(([name,value])=>({name,value:String(value)}));headers.push({name:'x-vercel-protection-bypass',value:process.env.VERCEL_AUTOMATION_BYPASS_SECRET});void call('Fetch.continueRequest',{requestId:q.requestId,headers},m.sessionId).catch(()=>{if(!closing&&!retiredSessions.has(m.sessionId))process.exitCode=1});return;} if (m.method === 'Page.javascriptDialogOpening') {
         dialog = true;
         void call('Page.handleJavaScriptDialog', { accept: allowNavigation }, m.sessionId);
         return;
@@ -164,6 +165,7 @@ try {
             await goto(t, route);
             await until(async () => role === 'manager' ? /Bingo-Matching-Tabelle|Zuordnungssatz/.test(await text(t)) : /404|not be found|nicht gefunden/i.test(await text(t)), 'role ' + role);
             if(role!=='manager')assert.equal(await evaluate(t,`fetch(${JSON.stringify(assetPath)}).then(r=>r.status)`),404,'known immutable asset still checks fresh role');passed.push('fresh ' + role + ' direct-link and immutable asset policy');
+            retiredSessions.add(t);
             await call('Target.disposeBrowserContext', { browserContextId: ctx });
         }
     }
@@ -177,6 +179,7 @@ catch (e) {
     process.exitCode = 1;
 }
 finally {
+    closing = true;
     if (ws?.readyState === 1) {
         await call('Browser.close').catch(() => { });
         ws.close();

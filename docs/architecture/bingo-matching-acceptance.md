@@ -151,7 +151,7 @@ Screenshots und der tatsächlich heruntergeladene Beispiel-Duplexbogen: [Abnahme
   Prisma-Historie. Die neue additive Migration und leere/befüllte Modellbasis sind geprüft.
 - Ein lokaler Gesamttest stieß auf eine vorhandene Windows-`DevToolsActivePort`-Dateisperre;
   der betroffene bestehende LOVD-/Such-Browsertest bestand bei gezielter Wiederholung.
-  Die erforderliche Linux-Head-CI muss abschließend vollständig erfolgreich sein.
+  Die erforderliche Linux-Head-CI muss abschließend vollständig erfolgreich sein. Der historische Vor-Bingo-Restore-Fixture klassifiziert das neue Modell `bingo_matching_assets` ausdrücklich als späteren Bestand und entfernt es nur aus dieser historischen Modellbasis. Die strikte Prüfung unbekannter Bingo-Modelle sowie die getrennte vollständige Matching-Wiederherstellung bleiben erhalten.
 - Historische Backup-Readback-Ursache und Wochenlauf sind separate Betriebspunkte.
   Die isolierte Wiederherstellung ersetzt keinen echten geplanten Wochenlauf.
 
