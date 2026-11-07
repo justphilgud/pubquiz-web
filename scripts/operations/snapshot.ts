@@ -43,8 +43,9 @@ export async function collectSnapshot(session: PgSession): Promise<Snapshot> {
     const cols = columns.filter(c => `${c.schema}.${c.table}` === key);
     const { schema, table } = cols[0];
     // Each row is JSON TEXT inside the outer JSON array: keep bigints/decimals exact.
+    const selected=key==='pubquiz.bingo_matching_assets'?cols.map(c=>c.column==='content'?`json_build_object('size',octet_length(content),'sha256',encode(sha256(content),'hex'),'signature',encode(substring(content from 1 for 12),'hex')) AS content`:projection([c])).join(','):projection(cols);
     const rows = await session.json<string[]>(`SELECT coalesce(json_agg(v ORDER BY v COLLATE "C"),'[]') FROM
-      (SELECT row_to_json(r)::text AS v FROM (SELECT ${projection(cols)} FROM ${tableName(schema, table)}) r) s`, "TABLE_ROWS");
+      (SELECT row_to_json(r)::text AS v FROM (SELECT ${selected} FROM ${tableName(schema, table)}) r) s`, "TABLE_ROWS");
     for (const row of rows) {
       if (archiveSchema && schema === "pubquiz" && ["meme_archive_sources", "meme_archive_entries"].includes(table)) inspectMemeArchiveRow(JSON.parse(row), media, table, requiredOriginals);
       else inspectRow(JSON.parse(row), media, schema, table);

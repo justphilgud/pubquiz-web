@@ -6,7 +6,7 @@ import {regularFace,glyphGeometry,type PrintMode} from './pdfSquare.server';
 import {draw,logo} from './pdfModern.server';
 import {geometry,position} from './printFormats';
 import {BingoPreparationError,decodeCard,MAX_EXPORT,type StoredCard} from './policy';
-import {termFor} from './termSet';
+import {termFor,usesCardText} from './termSet';
 type Face=ReturnType<typeof regularFace>;
 const ink=(hex:string)=>rgb(...[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255) as [number,number,number]);
 /** V4 only: full words, up to three lines, actual glyph metrics, never below 10 pt. */
@@ -32,7 +32,7 @@ export function fitReferenceTerm(value:string,face:Face,width:number,height:numb
 export function validateReferenceTerms(input:PrintSnapshot){
  const snap=parsePrintSnapshot(input);if(snap.version!==4||!snap.terms)return;
  const g=geometry(snap.settings.layout!.format),face=regularFace(Buffer.from(snap.text.bytes,'base64'));
- for(const entry of snap.terms.entries)try{fitReferenceTerm(entry.text,face,(g.side-28)/5-4,(g.side-70)/5-4);}catch(e){throw new BingoPreparationError(`Kugel ${entry.number}: ${e instanceof Error?e.message:'Begriff passt nicht.'}`);}
+ for(const entry of snap.terms.entries.filter(e=>e.number<=75))try{if(usesCardText(snap.terms,entry.number))fitReferenceTerm(termFor(snap.terms,entry.number),face,(g.side-28)/5-4,(g.side-70)/5-4);}catch(e){throw new BingoPreparationError(`Kugel ${entry.number}: ${e instanceof Error?e.message:'Begriff passt nicht.'}`);}
 }
 /** Separate versioned renderer. V1/V2/V3 exports never enter this implementation. */
 export async function createReferenceCardsPdf(input:PrintSnapshot,cards:readonly StoredCard[],mode:PrintMode='front',singleCard=false){
@@ -72,7 +72,7 @@ export async function createReferenceCardsPdf(input:PrintSnapshot,cards:readonly
      const cx=gx+col*w,cy=gy+(4-row)*h,free=row===2&&col===2;
      page.drawRectangle({x:cx,y:cy,width:w,height:h,color:ink(free?c.header:c.background),borderColor:ink(c.grid),borderWidth:.4});
      if(free)logo(page,front,cx+w/2,cy+h/2,w-5,h-4);
-     else if(snap.terms){const fit=fitReferenceTerm(termFor(snap.terms,card.cells[row][col]!),words.face,w-4,h-4),baseline=cy+(h+fit.inkHeight+(fit.lines.length-1)*fit.lineHeight)/2-fit.ascent;fit.lines.forEach((line,i)=>draw(page,line,words,fit.size,cx+2,baseline-i*fit.lineHeight,w-4,ink(c.numbers)));}
+     else if(snap.terms&&usesCardText(snap.terms,card.cells[row][col]!)){const fit=fitReferenceTerm(termFor(snap.terms,card.cells[row][col]!),words.face,w-4,h-4),baseline=cy+(h+fit.inkHeight+(fit.lines.length-1)*fit.lineHeight)/2-fit.ascent;fit.lines.forEach((line,i)=>draw(page,line,words,fit.size,cx+2,baseline-i*fit.lineHeight,w-4,ink(c.numbers)));}
      else{let size=snap.settings.layout.format==='A4_SIX'?24:26;while(glyphGeometry(numbers.face,String(card.cells[row][col]),size).width>w-4&&size>10)size-=.25;const run=numbers.face.layout(String(card.cells[row][col])),ascent=Math.max(...run.glyphs.map(g=>g.bbox.maxY))*size/numbers.face.unitsPerEm,descent=Math.min(...run.glyphs.map(g=>g.bbox.minY))*size/numbers.face.unitsPerEm;draw(page,String(card.cells[row][col]),numbers,size,cx+2,cy+(h-ascent-descent)/2,w-4,ink(c.numbers));}
     }
    }

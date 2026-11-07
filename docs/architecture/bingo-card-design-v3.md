@@ -173,3 +173,7 @@ Snapshot-/Wiederherstellungsintegrität ausschließlich isoliert.
 Browser-/Screenshot-/PDF-Artefakte und der tatsächliche gehostete Commit werden
 im PR dokumentiert. Keine vollständige Geräte- oder physische Duplexabnahme
 allein aus Canvas, Textextraktion oder mathematischer Spiegelung ableiten.
+
+### Bingo-Matching (Vertragsversion 2)
+
+Die neue gezielte Erweiterung ist in [bingo-matching.md](./bingo-matching.md) beschrieben: unabhängige Medien-/Kartenantwort, unveränderliche spielgebundene Fassung, 90 Verwaltungszeilen bei unverändertem 75er-Regelkern und aktuelle Berechtigungsprüfung. Bestehende V1-Karten-/Laufzeitverträge bleiben erhalten. Vollständige Zuordnungen und Medienbytes gehören ausdrücklich nicht in regelmäßige Statusabfragen. Praktische Nachweise und Grenzen stehen im zugehörigen Matching-Abnahmebericht.

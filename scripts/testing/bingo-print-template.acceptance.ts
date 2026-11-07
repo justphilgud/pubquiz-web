@@ -39,7 +39,7 @@ export async function exercisePrintTemplates(db:Client,api:Api){
 }
 
 /** Complete schema-only local/CI copy; never accepts a hosted source or an existing target. */
-export async function verifyEmptyPrintMigration(source:URL){
+export async function verifyEmptyPrintMigration(source:URL,matching=false){
  assert.ok(['127.0.0.1','localhost'].includes(source.hostname));assert.match(source.pathname,/^\/bingo_ap2_qa_\d+$/);
  const name=`bingo_print_empty_${Date.now()}`,controlUrl=new URL(source);controlUrl.pathname='/editorial_import_ci';
  const control=new PgClient({connectionString:controlUrl.toString()});await control.connect();let created=false;
@@ -59,7 +59,8 @@ export async function verifyEmptyPrintMigration(source:URL){
    const constraints=(await db.query("SELECT pg_get_constraintdef(oid) definition FROM pg_constraint WHERE conname='bingo_print_versions_snapshot_check'")).rows;
    assert.ok(constraints.some(r=>r.definition.includes("'4'")));
    assert.equal((await db.query('SELECT count(*)::int n FROM pubquiz.bingo_cards')).rows[0].n,0);
-   console.info('V4 migration on a complete empty disposable schema-only database: PASS');
+   if(matching){assert.equal((await db.query("SELECT to_regclass('pubquiz.bingo_matching_assets') t")).rows[0].t,null);await db.query(readFileSync('prisma/migrations/20261107150000_bingo_matching/migration.sql','utf8'));assert.equal((await db.query('SELECT count(*)::int n FROM pubquiz.bingo_matching_assets')).rows[0].n,0);assert.equal((await db.query("SELECT count(*)::int n FROM pg_trigger WHERE tgname IN ('bingo_matching_assets_immutable','bingo_term_sets_immutable')")).rows[0].n,2);}
+   console.info(matching?'Matching migration on a complete empty disposable schema-only database: PASS':'V4 migration on a complete empty disposable schema-only database: PASS');
   }finally{await db.end();}
  }finally{if(created){assert.match(name,/^bingo_print_empty_\d+$/);await control.query(`DROP DATABASE ${name} WITH (FORCE)`);}await control.end();}
 }

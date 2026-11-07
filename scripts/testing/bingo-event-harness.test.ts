@@ -13,5 +13,5 @@ test("actual browser acceptance expressions remain valid JavaScript after select
   }
   ts.forEachChild(node,visit);
  }
- for(const path of ['scripts/testing/bingo-event.browser.mjs','scripts/testing/event-settings.browser.mjs'])visit(ts.createSourceFile(path,readFileSync(path,'utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.JS));assert.ok(count>=50,'browser expression coverage unexpectedly missing');
+ for(const path of ['scripts/testing/bingo-event.browser.mjs','scripts/testing/event-settings.browser.mjs','scripts/testing/bingo-matching.browser.mjs','scripts/testing/bingo-matching-live.browser.mjs','scripts/testing/bingo-matching-pdf.browser.mjs','scripts/testing/bingo-matching-upload.browser.mjs','scripts/testing/bingo-matching-review.browser.mjs'])visit(ts.createSourceFile(path,readFileSync(path,'utf8'),ts.ScriptTarget.Latest,true,ts.ScriptKind.JS));assert.ok(count>=50,'browser expression coverage unexpectedly missing');
 });

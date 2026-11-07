@@ -61,6 +61,7 @@ jobs:
       github.ref != 'refs/heads/codex/bingo-event-operation' &&
       github.ref != 'refs/heads/codex/bingo-card-design-v3' &&
       github.ref != 'refs/heads/codex/bingo-print-templates-ui' &&
+      github.ref != 'refs/heads/codex/bingo-matching-table' &&
       !inputs.editorial_dry_run_only && !inputs.editorial_repair_test_questions &&
       (github.ref != 'refs/heads/codex/shared-game-design' || inputs.isolated_shared_design) &&
       (!inputs.isolated_shared_design || github.ref == 'refs/heads/codex/shared-game-design') &&

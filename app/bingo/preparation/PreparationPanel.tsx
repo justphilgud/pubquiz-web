@@ -82,7 +82,8 @@ export function RoundEditor({ round, data, onDirty, onBusy, externallyBlocked }:
       {message && <p role={message.error ? "alert" : "status"} className={message.error ? "text-red-700" : "text-emerald-800"}>{message.text}</p>}
       <div className="flex flex-wrap gap-3"><Button type="submit" disabled={blocked}>{pending ? "Wird gespeichert …" : "Runde speichern"}</Button><Link className="inline-flex min-h-11 items-center underline" href={`/bingo/${data.gameId}`}>Abbrechen</Link></div>
     </form>
-    <TermSetPanel gameId={data.gameId} roundId={round.id} revision={data.revision} current={round.terms??null} sets={data.termSets??[]} onDirty={setTermsDirty} disabled={blocked||dirty||round.cardCount>0}/>
+    <Link className="inline-flex min-h-11 items-center rounded border px-3" href={`/bingo/${data.gameId}/matching?round=${round.id}`}>Matching-Tabelle · Zahlen, Texte und Quizmedien</Link>
+    {round.terms?.version!==2&&<TermSetPanel gameId={data.gameId} roundId={round.id} revision={data.revision} current={round.terms??null} sets={(data.termSets??[]).filter(s=>s.config.version===1)} onDirty={setTermsDirty} disabled={blocked||dirty||round.cardCount>0}/>}
     {(dirty||termsDirty) && <p className="text-sm">Bitte Änderungen an Runde oder Karteninhalt zuerst speichern. Weitere Kartenaktionen sind bis dahin gesperrt.</p>}
     <fieldset disabled={blocked || dirty||termsDirty} className="min-w-0 space-y-3 border-t pt-3">
       <legend className="text-sm">{round.cardCount} zugeordnete Karten</legend>

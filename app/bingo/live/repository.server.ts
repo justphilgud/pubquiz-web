@@ -153,7 +153,8 @@ export async function readAudience(userId: number, key: string) {
   }, { isolationLevel: "RepeatableRead" });
 }
 export type ModerationView = Awaited<ReturnType<typeof readLegacyLive>>;
-export type AudienceView = {termMode?:boolean;labels?:Record<string,string|null>} & Omit<Awaited<ReturnType<typeof readAudience>>, "assetBase"> & { assetBase: string | null; phase?:"BETWEEN" };
+export type AudienceContent={kind:'TEXT';text:string}|{kind:'AUDIO'|'VIDEO'|'IMAGE';url:string;answer?:string};
+export type AudienceView = {serverAt?:number;content?:AudienceContent;playback?:import('./eventRun').BingoPlayback;termMode?:boolean;labels?:Record<string,string|null>} & Omit<Awaited<ReturnType<typeof readAudience>>, "assetBase"> & { assetBase: string | null; phase?:"BETWEEN" };
 /** Stable authenticated entry can already be opened before the conscious start. */
 export async function readGameAudience(userId: number, gameId: string): Promise<AudienceView> {
   assertUuid(gameId);

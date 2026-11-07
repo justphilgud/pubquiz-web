@@ -191,3 +191,9 @@ Druckversions- und Spielhashes bleiben bei kanonischer UTC-Auswertung identisch.
 Keine Produktionsdaten als Quelle. Aktuelle CI-, READY-/Alias-/Runtime- sowie
 gehostete Browser-/PDF-Nachweise werden in PR154 dokumentiert; die Einrichtung
 allein behauptet diese nachfolgenden Nachweise noch nicht.
+
+## Isolierte Matching-Preview (7. November 2026)
+
+Der Benutzer hat ausschließlich `codex/bingo-matching-table` ausdrücklich für die bestehende Vertrauensliste und die exakte Preview-Environment-Branch-Policy freigegeben. Vorhandene Einträge und Schutzregeln bleiben erhalten. Der gemeinsame Nonprod-Store wird ausschließlich mit dem aus diesem Branch abgeleiteten eigenen SHA-256-Präfix verwendet. Keine Production-Medien oder fremden Präfixe verändern.
+
+Eigene synthetische Datenbank `bingo_matching_review` auf dem bestehenden Launch-Nonprod-Endpunkt `ep-holy-term-baa881iq` (Projekt `falling-sky-48140800`). Nur diese Preview erhält genaue Branch-Overrides; Production und gemeinsame Development-Konfiguration bleiben unverändert. Der Deployment-Guard bindet Branch, direkten/gepoolten Host, Datenbankname und Endpointmarker. Der Branch ist ausdrücklich vom gemeinsamen Migrationsjob ausgeschlossen. Migration und Seed erfolgen ausschließlich nach Identitätsprüfung im eigenen isolierten Ziel. Tatsächlicher Compute: ein Read/Write-Endpunkt, 0,25 CU Minimum/Maximum, Suspendierung nach 300 Sekunden; keine zusätzliche Compute oder Replikate. Die aus einer geprüften lokalen synthetischen V4-Modellbasis erzeugte Datenbank ist keine behauptete Wiedergabe sämtlicher historischer Bootstrap-Migrationen.

@@ -208,3 +208,20 @@ test("V3.1 exact migration-bound trigger set accepts only the complete event ext
  for(const m of ref.migrations)assert.equal(hash(readFileSync(new URL(`../../prisma/migrations/${m.name}/migration.sql`,import.meta.url),"utf8").replaceAll("\r\n","\n")),m.sha256);
  for(const mutate of [(v:ReturnType<typeof fixture>)=>{v.bingoEventTables.pop();},(v:ReturnType<typeof fixture>)=>{v.bingoEventTables.push("unknown");},(v:ReturnType<typeof fixture>)=>{v.triggers.pop();},(v:ReturnType<typeof fixture>)=>{v.triggers.at(-1)!.enabled="D";},(v:ReturnType<typeof fixture>)=>{v.triggers.at(-1)!.functionName="unknown";},(v:ReturnType<typeof fixture>)=>{v.triggers.at(-1)!.table="quiz";},(v:ReturnType<typeof fixture>)=>{v.triggers.push({...v.triggers.at(-1)!,name:"unknown"});}]){const v=fixture();mutate(v);assert.throws(()=>reviewMemeArchiveExecutables(v),/SCHEMA_SECURITY_REVIEW_REQUIRED/);}
 });
+
+test('Matching accepts only its exact migration-bound immutable triggers and preserves older reviews',async()=>{
+ const {default:matching}=await import('./schema-reference/bingo-matching-routines.json'),{default:event}=await import('./schema-reference/bingo-event-routines.json');
+ const fixture=()=>{const old=bingoFixture();return {...old,bingoLiveTables:[...bingoLive.tables],bingoEventTables:[...event.tables],bingoMatchingTables:[...matching.tables],triggers:[...old.triggers,...structuredClone(bingoLive.triggers),...structuredClone(event.triggers),...structuredClone(matching.triggers)]};};
+ assert.deepEqual(reviewMemeArchiveExecutables(fixture())!.bingoMatchingMigrations,matching.migrations);
+ for(const m of matching.migrations)assert.equal(hash(readFileSync(new URL(`../../prisma/migrations/${m.name}/migration.sql`,import.meta.url),'utf8').replaceAll('\r\n','\n')),m.sha256);
+ for(const mutate of [(v:ReturnType<typeof fixture>)=>{v.bingoMatchingTables.push('unknown');},(v:ReturnType<typeof fixture>)=>{v.bingoMatchingTables=[];},(v:ReturnType<typeof fixture>)=>{v.triggers.pop();},(v:ReturnType<typeof fixture>)=>{v.triggers.at(-1)!.enabled='D';},(v:ReturnType<typeof fixture>)=>{v.triggers.at(-1)!.functionName='unknown';},(v:ReturnType<typeof fixture>)=>{v.triggers.at(-1)!.table='quiz';}]){const v=fixture();mutate(v);assert.throws(()=>reviewMemeArchiveExecutables(v),/SCHEMA_SECURITY_REVIEW_REQUIRED/);}
+});
+
+test('Matching binary inventory binds actual bytes, bounded format and metadata; credential scan remains active',async()=>{
+ const {inspectRow}=await import('./acceptance-policy');
+ const bytes=Buffer.alloc(44);bytes.write('RIFF');bytes.write('WAVE',8);
+ const row={id:'00000000-0000-4000-8000-000000000001',game_id:'00000000-0000-4000-8000-000000000002',source_question_id:1,source_media_id:1,source_revision:'a'.repeat(64),kind:'AUDIO',variant:'music_original_audio',content_type:'audio/wav',sha256:hash(bytes),answers:[{key:'field:1',label:'Interpret',text:'Nina'}],content:'\\x'+bytes.toString('hex'),created_at:'2026-11-07T00:00:00Z'};
+ assert.doesNotThrow(()=>inspectRow(row,new Set(),'pubquiz','bingo_matching_assets'));
+ const proof={size:bytes.length,sha256:hash(bytes),signature:bytes.subarray(0,12).toString('hex')};assert.doesNotThrow(()=>inspectRow({...row,content:proof},new Set(),'pubquiz','bingo_matching_assets'));
+ for(const change of [{content:{...proof,sha256:'b'.repeat(64)}},{content:{...proof,signature:'0000'}},{content:{...proof,size:101*1024*1024}},{content_type:'image/png'},{answers:[{key:'custom',label:'Test',text:'postgresql://not-a-credential@example.invalid/db'}]}])assert.throws(()=>inspectRow({...row,...change},new Set(),'pubquiz','bingo_matching_assets'));
+});

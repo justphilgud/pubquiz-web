@@ -457,6 +457,7 @@ export const ModelName = {
   benutzer_reihenrollen: 'benutzer_reihenrollen',
   game_drafts: 'game_drafts',
   bingo_preparations: 'bingo_preparations',
+  bingo_matching_assets: 'bingo_matching_assets',
   bingo_rounds: 'bingo_rounds',
   bingo_card_series: 'bingo_card_series',
   bingo_series_labels: 'bingo_series_labels',
@@ -489,7 +490,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "external_question_import_batches" | "external_question_import_items" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "meme_archive_sources" | "meme_archive_entries" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "live_polls" | "live_poll_revisions" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "live_poll_responses" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "meme_moderation_selections" | "meme_moderation_candidates" | "meme_presentations" | "meme_result_entries" | "meme_votes" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen" | "eventarten" | "eventreihe_eventarten" | "benutzer_eventartrollen" | "eventreihe_verwaltung" | "benutzer_reihenrollen" | "game_drafts" | "bingo_preparations" | "bingo_rounds" | "bingo_card_series" | "bingo_series_labels" | "bingo_print_versions" | "bingo_cards" | "bingo_round_series" | "bingo_issuance_changes" | "game_team_assignments" | "bingo_live_runs" | "bingo_live_cards" | "bingo_live_events" | "bingo_event_creation_requests" | "bingo_event_runs" | "bingo_event_round_plan" | "bingo_event_rounds" | "bingo_event_round_cards" | "bingo_term_sets"
+    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "external_question_import_batches" | "external_question_import_items" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "meme_archive_sources" | "meme_archive_entries" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "live_polls" | "live_poll_revisions" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "live_poll_responses" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "meme_moderation_selections" | "meme_moderation_candidates" | "meme_presentations" | "meme_result_entries" | "meme_votes" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen" | "eventarten" | "eventreihe_eventarten" | "benutzer_eventartrollen" | "eventreihe_verwaltung" | "benutzer_reihenrollen" | "game_drafts" | "bingo_preparations" | "bingo_matching_assets" | "bingo_rounds" | "bingo_card_series" | "bingo_series_labels" | "bingo_print_versions" | "bingo_cards" | "bingo_round_series" | "bingo_issuance_changes" | "game_team_assignments" | "bingo_live_runs" | "bingo_live_cards" | "bingo_live_events" | "bingo_event_creation_requests" | "bingo_event_runs" | "bingo_event_round_plan" | "bingo_event_rounds" | "bingo_event_round_cards" | "bingo_term_sets"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4933,6 +4934,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    bingo_matching_assets: {
+      payload: Prisma.$bingo_matching_assetsPayload<ExtArgs>
+      fields: Prisma.bingo_matching_assetsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.bingo_matching_assetsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_matching_assetsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.bingo_matching_assetsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_matching_assetsPayload>
+        }
+        findFirst: {
+          args: Prisma.bingo_matching_assetsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_matching_assetsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.bingo_matching_assetsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_matching_assetsPayload>
+        }
+        findMany: {
+          args: Prisma.bingo_matching_assetsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_matching_assetsPayload>[]
+        }
+        create: {
+          args: Prisma.bingo_matching_assetsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_matching_assetsPayload>
+        }
+        createMany: {
+          args: Prisma.bingo_matching_assetsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.bingo_matching_assetsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_matching_assetsPayload>[]
+        }
+        delete: {
+          args: Prisma.bingo_matching_assetsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_matching_assetsPayload>
+        }
+        update: {
+          args: Prisma.bingo_matching_assetsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_matching_assetsPayload>
+        }
+        deleteMany: {
+          args: Prisma.bingo_matching_assetsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.bingo_matching_assetsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.bingo_matching_assetsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_matching_assetsPayload>[]
+        }
+        upsert: {
+          args: Prisma.bingo_matching_assetsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$bingo_matching_assetsPayload>
+        }
+        aggregate: {
+          args: Prisma.Bingo_matching_assetsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBingo_matching_assets>
+        }
+        groupBy: {
+          args: Prisma.bingo_matching_assetsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Bingo_matching_assetsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.bingo_matching_assetsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Bingo_matching_assetsCountAggregateOutputType> | number
+        }
+      }
+    }
     bingo_rounds: {
       payload: Prisma.$bingo_roundsPayload<ExtArgs>
       fields: Prisma.bingo_roundsFieldRefs
@@ -7232,6 +7307,24 @@ export const Bingo_preparationsScalarFieldEnum = {
 export type Bingo_preparationsScalarFieldEnum = (typeof Bingo_preparationsScalarFieldEnum)[keyof typeof Bingo_preparationsScalarFieldEnum]
 
 
+export const Bingo_matching_assetsScalarFieldEnum = {
+  variant: 'variant',
+  answers: 'answers',
+  id: 'id',
+  game_id: 'game_id',
+  source_question_id: 'source_question_id',
+  source_media_id: 'source_media_id',
+  source_revision: 'source_revision',
+  kind: 'kind',
+  content_type: 'content_type',
+  sha256: 'sha256',
+  content: 'content',
+  created_at: 'created_at'
+} as const
+
+export type Bingo_matching_assetsScalarFieldEnum = (typeof Bingo_matching_assetsScalarFieldEnum)[keyof typeof Bingo_matching_assetsScalarFieldEnum]
+
+
 export const Bingo_roundsScalarFieldEnum = {
   term_snapshot: 'term_snapshot',
   id: 'id',
@@ -7421,6 +7514,7 @@ export type Bingo_event_round_cardsScalarFieldEnum = (typeof Bingo_event_round_c
 
 
 export const Bingo_term_setsScalarFieldEnum = {
+  config_hash: 'config_hash',
   id: 'id',
   game_id: 'game_id',
   config: 'config',
@@ -8193,6 +8287,7 @@ export type GlobalOmitConfig = {
   benutzer_reihenrollen?: Prisma.benutzer_reihenrollenOmit
   game_drafts?: Prisma.game_draftsOmit
   bingo_preparations?: Prisma.bingo_preparationsOmit
+  bingo_matching_assets?: Prisma.bingo_matching_assetsOmit
   bingo_rounds?: Prisma.bingo_roundsOmit
   bingo_card_series?: Prisma.bingo_card_seriesOmit
   bingo_series_labels?: Prisma.bingo_series_labelsOmit

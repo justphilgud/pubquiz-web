@@ -351,6 +351,11 @@ export type game_drafts = Prisma.game_draftsModel
  */
 export type bingo_preparations = Prisma.bingo_preparationsModel
 /**
+ * Model bingo_matching_assets
+ *
+ */
+export type bingo_matching_assets = Prisma.bingo_matching_assetsModel
+/**
  * Model bingo_rounds
  *
  */

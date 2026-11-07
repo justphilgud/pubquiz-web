@@ -111,6 +111,7 @@ export const ModelName = {
   benutzer_reihenrollen: 'benutzer_reihenrollen',
   game_drafts: 'game_drafts',
   bingo_preparations: 'bingo_preparations',
+  bingo_matching_assets: 'bingo_matching_assets',
   bingo_rounds: 'bingo_rounds',
   bingo_card_series: 'bingo_card_series',
   bingo_series_labels: 'bingo_series_labels',
@@ -1148,6 +1149,24 @@ export const Bingo_preparationsScalarFieldEnum = {
 export type Bingo_preparationsScalarFieldEnum = (typeof Bingo_preparationsScalarFieldEnum)[keyof typeof Bingo_preparationsScalarFieldEnum]
 
 
+export const Bingo_matching_assetsScalarFieldEnum = {
+  variant: 'variant',
+  answers: 'answers',
+  id: 'id',
+  game_id: 'game_id',
+  source_question_id: 'source_question_id',
+  source_media_id: 'source_media_id',
+  source_revision: 'source_revision',
+  kind: 'kind',
+  content_type: 'content_type',
+  sha256: 'sha256',
+  content: 'content',
+  created_at: 'created_at'
+} as const
+
+export type Bingo_matching_assetsScalarFieldEnum = (typeof Bingo_matching_assetsScalarFieldEnum)[keyof typeof Bingo_matching_assetsScalarFieldEnum]
+
+
 export const Bingo_roundsScalarFieldEnum = {
   term_snapshot: 'term_snapshot',
   id: 'id',
@@ -1337,6 +1356,7 @@ export type Bingo_event_round_cardsScalarFieldEnum = (typeof Bingo_event_round_c
 
 
 export const Bingo_term_setsScalarFieldEnum = {
+  config_hash: 'config_hash',
   id: 'id',
   game_id: 'game_id',
   config: 'config',

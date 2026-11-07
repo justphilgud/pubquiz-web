@@ -14,7 +14,8 @@ export type LiveCommand =
 export type LiveEvent = { id: string; at: number; actorId: number; command: LiveCommand };
 export type Call = { id: string; stage: Stage; throughPosition: number; cardId: string | null; draws: readonly Draw[] };
 export type LiveState = { run: BingoRun; calls: readonly Call[] };
-export type FrozenRound = { terms?:TermSet; id: string; label: string; target: number; issued: number | null; seriesIds: string[] };
+export type FrozenMatching = { id:string; hash:string; publication:'DIRECT'|'APPROVAL'|'HIDDEN' };
+export type FrozenRound = { terms?:TermSet; matching?:FrozenMatching; id: string; label: string; target: number; issued: number | null; seriesIds: string[] };
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export function assertUuid(value: unknown): asserts value is string {
   if (typeof value !== "string" || !uuid.test(value)) throw Error("INVALID_ID");
