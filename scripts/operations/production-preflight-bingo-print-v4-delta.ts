@@ -21,7 +21,7 @@ export function testBingoPrintV4Delta(sql:(v:string|Buffer)=>string,query:(v:str
  INSERT INTO pubquiz.bingo_card_series(id,game_id,origin_round_id,code,card_count,request_id,request_hash,print_snapshot,created_by) VALUES('${series}','${game}','${round}','BG-AAAAAAAAAAAA',1,'97000000-0000-4000-8000-000000000004','${"a".repeat(64)}','{"version":2}',97000);
  INSERT INTO pubquiz.bingo_cards(id,series_id,ordinal,printed_code,cells,layout_hash) VALUES('${card}','${series}',1,'BG-AAAAAAAAAAAA-0001','${cells}','${"b".repeat(64)}');
  INSERT INTO pubquiz.bingo_round_series(round_id,series_id,game_id) VALUES('${round}','${series}','${game}');
- INSERT INTO pubquiz.bingo_print_versions(series_id,version,snapshot,created_by) VALUES('${series}',1,'{"version":2}',97000);
+ INSERT INTO pubquiz.bingo_print_versions(series_id,version,snapshot,created_by) VALUES('${series}',2,'{"version":2}',97000);
  INSERT INTO pubquiz.bingo_live_runs(id,game_id,round_id,eventreihe_id,status,created_by,round_snapshot,design_snapshot,visual_assets,audience_key,start_request_id,start_request_hash) VALUES('${run}','${game}','${round}',97000,'RUNNING',97000,'{}','{}','{}','${run}','${run}','${"c".repeat(64)}');
  INSERT INTO pubquiz.bingo_live_cards(run_id,game_id,card_id,series_id) VALUES('${run}','${game}','${card}','${series}');
  INSERT INTO pubquiz.bingo_live_events(run_id,revision,request_id,request_hash,actor_id,command) VALUES('${run}',1,'${run}','${"d".repeat(64)}',97000,'{"kind":"pause"}');COMMIT;`);
@@ -33,8 +33,8 @@ export function testBingoPrintV4Delta(sql:(v:string|Buffer)=>string,query:(v:str
  if(rows()!==before)throw Error("PRINT_V4_EXISTING_ROWS_CHANGED");
  const rejected=(statement:string)=>{let failed=false;try{sql(statement);}catch{failed=true;}if(!failed)throw Error("PRINT_V4_CONSTRAINT_NOT_ENFORCED");};
  const newSeries=(version:number)=>`INSERT INTO pubquiz.bingo_card_series(id,game_id,origin_round_id,code,card_count,request_id,request_hash,print_snapshot,created_by) VALUES('${other}','${game}','${round}','BG-BBBBBBBBBBBB',1,'${other}','${"a".repeat(64)}','{"version":${version}}',97000)`;
- sql(`BEGIN;${newSeries(4)};INSERT INTO pubquiz.bingo_print_versions(series_id,version,snapshot,created_by) VALUES('${series}',2,'{"version":4}',97000);UPDATE pubquiz.eventreihen SET bingo_print_config='{"version":2}' WHERE eventreihe_id=97000;UPDATE pubquiz.game_drafts SET bingo_print_config='{"version":2}' WHERE id='${game}';ROLLBACK;`);
- rejected(newSeries(5));rejected(`INSERT INTO pubquiz.bingo_print_versions(series_id,version,snapshot,created_by) VALUES('${series}',2,'{"version":5}',97000)`);
+ sql(`BEGIN;${newSeries(4)};INSERT INTO pubquiz.bingo_print_versions(series_id,version,snapshot,created_by) VALUES('${series}',3,'{"version":4}',97000);UPDATE pubquiz.eventreihen SET bingo_print_config='{"version":2}' WHERE eventreihe_id=97000;UPDATE pubquiz.game_drafts SET bingo_print_config='{"version":2}' WHERE id='${game}';ROLLBACK;`);
+ rejected(newSeries(5));rejected(`INSERT INTO pubquiz.bingo_print_versions(series_id,version,snapshot,created_by) VALUES('${series}',3,'{"version":5}',97000)`);
  rejected("UPDATE pubquiz.eventreihen SET bingo_print_config='{\"version\":3}' WHERE eventreihe_id=97000");
  rejected(`UPDATE pubquiz.game_drafts SET bingo_print_config='{"version":3}' WHERE id='${game}'`);
  rejected(`UPDATE pubquiz.game_drafts SET eventart='POWERPOINT_KARAOKE',bingo_print_config='{"version":2}' WHERE id='${game}'`);
