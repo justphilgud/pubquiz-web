@@ -12,6 +12,12 @@ export const BINGO_PRINT_REVIEW_DATABASE = {
   name: "bingo_print_v4_review",
   endpoint: "ep-holy-term-baa881iq",
 } as const;
+// Separate synthetic database on the existing Nonprod compute; no extra service.
+export const BINGO_MATCHING_REVIEW_DATABASE = {
+  branch:'codex/bingo-matching-table',host:BINGO_PRINT_REVIEW_DATABASE.host,
+  pooledHost:BINGO_PRINT_REVIEW_DATABASE.pooledHost,name:'bingo_matching_review',
+  endpoint:BINGO_PRINT_REVIEW_DATABASE.endpoint,
+} as const;
 
 
 export type DeploymentEnvironment = "preview" | "production";
@@ -217,7 +223,10 @@ export function validateDeploymentEnvironment(
 
   const review = BINGO_PRINT_REVIEW_DATABASE;
   const isReviewHost = database.host === review.host || database.host === review.pooledHost;
-  if (environment === "preview" && context.ref === "refs/heads/" + review.branch) {
+  const matching=BINGO_MATCHING_REVIEW_DATABASE;
+  if(environment==='preview'&&context.ref==='refs/heads/'+matching.branch){
+    if(!isReviewHost||database.name!==matching.name||expectedBranch!==matching.endpoint)throw new DeploymentValidationError('BINGO_MATCHING_REVIEW_IDENTITY_MISMATCH','Dieser Matching-Branch benötigt ausschließlich seine eigene isolierte Testdatenbank.');
+  } else if (environment === "preview" && context.ref === "refs/heads/" + review.branch) {
     if (!isReviewHost || database.name !== review.name || expectedBranch !== review.endpoint) {
       throw new DeploymentValidationError(
         "BINGO_PRINT_REVIEW_IDENTITY_MISMATCH",

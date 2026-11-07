@@ -257,3 +257,9 @@ test('Bingo print template Preview never migrates the shared development databas
  assert.equal(JSON.parse(readFileSync('vercel.json','utf8')).git.deploymentEnabled,false);
  assert.match(preview,/TRUSTED_PREVIEW_BRANCHES/);
 });
+test('Bingo Matching Preview never enters shared migration and retains exact trust/source guards',()=>{
+ assert.match(preview,/github.ref != 'refs\/heads\/codex\/bingo-matching-table' &&/);
+ assert.equal(JSON.parse(readFileSync('vercel.json','utf8')).git.deploymentEnabled,false);
+ assert.match(preview,/TRUSTED_PREVIEW_BRANCHES/);
+ assert.ok(preview.includes('node --import tsx scripts/deploy-vercel-git-preview.ts'));
+});

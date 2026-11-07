@@ -166,3 +166,14 @@ test("isolated print preview binds only its exact approved branch, host, databas
   assertValidationCode({ ...review, deploymentRef: "refs/heads/feature/other" }, "ISOLATED_PREVIEW_SCOPE_MISMATCH");
   assertValidationCode({ ...review, deploymentEnvironment: "production", deploymentRef: "refs/heads/main" }, "ISOLATED_PREVIEW_SCOPE_MISMATCH");
 });
+test('Matching Preview binds its own database without opening the existing print preview target',()=>{
+ const matching={...previewInput,deploymentRef:'refs/heads/codex/bingo-matching-table',expectedDatabaseHost:'ep-holy-term-baa881iq-pooler.c-8.eu-central-1.aws.neon.tech',expectedDatabaseName:'bingo_matching_review',expectedDatabaseBranch:'ep-holy-term-baa881iq',databaseUrl:'postgresql://synthetic:fixture@ep-holy-term-baa881iq-pooler.c-8.eu-central-1.aws.neon.tech/bingo_matching_review?sslmode=verify-full'};
+ assert.equal(validateDeploymentEnvironment(matching).databaseBranchVerified,true);
+ assert.equal(validateDeploymentEnvironment({...matching,expectedDatabaseHost:matching.expectedDatabaseHost.replace('-pooler.','.'),databaseUrl:matching.databaseUrl.replace('-pooler.','.')}).databaseBranchVerified,true);
+ for(const name of ['bingo_print_v4_review','neondb','foreign'])assertValidationCode({...matching,expectedDatabaseName:name,databaseUrl:matching.databaseUrl.replace('bingo_matching_review',name)},'BINGO_MATCHING_REVIEW_IDENTITY_MISMATCH');
+ assertValidationCode({...matching,expectedDatabaseBranch:undefined},'BINGO_MATCHING_REVIEW_IDENTITY_MISMATCH');
+ assertValidationCode({...previewInput,deploymentRef:matching.deploymentRef},'BINGO_MATCHING_REVIEW_IDENTITY_MISMATCH');
+ assertValidationCode({...matching,deploymentEnvironment:'production',deploymentRef:'refs/heads/main'},'ISOLATED_PREVIEW_SCOPE_MISMATCH');
+ assertValidationCode({...matching,deploymentRef:'refs/heads/codex/foreign'},'ISOLATED_PREVIEW_SCOPE_MISMATCH');
+ assertValidationCode({...matching,deploymentRef:'refs/heads/codex/bingo-print-templates-ui'},'BINGO_PRINT_REVIEW_IDENTITY_MISMATCH');
+});
