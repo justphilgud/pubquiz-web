@@ -151,3 +151,43 @@ Damit bleibt workflow_run vom main-Controller gesperrt; Abnahmen werden per
 workflow_dispatch auf einem der drei ausdrücklich freigegebenen Branches gestartet.
 Direkte administrative Vercel-Deployments müssen dieselbe geprüfte Auswahl
 beachten; keine pauschale Freigabe fremder PRs oder Branches.
+
+## Isolierte Launch-Preview für PR154 (7. November 2026)
+
+Ausdrücklich autorisierte, ausschließlich synthetische Abnahmeumgebung für
+`codex/bingo-print-templates-ui`:
+
+- Organisation `justphilgud`, `org-red-fog-55598232`, bestehender Launch-Tarif.
+- Projekt `pubquiz-nonprod-pr154-bingo-print`, `falling-sky-48140800`, Frankfurt,
+  PostgreSQL 17; Branch `br-dry-tooth-bac6tr7o`.
+- Datenbank `bingo_print_v4_review`; Endpoint `ep-holy-term-baa881iq`.
+  Anwendung nutzt dessen gepoolten Host, Schemaoperationen den direkten Host.
+- Tatsächlich erneut gelesene Compute-Konfiguration: genau ein Read-write-Compute,
+  Minimum = Maximum **0,25 CU**, Suspendierung nach **300 Sekunden** Inaktivität.
+  Keine Replikate, Functions, Auth-/Storage-Zusatzdienste; Retention ein Tag.
+  Compute-Suspendierung beendet nicht die Speicherabrechnung. Kein Tarifwechsel
+  und keine Änderung des organisationsweiten Ausgabenlimits.
+
+Nur die exakten Preview-Branch-Overrides für `DATABASE_URL` und die drei
+`EXPECTED_DATABASE_*`-Werte werden zugeordnet. Der bestehende Datenbankvalidator
+bindet diesen Branch zusätzlich an genau Host, Datenbank und Endpoint; er weist
+auch passend umkonfigurierte fremde Ziele sowie die Nutzung dieses Testziels in
+Production oder anderen Branches ab. Gemeinsames Development und Production
+bleiben unverändert. Die zentrale Medienkonfiguration bleibt geerbt, ausschließlich
+das eigene bestehende SHA256-Branchpräfix ist zulässig. Keine neue Medienausnahme.
+
+Das alte Free-Projekt `polished-snow-55356911` in
+`org-sparkling-forest-86747503` bleibt gesperrt und unangetastet. Diese Einrichtung
+setzt dessen Kontingent nicht zurück und migriert/löscht dort nichts.
+
+Die neue leere Datenbank erhält ausschließlich die bereits lokal geprüfte
+synthetische `pubquiz`-Fixture. Deren Prisma-Historientabelle existiert nicht;
+das ist ausdrücklich **kein erfolgreicher historischer Neuinstallationsreplay**
+und keine Baseline/resolve an einer vorhandenen Datenbank. Die bekannte historische
+0_init-/Draft-Kollision bleibt offen. Die vollständigen leeren/befüllten
+V4-Migrationsprüfungen bleiben in CI erhalten. Zusätzlich wurde der exakte V4-SQL
+im gehosteten synthetischen Ziel erneut erfolgreich ausgeführt; Karten-,
+Druckversions- und Spielhashes bleiben bei kanonischer UTC-Auswertung identisch.
+Keine Produktionsdaten als Quelle. Aktuelle CI-, READY-/Alias-/Runtime- sowie
+gehostete Browser-/PDF-Nachweise werden in PR154 dokumentiert; die Einrichtung
+allein behauptet diese nachfolgenden Nachweise noch nicht.

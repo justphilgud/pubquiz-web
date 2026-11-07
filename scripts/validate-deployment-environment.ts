@@ -4,6 +4,15 @@ import { pathToFileURL } from "node:url";
 import { processEnv } from "@next/env";
 
 export const EXPECTED_REPOSITORY = "justphilgud/pubquiz-web";
+// Explicitly approved isolated PR154 resource; never a shared or Production target.
+export const BINGO_PRINT_REVIEW_DATABASE = {
+  branch: "codex/bingo-print-templates-ui",
+  host: "ep-holy-term-baa881iq.c-8.eu-central-1.aws.neon.tech",
+  pooledHost: "ep-holy-term-baa881iq-pooler.c-8.eu-central-1.aws.neon.tech",
+  name: "bingo_print_v4_review",
+  endpoint: "ep-holy-term-baa881iq",
+} as const;
+
 
 export type DeploymentEnvironment = "preview" | "production";
 
@@ -202,6 +211,23 @@ export function validateDeploymentEnvironment(
     throw new DeploymentValidationError(
       "DATABASE_BRANCH_MISMATCH",
       "Die Datenbank-Branch- oder Endpoint-Kennung wurde im Host nicht gefunden.",
+    );
+  }
+
+
+  const review = BINGO_PRINT_REVIEW_DATABASE;
+  const isReviewHost = database.host === review.host || database.host === review.pooledHost;
+  if (environment === "preview" && context.ref === "refs/heads/" + review.branch) {
+    if (!isReviewHost || database.name !== review.name || expectedBranch !== review.endpoint) {
+      throw new DeploymentValidationError(
+        "BINGO_PRINT_REVIEW_IDENTITY_MISMATCH",
+        "Dieser Preview-Branch benötigt ausschließlich seine freigegebene isolierte Datenbank.",
+      );
+    }
+  } else if (isReviewHost) {
+    throw new DeploymentValidationError(
+      "ISOLATED_PREVIEW_SCOPE_MISMATCH",
+      "Die isolierte Druckvorlagen-Datenbank ist nur für ihren exakten Preview-Branch freigegeben.",
     );
   }
 

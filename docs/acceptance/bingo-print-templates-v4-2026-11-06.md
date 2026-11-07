@@ -116,3 +116,28 @@ entscheidung ist für die bereits implementierten Details nötig.
 ![Bingo vor und nach der Angleichung](assets/bingo-print-templates-v4/bingo-before-after-laptop.png)
 
 ![Zwölf tatsächliche PDF-Varianten mit Vorder- und Rückseite](assets/bingo-print-templates-v4/pdf-contact-sheet.png)
+
+## Fortsetzung am 7. November: eigene Launch-Testressource
+
+Der historische Free-Projekt-Blocker bleibt bestehen; er wird weder als behoben
+noch als zurückgesetztes Kontingent dargestellt. Für die ausdrücklich autorisierte
+Fortsetzung wurde stattdessen ausschließlich in der bestehenden Launch-Organisation
+das eigene synthetische Projekt `falling-sky-48140800`
+(`pubquiz-nonprod-pr154-bingo-print`) eingerichtet. Exakte Branchbindung,
+Ressourcenbegrenzung und Fixture-/Migrationsgrenzen stehen im
+[Umgebungsvertrag](../architecture/media-upload-environments.md#isolierte-launch-preview-für-pr154-7-november-2026).
+
+Die lokal geprüfte Schema-/Daten-Fixture stammt nur von Loopback und enthält
+1538 synthetische Karten, drei historische Druckversionen und null reale
+Benutzerkonten. Kein Abzug aus Production oder dem alten Neon-Projekt.
+Die vollständige Kopie der Karten, Druckversionen und Spiele sowie deren Erhalt
+nach erneutem exaktem V4-SQL sind im neuen Ziel hashgleich geprüft. Der erste
+textuelle Hashvergleich erkannte unterschiedliche Session-Zeitzonen
+(Europe/Berlin gegenüber GMT); die unabhängige kanonische UTC-Prüfung bestätigt
+gleiche Daten. Keine Anwendungskorrektur oder Abschwächung von Integritätsprüfungen.
+
+Der bereits veröffentlichte Transfer-Fix ist Production-Commit `e877959f`.
+Dieser Designrelease benötigt weiterhin die gehostete Abnahme und den frischen
+exakten geschützten Production-Preflight mit ausschließlich der V4-Migration.
+Ergebnisse und endgültige Release-SHAs werden im PR154 nachgeführt. Diese Notiz
+behauptet keinen bereits abgeschlossenen Designrelease oder physischen Drucktest.
