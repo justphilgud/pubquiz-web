@@ -3,7 +3,7 @@ import {requireActor} from '@/app/lib/permissions';
 import {revalidatePath} from 'next/cache';
 import {MatchingError} from '../preparation/matching';
 import {BingoPreparationError} from '../preparation/policy';
-import {searchMatchingSources} from './source.server';
+import {searchMatchingSources,listMatchingTemplates} from './source.server';
 import {writeMatching,readRetainedAnswers} from './repository.server';
 import {prisma} from '@/app/lib/prisma';
 import {preparationContext} from '../preparation/access.server';
@@ -18,11 +18,17 @@ export async function getMatchingSource(gameId:string,questionId:number,assetId?
   const media=checked.filter(m=>m.available).map(m=>m.medium);return {success:true as const,item:{...source.view,media,browserSpeechOnly:source.view.browserSpeechOnly}};
  }catch{return {success:false as const};}
 }
-export async function findMatchingSources(gameId:string,input:{search:string;template:string;kind:string;page:number}){
+export async function findMatchingSources(gameId:string,input:{search:string;template:string;templateCode?:string;kind:string;page:number}){
  const {actor}=await requireActor();
  try{return {success:true as const,...await searchMatchingSources(actor.userId,gameId,input)};}catch{return {success:false as const,message:'Quellen konnten nicht geladen werden. Bitte aktuelle Rechte und Filter prüfen.'};}
 }
 export async function saveMatching(input:{gameId:string;roundId:string;revision:number;config:unknown}){
  const {actor}=await requireActor();try{const result=await writeMatching(actor.userId,input);revalidatePath(`/bingo/${input.gameId}`);revalidatePath(`/bingo/${input.gameId}/matching`);return result;}
  catch(e){return {success:false as const,message:e instanceof MatchingError||e instanceof BingoPreparationError?e.message:'Nicht gespeichert. Bitte aktuelle Rechte, Medien und Angaben prüfen. Deine Eingaben bleiben erhalten.'};}
+}
+
+export async function getMatchingTemplates(gameId:string){
+ const {actor}=await requireActor();
+ try{return {success:true as const,items:await listMatchingTemplates(actor.userId,gameId)};}
+ catch{return {success:false as const,message:'Vorlagen konnten nicht geladen werden. Bitte erneut versuchen.'};}
 }

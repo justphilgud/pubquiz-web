@@ -1,0 +1,34 @@
+{
+  "passed": true,
+  "viewports": [
+    [
+      1366,
+      768
+    ],
+    [
+      1280,
+      720
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "checks": [
+    "no horizontal overflow",
+    "sticky save",
+    "template dropdown and exact code filter",
+    "Escape and focus return",
+    "artist/title independence",
+    "duplicate validation",
+    "same text",
+    "cancel guard",
+    "conflict retains draft",
+    "save payload 90 entries",
+    "range 15–26",
+    "bulk keep number",
+    "76–90 notice",
+    "locked round"
+  ],
+  "boundary": "Actual React/CSS, mocked server actions; no database or hosted acceptance."
+}

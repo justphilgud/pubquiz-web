@@ -1,4 +1,5 @@
 import 'server-only';
+import {GENERAL_TEMPLATE,matchingTemplateOption,type MatchingTemplateOption} from './templateOptions';
 import type {Prisma} from '@/app/generated/prisma/client';
 import {prisma} from '@/app/lib/prisma';
 import {getActorPermissions} from '@/app/roles/roleAssignments.server';
@@ -30,16 +31,42 @@ export async function authorizedSource(tx:Prisma.TransactionClient,userId:number
  if(!q||!canViewScopedQuestion(actor,mapQuestionAccessContext(q))||!isQuestionEligibleForQuiz({scope:q.geltungsbereich,eventSeriesIds:q.eventreihen.map(e=>e.eventreihe_id),quizEventSeriesId:seriesId,isApproved:q.freigegeben,isArchived:q.ist_archiviert,validUntil:q.gueltig_bis,now:new Date()}))throw new MatchingError('Quizquelle nicht gefunden, nicht freigegeben oder nicht für diese Eventreihe berechtigt.');
  return {row:q,view:projectMatchingSource(q)};
 }
-export async function searchMatchingSources(userId:number,gameId:string,input:{search:string;template:string;kind:string;page:number}){
- if(typeof input.search!=='string'||input.search.length>120||typeof input.template!=='string'||input.template.length>100||!['','AUDIO','IMAGE','VIDEO'].includes(input.kind)||!Number.isInteger(input.page)||input.page<1||input.page>10000)throw new MatchingError('Ungültige Quellensuche.');
+export async function searchMatchingSources(userId:number,gameId:string,input:{search:string;template:string;templateCode?:string;kind:string;page:number}){
+ if((input.templateCode!==undefined&&(typeof input.templateCode!=='string'||input.templateCode.length>100))||typeof input.search!=='string'||input.search.length>120||typeof input.template!=='string'||input.template.length>100||!['','AUDIO','IMAGE','VIDEO'].includes(input.kind)||!Number.isInteger(input.page)||input.page<1||input.page>10000)throw new MatchingError('Ungültige Quellensuche.');
  return prisma.$transaction(async tx=>{
   const {game}=await preparationContext(tx,userId,gameId),actor=await getActorPermissions(userId,tx);
   const rows=await tx.fragen.findMany({where:{freigegeben:true,ist_archiviert:false,
    OR:[{geltungsbereich:'GLOBAL'},{geltungsbereich:'EVENT_SERIES',eventreihen:{some:{eventreihe_id:game.eventreihe_id}}}],
-   AND:[{OR:[{gueltig_bis:null},{gueltig_bis:{gte:new Date()}}]},...(input.template?[{OR:[{vorlage:{name:{contains:input.template,mode:'insensitive' as const}}},{source_vorlage:{name:{contains:input.template,mode:'insensitive' as const}}}]}]:[])],
+   AND:[...(input.templateCode?[input.templateCode===GENERAL_TEMPLATE?{source_vorlage_id:null,vorlage_id:null}:{OR:[{source_vorlage:{code:input.templateCode}},{source_vorlage_id:null,vorlage:{code:input.templateCode}}]}]:[]),{OR:[{gueltig_bis:null},{gueltig_bis:{gte:new Date()}}]},...(input.template?[{OR:[{vorlage:{name:{contains:input.template,mode:'insensitive' as const}}},{source_vorlage:{name:{contains:input.template,mode:'insensitive' as const}}}]}]:[])],
    frage:{contains:input.search,mode:'insensitive'}},select:sourceSelect,orderBy:{fragen_id:'asc'},skip:(input.page-1)*20,take:21});
   const visible=rows.slice(0,20).filter(q=>canViewScopedQuestion(actor,mapQuestionAccessContext(q))).map(projectMatchingSource).filter(q=>!input.kind||q.media.some(m=>m.kind===input.kind));
   return {items:visible,more:rows.length>20,seriesId:game.eventreihe_id};
  },{isolationLevel:'RepeatableRead'});
 }
 export type MatchingSourceView=ReturnType<typeof projectMatchingSource>;
+
+/** Explicit dialog load, paged metadata only; never media, answers or a polling dependency. */
+export async function listMatchingTemplates(userId:number,gameId:string){
+ return prisma.$transaction(async tx=>{
+  const {game}=await preparationContext(tx,userId,gameId);
+  const actor=await getActorPermissions(userId,tx);
+  const options=new Map<string,MatchingTemplateOption>();
+  const now=new Date();
+  let after=0;
+  for(;;){
+   const rows=await tx.fragen.findMany({
+    where:{fragen_id:{gt:after},freigegeben:true,ist_archiviert:false,
+     OR:[{geltungsbereich:'GLOBAL'},{geltungsbereich:'EVENT_SERIES',eventreihen:{some:{eventreihe_id:game.eventreihe_id}}}],
+     AND:[{OR:[{gueltig_bis:null},{gueltig_bis:{gte:now}}]}]},
+    select:{fragen_id:true,geltungsbereich:true,created_by_user_id:true,review_status:true,ist_archiviert:true,freigegeben:true,eventreihen:{select:{eventreihe_id:true}},vorlage:{select:{code:true,name:true}},source_vorlage:{select:{code:true,name:true}}},
+    orderBy:{fragen_id:'asc'},take:200});
+   for(const row of rows){
+    if(!canViewScopedQuestion(actor,mapQuestionAccessContext(row)))continue;
+    const option=matchingTemplateOption(row);options.set(option.code,option);
+   }
+   if(rows.length<200)break;
+   after=rows[rows.length-1].fragen_id;
+  }
+  return [...options.values()].sort((a,b)=>a.name.localeCompare(b.name,'de')||a.code.localeCompare(b.code));
+ },{isolationLevel:'RepeatableRead'});
+}

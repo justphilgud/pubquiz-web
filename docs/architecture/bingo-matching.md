@@ -147,6 +147,32 @@ deren Prüfungen bleiben unverändert. Kein manueller Production-Backup/Restore.
 
 ## Verifikation
 
+### Matching-Editor: Bedienung und Vorlagenfilter
+
+Die Matching-Seite gruppiert Einstellungen, Bereichsauswahl und Zuordnungszeilen.
+Die vorhandene Medien-Lupe steht bündig neben der Präsentationsauswahl. Auf kleinen
+Bildschirmen stehen Präsentation und Kartenantwort innerhalb jeder Kugel untereinander.
+Eine am unteren Rand sichtbare Leiste zeigt Speicherstatus, Konflikt-/Fehlermeldungen
+und Speichern/Abbrechen. Die Bereichsauswahl filtert ausschließlich die Ansicht;
+der gespeicherte Satz enthält weiterhin alle 90 Einträge und die 75er-Regel bleibt.
+
+Der Filter „Fragevorlage“ ist eine durchsuchbare Einzelauswahl. Er verwendet stabile
+Vorlagencodes und bevorzugt `source_vorlage` gegenüber der technischen Basisvorlage.
+Angeboten werden nur Vorlagen mindestens einer freigegebenen, gültigen, nicht
+archivierten und für Spielreihe sowie aktuellen Quiz-Zugriff sichtbaren Quelle.
+Fehlende Preview-Daten können daher Optionen reduzieren; sie erklären aber nicht das
+frühere Freitextfeld. Medienverfügbarkeit wird weiterhin bei der Quellenauswahl geprüft.
+
+Das Öffnen des Dialogs lädt einmalig Vorlagen- und Berechtigungsmetadaten in Seiten
+von 200 Datensätzen; Frageninhalte, Antworten und Medien werden dafür nicht geladen.
+Es gibt keine zusätzliche Pollingabhängigkeit. Die neue Serveraktion prüft Sitzung,
+Bingo-Spielzugriff und Quiz-Quellenrechte erneut. Die Freitext-Filteroption bleibt für
+bestehende Aufrufer kompatibel; die Oberfläche nutzt den exakten Codefilter.
+
+CSS bleibt lokal im Matching-Modul. Keine Änderung gemeinsamer UI-Komponenten,
+Quizansichten, Druckvorlagen, Laufzeit-, Speicher- oder Snapshot-Verträge.
+Lokale Nachweise und Prüfgrenzen: [Matching-UX](../reviews/bingo-matching-ux/README.md).
+
 Verbindlich: `test:bingo-preparation`, `test:bingo`, Typecheck, geänderte-Dateien-ESLint,
 vollständige erforderliche CI und Build. Die echte PostgreSQL-Abnahme erweitert
 `bingo-preparation.integration.test.ts`: leere/befüllte additive Migration, alte
