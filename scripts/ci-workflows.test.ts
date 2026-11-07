@@ -263,3 +263,12 @@ test('Bingo Matching Preview never enters shared migration and retains exact tru
  assert.match(preview,/TRUSTED_PREVIEW_BRANCHES/);
  assert.ok(preview.includes('node --import tsx scripts/deploy-vercel-git-preview.ts'));
 });
+
+test('Matching UX Preview cannot run the shared migration job and retains all existing trust gates',()=>{
+ assert.match(preview,/github.ref != 'refs\/heads\/codex\/bingo-matching-ux-polish' &&/);
+ assert.match(preview,/github.ref != 'refs\/heads\/codex\/bingo-matching-table' &&/);
+ assert.equal(JSON.parse(readFileSync('vercel.json','utf8')).git.deploymentEnabled,false);
+ assert.ok(preview.includes('node scripts/verify-preview-ci.ts'));
+ assert.ok(preview.includes('node --import tsx scripts/deploy-vercel-git-preview.ts'));
+ assert.match(preview,/TRUSTED_PREVIEW_BRANCHES/);
+});

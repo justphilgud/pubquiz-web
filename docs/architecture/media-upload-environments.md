@@ -197,3 +197,28 @@ allein behauptet diese nachfolgenden Nachweise noch nicht.
 Der Benutzer hat ausschließlich `codex/bingo-matching-table` ausdrücklich für die bestehende Vertrauensliste und die exakte Preview-Environment-Branch-Policy freigegeben. Vorhandene Einträge und Schutzregeln bleiben erhalten. Der gemeinsame Nonprod-Store wird ausschließlich mit dem aus diesem Branch abgeleiteten eigenen SHA-256-Präfix verwendet. Keine Production-Medien oder fremden Präfixe verändern.
 
 Eigene synthetische Datenbank `bingo_matching_review` auf dem bestehenden Launch-Nonprod-Endpunkt `ep-holy-term-baa881iq` (Projekt `falling-sky-48140800`). Nur diese Preview erhält genaue Branch-Overrides; Production und gemeinsame Development-Konfiguration bleiben unverändert. Der Deployment-Guard bindet Branch, direkten/gepoolten Host, Datenbankname und Endpointmarker. Der Branch ist ausdrücklich vom gemeinsamen Migrationsjob ausgeschlossen. Migration und Seed erfolgen ausschließlich nach Identitätsprüfung im eigenen isolierten Ziel. Tatsächlicher Compute: ein Read/Write-Endpunkt, 0,25 CU Minimum/Maximum, Suspendierung nach 300 Sekunden; keine zusätzliche Compute oder Replikate. Die aus einer geprüften lokalen synthetischen V4-Modellbasis erzeugte Datenbank ist keine behauptete Wiedergabe sämtlicher historischer Bootstrap-Migrationen.
+
+## Isolierte Matching-UX-Preview / PR160
+
+Der Benutzer hat am 7. November 2026 genau `codex/bingo-matching-ux-polish`
+ausdrücklich für die bestehende Preview-Allowlist und die exakte Environment-
+Branch-Policy freigegeben. Keine Wildcards oder weiteren Branches aufnehmen;
+vorhandene Freigaben und Environment-Schutzregeln bleiben erhalten.
+
+Eigene rein synthetische Datenbank `bingo_matching_ux_review` auf dem bestehenden
+Launch-Nonprod-Endpunkt `ep-holy-term-baa881iq` / Projekt `falling-sky-48140800`.
+Keine zusätzliche Compute, Replikate oder Dienste. Tatsächlich gelesene Grenzen:
+0,25 CU Minimum/Maximum, Suspendierung nach300 Sekunden. Nur exakte Preview-
+Branch-Overrides für DATABASE_URL und EXPECTED_DATABASE_HOST/NAME/BRANCH.
+Production, gemeinsames Development, PR154 und die bisherige Matching-Preview
+werden weder umgebunden noch zurückgesetzt. Medien ausschließlich im eigenen,
+aus dem neuen Branch abgeleiteten SHA256-Präfix des bestehenden Nonprod-Stores.
+
+Der Guard bindet Branch, direkten/gepoolten Host, Datenbankname und Endpointmarker.
+Der Branch ist vom gemeinsamen Migrationsjob ausdrücklich ausgeschlossen; die
+gezielte administrative Git-Preview-Bereitstellung erhält sämtliche Source-,
+CI-, Trust-, Medien- und READY-Prüfungen. Schema und synthetische Testfälle werden
+nur nach Identitätsprüfung in der neuen leeren Datenbank eingerichtet. Das ist
+kein behaupteter vollständiger historischer Bootstrap-Replay und keine Baseline/
+Reparatur einer bestehenden Prisma-Historie. Keine neue Anwendungsmigration.
+Bereitstellung und gehostete Abnahme werden getrennt in PR160 nachgewiesen.
