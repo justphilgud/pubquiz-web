@@ -64,7 +64,7 @@ Eine echte visuelle Abweichung wurde gefunden und behoben: Der wiederverwendete
 Audio-Countdown benötigte einen eigenen Bingo-Container für `cqw` und eine scrollfreie Medienfläche. Die Schrift wurde
 am Fenster statt am verfügbaren Feld bemessen. Lokale Containerbegrenzung und eine
 Geometrieprüfung ergänzen den unveränderten Quizplayer. Eine weitere kleine Korrektur
-trennt fehlende Mediendateien vom Hinweis auf Browser-TTS ohne Aufnahme. Das gekoppelte Karten-Eingabefeld zeigt ebenfalls den tatsächlich abgeleiteten Text; die manuelle Alternative bleibt gespeichert.
+trennt fehlende Mediendateien vom Hinweis auf Browser-TTS ohne Aufnahme. Das gekoppelte Karten-Eingabefeld zeigt ebenfalls den tatsächlich abgeleiteten Text; die manuelle Alternative bleibt gespeichert. Überlange oder unzulässige ausgewählte Texte erhalten dieselbe Zeilenvalidierung wie am Server, bevor gespeichert wird.
 
 ## Gemessener Transfer
 
@@ -102,7 +102,7 @@ Matching-Vorherlauf behauptet. Die Tabelle enthält keine Hochrechnung.
 
 ## Isolierte Preview und Betrieb
 
-[Matching-Tabelle](https://pubquiz-web-git-codex-bingo-matching-table-just-phil-gud.vercel.app/bingo/19b8f759-e82d-434d-960b-fb145c5f558f/matching?round=fea7275c-c5ad-45ee-b32c-9d034704ccdf)
+[Matching-Tabelle](https://pubquiz-web-git-codex-bingo-matching-table-just-phil-gud.vercel.app/bingo/bae5f450-cdd3-4149-9216-d054c3652eae/matching?round=b224a3a2-1cc7-4cbf-bbb7-d1c4a7894aad)
 für den ungestarteten eigenen Abnahmefall;
 [geprüfte Moderation](https://pubquiz-web-git-codex-bingo-matching-table-just-phil-gud.vercel.app/bingo/72034f46-d3a8-470d-8d7f-3d6d85da0301/moderation)
 und [Präsentation](https://pubquiz-web-git-codex-bingo-matching-table-just-phil-gud.vercel.app/bingo/72034f46-d3a8-470d-8d7f-3d6d85da0301/praesentation).
@@ -130,6 +130,8 @@ Der bestehende autorisierte Preview-Automationszugang wird ausschließlich als H
 an den exakten Preview-Host gesendet; keine Änderung an Vercel-Schutzregeln und keine
 Weitergabe an Blob-Hosts. Kontopasswörter bleiben in einer ignorierten privaten lokalen
 Zugangsdatei, nicht im Repository, PR oder in Logs. Kein Production-Zugang verwendet.
+
+Screenshots und der tatsächlich heruntergeladene Beispiel-Duplexbogen: [Abnahmebelege](../reviews/bingo-matching/README.md). Native Tab-Fokussierung im echten Quellendialog ist zusätzlich geprüft. Der vollständige Liveablauf wurde nach der Container-/Scrollkorrektur auch auf `2535a92ff9ff74375e7093beeb45eb13c953d17a` gehostet wiederholt.
 
 ## Prüfgrenzen und Entscheidungen
 
@@ -164,7 +166,7 @@ Zugangsdatei, nicht im Repository, PR oder in Logs. Kein Production-Zugang verwe
    „Zuordnung übernehmen“ und „Zuordnungssatz speichern“ betätigen; danach neu laden.
 4. „Von“ 15 und „Bis“ 26, „Bereich auswählen“ und die Sammelaktionen ausprobieren.
    Andere Zuordnungen bleiben gespeichert. „1–90“ zeigt 76–90 als außerhalb des Modus.
-5. In der Vorbereitung ausdrücklich Karten erzeugen. Bestehende Karten werden nicht
+5. In der Vorbereitung die Runde mit „Bearbeiten“ öffnen und ausdrücklich „Kartenserie erzeugen“ wählen. Bestehende Karten werden nicht
    automatisch ersetzt. Für den vorbereiteten Vergleichsfall „Karten und PDF“ öffnen
    und „Duplex-PDF“ herunterladen; Vorder-/Rückseite und Beschriftungen vergleichen.
 6. Moderation und „Präsentation öffnen“ in getrennten Fenstern öffnen. Beim abgeschlossenen

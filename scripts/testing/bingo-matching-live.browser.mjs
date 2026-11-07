@@ -4,10 +4,10 @@ import path from 'node:path';
 export async function matchingLiveBrowser({ s, context, fixture, origin, out, tab, goto, query, text, set, button, until, evaluate, call, delay, screenshot, passed }) {
     const game = fixture.games.find(g => g.prepared), route = `/bingo/${game.gameId}/moderation`;
     await goto(s, route);
-    await until(async () => /Erste Runde starten|Aktuelle Zahl/.test(await text(s)), 'moderation ready');
+    await until(()=>query(s,'[aria-label="Runden und Status"]','!==null'),'moderation ready');
     let cached=null,etag=null,readAt=0;const state=async()=>{if(cached&&Date.now()-readAt<700)return cached;const result=await evaluate(s,`fetch('/api/bingo/live/${game.gameId}',{headers:${JSON.stringify(etag?{'If-None-Match':etag}:{})}}).then(async r=>({status:r.status,etag:r.headers.get('etag'),body:r.status===304?null:await r.json()}))`);readAt=Date.now();if(result.status===200){cached=result.body;etag=result.etag;}else if(result.status!==304)throw Error('Synthetic status read failed: '+result.status);return cached;}, confirm = async (label) => { await button(s, label); await button(s, 'Bestätigen'); await until(() => query(s, '[role=dialog]', '===null'), 'confirmation closed'); await delay(400); };
     if((await state()).live?.state.run.status==='ENDED'){await goto(s,route+'?new=1');await confirm('Erste Runde starten');cached=null;etag=null;readAt=0;}else if(!(await state()).live)await confirm('Erste Runde starten');
-    await until(async () => !!(await state()).live, 'run started');
+    await until(async () => (await state()).live?.state.run.status==='RUNNING', 'run started');
     let view = await state();
     if (view.live.state.run.status !== 'RUNNING')
         throw Error('Fresh running synthetic fixture required; no reset');

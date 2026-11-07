@@ -13,10 +13,11 @@ export class MatchingError extends Error {}
 const object = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
 const exact = (v: Record<string, unknown>, keys: string) => Object.keys(v).sort().join() === keys.split(',').sort().join();
 export const cleanMatchingText = (s: string) => s.normalize('NFC').trim().replace(/[\t\r ]+/g, ' ');
+const invalidMatchingText = (text:string) => {const value=cleanMatchingText(text);return [...value].length>120 || /[\u0000-\u0008\u000b-\u001f\u007f]/.test(value);};
 function checkedText(v: unknown, number: number, required = true): string {
   if (typeof v !== 'string') throw new MatchingError(`Kugel ${number}: Text fehlt.`);
   const text = cleanMatchingText(v);
-  if ((required && !text) || [...text].length > 120 || /[\u0000-\u0008\u000b-\u001f\u007f]/.test(text)) throw new MatchingError(`Kugel ${number}: Bitte einen Text mit 1 bis 120 Zeichen angeben. Zusätzlich gelten die Druckgrenzen.`);
+  if ((required && !text) || invalidMatchingText(text)) throw new MatchingError(`Kugel ${number}: Bitte einen Text mit 1 bis 120 Zeichen angeben. Zusätzlich gelten die Druckgrenzen.`);
   return text;
 }
 export function parseMatchingSource(value: unknown): MatchingSource {
@@ -27,6 +28,7 @@ export function printedMatchingText(entry: MatchingEntry): string { return entry
 export function matchingErrors(entries: MatchingEntry[]): Map<number, string> {
   const errors = new Map<number,string>(), labels = new Map<string,number>();
   for (const entry of entries) {
+    if(invalidMatchingText(entry.text)||entry.presentation.kind==='TEXT'&&invalidMatchingText(entry.presentation.text))errors.set(entry.number,'Bitte höchstens 120 Zeichen ohne unzulässige Steuerzeichen verwenden. Zusätzlich gelten die Druckgrenzen.');
     if(!entry.keepNumber&&entry.presentation.kind==='TEXT'&&!entry.presentation.text.trim())errors.set(entry.number,'Präsentationstext fehlt.');
     if (!entry.keepNumber && entry.presentation.kind === 'MEDIA' && !entry.presentation.source) errors.set(entry.number, 'Bitte ein tatsächlich vorhandenes Medium auswählen. Browser-Sprachausgabe ist keine Aufnahme.');
     const text = printedMatchingText(entry), key = cleanMatchingText(text).toLocaleLowerCase('de-DE').replace(/\s+/g,' ');

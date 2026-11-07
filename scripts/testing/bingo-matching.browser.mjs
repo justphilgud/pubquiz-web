@@ -1,3 +1,4 @@
+import {prepareMatchingReview} from './bingo-matching-review.browser.mjs';
 import {matchingPdfDownload} from './bingo-matching-pdf.browser.mjs';
 import {uploadMatchingFixtures} from './bingo-matching-upload.browser.mjs';
 import { matchingLiveBrowser } from './bingo-matching-live.browser.mjs';
@@ -67,10 +68,11 @@ try {
     const context = (await call('Target.createBrowserContext')).browserContextId, s = await tab(context);
     await login(s, accounts.find(a => a.role === 'admin'));
     passed.push('fresh synthetic Admin login');
+    if(process.argv.includes('--prepare-review'))await prepareMatchingReview({s,fixture,kind,out,goto,query,set,button,until,evaluate,selectLabel,saveUi,screenshot,call,passed});
     if(process.argv.includes('--verify-only')){const expected=JSON.parse(fs.readFileSync('.artifacts/matching-preview-deployment.json')).sha;const runtime=await evaluate(s,"fetch('/api/admin/monitoring').then(r=>r.json())");assert.equal(runtime.release,expected);assert.equal(runtime.environment,'preview');assert.equal(runtime.db.ok,true);fs.writeFileSync(path.join(out,'runtime-proof.json'),JSON.stringify({release:runtime.release,environment:runtime.environment,dbOk:runtime.db.ok},null,2));passed.push('actual authenticated runtime SHA and Preview database read');}
     if(process.argv.includes('--pdf-only'))await matchingPdfDownload({s,context,fixture,out,goto,query,set,button,until,evaluate,call,screenshot,passed});
     if(process.argv.includes('--upload-fixtures')){await uploadMatchingFixtures({s,origin,out,evaluate});passed.push('existing authenticated upload into own branch prefix');}
-    if (!process.argv.includes('--live-only')&&!process.argv.includes('--upload-fixtures')&&!process.argv.includes('--pdf-only')&&!process.argv.includes('--verify-only')) {
+    if (!process.argv.includes('--live-only')&&!process.argv.includes('--upload-fixtures')&&!process.argv.includes('--pdf-only')&&!process.argv.includes('--verify-only')&&!process.argv.includes('--prepare-review')) {
         const game = fixture.games.find(g => !g.prepared), route = `/bingo/${game.gameId}/matching?round=${game.rounds[0]}`;
         await goto(s, route);
         await until(() => query(s, '[data-matching-number="1"]', '!==null'), 'matching editor');
@@ -93,7 +95,7 @@ try {
         passed.push('native navigation cancellation retains input');
         await goto(s, route);
         await delay(500);
-        await set(s, '[aria-label="Bereich von"]', '15');
+        const outsideBefore=await query(s,'[data-matching-number="1"]','.innerText');await set(s, '[aria-label="Bereich von"]', '15');
         await set(s, '[aria-label="Bereich bis"]', '26').catch(async () => { const sels = await evaluate(s, '[...document.querySelectorAll("input[type=number]")].map(e=>e.outerHTML)'); throw Error(JSON.stringify(sels)); });
         const rangePrefix = (await query(s, '[aria-label="Präsentationstext Kugel 15"]', '.value')).startsWith('Bereich ') ? 'Feld' : 'Bereich';
         await button(s, 'Bereich auswählen');
@@ -105,7 +107,7 @@ try {
         await saveUi(s);
         await goto(s, route);
         await until(() => query(s, '[aria-label="Präsentationstext Kugel 15"]', '?.value===' + JSON.stringify(rangePrefix + ' 15')), 'range retained');
-        assert.match(await text(s), /Originalaufnahme/);
+        assert.equal(await query(s,'[data-matching-number="1"]','.innerText'),outsideBefore,'range edits preserve the full outside row');
         passed.push('15–26 save/reload preserves other media entries');
         for (let n = 2; n <= 7; n++)
             await check(s, `[aria-label="Kugel ${n}: Zahl beibehalten"]`, true);
@@ -140,6 +142,7 @@ try {
             }
         passed.push('all six original/reverse × artist/title/combination UI saves; variant preserves answer');
         await set(s,'#kind-8','MEDIA');for(const [search,label]of [['Matching QA Browser-Sprachausgabe','Browser-Sprachausgabe ohne Aufnahme'],['Matching QA fehlende Aufnahme','fehlende gespeicherte Mediendatei']]){await button(s,'Kugel 8: Aus Quizbestand auswählen');await set(s,'[role=dialog] input[maxlength="120"]',search);await button(s,'Suchen');await until(()=>evaluate(s,`[...document.querySelectorAll('[role=dialog] button')].some(b=>b.textContent.includes(${JSON.stringify(search)}))`),'negative source result');await evaluate(s,`[...document.querySelectorAll('[role=dialog] button')].find(b=>b.textContent.includes(${JSON.stringify(search)})).click()`);await until(async()=>/keine ladbare Mediendatei/.test(await text(s)),'unavailable source explained');assert.equal(await evaluate(s,'[...[...document.querySelectorAll("[role=dialog] label")].find(l=>l.textContent.startsWith("Medium und Variante")).querySelector("select").options].length'),1);assert.equal(await evaluate(s,'[...document.querySelectorAll("[role=dialog] button")].find(b=>b.textContent==="Zuordnung übernehmen").disabled'),true);passed.push(label+' rejected without invented media');await button(s,'Schließen');}await goto(s,route);
+        await check(s,'[aria-label="Kugel 9: Zahl beibehalten"]',false);await set(s,'[aria-label="Präsentationstext Kugel 9"]','W'.repeat(121));await until(()=>query(s,'[data-matching-number="9"] [role=alert]','?.textContent.includes("120 Zeichen")'),'long selected text has a row error');assert.equal(await query(s,'button[type=submit]','.disabled'),true);await goto(s,route);for(const n of [9,10]){await check(s,`[aria-label="Kugel ${n}: Zahl beibehalten"]`,false);await set(s,`[aria-label="Präsentationstext Kugel ${n}"]`,'Mehrdeutig');}await until(()=>query(s,'[data-matching-number="10"] [role=alert]','?.textContent.includes("Gleiche Kartenbeschriftung")'),'duplicate label row error');assert.equal(await query(s,'button[type=submit]','.disabled'),true);await goto(s,route);passed.push('long and duplicate labels are explained on their rows before saving');
         await button(s, '1–90');
         assert.equal(await evaluate(s, 'document.querySelectorAll("[data-matching-number]").length'), 90);
         assert.match(await text(s), /Außerhalb 75er-Modus/);
@@ -164,9 +167,9 @@ try {
             await call('Target.disposeBrowserContext', { browserContextId: ctx });
         }
     }
-    if (!process.argv.includes('--editor-only')&&!process.argv.includes('--upload-fixtures')&&!process.argv.includes('--pdf-only')&&!process.argv.includes('--verify-only'))
+    if (!process.argv.includes('--editor-only')&&!process.argv.includes('--upload-fixtures')&&!process.argv.includes('--pdf-only')&&!process.argv.includes('--verify-only')&&!process.argv.includes('--prepare-review'))
         await matchingLiveBrowser({ s, context, fixture, origin, out, tab, goto, query, text, set, button, until, evaluate, call, delay, screenshot, passed });
-    const phase=process.argv.includes('--pdf-only')?'pdf':process.argv.includes('--live-only')?'live':process.argv.includes('--editor-only')?'editor':process.argv.includes('--upload-fixtures')?'upload':'full';fs.writeFileSync(path.join(out,phase+'-results.json'),JSON.stringify({origin,phase,passed,phasePassed:true,productionTouched:false},null,2));
+    const phase=process.argv.includes('--prepare-review')?'review':process.argv.includes('--verify-only')?'verify':process.argv.includes('--pdf-only')?'pdf':process.argv.includes('--live-only')?'live':process.argv.includes('--editor-only')?'editor':process.argv.includes('--upload-fixtures')?'upload':'full';fs.writeFileSync(path.join(out,phase+'-results.json'),JSON.stringify({origin,phase,passed,phasePassed:true,productionTouched:false},null,2));
     console.log(JSON.stringify({ origin, passed }));
 }
 catch (e) {
