@@ -1,0 +1,1151 @@
+{
+  "fullFlowRuntime": {
+    "release": "f51390b3f6c1ff311787112f2d60903ce1442cf3",
+    "environment": "preview",
+    "dbOk": true
+  },
+  "deployment": {
+    "branch": "codex/bingo-matching-ux-polish",
+    "deploymentId": "dpl_5QW2giQ6CyvQWoRwe9Hoha834kbt",
+    "environment": "preview",
+    "environmentKeysVerified": [
+      "TEMPLATE_MEDIA_UPLOAD_ENABLED",
+      "MEDIA_UPLOAD_ENV",
+      "MEDIA_UPLOAD_STORE_ENV",
+      "BLOB_STORE_ID",
+      "BLOB_READ_WRITE_TOKEN",
+      "BLOB_WEBHOOK_PUBLIC_KEY"
+    ],
+    "sha": "f51390b3f6c1ff311787112f2d60903ce1442cf3",
+    "url": "https://pubquiz-3w8bxcio9-just-phil-gud.vercel.app"
+  },
+  "alias": {
+    "id": "dpl_5QW2giQ6CyvQWoRwe9Hoha834kbt",
+    "state": "READY",
+    "sourceSha": "f51390b3f6c1ff311787112f2d60903ce1442cf3",
+    "alias": "pubquiz-web-git-codex-bingo-matching-ux-polish-just-phil-gud.vercel.app",
+    "aliasDeployment": "dpl_5QW2giQ6CyvQWoRwe9Hoha834kbt",
+    "expectedSha": "f51390b3f6c1ff311787112f2d60903ce1442cf3",
+    "target": {
+      "environment": "PREVIEW",
+      "repository": "justphilgud/pubquiz-web",
+      "branch": "codex/bingo-matching-ux-polish",
+      "databaseHost": "ep-holy-term-baa881iq-pooler.c-8.eu-central-1.aws.neon.tech",
+      "databaseName": "bingo_matching_ux_review",
+      "databaseBranchVerified": true
+    }
+  },
+  "trust": {
+    "branch": "codex/bingo-matching-ux-polish",
+    "userAuthorization": "explicit chat authorization 2026-11-07",
+    "trusted": true,
+    "exactPolicy": {
+      "id": 65887057,
+      "node_id": "MDE2OkdhdGVCcmFuY2hQb2xpY3k2NTg4NzA1Nw==",
+      "name": "codex/bingo-matching-ux-polish",
+      "type": "branch"
+    },
+    "otherTrustedEntriesPreserved": true,
+    "otherPoliciesAndProtectionRulesPreserved": true,
+    "wildcardsAdded": false
+  },
+  "resources": {
+    "source": "own verified loopback schema only; selected synthetic source metadata and five synthetic accounts",
+    "project": "falling-sky-48140800",
+    "endpoint": "ep-holy-term-baa881iq",
+    "database": "bingo_matching_ux_review",
+    "db": "bingo_matching_ux_review",
+    "real_users": 0,
+    "cards": 0,
+    "live_runs": 0,
+    "history": null,
+    "tables": 78,
+    "counts": {
+      "medientyp": 3,
+      "antworttyp": 1,
+      "templates": 4,
+      "questions": 268,
+      "scopes": 1,
+      "fields": 2,
+      "solutions": 2,
+      "answers": 4,
+      "media": 268
+    },
+    "productionTouched": false,
+    "existingTargetsUntouched": true,
+    "computeCreated": false,
+    "migrationHistory": "No baseline/resolve or historical bootstrap replay claimed; verified model schema only; no new PR160 migration"
+  },
+  "compute": {
+    "id": "ep-holy-term-baa881iq",
+    "minCu": 0.25,
+    "maxCu": 0.25,
+    "suspendSeconds": 300,
+    "groupSize": {
+      "min": 1,
+      "max": 1
+    }
+  },
+  "binding": {
+    "project": "prj_9Nnwer6B43P0nfrOZPIEygFWg666",
+    "branch": "codex/bingo-matching-ux-polish",
+    "keys": [
+      "DATABASE_URL",
+      "EXPECTED_DATABASE_HOST",
+      "EXPECTED_DATABASE_NAME",
+      "EXPECTED_DATABASE_BRANCH"
+    ],
+    "productionAndOtherBranchMetadataUnchanged": true,
+    "otherEnvironmentMetadataHash": "f23aac674b67b770f5bd64dc8a6e45c40ee56904acfc3c3d4c8763472c8eb542",
+    "credentialsPrinted": false
+  },
+  "media": {
+    "database": "bingo_matching_ux_review",
+    "prefix": "preview/f328f8ab8997e3ea86ddb4103c4ce6017cbadec34b17fbe07fbf619dbd02c6e2",
+    "updates": [
+      {
+        "name": "original.wav",
+        "rows": 51
+      },
+      {
+        "name": "reverse.wav",
+        "rows": 1
+      },
+      {
+        "name": "bitcrush.wav",
+        "rows": 1
+      },
+      {
+        "name": "flag.png",
+        "rows": 211
+      },
+      {
+        "name": "outline.png",
+        "rows": 1
+      },
+      {
+        "name": "speech.wav",
+        "rows": 1
+      }
+    ],
+    "onlyOwnNewDatabaseChanged": true
+  },
+  "passed": [
+    "fresh synthetic Admin login",
+    "authenticated actual Preview runtime SHA and database read",
+    "actual AppHeader and idle page without source/template POST polling",
+    "actual save immutable version and full document reload",
+    "native browser cancellation preserves page and actual unsaved input",
+    "15–26 bulk assignment persists, all90 retained, hidden original and inactive alternatives preserved",
+    "actual two-window PostgreSQL CAS conflict preserves second draft",
+    "duplicate validation blocks save with hidden-row error summary",
+    "actual 50 audio results beyond210images: pages20/20/10 with no false empty page",
+    "real template keyboard selection, complete long-name context, nested Escape and focus restoration",
+    "six actual source combinations Original/Reverse × artist/title/combined; fresh authorization, immutable save and reload",
+    "own card text independently selected, freshly verified, saved and reloaded",
+    "native Tab, visible focus and last row clear save toolbar at1366×768/1280×720/390×844",
+    "actual fresh manager routed permission check",
+    "actual fresh editor routed permission check",
+    "actual fresh management routed permission check",
+    "actual fresh none routed permission check",
+    "hosted metadata/search transport failures visibly retry; main draft retained",
+    "delayed actual hosted source request cannot replace newer filter results",
+    "actual synthetic approval withdrawal before apply is denied and preserves dialog/main draft",
+    "hosted foreign series/manipulated round, Bingo-only source restrictions and fresh role revocation denied; own fixture restored",
+    "used-card round visibly explained and read-only"
+  ],
+  "additionalWriteDenials": {
+    "passed": [
+      "fresh synthetic Admin login",
+      "actual hosted role withdrawal rejects stale save and direct read, keeps draft, revision and version count",
+      "actual hosted product withdrawal rejects stale save and direct read, keeps draft, revision and version count"
+    ],
+    "ownFixtureRestored": true,
+    "productionTouched": false
+  },
+  "postconditions": {
+    "db": "bingo_matching_ux_review",
+    "real_users": 0,
+    "quiz": 0,
+    "teams": 0,
+    "live_runs": 0,
+    "review_status": "DRAFT",
+    "review_cards": 0,
+    "locked_cards": 4,
+    "restored_products": 2,
+    "restored_manager": "EVENT_MANAGER",
+    "restored_source": true
+  },
+  "network": {
+    "idleWindows": [
+      {
+        "label": "page before opening dialog",
+        "durationMs": 10000,
+        "sourcePosts": 0
+      },
+      {
+        "label": "open dialog with settled filters",
+        "durationMs": 10011,
+        "sourcePosts": 0
+      },
+      {
+        "label": "page after closing dialog",
+        "durationMs": 10005,
+        "sourcePosts": 0
+      }
+    ],
+    "totalMatchingPostActions": 60,
+    "capturedRequestWindowMs": 81142,
+    "requests": [
+      {
+        "relativeMs": 0,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 1036,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 1373,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 1409,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 1506,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 2105,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 2296,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 2399,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 2842,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 2977,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 5012,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 5349,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 5649,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 5654,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 5718,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 6066,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 6160,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 6622,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 7100,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 7207,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 7354,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 7534,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 7836,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 7922,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 7989,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 8282,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 8854,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 8922,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 9303,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 9832,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 9931,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 9998,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 10606,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 21051,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 21670,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 22318,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 23965,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 24455,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 24721,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 25709,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 26231,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 27035,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 27331,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 27351,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 27476,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 27740,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 27835,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 27887,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 28368,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 28637,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 29622,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 30007,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 30718,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 31018,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 31024,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 31098,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 31584,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 31693,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 31741,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 31995,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 32342,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 32606,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 33702,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 34467,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 35253,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 35538,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 35561,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 35646,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 35946,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 35965,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 36060,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 36452,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 36584,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 37705,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 38332,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 38874,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 39202,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 39208,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 39277,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 39745,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 39834,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 39901,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 40372,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 40509,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 41204,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 41849,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 42369,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 42674,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 42679,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 42957,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 43238,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 43338,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 43393,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 43886,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 44155,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 45158,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 45815,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 46587,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 46874,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 46887,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 46994,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 47378,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 47518,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 47519,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 47867,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 48003,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 48984,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 49387,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 49986,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 50272,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 50300,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 50364,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 50682,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 50773,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 64127,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 64626,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 64713,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 64718,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 64951,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 66568,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 68305,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 69864,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 70186,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 70608,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 70704,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 70884,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 70992,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 71137,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 71605,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 71986,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 72487,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 72875,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 73265,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 73662,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 73772,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 73998,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 74373,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 74640,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 75660,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 76049,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 76541,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 76647,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 77936,
+        "path": "/bingo/0b75eaba-05c3-4f21-9f2b-ac0460410af7/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 78227,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 78640,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 79083,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 79168,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 79187,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 79483,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "POST",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 79825,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 80204,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 80299,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 80302,
+        "path": "/bingo/b5b5ff12-dcce-484f-98b8-9f11dba57f99/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 80635,
+        "path": "/bingo/32e5cec0-d96e-4af0-8634-7f188d18b80e/matching",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 80926,
+        "path": "/bingo/32e5cec0-d96e-4af0-8634-7f188d18b80e/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 81142,
+        "path": "/bingo/32e5cec0-d96e-4af0-8634-7f188d18b80e/vorbereitung",
+        "method": "GET",
+        "serverAction": false
+      }
+    ]
+  },
+  "reviewUrl": "https://pubquiz-web-git-codex-bingo-matching-ux-polish-just-phil-gud.vercel.app/bingo/f4f47ffe-e986-45a1-a11a-c32412175ca0/matching?round=31fbbca7-6520-4b19-b4f3-4c2d9428e95b",
+  "physicalDeviceTest": false,
+  "productionTouched": false,
+  "additionalMediaProof": {
+    "passed": [
+      "fresh synthetic Admin login",
+      "authenticated actual Preview runtime SHA and database read",
+      "actual authorized hosted image preview320px and card answer Japan",
+      "actual missing file and browser-only TTS both blocked and distinctly explained"
+    ],
+    "realHostedMedia": true,
+    "productionTouched": false
+  }
+}

@@ -1,6 +1,121 @@
 # PR #160: Matching-Ansicht und Suche
 
-## Aktuell: vollständige lokale Abnahme, Hosting blockiert
+## Gehostete technische Abnahme bestanden
+
+7. November 2026. Die zuvor fehlende menschliche Freigabe für genau
+`codex/bingo-matching-ux-polish` wurde ausdrücklich erteilt und umgesetzt.
+Vorhandene Allowlist-Einträge, Branch-Policies und Environment-Schutzregeln sind
+nachweislich erhalten; keine Wildcards. Der Branch ist zusätzlich vom gemeinsamen
+Migrationsjob ausgeschlossen und exakt an seine eigene Datenbank gebunden.
+
+**Vollständig gehostet geprüfter Anwendungsstand:**
+`f51390b3f6c1ff311787112f2d60903ce1442cf3`.
+[Push-CI](https://github.com/justphilgud/pubquiz-web/actions/runs/42415800967) und
+[PR-CI](https://github.com/justphilgud/pubquiz-web/actions/runs/42415803638) vollständig
+PASS. Die nachfolgende Änderung enthält nur Browser-Prüfharness, Nachweise und
+Dokumentation; keinen Anwendungscode. Abschließender Head, dessen CI und erneut
+abgeglichene Alias-/Runtime-Revision werden in [PR160](https://github.com/justphilgud/pubquiz-web/pull/160)
+ausgewiesen. Reviewbereit erst nach diesen abschließenden Prüfungen.
+
+### Direkte Preview und isolierte Daten
+
+[Ungestarteter Abnahmefall – Matching-Tabelle](https://pubquiz-web-git-codex-bingo-matching-ux-polish-just-phil-gud.vercel.app/bingo/f4f47ffe-e986-45a1-a11a-c32412175ca0/matching?round=31fbbca7-6520-4b19-b4f3-4c2d9428e95b).
+Anmeldung mit dem vorhandenen synthetischen Admin oder Manager aus der privaten,
+ignorierten lokalen Zugangsdatei. Keine Zugangsdaten im Repository oder PR.
+Der Abnahmefall wurde zweimal vollständig geöffnet/neu geladen und dabei nicht verändert.
+
+Erstes verifiziertes Deployment: `dpl_5QW2giQ6CyvQWoRwe9Hoha834kbt`,
+[Deployment-URL](https://pubquiz-3w8bxcio9-just-phil-gud.vercel.app), READY.
+Branch-Alias und authentifizierte `/api/admin/monitoring`-Runtime bestätigen exakt
+diesen Commit, Preview-Umgebung und erfolgreiche Datenbankleseprüfung.
+Der finale Dokumentations-Head wird anschließend erneut über denselben geprüften
+Git-Preview-Prozess ausgeliefert und im PR nachgewiesen; die erste URL wird dadurch
+nicht als finale Revision ausgegeben.
+
+- Eigene Datenbank **bingo_matching_ux_review**, bestehendes Launch-Nonprod-Projekt
+  **falling-sky-48140800**, Endpunkt **ep-holy-term-baa881iq**.
+- Tatsächlich geprüft: ein Read-write-Compute, **0,25 CU** Minimum/Maximum,
+  Suspendierung nach **300 Sekunden**, keine zusätzliche Compute oder Replikate.
+- Neue leere Datenbank erhielt ausschließlich die geprüfte eigene lokale Schema-Basis,
+  fünf synthetische Konten und 268 synthetische Quellen inklusive des 210/50-Suchfalls.
+  Keine echten Benutzer, Quizze, Teams oder Live-Durchläufe. Vier Karten nur im
+  gesonderten schreibgeschützten Prüffall; der eigentliche Abnahmefall hat keine Karten.
+- Keine neue Anwendungsmigration, kein Zurücksetzen/Baseline/Resolve einer bestehenden
+  Migrationshistorie. Die bekannte historische Bootstrap-Grenze bleibt: Schema-Basis
+  ist kein behaupteter Replay aller historischen Prisma-Migrationen. Kein bestehendes
+  Development-, Matching-, Druck- oder Production-Ziel migriert oder zurückgesetzt.
+- Nur vier genaue Vercel-Branch-Overrides für Datenbank/EXPECTED_DATABASE-Werte;
+  andere Environment-Metadaten unverändert geprüft. Medien im eigenen Präfix
+  `preview/f328f8ab8997e3ea86ddb4103c4ce6017cbadec34b17fbe07fbf619dbd02c6e2/`.
+  Zentrale Medienkonfiguration geerbt, keine Medien-Credentials exportiert und keine
+  fremden Medien geändert/gelöscht.
+
+### Tatsächlich gehostet geprüft
+
+| Bereich | Ergebnis |
+| --- | --- |
+| Vollständige Oberfläche | Echter AppHeader, ursprüngliche Phil-Gud-Schrift, 1366×768, 1280×720, 390×844; Seite/Zeilen/Dialog ohne horizontalen Überlauf |
+| Bedienung | Native Tab-/Escape-Bedienung, Fokus zur Lupe zurück, letzte Zeile über Speicherleiste; tatsächlicher nativer Abbruch erhält Seite und Eingabe |
+| Persistenz | Echte Server Actions, unveränderliche Speicherung, voller Reload und erneutes Öffnen; echter Zwei-Fenster-CAS erhält abgewiesenen Entwurf |
+| Zeilen/Filter | 15–26/Sammelaktionen, versteckte Einträge erhalten, alle 90 gespeichert, 76–90-Hinweis, inaktive Alternative erhalten, Drucktextkopplung, Dubletten und ausgeblendete Fehler |
+| Suche | 210 Bilder vor 50 Audioquellen: 20/20/10, letzte Teilseite, Filterwechsel zur ersten Seite, tatsächliche Vorlagennamen hinter Quelle 200, stabile Codes, lange Auswahl vollständig im Kontext |
+| Medien/Karte | Original/Rückwärts × Interpret/Titel/Kombination und eigener Text jeweils tatsächlich übernommen/gespeichert/neu geladen; geschützte Bildvorschau 320px mit Japan-Kartenantwort geladen |
+| Fehlende Quellen | Browser-TTS ohne Datei und fehlende tatsächliche Datei über echte Quellenantworten getrennt erklärt; Übernahme in beiden Fällen gesperrt |
+| Netzwerkfehler | Tatsächliche Browseranfragen gezielt gestört: Vorlagen-/Suchfehler sichtbar, Wiederholen erfolgreich, Entwurf erhalten; keine simulierten Server Actions |
+| Verspätete Anfrage | Echte Anfrage im Browser verzögert, Filter inzwischen geändert; anschließend keine alten Treffer unter dem neueren Filter |
+| Frische Quellenprüfung | Freigabe der eigenen synthetischen Quelle nach Auswahl entzogen; Übernahme abgewiesen, Dialog und Hauptentwurf erhalten; Freigabe danach wiederhergestellt |
+| Rollen/Objekte | Frische getrennte Anmeldungen: Admin/Manager positiv; Editor/reine Verwaltung/unzugeordnet negativ. Fremde Reihe und manipulierte Rundenzuordnung404 |
+| Nur Bingo-Zugriff | Quiz-Produkt im eigenen synthetischen Fall kurz deaktiviert: Bingo-Editor erreichbar, Quellen und Vorlagen leer; Produkt danach wiederhergestellt |
+| Tatsächliche Schreibabweisung | Rechte- sowie Bingo-Produktentzug nach Öffnen: Server lehnt Save aus alter Ansicht ab; Entwurf, Vorbereitungsrevision und Zahl der Fassungen unverändert. Direktlink ebenfalls abgewiesen; eigene Fixture exakt wiederhergestellt |
+| Bestand | Verwendete Kartenrunde sichtbar schreibgeschützt; 4 Karten unverändert. Sauberer Abnahmefall weiterhin DRAFT, 0 Kartenserien, 0 Live-Durchläufe |
+| Ruhephasen | Je 10 s vor Öffnen, im ruhenden Dialog und nach Schließen: 0 weitere Quellen-POSTs. 60 gezielte Server Actions im funktionalen Hauptablauf, 81,142 s zwischen erstem/letztem protokollierten Bingo-Request; keine Transfer-/Kostenhochrechnung |
+
+Der Hauptablauf umfasst 22 protokollierte Prüfgruppen, ergänzt durch zwei tatsächliche
+Schreibabweisungsfälle und die gesonderte Bild-/Datei-/TTS-Prüfung. Lokale/CI-Nachweise
+unten bleiben erhalten: 36 Vorbereitungstests, 37 Bingo-Tests, 39 gezielte Quiz-/Quellen-/
+Medien-/Navigationsprüfungen, Typecheck, strikter Changed-file-Lint, Build und vollständige
+PostgreSQL-Abnahme. 54 Preview-/Trust-/Umgebungs-Guards zusätzlich PASS.
+
+Reproduzierbarer vollständiger Browserablauf nach Einrichtung der eigenen Fixture:
+`node scripts/testing/bingo-matching-ux.browser.mjs --hosted`.
+Der Parameter bindet genau diesen Preview-Alias und diese eigene synthetische
+Datenbank; der Default bleibt die eigene lokale Prüfung. Der vorhandene private
+Automation-Zugang bleibt ausschließlich im Prozess; kein Schlüssel im Testprotokoll.
+
+Grenzen: automatisierte Headless-Browser mit echten Seiten/Serveraktionen, keine
+menschliche fachliche Abnahme behauptet. Keine physischen Mobilgeräte, Bildschirmtastatur,
+Beamer oder hörbare Audioprüfung. Ein zusätzlich versuchter Video-Upload im Standardtemplate
+wurde vom bestehenden Medienvertrag korrekt abgewiesen; keine Freischaltung oder neue
+Film-/Serienvorlage ergänzt und keine neue gehostete Video-Wiedergabe behauptet.
+Keine Codeblocker in der Matching-Überarbeitung gefunden. Historische Betriebs-/Bootstrap-
+Themen werden nicht als durch diesen PR behoben dargestellt.
+
+[Bereinigte gehostete Nachweise, Runtime-/Alias-/Datenbank- und Netzwerkprüfung](./hosted-20261107/results.json).
+
+### Aktuelle Screenshots
+
+| Ansicht | Bilder |
+| --- | --- |
+| Laptop 1366×768 | [Vollständige Seite](./hosted-20261107/page-1366.png) · [Zeilen](./hosted-20261107/rows-1366.png) · [Suchdialog](./hosted-20261107/dialog-1366.png) |
+| Laptop 1280×720 | [Seite](./hosted-20261107/page-1280.png) · [Dialog](./hosted-20261107/dialog-1280.png) |
+| Mobil 390×844 | [Seite](./hosted-20261107/page-390.png) · [Zeilen](./hosted-20261107/rows-390.png) · [Dialog](./hosted-20261107/dialog-390.png) |
+| Zustände | [Fokus letzte Zeile](./hosted-20261107/last-row-390.png) · [Schreibschutz](./hosted-20261107/locked-1366.png) · [echte Bildvorschau](./hosted-20261107/image-preview-1366.png) |
+| Sauberer Abnahmefall | [Laptop](./hosted-20261107/review-1366.png) · [Mobil](./hosted-20261107/review-rows-390.png) |
+
+### Sechs Schritte für die fachliche Abnahme
+
+1. Den direkten Abnahme-Link mit dem synthetischen Admin/Manager öffnen; Event und Runde prüfen.
+2. Bei Kugel 2 „Zahl beibehalten“ umschalten: vorbereitete Alternative bleibt, „Gedruckt“ zeigt die Wirkung.
+3. Bereich 15–26 und Sammelaktionen prüfen; danach 1–90 und erhaltene ausgeblendete Zeilen ansehen.
+4. Lupe öffnen, „Fragevorlage“ durchsuchen und Medientyp filtern; Escape schließt zuerst Auswahl, dann Dialog.
+5. Musikquelle wählen, Variante und Kartenantwort unabhängig ändern; übernehmen, speichern und vollständig neu laden.
+6. Unspeicherte Änderung abbrechen und den Wechsel verwerfen; für CAS zwei Fenster vor dem ersten Save öffnen, dann im zweiten speichern.
+
+**Kein Merge und kein Production-Deployment. Keine produktiven Daten, Rechte oder Sessions geändert.**
+
+---
+
+## Vor der Branch-Freigabe: lokale Vollabnahme (historischer Stand)
 
 7. November 2026. Geprüfter Anwendungscode: **8342344f5f52c1f8644093bfab4cf5e3e3610bfa**, Suchfix **2bf183b8**; Fortsetzung von `80438bad`. Der folgende Dokumentations-/Harness-Lint-Commit verändert keinen Anwendungscode. Abschließender Head und erforderliche CI-Läufe stehen in [PR #160](https://github.com/justphilgud/pubquiz-web/pull/160).
 
