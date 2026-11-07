@@ -17,7 +17,7 @@ export async function matchingLiveBrowser({ s, context, fixture, origin, out, ta
     const p = await tab(context);
     await call('Page.addScriptToEvaluateOnNewDocument', { source: `window.__matchingPlays=0;const play=HTMLMediaElement.prototype.play;HTMLMediaElement.prototype.play=function(){window.__matchingPlays++;return play.call(this)}` }, p);
     await goto(p, `/bingo/${game.gameId}/praesentation`);
-    await until(async () => /Matching|BINGO/i.test(await text(p)), 'audience ready');
+    await until(()=>query(p,'[aria-label="Bingo-Präsentation"]','!==null'),'audience ready');
     async function draw(n) { await set(s, 'input[type=number][min="1"][max="75"]', String(n)); await button(s, 'Zahl veröffentlichen'); await until(async () => { const v = await state(); return v.live.state.run.rounds.at(-1).draws.at(-1)?.number === n; }, 'saved draw ' + n); await until(() => query(s, 'input[type=number][min="1"][max="75"]', '?.value===""'), 'draw UI settled'); }
     const already = () => state().then(v => v.live.state.run.rounds.at(-1).draws.map(d => d.number));
     if (!(await already()).includes(1))
@@ -25,7 +25,7 @@ export async function matchingLiveBrowser({ s, context, fixture, origin, out, ta
     await until(() => query(p, 'audio', '!==null'), 'audience audio');
     assert.equal(await query(p, 'audio', '.paused'), true);
     await button(p, 'Präsentation freigeben');
-    await button(s, 'Präsentationsmedium starten');
+    await button(s, (await state()).live.state.playback?'Präsentationsmedium erneut abspielen':'Präsentationsmedium starten');
     await until(() => query(p, 'audio', '?.paused===false'), 'actual audience audio play');
     const plays = await evaluate(p, 'window.__matchingPlays');
     await delay(3300);
@@ -47,10 +47,10 @@ export async function matchingLiveBrowser({ s, context, fixture, origin, out, ta
     await screenshot(p, 'presentation-1080', 1920, 1080);
     await screenshot(p, 'presentation-mobile', 390, 844);
     await call('Emulation.setDeviceMetricsOverride', { width: 1366, height: 768, deviceScaleFactor: 1, mobile: false }, s);
-    await button(s, 'Pausieren');
+    await confirm('Pausieren');
     await until(async () => (await state()).live.state.run.status === 'PAUSED', 'game paused');
     await until(() => query(p, 'audio', '?.paused===true'), 'game pause stops media');
-    await button(s, 'Fortsetzen');
+    await confirm('Fortsetzen');
     await until(async () => (await state()).live.state.run.status === 'RUNNING', 'game resumed');
     passed.push('global pause/resume keeps playback explicitly paused');
     await goto(p, `/bingo/${game.gameId}/praesentation`);
@@ -101,6 +101,9 @@ export async function matchingLiveBrowser({ s, context, fixture, origin, out, ta
     await confirm('Bestätigen');
     await until(async () => /Bestätigt/.test(await text(s)), 'win persisted');
     passed.push('actual call, printed card identity, line evaluation and confirmed win');
+    view=await state();const corrected=view.live.state.run.rounds[0].draws.find(d=>d.number===card.cells[0][0]),replacement=Array.from({length:75},(_,i)=>i+1).find(n=>!view.live.state.run.rounds[0].draws.some(d=>d.number===n));await evaluate(s,'[...document.querySelectorAll("summary")].find(e=>e.textContent.startsWith("Frühere Ziehung")).click()');
+    await evaluate(s,`(()=>{const f=[...document.querySelectorAll('details')].find(e=>e.querySelector('summary')?.textContent.startsWith('Frühere Ziehung')).querySelector('form'),v=f.querySelector('select');Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,'value').set.call(v,${JSON.stringify(corrected.id)});v.dispatchEvent(new Event('change',{bubbles:true}))})()`);await set(s,'details input[type=number][required]',String(replacement));await set(s,'details input[maxlength="1000"]','Synthetische historische Korrektur');await confirm('Korrektur prüfen');await until(async()=>(await state()).live.blocked,'confirmed claim requires review');await set(s,'section[id^=call-] input[maxlength="1000"]','Nachprüfung: Korrektur bestätigt');await confirm('Widerrufen');await until(async()=>!(await state()).live.blocked,'review resolved');passed.push('historical correction preserves call cutoff, requires review and blocks further draws');
+    await call('Network.enable',{},s);await call('Network.emulateNetworkConditions',{offline:true,latency:0,downloadThroughput:0,uploadThroughput:0},s);await until(async()=>/Verbindung unterbrochen/.test(await text(s)),'moderator offline',25000);await call('Network.emulateNetworkConditions',{offline:false,latency:0,downloadThroughput:-1,uploadThroughput:-1},s);await until(async()=>!/Verbindung unterbrochen/.test(await text(s)),'moderator reconnect',25000);passed.push('moderator tab-only offline/reconnect preserves draws and call decisions');
     await confirm('Runde abschließen');
     await until(async () => /Runde abgeschlossen/.test(await text(s)), 'round closed');
     await confirm('Nächste Runde starten');

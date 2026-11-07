@@ -34,9 +34,10 @@ finally {
 } }
 async function query(s, selector, tail = '') { return evaluate(s, 'document.querySelector(' + JSON.stringify(selector) + ')' + tail); }
 async function text(s) { return evaluate(s, 'document.body?.innerText??""'); }
-async function button(s, label) { await until(() => evaluate(s, `[...(document.querySelector('[role=dialog]')??document).querySelectorAll('button')].some(e=>(e.textContent.trim()===${JSON.stringify(label)}||e.getAttribute('aria-label')===${JSON.stringify(label)})&&!e.disabled)`), 'button ready ' + label); await evaluate(s, `(()=>{const e=[...(document.querySelector('[role=dialog]')??document).querySelectorAll('button')].find(e=>e.textContent.trim()===${JSON.stringify(label)}||e.getAttribute('aria-label')===${JSON.stringify(label)});if(!e||e.disabled)throw Error('Unavailable button '+${JSON.stringify(label)});e.click()})()`); await delay(100); }
-async function set(s, selector, value) { await until(() => query(s, selector, "!==null"), "input ready " + selector); await evaluate(s, `(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)throw Error('Missing input '+${JSON.stringify(selector)});Object.getOwnPropertyDescriptor(e.tagName==='SELECT'?HTMLSelectElement.prototype:HTMLInputElement.prototype,'value').set.call(e,${JSON.stringify(value)});e.dispatchEvent(new Event(e.tagName==='SELECT'?'change':'input',{bubbles:true}))})()`); await delay(120); }
+async function button(s, label) { await until(() => evaluate(s, `[...(document.querySelector('[role=dialog]')??document).querySelectorAll('button')].some(e=>(e.textContent.trim()===${JSON.stringify(label)}||e.getAttribute('aria-label')===${JSON.stringify(label)})&&!e.matches(':disabled'))`), 'button ready ' + label); await evaluate(s, `(()=>{const e=[...(document.querySelector('[role=dialog]')??document).querySelectorAll('button')].find(e=>e.textContent.trim()===${JSON.stringify(label)}||e.getAttribute('aria-label')===${JSON.stringify(label)});if(!e||e.matches(':disabled'))throw Error('Unavailable button '+${JSON.stringify(label)});e.click()})()`); await delay(100); }
+async function set(s, selector, value) { await until(() => query(s, selector, "!==null&&!document.querySelector("+JSON.stringify(selector)+").matches(':disabled')"), "input ready " + selector); await evaluate(s, `(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)throw Error('Missing input '+${JSON.stringify(selector)});Object.getOwnPropertyDescriptor(e.tagName==='SELECT'?HTMLSelectElement.prototype:HTMLInputElement.prototype,'value').set.call(e,${JSON.stringify(value)});e.dispatchEvent(new Event(e.tagName==='SELECT'?'change':'input',{bubbles:true}))})()`); await delay(120); }
 async function selectLabel(s, label, value) { await evaluate(s, `(()=>{const label=[...document.querySelectorAll('[role=dialog] label')].find(l=>l.textContent.startsWith(${JSON.stringify(label)})),e=label?.querySelector('select');if(!e)throw Error('Missing dialog select');Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,'value').set.call(e,${JSON.stringify(value)});e.dispatchEvent(new Event('change',{bubbles:true}))})()`); await delay(150); }
+async function saveUi(s){const count=await query(s,'select','.options.length');await button(s,'Zuordnungssatz speichern');await until(()=>query(s,'select','.options.length>'+count),'new immutable version loaded');}
 async function check(s, selector, checked) { await evaluate(s, `(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)throw Error('Missing checkbox');if(e.checked!==${checked})e.click()})()`); await delay(120); }
 async function login(s, a) { await goto(s, '/login'); await until(() => evaluate(s, '!!document.querySelector("[name=email]")'), 'login ready'); await set(s, '[name=email]', a.email); await set(s, '[name=password]', a.password); await evaluate(s, 'document.querySelector("button[type=submit]").click()'); await until(() => evaluate(s, 'location.pathname!=="/login"'), 'fresh password login'); }
 async function screenshot(s, name, w, h) { await call('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile: w < 500 }, s); await delay(300); await evaluate(s, 'document.fonts.ready'); const r = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false }, s); fs.writeFileSync(path.join(out, name + '.png'), Buffer.from(r.data, 'base64')); assert.equal(await evaluate(s, 'document.documentElement.scrollWidth<=innerWidth'), true, 'page overflow ' + name); }
@@ -73,8 +74,7 @@ try {
         await screenshot(s, 'matching-1280', 1280, 720);
         await call('Emulation.setDeviceMetricsOverride', { width: 1366, height: 768, deviceScaleFactor: 1, mobile: false }, s);
         await set(s, 'input[maxlength="80"]', 'Browserprüfung ' + Date.now());
-        await button(s, 'Zuordnungssatz speichern');
-        await until(async () => /Neue Zuordnungsfassung gespeichert/.test(await text(s)), 'save matching');
+        await saveUi(s);
         await goto(s, route);
         await until(() => query(s, 'input[maxlength="80"]', '?.value.startsWith("Browserprüfung")'), 'persisted reload');
         passed.push('save and full reload');
@@ -96,8 +96,7 @@ try {
         await until(() => evaluate(s, 'document.querySelectorAll("[data-matching-number]").length===12'), 'range 15–26');
         for (let n = 15; n <= 26; n++)
             await set(s, `[aria-label="Präsentationstext Kugel ${n}"]`, `${rangePrefix} ${n}`);
-        await button(s, 'Zuordnungssatz speichern');
-        await until(async () => /Neue Zuordnungsfassung gespeichert/.test(await text(s)), 'range save');
+        await saveUi(s);
         await goto(s, route);
         await until(() => query(s, '[aria-label="Präsentationstext Kugel 15"]', '?.value===' + JSON.stringify(rangePrefix + ' 15')), 'range retained');
         assert.match(await text(s), /Originalaufnahme/);
@@ -130,8 +129,7 @@ try {
                 assert.ok(await query(s, '[role=dialog] audio', '?.src.endsWith("/' + variant + '")'));
                 await button(s, 'Zuordnung übernehmen');
                 await set(s, 'input[maxlength="80"]', 'Kombination ' + variant + ' ' + label + ' ' + Date.now());
-                await button(s, 'Zuordnungssatz speichern');
-                await until(async () => /Neue Zuordnungsfassung gespeichert/.test(await text(s)), 'combination save');
+                await saveUi(s);
                 await until(() => query(s, 'button[type=submit]', '.disabled===true'), 'saved baseline');
             }
         passed.push('all six original/reverse × artist/title/combination UI saves; variant preserves answer');
@@ -143,8 +141,7 @@ try {
         await goto(stale, route);
         await until(() => query(stale, 'input[maxlength="80"]', '!==null'), 'stale editor');
         await set(s, 'input[maxlength="80"]', 'Aktuelle Fassung ' + Date.now());
-        await button(s, 'Zuordnungssatz speichern');
-        await until(async () => /Neue Zuordnungsfassung gespeichert/.test(await text(s)), 'new concurrent version');
+        await saveUi(s);
         await set(stale, 'input[maxlength="80"]', 'Konflikt bleibt erhalten');
         await button(stale, 'Zuordnungssatz speichern');
         await until(async () => /inzwischen geändert/.test(await text(stale)), 'CAS visible');
