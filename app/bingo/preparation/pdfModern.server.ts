@@ -6,7 +6,7 @@ import { parsePrintSnapshot, type EmbeddedAsset, type PrintSnapshot } from './pr
 import { regularFace, glyphGeometry, type PrintMode } from './pdfSquare.server';
 import { geometry, position } from './printFormats';
 import { decodeCard, MAX_EXPORT, BingoPreparationError, type StoredCard } from './policy';
-import { termFor } from './termSet';
+import { termFor, usesCardText } from './termSet';
 type Face=ReturnType<typeof fontkit.create>;
 type Font={face:Face;font:PDFFont};
 const ink=(hex:string)=>rgb(...[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255) as [number,number,number]);
@@ -50,7 +50,7 @@ export function validateModernTerms(input:PrintSnapshot){
  const snap=parsePrintSnapshot(input);if(snap.version!==3||!snap.settings.layout||!snap.terms)return;
  const g=geometry(snap.settings.layout.format),face=regularFace(Buffer.from(snap.text.bytes,'base64')),cell=(g.side-36)/5;
  const limit=snap.settings.layout.format==='A4_SIX'?36:40;
- for(const entry of snap.terms.entries){if([...entry.text].length>limit)throw new BingoPreparationError(`Kugel ${entry.number}: höchstens ${limit} Zeichen für ${snap.settings.layout.format}. Bitte Begriff kürzen oder Format ändern.`);fitTerm(entry.text,face,cell-6,cell-6);}
+ for(const entry of snap.terms.entries.filter(e=>e.number<=75)){if(!usesCardText(snap.terms,entry.number))continue;const text=termFor(snap.terms,entry.number);if([...text].length>limit)throw new BingoPreparationError(`Kugel ${entry.number}: höchstens ${limit} Zeichen für ${snap.settings.layout.format}. Bitte Begriff kürzen oder Format ändern.`);fitTerm(text,face,cell-6,cell-6);}
 }
 export async function createModernCardsPdf(input:PrintSnapshot,cards:readonly StoredCard[],mode:PrintMode='front',singleCard=false){
   const snap=parsePrintSnapshot(input);if(snap.version!==3||!snap.settings.layout)throw new BingoPreparationError('Ungültiger V3-Druckstand.');
@@ -80,7 +80,7 @@ export async function createModernCardsPdf(input:PrintSnapshot,cards:readonly St
           page.drawRectangle({x:cx,y:cy,width:cell,height:h,color:ink(row===0||free?colors.header:colors.background),borderColor:ink(colors.grid),borderWidth:.5});
           if(free)logo(page,front,cx+cell/2,cy+cell/2,cell-8,cell-8);
           else if(row===0)draw(page,'BINGO'[col],heading,19,cx+2,cy+4,cell-4,ink(colors.heading));
-          else if(snap.terms){const term=termFor(snap.terms,card.cells[row-1][col]!),fit=fitTerm(term,words.face,cell-6,cell-6),top=cy+(cell+fit.inkHeight+(fit.lines.length-1)*fit.lineHeight)/2-words.face.ascent/words.face.unitsPerEm*fit.size;fit.lines.forEach((line,i)=>draw(page,line,words,fit.size,cx+3,top-i*fit.lineHeight,cell-6,ink(colors.numbers)));}
+          else if(snap.terms&&usesCardText(snap.terms,card.cells[row-1][col]!)){const term=termFor(snap.terms,card.cells[row-1][col]!),fit=fitTerm(term,words.face,cell-6,cell-6),top=cy+(cell+fit.inkHeight+(fit.lines.length-1)*fit.lineHeight)/2-words.face.ascent/words.face.unitsPerEm*fit.size;fit.lines.forEach((line,i)=>draw(page,line,words,fit.size,cx+3,top-i*fit.lineHeight,cell-6,ink(colors.numbers)));}
           else draw(page,String(card.cells[row-1][col]),numbers,22,cx+3,cy+(cell-22)/2+4,cell-6,ink(colors.numbers));
         }
       }

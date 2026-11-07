@@ -5,15 +5,18 @@ import { applyLiveEvent, assertUuid, initialState, parseLiveCommand, type Call, 
 
 /** V2 is opt-in. AP3 replay and its one-round histories are deliberately unchanged. */
 export type EventCall = Call & { roundId: string; recordedAt: number };
-export type EventRunState = { revealed?:readonly string[]; version: 2; contextRevision:number; run: BingoRun; calls: readonly EventCall[]; frozen: readonly FrozenRound[] };
+export type BingoPlayback = {id:string;drawId:string;action:'PLAY'|'PAUSE'|'REPLAY';at:number;sequence:number;restartId:string|null;position:number};
+export type EventRunState = { playback?:BingoPlayback; revealed?:readonly string[]; version: 2; contextRevision:number; run: BingoRun; calls: readonly EventCall[]; frozen: readonly FrozenRound[] };
 export type EventCommand = Exclude<LiveCommand, { kind: "call" } | { kind: "correct" }> |
   { kind: "call"; stage: Stage; context: string } | {kind:"reveal";drawId:string} |
+  {kind:'playback';drawId:string;action:'PLAY'|'PAUSE'|'REPLAY'} |
   { kind: "correct"; drawId: string; number: number; reason: string } |
   { kind: "closeRound" } | { kind: "startRound"; roundId: string; preparationRevision:number } | {kind:"appendRound";label:string;target:number;preparationRevision:number};
 export type EventRunEvent = Omit<LiveEvent, "command"> & { command: EventCommand; frozen?: FrozenRound };
 export function parseEventCommand(value: unknown): EventCommand {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw Error("INVALID_COMMAND");
   const r = value as Record<string, unknown>;
+  if(r.kind==='playback'){assertUuid(r.drawId);if(Object.keys(r).sort().join()!=='action,drawId,kind'||!['PLAY','PAUSE','REPLAY'].includes(String(r.action)))throw Error('INVALID_COMMAND');return r as EventCommand;}
   if(r.kind==='reveal'){assertUuid(r.drawId);if(Object.keys(r).sort().join()!=='drawId,kind')throw Error('INVALID_COMMAND');return r as EventCommand;}
   if (r.kind === "closeRound") { if (Object.keys(r).join() !== "kind") throw Error("INVALID_COMMAND"); return {kind:"closeRound"}; }
   if(r.kind==="appendRound") {if(Object.keys(r).sort().join()!=="kind,label,preparationRevision,target"||typeof r.label!=="string"||!r.label.trim()||r.label.length>80||!Number.isSafeInteger(r.preparationRevision)||Number(r.preparationRevision)<0||!Number.isInteger(r.target)||Number(r.target)<1||Number(r.target)>75)throw Error("INVALID_COMMAND");return r as EventCommand;}
@@ -68,7 +71,8 @@ function applyEventRunEventInner(state: EventRunState, event: EventRunEvent, car
     const closed=closeRound(run,round.id);
     return {...state,run:closed.status==="RUNNING"?pauseRun(closed,event.at):closed};
   }
-  if(c.kind==='reveal'){if(!round.draws.some(d=>d.id===c.drawId)||!state.frozen.find(f=>f.id===round.id)?.terms)throw Error('DRAW_NOT_FOUND');if(state.revealed?.includes(c.drawId))throw Error('ALREADY_REVEALED');return {...state,revealed:[...(state.revealed??[]),c.drawId]};}
+  if(c.kind==='reveal'){const frozen=state.frozen.find(f=>f.id===round.id);if(!round.draws.some(d=>d.id===c.drawId)||!frozen?.terms&&!frozen?.matching)throw Error('DRAW_NOT_FOUND');if(state.revealed?.includes(c.drawId))throw Error('ALREADY_REVEALED');return {...state,revealed:[...(state.revealed??[]),c.drawId]};}
+  if(c.kind==='playback'){if(!state.frozen.find(f=>f.id===round.id)?.matching||round.draws.at(-1)?.id!==c.drawId)throw Error('MEDIA_CONTEXT_CHANGED');if(c.action!=='PAUSE'&&run.status!=='RUNNING')throw Error('RUN_NOT_RUNNING');const prior=state.playback,position=c.action==='REPLAY'?0:prior?prior.position+(prior.action==='PAUSE'?0:Math.max(0,event.at-prior.at)/1000):0;return {...state,playback:{id:event.id,drawId:c.drawId,action:c.action,at:event.at,sequence:(prior?.sequence??0)+1,restartId:c.action==='REPLAY'?event.id:prior?.restartId??null,position}};}
   if(c.kind==="resume" && !run.rounds.some(r=>r.status==="OPEN"))throw Error("ROUND_NOT_OPEN");
   if(c.kind==="draw"&&blockingCalls(state))throw Error("OPEN_CLAIMS");
   if(c.kind==="call") {
@@ -98,5 +102,7 @@ function applyEventRunEventInner(state: EventRunState, event: EventRunEvent, car
 
 export function applyEventRunEvent(state:EventRunState,event:EventRunEvent,cards:readonly BingoCard[]):EventRunState {
  const next=applyEventRunEventInner(state,event,cards);
- return {...next,contextRevision:["call","identify","decide","reveal"].includes(event.command.kind)?state.contextRevision:state.contextRevision+1};
+ const clear=['draw','closeRound','startRound','end'].includes(event.command.kind)||event.command.kind==='correct'&&currentEventRound(state).draws.at(-1)?.id===event.command.drawId;
+ const paused=event.command.kind==='pause'&&state.playback?{playback:{...state.playback,id:event.id,action:'PAUSE' as const,at:event.at,sequence:state.playback.sequence+1,position:state.playback.position+(state.playback.action==='PAUSE'?0:Math.max(0,event.at-state.playback.at)/1000)}}:{};
+ return {...next,...(clear?{playback:undefined}:paused),contextRevision:["call","identify","decide","reveal","playback"].includes(event.command.kind)?state.contextRevision:state.contextRevision+1};
 }

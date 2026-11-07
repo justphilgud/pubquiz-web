@@ -15,6 +15,7 @@ import {activeElapsedMs} from "../core/run";
 import {applyEventRunEvent,blockingCalls,callContextData,currentEventRound,initialEventRun,parseEventCommand,type EventCommand} from "./eventRun";
 import {parseRoundSnapshot} from "./roundSnapshot";
 import {readPreparation} from "../preparation/readPreparation.server";
+import {frozenMatching,readMatchingEntry,audienceMatching} from '../matching/repository.server';
 type Tx=Prisma.TransactionClient;
 type Row={id:string;game_id:string;round_id:string;eventreihe_id:number;status:string;revision:number;started_at:Date;round_snapshot:unknown;design_snapshot:SharedDesign;audience_key:string;start_request_hash:string};
 type CardRow={round_id:string;id:string;series_id:string;cells:unknown;layout_hash:string;printed_code:string;ordinal:number;prefix:number};
@@ -59,11 +60,17 @@ async function load(tx:Tx,row:Row){
 async function freeze(tx:Tx,gameId:string,runId:string,roundId:string,at:number){
  const round=await tx.bingo_rounds.findFirst({where:{id:roundId,game_id:gameId},include:{series:true}});
  if(!round||!round.series.length)throw Error("NO_ASSIGNED_CARDS");
- const snapshot=parseRoundSnapshot({id:round.id,label:round.label,target:round.planned_draws,issued:round.issued_count,seriesIds:round.series.map(s=>s.series_id).sort(),...(round.term_snapshot?{terms:parseTermSet(round.term_snapshot)}:{})});
+ const snapshot=parseRoundSnapshot({id:round.id,label:round.label,target:round.planned_draws,issued:round.issued_count,seriesIds:round.series.map(s=>s.series_id).sort(),...await roundContent(tx,gameId,round.id,round.term_snapshot)});
  await tx.$executeRaw`INSERT INTO pubquiz.bingo_event_rounds(run_id,round_id,game_id,round_snapshot,opened_at) VALUES(${runId}::uuid,${roundId}::uuid,${gameId}::uuid,${JSON.stringify(snapshot)}::jsonb,${new Date(at)})`;
  await tx.$executeRaw`INSERT INTO pubquiz.bingo_event_round_cards(run_id,round_id,game_id,card_id,series_id) SELECT ${runId}::uuid,${roundId}::uuid,${gameId}::uuid,c.id,c.series_id FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_round_series rs ON rs.series_id=c.series_id WHERE rs.round_id=${roundId}::uuid AND rs.game_id=${gameId}::uuid`;
  const count=(await tx.$queryRaw<{n:number}[]>`SELECT count(*)::int n FROM pubquiz.bingo_event_round_cards WHERE run_id=${runId}::uuid AND round_id=${roundId}::uuid`)[0].n;
  if(!count||(snapshot.issued!==null&&snapshot.issued>count))throw Error("INVALID_FROZEN_CARDS");return snapshot;
+}
+async function roundContent(tx:Tx,gameId:string,roundId:string,value:unknown){
+ if(!value)return {};const config=parseTermSet(value);if(config.version===1)return {terms:config};
+ // Compare inside PostgreSQL. Embedded fonts and full print snapshots never cross the boundary.
+ const [mismatch]=await tx.$queryRaw<{n:number}[]>`SELECT count(*)::int n FROM pubquiz.bingo_round_series rs JOIN pubquiz.bingo_card_series s ON s.id=rs.series_id WHERE rs.game_id=${gameId}::uuid AND rs.round_id=${roundId}::uuid AND (s.print_snapshot->'terms') IS DISTINCT FROM ${JSON.stringify(config)}::jsonb`;
+ if(mismatch.n)throw Error('MATCHING_CARDS_CONFLICT');return frozenMatching(tx,gameId,config);
 }
 export async function startEventRun(userId:number,input:{gameId:string;requestId:string;expectedSeriesId:number;preparationRevision:number}){
  assertUuid(input.gameId);assertUuid(input.requestId);integer(input.expectedSeriesId);integer(input.preparationRevision);const hash=sha256(canonical({...input,protocol:2}));
@@ -76,7 +83,7 @@ export async function startEventRun(userId:number,input:{gameId:string;requestId
   if((await tx.bingo_preparations.findUnique({where:{game_id:game.id}}))?.revision!==input.preparationRevision)throw Error("PREPARATION_CHANGED");
   const plan=await tx.bingo_rounds.findMany({where:{game_id:game.id},orderBy:{position:"asc"},include:{series:true}}),first=plan[0];
   if(!first?.series.length)throw Error("NO_ASSIGNED_CARDS");
-  const snapshot=parseRoundSnapshot({id:first.id,label:first.label,target:first.planned_draws,issued:first.issued_count,seriesIds:first.series.map(s=>s.series_id).sort(),...(first.term_snapshot?{terms:parseTermSet(first.term_snapshot)}:{})});
+  const snapshot=parseRoundSnapshot({id:first.id,label:first.label,target:first.planned_draws,issued:first.issued_count,seriesIds:first.series.map(s=>s.series_id).sort(),...await roundContent(tx,game.id,first.id,first.term_snapshot)});
   const design=(await resolveSharedDesign(tx,game.shared_design_template_id,series)).design,assets=await captureLiveAssets(design);
   const previous=(await tx.$queryRaw<{at:Date|null}[]>`SELECT max(started_at) at FROM pubquiz.bingo_live_runs WHERE game_id=${game.id}::uuid`)[0].at;
   const at=Math.max(await clock(tx),(previous?.getTime()??-1)+1),id=randomUUID(),key=randomUUID();
@@ -98,6 +105,11 @@ export async function commandEventRun(userId:number,input:{gameId:string;runId:s
   if(command.kind==="call"){if(input.revision>row.revision||command.context!==sha256(canonical(callContextData(state))))throw Error("CALL_CONTEXT_CONFLICT");}
   else if(input.revision!==row.revision)throw Error("REVISION_CONFLICT");
   const at=Math.max(await clock(tx),loaded.previousAt),round=currentEventRound(state);let opened:FrozenRound|null=null;
+  if(command.kind==='playback'){
+   const ref=state.frozen.find(f=>f.id===round.id)?.matching,last=round.draws.at(-1);
+   if(!ref||!last||last.id!==command.drawId)throw Error('MEDIA_CONTEXT_CHANGED');
+   const entry=await readMatchingEntry(tx,game.id,ref,last.number);if(entry.keepNumber||entry.presentation.kind!=='MEDIA'||entry.presentation.source?.kind==='IMAGE')throw Error('MEDIA_NOT_PLAYABLE');
+  }
   if(command.kind==="appendRound"||command.kind==="startRound"){
    if((await tx.bingo_preparations.findUnique({where:{game_id:game.id}}))?.revision!==command.preparationRevision)throw Error("PREPARATION_CHANGED");
    if(state.run.status==="ENDED")throw Error("RUN_ENDED");
@@ -133,13 +145,15 @@ export async function readEventModeration(userId:number,gameId:string,runId?:str
   const plan=row?await tx.$queryRaw<{round_id:string;position:number}[]>`SELECT round_id,position FROM pubquiz.bingo_event_round_plan WHERE run_id=${row.id}::uuid ORDER BY position`:[];
   const rounds=await tx.bingo_rounds.findMany({where:{game_id:gameId},orderBy:{position:"asc"},select:{id:true,position:true,label:true,series:{select:{series_id:true,series:{select:{code:true,card_count:true}}}}}});
   const next=plan.find(p=>!loaded?.state.frozen.some(r=>r.id===p.round_id));
+  const matching=round&&loaded?.state.frozen.find(f=>f.id===round.id)?.matching,last=round?.draws.at(-1);
+  const matchingEntry=matching&&last?await readMatchingEntry(tx,gameId,matching,last.number):null;
   const pageRound=rounds.find(r=>r.id===next?.round_id)??rounds.find(r=>!loaded?.state.frozen.some(f=>f.id===r.id));
   return {protocol:2 as const,prepareNew,gameId,title:game.titel,seriesId:game.eventreihe_id,archived:series.ist_archiviert,
    preparationRevision:(await tx.bingo_preparations.findUnique({where:{game_id:gameId}}))?.revision??0,
    rounds,plan,runs:rows.map(r=>({id:r.id,status:r.status,startedAt:r.started_at.toISOString()})),
    preparationPage:pageRound?Math.floor((pageRound.position-1)/25)+1:1,
    live:row&&loaded&&round?{events:loaded.events.map(e=>({id:e.request_id,at:e.occurred_at.getTime(),actorId:e.actor_id,command:parseEventEnvelope(e.command).input.command})),id:row.id,revision:row.revision,startedAt:row.started_at.getTime(),round:loaded.state.frozen.find(f=>f.id===round.id)!,state:loaded.state,
-    cards:loaded.cardsByRound.get(round.id)??[],design:row.design_snapshot,audienceKey:row.audience_key,serverAt:at,elapsedMs:activeElapsedMs(loaded.state.run,at),
+    matchingEntry,cards:loaded.cardsByRound.get(round.id)??[],design:row.design_snapshot,audienceKey:row.audience_key,serverAt:at,elapsedMs:activeElapsedMs(loaded.state.run,at),
     roundElapsedMs:loaded.durations.get(round.id)??activeElapsedMs(loaded.state.run,at)-(loaded.starts.get(round.id)??0),
     blocked:blockingCalls(loaded.state),callContext:sha256(canonical(callContextData(loaded.state))),between:round.status==="CLOSED"&&loaded.state.run.status!=="ENDED",
     summary:loaded.state.run.rounds.map(r=>({id:r.id,label:loaded.state.frozen.find(f=>f.id===r.id)!.label,draws:r.draws.length,confirmed:r.claims.filter(c=>c.decisions.at(-1)?.action==="CONFIRM").length,activeMs:loaded.durations.get(r.id)??activeElapsedMs(loaded.state.run,at)-(loaded.starts.get(r.id)??0)}))}:null};
@@ -154,9 +168,11 @@ export async function readEventAudience(userId:number,key:string){
   const [row]=await tx.$queryRaw<Row[]>`SELECT r.id,r.game_id,r.round_id,r.eventreihe_id,r.status,r.revision,r.started_at,r.round_snapshot,r.design_snapshot,r.audience_key,r.start_request_hash FROM pubquiz.bingo_live_runs r JOIN pubquiz.bingo_event_runs e ON e.run_id=r.id WHERE r.audience_key=${key}::uuid`;
   if(!row)throw Error("RUN_NOT_FOUND");await preparationContext(tx,userId,row.game_id);
   const {state}=await load(tx,row),round=currentEventRound(state);
+  const frozen=state.frozen.find(f=>f.id===round.id)!,last=round.draws.at(-1),matching=frozen.matching;
+  const content=matching&&last?audienceMatching(await readMatchingEntry(tx,row.game_id,matching,last.number),state.revealed?.includes(last.id)??false,matching.publication,row.game_id):undefined;
   return {id:row.id,revision:row.revision,startedAt:row.started_at.getTime(),status:state.run.status,label:state.frozen.find(f=>f.id===round.id)!.label,
    termMode:Boolean(state.frozen.find(f=>f.id===round.id)?.terms),labels:Object.fromEntries(round.draws.map(draw=>{const terms=state.frozen.find(f=>f.id===round.id)?.terms;return [draw.number,terms?publishedTerm(terms,draw.number,true,state.revealed?.includes(draw.id)??false):null];}).filter(([,text])=>text!==null)),
-   target:round.plannedDraws,draws:round.draws,design:row.design_snapshot,assetBase:`/api/bingo/presentation/${key}/assets`,
+   ...(content?{content}:{}),serverAt:Math.max(await clock(tx),state.playback?.at??0),playback:state.playback,target:round.plannedDraws,draws:round.draws,design:row.design_snapshot,assetBase:`/api/bingo/presentation/${key}/assets`,
    phase:round.status==="CLOSED"&&state.run.status!=="ENDED"?"BETWEEN" as const:undefined,
    claims:round.claims.map(c=>({id:c.id,stage:c.stage,action:c.decisions.at(-1)?.action??null,needsReview:c.needsReview}))};
  },{isolationLevel:"RepeatableRead"});

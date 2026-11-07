@@ -1,0 +1,43 @@
+{
+  "migrations": [
+    {
+      "name": "20261107150000_bingo_matching",
+      "sha256": "7a5998e3b027ad002112c12f948e9f8435b462308858d85efcc495cb26c2447f"
+    }
+  ],
+  "tables": [
+    "bingo_matching_assets"
+  ],
+  "triggers": [
+    {
+      "schema": "pubquiz",
+      "name": "bingo_matching_assets_immutable",
+      "table": "bingo_matching_assets",
+      "functionSchema": "pubquiz",
+      "functionName": "bingo_immutable_record",
+      "type": 27,
+      "enabled": "O",
+      "deferrable": false,
+      "deferred": false,
+      "constraint": false,
+      "columns": "",
+      "arguments": "",
+      "condition": null
+    },
+    {
+      "schema": "pubquiz",
+      "name": "bingo_term_sets_immutable",
+      "table": "bingo_term_sets",
+      "functionSchema": "pubquiz",
+      "functionName": "bingo_immutable_record",
+      "type": 27,
+      "enabled": "O",
+      "deferrable": false,
+      "deferred": false,
+      "constraint": false,
+      "columns": "",
+      "arguments": "",
+      "condition": null
+    }
+  ]
+}

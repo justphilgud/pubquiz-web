@@ -7,6 +7,9 @@ import { isSafeTemplateAssetReference } from "../../app/rendering/presentationTe
 import { parsePrintSnapshot } from "../../app/bingo/preparation/printSnapshot";
 import { decodeCard } from "../../app/bingo/preparation/policy";
 import { parseLiveAssets } from "../../app/bingo/live/visualAssets";
+import {parseTermSet} from '../../app/bingo/preparation/termSet';
+import {canonical,sha256} from '../../app/bingo/preparation/printSnapshot';
+import {matchingContentType} from '../../app/bingo/matching/mediaFormat';
 
 export const RESTORE_TARGET = {
   project: "icy-leaf-46256271", branch: "br-bitter-paper-b20sx4lu",
@@ -53,6 +56,7 @@ export function auditColumns(columns: Column[]) {
     tableName(c.schema, c.table); identifier(c.column);
     const key = `${c.schema}.${c.table}.${c.column}`;
     if (key in AUTH_COLUMNS) requireCondition(c.default === null && c.type === "text", "AUTH_COLUMN_DEFAULT_REVIEW_REQUIRED");
+    if(key==='pubquiz.bingo_matching_assets.content')requireCondition(c.type==='bytea','MATCHING_BINARY_COLUMN_REQUIRED');
     requireCondition(!/(password|passwort|secret|token|credential|api_?key|authorization|private_?key)/i.test(c.column) ||
       key in AUTH_COLUMNS || key === "pubquiz.users.must_change_password", "UNREVIEWED_SECRET_COLUMN");
     requireCondition(!c.generated && !c.identity, "UNREVIEWED_GENERATED_COLUMN");
@@ -70,6 +74,25 @@ function exactKeys(value: unknown, keys: string): asserts value is Record<string
 // Only this persisted presentation field uses "tokens" for design, not authentication.
 // Check exact shape and bounded design values, then retain the ordinary recursive scan.
 export function inspectRow(value: Record<string, unknown>, media: Set<string>, schema: string, table: string) {
+  if(schema==='pubquiz'&&table==='bingo_term_sets'){
+    const config=parseTermSet(value.config);if(config.version===2)requireCondition(value.config_hash===sha256(canonical(config)),'MATCHING_CONFIG_CHECKSUM_REQUIRED');
+  }
+  if(schema==='pubquiz'&&table==='bingo_matching_assets'){
+    exactKeys(value,'id,game_id,source_question_id,source_media_id,source_revision,kind,variant,content_type,sha256,answers,content,created_at');
+    requireCondition(Array.isArray(value.answers)&&value.answers.every(a=>record(a)&&Object.keys(a).sort().join()==='key,label,text'&&typeof a.key==='string'&&typeof a.label==='string'&&typeof a.text==='string'&&a.text.trim()),'MATCHING_ANSWERS_STRUCTURE_REQUIRED');
+    requireCondition(typeof value.id==='string'&&/^[a-f0-9-]{36}$/i.test(value.id)&&typeof value.game_id==='string'&&/^[a-f0-9-]{36}$/i.test(value.game_id)&&Number.isSafeInteger(value.source_question_id)&&Number(value.source_question_id)>0&&Number.isSafeInteger(value.source_media_id)&&Number(value.source_media_id)>0&&typeof value.source_revision==='string'&&/^[a-f0-9]{64}$/.test(value.source_revision),'MATCHING_ASSET_STRUCTURE_REQUIRED');
+    // collectSnapshot derives this compact proof from bytea in PostgreSQL. The dump
+    // retains every byte; restored bytes are hashed again, not trusted from a stored hash.
+    let proof:Record<string,unknown>;
+    if(typeof value.content==='string'&&/^\\x(?:[a-f0-9]{2})+$/.test(value.content)){const bytes=Buffer.from(value.content.slice(2),'hex');proof={size:bytes.length,sha256:sha256(bytes),signature:bytes.subarray(0,12).toString('hex')};}
+    else{exactKeys(value.content,'size,sha256,signature');proof=value.content;}
+    const limits:Record<string,number>={AUDIO:25*1024*1024,IMAGE:10*1024*1024,VIDEO:100*1024*1024};
+    requireCondition(Number.isSafeInteger(proof.size)&&Number(proof.size)>0&&Number(proof.size)<=limits[String(value.kind)]&&value.sha256===proof.sha256&&typeof proof.signature==='string'&&/^(?:[a-f0-9]{2}){1,12}$/.test(proof.signature),'MATCHING_ASSET_CHECKSUM_REQUIRED');
+    requireCondition(matchingContentType(Buffer.from(proof.signature as string,'hex'),String(value.kind))===value.content_type,'MATCHING_ASSET_FORMAT_REQUIRED');
+    requireCondition(typeof value.content_type==='string'&&({AUDIO:['audio/mpeg','audio/mp4','audio/wav','audio/ogg'],IMAGE:['image/png','image/jpeg','image/webp'],VIDEO:['video/mp4','video/webm']} as Record<string,string[]>)[String(value.kind)]?.includes(value.content_type),'MATCHING_ASSET_FORMAT_REQUIRED');
+    // Binary bytes are retained and hashed, not mistaken for text or an external URL.
+    const {content:_content,...rest}=value;void _content;inspectValue(rest,media);return;
+  }
   if(schema==="pubquiz"&&table==="bingo_event_rounds")parseRoundSnapshot(value.round_snapshot);
   if(schema==="pubquiz"&&table==="bingo_live_events"&&value.event_round_id!=null)parseEventEnvelope(value.command);
   if (schema === "pubquiz" && table === "bingo_live_runs") {

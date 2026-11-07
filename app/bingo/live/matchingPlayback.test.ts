@@ -1,0 +1,21 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {initialEventRun,applyEventRunEvent,currentEventRound,callContextData,parseEventCommand,type EventCommand} from './eventRun';
+import {parseRoundSnapshot} from './roundSnapshot';
+const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`;
+test('matching reference and media journal preserve numeric rules and call boundaries',()=>{
+ const frozen=parseRoundSnapshot({id:id(1),label:'Musik',target:30,issued:null,seriesIds:[id(2)],matching:{id:id(3),hash:'a'.repeat(64),publication:'HIDDEN'}});
+ let state=initialEventRun(id(4),id(5),frozen,1000),n=10;
+ const send=(command:EventCommand)=>{const event={id:id(n++),at:2000+n,actorId:1,command};state=applyEventRunEvent(state,event,[]);};
+ send({kind:'draw',number:1});const draw=currentEventRound(state).draws[0],context=callContextData(state);
+ send({kind:'playback',drawId:draw.id,action:'PLAY'});const first=state.playback!;assert.equal(first.sequence,1);assert.deepEqual(callContextData(state),context);
+ send({kind:'playback',drawId:draw.id,action:'PAUSE'});assert.equal(state.playback?.sequence,2);assert.equal(state.playback?.restartId,null);
+ send({kind:'playback',drawId:draw.id,action:'REPLAY'});assert.equal(state.playback?.sequence,3);assert.equal(state.playback?.restartId,state.playback?.id);
+ send({kind:'reveal',drawId:draw.id});assert.equal(state.revealed?.includes(draw.id),true);assert.deepEqual(callContextData(state),context);
+ send({kind:'pause'});assert.throws(()=>send({kind:'playback',drawId:draw.id,action:'PLAY'}),/RUN_NOT_RUNNING/);send({kind:'resume'});
+ send({kind:'draw',number:2});assert.equal(state.playback,undefined);assert.throws(()=>send({kind:'playback',drawId:draw.id,action:'PLAY'}),/MEDIA_CONTEXT_CHANGED/);
+ send({kind:'correct',drawId:draw.id,number:3,reason:'Korrektur'});assert.equal(state.revealed?.includes(draw.id),false);assert.deepEqual(currentEventRound(state).draws.map(d=>d.number),[3,2]);
+ send({kind:'closeRound'});assert.throws(()=>send({kind:'playback',drawId:draw.id,action:'PLAY'}),/ROUND_NOT_OPEN/);
+ assert.throws(()=>parseEventCommand({kind:'playback',drawId:draw.id,action:'PLAY',url:'https://example.com/answer.mp3'}));
+ assert.throws(()=>parseRoundSnapshot({...frozen,matching:{...frozen.matching,entries:[]}}));
+});

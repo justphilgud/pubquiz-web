@@ -135,3 +135,7 @@ OCR, synchronization, draw state and live operation are deliberately outside AP2
 Für neue Karten, ausdrücklich bestätigte Neugestaltung, Begriffssets und deren
 Veröffentlichung gilt ergänzend [Bingo-Karten und Druck V3](bingo-card-design-v3.md).
 Historische Druckstände und numerische Laufdaten behalten ihren bisherigen Vertrag.
+
+### Bingo-Matching (Vertragsversion 2)
+
+Die neue gezielte Erweiterung ist in [bingo-matching.md](./bingo-matching.md) beschrieben: unabhängige Medien-/Kartenantwort, unveränderliche spielgebundene Fassung, 90 Verwaltungszeilen bei unverändertem 75er-Regelkern und aktuelle Berechtigungsprüfung. Bestehende V1-Karten-/Laufzeitverträge bleiben erhalten. Vollständige Zuordnungen und Medienbytes gehören ausdrücklich nicht in regelmäßige Statusabfragen. Praktische Nachweise und Grenzen stehen im zugehörigen Matching-Abnahmebericht.

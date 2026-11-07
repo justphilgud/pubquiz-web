@@ -35,6 +35,7 @@ export type Bingo_term_setsSumAggregateOutputType = {
 }
 
 export type Bingo_term_setsMinAggregateOutputType = {
+  config_hash: string | null
   id: string | null
   game_id: string | null
   revision: number | null
@@ -43,6 +44,7 @@ export type Bingo_term_setsMinAggregateOutputType = {
 }
 
 export type Bingo_term_setsMaxAggregateOutputType = {
+  config_hash: string | null
   id: string | null
   game_id: string | null
   revision: number | null
@@ -51,6 +53,7 @@ export type Bingo_term_setsMaxAggregateOutputType = {
 }
 
 export type Bingo_term_setsCountAggregateOutputType = {
+  config_hash: number
   id: number
   game_id: number
   config: number
@@ -70,6 +73,7 @@ export type Bingo_term_setsSumAggregateInputType = {
 }
 
 export type Bingo_term_setsMinAggregateInputType = {
+  config_hash?: true
   id?: true
   game_id?: true
   revision?: true
@@ -78,6 +82,7 @@ export type Bingo_term_setsMinAggregateInputType = {
 }
 
 export type Bingo_term_setsMaxAggregateInputType = {
+  config_hash?: true
   id?: true
   game_id?: true
   revision?: true
@@ -86,6 +91,7 @@ export type Bingo_term_setsMaxAggregateInputType = {
 }
 
 export type Bingo_term_setsCountAggregateInputType = {
+  config_hash?: true
   id?: true
   game_id?: true
   config?: true
@@ -182,6 +188,7 @@ export type bingo_term_setsGroupByArgs<ExtArgs extends runtime.Types.Extensions.
 }
 
 export type Bingo_term_setsGroupByOutputType = {
+  config_hash: string | null
   id: string
   game_id: string
   config: runtime.JsonValue
@@ -214,6 +221,7 @@ export type bingo_term_setsWhereInput = {
   AND?: Prisma.bingo_term_setsWhereInput | Prisma.bingo_term_setsWhereInput[]
   OR?: Prisma.bingo_term_setsWhereInput[]
   NOT?: Prisma.bingo_term_setsWhereInput | Prisma.bingo_term_setsWhereInput[]
+  config_hash?: Prisma.StringNullableFilter<"bingo_term_sets"> | string | null
   id?: Prisma.UuidFilter<"bingo_term_sets"> | string
   game_id?: Prisma.UuidFilter<"bingo_term_sets"> | string
   config?: Prisma.JsonFilter<"bingo_term_sets">
@@ -224,6 +232,7 @@ export type bingo_term_setsWhereInput = {
 }
 
 export type bingo_term_setsOrderByWithRelationInput = {
+  config_hash?: Prisma.SortOrderInput | Prisma.SortOrder
   id?: Prisma.SortOrder
   game_id?: Prisma.SortOrder
   config?: Prisma.SortOrder
@@ -238,6 +247,7 @@ export type bingo_term_setsWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.bingo_term_setsWhereInput | Prisma.bingo_term_setsWhereInput[]
   OR?: Prisma.bingo_term_setsWhereInput[]
   NOT?: Prisma.bingo_term_setsWhereInput | Prisma.bingo_term_setsWhereInput[]
+  config_hash?: Prisma.StringNullableFilter<"bingo_term_sets"> | string | null
   game_id?: Prisma.UuidFilter<"bingo_term_sets"> | string
   config?: Prisma.JsonFilter<"bingo_term_sets">
   revision?: Prisma.IntFilter<"bingo_term_sets"> | number
@@ -247,6 +257,7 @@ export type bingo_term_setsWhereUniqueInput = Prisma.AtLeast<{
 }, "id">
 
 export type bingo_term_setsOrderByWithAggregationInput = {
+  config_hash?: Prisma.SortOrderInput | Prisma.SortOrder
   id?: Prisma.SortOrder
   game_id?: Prisma.SortOrder
   config?: Prisma.SortOrder
@@ -264,6 +275,7 @@ export type bingo_term_setsScalarWhereWithAggregatesInput = {
   AND?: Prisma.bingo_term_setsScalarWhereWithAggregatesInput | Prisma.bingo_term_setsScalarWhereWithAggregatesInput[]
   OR?: Prisma.bingo_term_setsScalarWhereWithAggregatesInput[]
   NOT?: Prisma.bingo_term_setsScalarWhereWithAggregatesInput | Prisma.bingo_term_setsScalarWhereWithAggregatesInput[]
+  config_hash?: Prisma.StringNullableWithAggregatesFilter<"bingo_term_sets"> | string | null
   id?: Prisma.UuidWithAggregatesFilter<"bingo_term_sets"> | string
   game_id?: Prisma.UuidWithAggregatesFilter<"bingo_term_sets"> | string
   config?: Prisma.JsonWithAggregatesFilter<"bingo_term_sets">
@@ -273,6 +285,7 @@ export type bingo_term_setsScalarWhereWithAggregatesInput = {
 }
 
 export type bingo_term_setsCreateInput = {
+  config_hash?: string | null
   id: string
   config: Prisma.JsonNullValueInput | runtime.InputJsonValue
   revision?: number
@@ -282,6 +295,7 @@ export type bingo_term_setsCreateInput = {
 }
 
 export type bingo_term_setsUncheckedCreateInput = {
+  config_hash?: string | null
   id: string
   game_id: string
   config: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -291,6 +305,7 @@ export type bingo_term_setsUncheckedCreateInput = {
 }
 
 export type bingo_term_setsUpdateInput = {
+  config_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   config?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   revision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -300,6 +315,7 @@ export type bingo_term_setsUpdateInput = {
 }
 
 export type bingo_term_setsUncheckedUpdateInput = {
+  config_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   game_id?: Prisma.StringFieldUpdateOperationsInput | string
   config?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -309,6 +325,7 @@ export type bingo_term_setsUncheckedUpdateInput = {
 }
 
 export type bingo_term_setsCreateManyInput = {
+  config_hash?: string | null
   id: string
   game_id: string
   config: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -318,6 +335,7 @@ export type bingo_term_setsCreateManyInput = {
 }
 
 export type bingo_term_setsUpdateManyMutationInput = {
+  config_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   config?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   revision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -326,6 +344,7 @@ export type bingo_term_setsUpdateManyMutationInput = {
 }
 
 export type bingo_term_setsUncheckedUpdateManyInput = {
+  config_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   game_id?: Prisma.StringFieldUpdateOperationsInput | string
   config?: Prisma.JsonNullValueInput | runtime.InputJsonValue
@@ -345,6 +364,7 @@ export type bingo_term_setsOrderByRelationAggregateInput = {
 }
 
 export type bingo_term_setsCountOrderByAggregateInput = {
+  config_hash?: Prisma.SortOrder
   id?: Prisma.SortOrder
   game_id?: Prisma.SortOrder
   config?: Prisma.SortOrder
@@ -358,6 +378,7 @@ export type bingo_term_setsAvgOrderByAggregateInput = {
 }
 
 export type bingo_term_setsMaxOrderByAggregateInput = {
+  config_hash?: Prisma.SortOrder
   id?: Prisma.SortOrder
   game_id?: Prisma.SortOrder
   revision?: Prisma.SortOrder
@@ -366,6 +387,7 @@ export type bingo_term_setsMaxOrderByAggregateInput = {
 }
 
 export type bingo_term_setsMinOrderByAggregateInput = {
+  config_hash?: Prisma.SortOrder
   id?: Prisma.SortOrder
   game_id?: Prisma.SortOrder
   revision?: Prisma.SortOrder
@@ -420,6 +442,7 @@ export type bingo_term_setsUncheckedUpdateManyWithoutPreparationNestedInput = {
 }
 
 export type bingo_term_setsCreateWithoutPreparationInput = {
+  config_hash?: string | null
   id: string
   config: Prisma.JsonNullValueInput | runtime.InputJsonValue
   revision?: number
@@ -428,6 +451,7 @@ export type bingo_term_setsCreateWithoutPreparationInput = {
 }
 
 export type bingo_term_setsUncheckedCreateWithoutPreparationInput = {
+  config_hash?: string | null
   id: string
   config: Prisma.JsonNullValueInput | runtime.InputJsonValue
   revision?: number
@@ -465,6 +489,7 @@ export type bingo_term_setsScalarWhereInput = {
   AND?: Prisma.bingo_term_setsScalarWhereInput | Prisma.bingo_term_setsScalarWhereInput[]
   OR?: Prisma.bingo_term_setsScalarWhereInput[]
   NOT?: Prisma.bingo_term_setsScalarWhereInput | Prisma.bingo_term_setsScalarWhereInput[]
+  config_hash?: Prisma.StringNullableFilter<"bingo_term_sets"> | string | null
   id?: Prisma.UuidFilter<"bingo_term_sets"> | string
   game_id?: Prisma.UuidFilter<"bingo_term_sets"> | string
   config?: Prisma.JsonFilter<"bingo_term_sets">
@@ -474,6 +499,7 @@ export type bingo_term_setsScalarWhereInput = {
 }
 
 export type bingo_term_setsCreateManyPreparationInput = {
+  config_hash?: string | null
   id: string
   config: Prisma.JsonNullValueInput | runtime.InputJsonValue
   revision?: number
@@ -482,6 +508,7 @@ export type bingo_term_setsCreateManyPreparationInput = {
 }
 
 export type bingo_term_setsUpdateWithoutPreparationInput = {
+  config_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   config?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   revision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -490,6 +517,7 @@ export type bingo_term_setsUpdateWithoutPreparationInput = {
 }
 
 export type bingo_term_setsUncheckedUpdateWithoutPreparationInput = {
+  config_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   config?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   revision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -498,6 +526,7 @@ export type bingo_term_setsUncheckedUpdateWithoutPreparationInput = {
 }
 
 export type bingo_term_setsUncheckedUpdateManyWithoutPreparationInput = {
+  config_hash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   id?: Prisma.StringFieldUpdateOperationsInput | string
   config?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   revision?: Prisma.IntFieldUpdateOperationsInput | number
@@ -508,6 +537,7 @@ export type bingo_term_setsUncheckedUpdateManyWithoutPreparationInput = {
 
 
 export type bingo_term_setsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  config_hash?: boolean
   id?: boolean
   game_id?: boolean
   config?: boolean
@@ -518,6 +548,7 @@ export type bingo_term_setsSelect<ExtArgs extends runtime.Types.Extensions.Inter
 }, ExtArgs["result"]["bingo_term_sets"]>
 
 export type bingo_term_setsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  config_hash?: boolean
   id?: boolean
   game_id?: boolean
   config?: boolean
@@ -528,6 +559,7 @@ export type bingo_term_setsSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
 }, ExtArgs["result"]["bingo_term_sets"]>
 
 export type bingo_term_setsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  config_hash?: boolean
   id?: boolean
   game_id?: boolean
   config?: boolean
@@ -538,6 +570,7 @@ export type bingo_term_setsSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
 }, ExtArgs["result"]["bingo_term_sets"]>
 
 export type bingo_term_setsSelectScalar = {
+  config_hash?: boolean
   id?: boolean
   game_id?: boolean
   config?: boolean
@@ -546,7 +579,7 @@ export type bingo_term_setsSelectScalar = {
   updated_at?: boolean
 }
 
-export type bingo_term_setsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "game_id" | "config" | "revision" | "created_at" | "updated_at", ExtArgs["result"]["bingo_term_sets"]>
+export type bingo_term_setsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"config_hash" | "id" | "game_id" | "config" | "revision" | "created_at" | "updated_at", ExtArgs["result"]["bingo_term_sets"]>
 export type bingo_term_setsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   preparation?: boolean | Prisma.bingo_preparationsDefaultArgs<ExtArgs>
 }
@@ -563,6 +596,7 @@ export type $bingo_term_setsPayload<ExtArgs extends runtime.Types.Extensions.Int
     preparation: Prisma.$bingo_preparationsPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    config_hash: string | null
     id: string
     game_id: string
     config: runtime.JsonValue
@@ -652,8 +686,8 @@ export interface bingo_term_setsDelegate<ExtArgs extends runtime.Types.Extension
    * // Get first 10 Bingo_term_sets
    * const bingo_term_sets = await prisma.bingo_term_sets.findMany({ take: 10 })
    *
-   * // Only select the `id`
-   * const bingo_term_setsWithIdOnly = await prisma.bingo_term_sets.findMany({ select: { id: true } })
+   * // Only select the `config_hash`
+   * const bingo_term_setsWithConfig_hashOnly = await prisma.bingo_term_sets.findMany({ select: { config_hash: true } })
    *
    */
   findMany<T extends bingo_term_setsFindManyArgs>(args?: Prisma.SelectSubset<T, bingo_term_setsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$bingo_term_setsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -697,9 +731,9 @@ export interface bingo_term_setsDelegate<ExtArgs extends runtime.Types.Extension
    *   ]
    * })
    *
-   * // Create many Bingo_term_sets and only return the `id`
-   * const bingo_term_setsWithIdOnly = await prisma.bingo_term_sets.createManyAndReturn({
-   *   select: { id: true },
+   * // Create many Bingo_term_sets and only return the `config_hash`
+   * const bingo_term_setsWithConfig_hashOnly = await prisma.bingo_term_sets.createManyAndReturn({
+   *   select: { config_hash: true },
    *   data: [
    *     // ... provide data here
    *   ]
@@ -788,9 +822,9 @@ export interface bingo_term_setsDelegate<ExtArgs extends runtime.Types.Extension
    *   ]
    * })
    *
-   * // Update zero or more Bingo_term_sets and only return the `id`
-   * const bingo_term_setsWithIdOnly = await prisma.bingo_term_sets.updateManyAndReturn({
-   *   select: { id: true },
+   * // Update zero or more Bingo_term_sets and only return the `config_hash`
+   * const bingo_term_setsWithConfig_hashOnly = await prisma.bingo_term_sets.updateManyAndReturn({
+   *   select: { config_hash: true },
    *   where: {
    *     // ... provide filter here
    *   },
@@ -993,6 +1027,7 @@ export interface Prisma__bingo_term_setsClient<T, Null = never, ExtArgs extends 
  * Fields of the bingo_term_sets model
  */
 export interface bingo_term_setsFieldRefs {
+  readonly config_hash: Prisma.FieldRef<"bingo_term_sets", 'String'>
   readonly id: Prisma.FieldRef<"bingo_term_sets", 'String'>
   readonly game_id: Prisma.FieldRef<"bingo_term_sets", 'String'>
   readonly config: Prisma.FieldRef<"bingo_term_sets", 'Json'>

@@ -153,3 +153,7 @@ vortäuschen. Die bestehende Templateverwaltung trennt globale Bearbeitung von
 zulässiger Druckauswahl: nur Admin bearbeitet, berechtigter Bingo-Manager liest
 System/aktive Druckvorlagen und wählt sie für eigene Events. Live-/Antwortvorlagen
 bleiben separat. Vertrag und Versionierung: [Bingo-Druckvorlagen V4](bingo-print-templates-v4.md).
+
+### Bingo-Matching (Vertragsversion 2)
+
+Die neue gezielte Erweiterung ist in [bingo-matching.md](./bingo-matching.md) beschrieben: unabhängige Medien-/Kartenantwort, unveränderliche spielgebundene Fassung, 90 Verwaltungszeilen bei unverändertem 75er-Regelkern und aktuelle Berechtigungsprüfung. Bestehende V1-Karten-/Laufzeitverträge bleiben erhalten. Vollständige Zuordnungen und Medienbytes gehören ausdrücklich nicht in regelmäßige Statusabfragen. Praktische Nachweise und Grenzen stehen im zugehörigen Matching-Abnahmebericht.

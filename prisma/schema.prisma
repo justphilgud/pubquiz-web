@@ -1609,11 +1609,30 @@ model game_drafts {
 }
 
 model bingo_preparations {
+  matching_assets bingo_matching_assets[]
   term_sets bingo_term_sets[]
   game_id String @id @db.Uuid
   revision Int @default(0)
   game game_drafts @relation(fields:[game_id],references:[id],onDelete:Restrict)
   @@schema("pubquiz")
+}
+model bingo_matching_assets {
+ variant String @db.VarChar(80)
+ answers Json
+ id String @id @db.Uuid
+ game_id String @db.Uuid
+ source_question_id Int
+ source_media_id Int
+ source_revision String @db.VarChar(64)
+ kind String @db.VarChar(5)
+ content_type String @db.VarChar(80)
+ sha256 String @db.VarChar(64)
+ content Bytes
+ created_at DateTime @default(now()) @db.Timestamptz(3)
+ preparation bingo_preparations @relation(fields:[game_id],references:[game_id],onDelete:Restrict)
+ @@unique([game_id,source_media_id,source_revision])
+ @@index([game_id],map:"bingo_matching_assets_game")
+ @@schema("pubquiz")
 }
 model bingo_rounds {
   term_snapshot Json?
@@ -1853,6 +1872,7 @@ model bingo_event_round_cards {
 }
 
 model bingo_term_sets {
+ config_hash String? @db.VarChar(64)
  id String @id @db.Uuid
  game_id String @db.Uuid
  config Json

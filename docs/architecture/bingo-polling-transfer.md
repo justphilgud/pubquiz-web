@@ -66,3 +66,7 @@ Die echten drei Route Handler laufen über einen lokalen HTTP-Server; nur die
 Sessionauflösung wird für diese Messung auf synthetischen Admin 1 gebunden.
 Die zusätzliche Browserabnahme verwendet echte frische Passwortanmeldungen.
 Kein Neon-/Production-Verkehr, kein TLS, keine Hochrechnung als Messwert.
+
+### Bingo-Matching (Vertragsversion 2)
+
+Die neue gezielte Erweiterung ist in [bingo-matching.md](./bingo-matching.md) beschrieben: unabhängige Medien-/Kartenantwort, unveränderliche spielgebundene Fassung, 90 Verwaltungszeilen bei unverändertem 75er-Regelkern und aktuelle Berechtigungsprüfung. Bestehende V1-Karten-/Laufzeitverträge bleiben erhalten. Vollständige Zuordnungen und Medienbytes gehören ausdrücklich nicht in regelmäßige Statusabfragen. Praktische Nachweise und Grenzen stehen im zugehörigen Matching-Abnahmebericht.
