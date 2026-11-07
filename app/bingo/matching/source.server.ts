@@ -22,7 +22,7 @@ export function projectMatchingSource(q:SourceRow){
   media.push({id:m.medien_id,kind,variant:slot?.key??(kind==='AUDIO'?'question_audio':kind==='VIDEO'?'question_video':'question_image')});
  }
  for(const m of [...q.antwortfelder.flatMap(f=>f.medien),...q.antworten.flatMap(a=>a.medien)])if(m.datei&&m.slot_key==='answer_image'&&getQuestionMediaTypeFromName(m.medientyp.medientyp)==='IMAGE')media.push({id:m.medien_id,kind:'IMAGE',variant:'answer_image'});
- return {id:q.fragen_id,title:q.frage,template:q.source_vorlage?.name??q.vorlage?.name??'Allgemeine Frage',revision,media,answers:matchingAnswers(q.antwortfelder.map(f=>({id:f.antwortfeld_id,label:f.label,solutions:f.loesungen.map(s=>s.loesung_text)})),q.antworten.map(a=>({id:a.antwort_id,text:a.antwort}))),browserSpeechOnly:!media.some(m=>m.kind==='AUDIO')};
+ return {id:q.fragen_id,title:q.frage,template:q.source_vorlage?.name??q.vorlage?.name??'Allgemeine Frage',revision,media,answers:matchingAnswers(q.antwortfelder.map(f=>({id:f.antwortfeld_id,label:f.label,solutions:f.loesungen.map(s=>s.loesung_text)})),q.antworten.map(a=>({id:a.antwort_id,text:a.antwort}))),browserSpeechOnly:media.length===0};
 }
 export async function authorizedSource(tx:Prisma.TransactionClient,userId:number,seriesId:number,questionId:number){
  if(!Number.isSafeInteger(questionId)||questionId<1)throw new MatchingError('Quizquelle nicht gefunden oder nicht berechtigt.');

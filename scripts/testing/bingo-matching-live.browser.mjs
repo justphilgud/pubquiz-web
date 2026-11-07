@@ -5,9 +5,8 @@ export async function matchingLiveBrowser({ s, context, fixture, origin, out, ta
     const game = fixture.games.find(g => g.prepared), route = `/bingo/${game.gameId}/moderation`;
     await goto(s, route);
     await until(async () => /Erste Runde starten|Aktuelle Zahl/.test(await text(s)), 'moderation ready');
-    const state = () => evaluate(s, `fetch('/api/bingo/live/${game.gameId}').then(r=>r.json())`), confirm = async (label) => { await button(s, label); await button(s, 'Bestätigen'); await until(() => query(s, '[role=dialog]', '===null'), 'confirmation closed'); await delay(400); };
-    if (!(await state()).live)
-        await confirm('Erste Runde starten');
+    let cached=null,etag=null,readAt=0;const state=async()=>{if(cached&&Date.now()-readAt<700)return cached;const result=await evaluate(s,`fetch('/api/bingo/live/${game.gameId}',{headers:${JSON.stringify(etag?{'If-None-Match':etag}:{})}}).then(async r=>({status:r.status,etag:r.headers.get('etag'),body:r.status===304?null:await r.json()}))`);readAt=Date.now();if(result.status===200){cached=result.body;etag=result.etag;}else if(result.status!==304)throw Error('Synthetic status read failed: '+result.status);return cached;}, confirm = async (label) => { await button(s, label); await button(s, 'Bestätigen'); await until(() => query(s, '[role=dialog]', '===null'), 'confirmation closed'); await delay(400); };
+    if((await state()).live?.state.run.status==='ENDED'){await goto(s,route+'?new=1');await confirm('Erste Runde starten');cached=null;etag=null;readAt=0;}else if(!(await state()).live)await confirm('Erste Runde starten');
     await until(async () => !!(await state()).live, 'run started');
     let view = await state();
     if (view.live.state.run.status !== 'RUNNING')
@@ -36,17 +35,17 @@ export async function matchingLiveBrowser({ s, context, fixture, origin, out, ta
     await delay(700);
     assert.ok(Math.abs(await query(p, 'audio', '.currentTime') - pauseAt) < 0.2);
     await button(s, 'Präsentationsmedium starten');
-    await until(() => query(p, 'audio', '?.paused===false'), 'media resumes');
-    assert.ok(await query(p, 'audio', '.currentTime') >= pauseAt - .2);
-    await button(s, 'Präsentationsmedium erneut abspielen');
-    await until(() => query(p, 'audio', '?.currentTime<3&&!document.querySelector("audio").paused'), 'replay from beginning');
+    await until(() => query(p, 'audio', '?.paused===false&&document.querySelector("audio").currentTime>='+String(pauseAt-.2)), 'media resumes at saved position');
+    await evaluate(p,'window.__matchingPriorAudio=document.querySelector("audio");true');await button(s, 'Präsentationsmedium erneut abspielen');
+    await until(()=>query(p,'audio','!==window.__matchingPriorAudio&&!document.querySelector("audio").paused'),'fresh replay media node');await until(async()=>{const v=await state();return v.live.state.playback.action==='REPLAY'&&v.live.state.playback.position===0},'replay starts from persisted zero');
     passed.push('separate audience: activation, actual audio play/pause/resume/replay and no polling restarts');
+    const mediaGeometry=await evaluate(p,"(()=>{const e=document.querySelector('[aria-label=\"Zugeordneter Präsentationsinhalt\"]'),r=e.getBoundingClientRect(),o=e.querySelector('output')?.getBoundingClientRect();return{width:e.clientWidth,scrollWidth:e.scrollWidth,height:e.clientHeight,scrollHeight:e.scrollHeight,contained:!o||o.left>=r.left-1&&o.right<=r.right+1&&o.top>=r.top-1&&o.bottom<=r.bottom+1}})()");assert.ok(mediaGeometry.scrollWidth<=mediaGeometry.width&&mediaGeometry.scrollHeight<=mediaGeometry.height&&mediaGeometry.contained,'countdown is contained without scrollbars');
     await screenshot(s, 'moderation-laptop', 1366, 768);
     await screenshot(p, 'presentation-laptop', 1366, 768);
     await screenshot(s, 'moderation-mobile', 390, 844);
     await screenshot(p, 'presentation-1080', 1920, 1080);
     await screenshot(p, 'presentation-mobile', 390, 844);
-    await call('Emulation.setDeviceMetricsOverride', { width: 1366, height: 768, deviceScaleFactor: 1, mobile: false }, s);
+    await call('Emulation.setDeviceMetricsOverride', { width: 1366, height: 768, deviceScaleFactor: 1, mobile: false }, s);await call('Emulation.setDeviceMetricsOverride',{width:1366,height:768,deviceScaleFactor:1,mobile:false},p);
     await confirm('Pausieren');
     await until(async () => (await state()).live.state.run.status === 'PAUSED', 'game paused');
     await until(() => query(p, 'audio', '?.paused===true'), 'game pause stops media');
@@ -72,7 +71,7 @@ export async function matchingLiveBrowser({ s, context, fixture, origin, out, ta
     for (const [n, type] of [[2, 'audio'], [3, 'audio'], [4, 'img'], [5, 'img'], [6, 'audio'], [7, 'video']]) {
         if (!(await already()).includes(n))
             await draw(n);
-        await until(() => query(p, type, '!==null'), 'mixed media ' + n);
+        await until(()=>query(p,'[data-number="'+n+'"]','.dataset.state==="current"'),'audience current number '+n);await until(() => query(p, '[aria-label="Zugeordneter Präsentationsinhalt"] '+type, '!==null'), 'mixed media ' + n);
         if (type === 'audio' || type === 'video') {
             await until(() => query(p, type, '.paused===true'), 'next draw stops prior playback');
             if (await evaluate(p, '[...document.querySelectorAll("button")].some(b=>b.textContent==="Präsentation freigeben")'))
@@ -81,7 +80,7 @@ export async function matchingLiveBrowser({ s, context, fixture, origin, out, ta
             await until(() => query(p, type, '.paused===false'), 'mixed actual play ' + n);
         }
         else
-            await until(() => query(p, 'img', '?.complete&&document.querySelector("img").naturalWidth>0'), 'image loaded ' + n);
+            await until(() => query(p, '[aria-label="Zugeordneter Präsentationsinhalt"] img', '.naturalWidth>0'), 'image loaded ' + n);
     }
     passed.push('original/reverse/bitcrush, flag, outline, stored speech and actual video across draw changes');
     await button(s, 'Begriff auflösen');
@@ -112,7 +111,7 @@ export async function matchingLiveBrowser({ s, context, fixture, origin, out, ta
     assert.equal((await state()).live.state.run.rounds.length, 2);
     passed.push('round transition persists through full moderator reload');
     await confirm('Runde abschließen');
-    await evaluate(s, 'document.querySelector("summary[aria-label=\"Weitere Aktionen\"]").click()');
+    await evaluate(s, '[...document.querySelectorAll("summary")].find(e=>e.getAttribute("aria-label")==="Weitere Aktionen").click()');
     await confirm('Event abschließen');
     await until(async () => (await state()).live.state.run.status === 'ENDED', 'event ended');
     passed.push('event completion and unchanged numeric round');

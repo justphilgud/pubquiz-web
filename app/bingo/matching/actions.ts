@@ -15,7 +15,7 @@ export async function getMatchingSource(gameId:string,questionId:number,assetId?
  if(assetId&&retainedActor){try{return {success:true as const,item:{answers:await readRetainedAnswers(retainedActor.actor.userId,gameId,assetId)}};}catch{return {success:false as const};}}
  const {actor}=await requireActor();try{const source=await prisma.$transaction(async tx=>{const {game}=await preparationContext(tx,actor.userId,gameId);return authorizedSource(tx,actor.userId,game.eventreihe_id,questionId);});
   const checked=await Promise.all(source.view.media.map(async m=>({medium:m,available:await matchingMediaAvailable(matchingMediaRows(source.row).find(r=>r.medien_id===m.id)!.datei,m.kind)})));
-  const media=checked.filter(m=>m.available).map(m=>m.medium);return {success:true as const,item:{...source.view,media,browserSpeechOnly:!media.some(m=>m.kind==='AUDIO')}};
+  const media=checked.filter(m=>m.available).map(m=>m.medium);return {success:true as const,item:{...source.view,media,browserSpeechOnly:source.view.browserSpeechOnly}};
  }catch{return {success:false as const};}
 }
 export async function findMatchingSources(gameId:string,input:{search:string;template:string;kind:string;page:number}){

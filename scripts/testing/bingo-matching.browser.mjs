@@ -1,3 +1,5 @@
+import {matchingPdfDownload} from './bingo-matching-pdf.browser.mjs';
+import {uploadMatchingFixtures} from './bingo-matching-upload.browser.mjs';
 import { matchingLiveBrowser } from './bingo-matching-live.browser.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -15,6 +17,7 @@ if (!chrome)
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'bingo-matching-browser-')), browser = spawn(chrome, ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-background-networking', '--no-first-run', `--user-data-dir=${profile}`, '--remote-debugging-port=0', 'about:blank'], { stdio: 'ignore' });
 let ws, id = 0, dialog = false, allowNavigation = false;
 const requests = new Map(), passed = [];
+const appendProgress=passed.push.bind(passed);passed.push=(...items)=>{const count=appendProgress(...items);fs.writeFileSync(path.join(out,'progress-'+(process.argv.includes('--live-only')?'live':process.argv.includes('--editor-only')?'editor':'other')+'.json'),JSON.stringify({origin,passed},null,2));return count;};
 const delay = ms => new Promise(r => setTimeout(r, ms));
 async function until(f, m, timeout = 60000) { const end = Date.now() + timeout; while (Date.now() < end) {
     if (await f())
@@ -24,7 +27,7 @@ async function until(f, m, timeout = 60000) { const end = Date.now() + timeout; 
 function call(method, params = {}, sessionId) { return new Promise((resolve, reject) => { const key = ++id, timer = setTimeout(() => { requests.delete(key); reject(Error('CDP timeout ' + method)); }, 30000); requests.set(key, { resolve: r => { clearTimeout(timer); resolve(r); }, reject: e => { clearTimeout(timer); reject(e); } }); ws.send(JSON.stringify({ id: key, method, params, sessionId })); }); }
 async function evaluate(s, expression) { const r = await call('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true, userGesture: true }, s); if (r.exceptionDetails)
     throw Error(r.exceptionDetails.exception?.description || r.exceptionDetails.text); return r.result?.value; }
-async function tab(context) { const t = await call('Target.createTarget', { url: 'about:blank', browserContextId: context }); const s = (await call('Target.attachToTarget', { targetId: t.targetId, flatten: true })).sessionId; await call('Page.enable', {}, s); return s; }
+async function tab(context) { const t = await call('Target.createTarget', { url: 'about:blank', browserContextId: context }); const s = (await call('Target.attachToTarget', { targetId: t.targetId, flatten: true })).sessionId; await call('Page.enable', {}, s);if(hosted){if(!process.env.VERCEL_AUTOMATION_BYPASS_SECRET)throw Error('Existing authorized Preview automation credential required');await call('Fetch.enable',{patterns:[{urlPattern:origin+'/*',requestStage:'Request'}]},s);}return s; }
 async function goto(s, p) { const token = 'navigation-' + Date.now() + '-' + Math.random(); await evaluate(s, 'window.__matchingNavigationToken=' + JSON.stringify(token)); allowNavigation = true; try {
     await call('Page.navigate', { url: origin + p }, s);
     await until(() => evaluate(s, 'window.__matchingNavigationToken!==' + JSON.stringify(token) + '&&document.readyState==="complete"'), 'new document ready');
@@ -40,7 +43,7 @@ async function selectLabel(s, label, value) { await evaluate(s, `(()=>{const lab
 async function saveUi(s){const count=await query(s,'select','.options.length');await button(s,'Zuordnungssatz speichern');await until(()=>query(s,'select','.options.length>'+count),'new immutable version loaded');}
 async function check(s, selector, checked) { await evaluate(s, `(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)throw Error('Missing checkbox');if(e.checked!==${checked})e.click()})()`); await delay(120); }
 async function login(s, a) { await goto(s, '/login'); await until(() => evaluate(s, '!!document.querySelector("[name=email]")'), 'login ready'); await set(s, '[name=email]', a.email); await set(s, '[name=password]', a.password); await evaluate(s, 'document.querySelector("button[type=submit]").click()'); await until(() => evaluate(s, 'location.pathname!=="/login"'), 'fresh password login'); }
-async function screenshot(s, name, w, h) { await call('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile: w < 500 }, s); await delay(300); await evaluate(s, 'document.fonts.ready'); const r = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false }, s); fs.writeFileSync(path.join(out, name + '.png'), Buffer.from(r.data, 'base64')); assert.equal(await evaluate(s, 'document.documentElement.scrollWidth<=innerWidth'), true, 'page overflow ' + name); }
+async function screenshot(s, name, w, h) { await call('Emulation.setDeviceMetricsOverride', { width: w, height: h, deviceScaleFactor: 1, mobile: w < 500 }, s); await delay(300); await evaluate(s, 'document.fonts.ready.then(()=>true)'); const r = await call('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false }, s); fs.writeFileSync(path.join(out, name + '.png'), Buffer.from(r.data, 'base64')); assert.equal(await evaluate(s, 'document.documentElement.scrollWidth<=innerWidth'), true, 'page overflow ' + name); }
 try {
     let endpoint;
     await until(() => { try {
@@ -52,7 +55,7 @@ try {
     } }, 'Chrome start');
     ws = new WebSocket(`ws://127.0.0.1:${endpoint[0]}${endpoint[1]}`);
     await new Promise((r, j) => { ws.onopen = r; ws.onerror = j; });
-    ws.onmessage = e => { const m = JSON.parse(String(e.data)); if (m.method === 'Page.javascriptDialogOpening') {
+    ws.onmessage = e => { const m = JSON.parse(String(e.data));if(m.method==='Fetch.requestPaused'){const q=m.params;if(new URL(q.request.url).origin!==origin)throw Error('Foreign origin interception forbidden');const headers=Object.entries(q.request.headers).map(([name,value])=>({name,value:String(value)}));headers.push({name:'x-vercel-protection-bypass',value:process.env.VERCEL_AUTOMATION_BYPASS_SECRET});void call('Fetch.continueRequest',{requestId:q.requestId,headers},m.sessionId).catch(()=>{process.exitCode=1});return;} if (m.method === 'Page.javascriptDialogOpening') {
         dialog = true;
         void call('Page.handleJavaScriptDialog', { accept: allowNavigation }, m.sessionId);
         return;
@@ -64,7 +67,10 @@ try {
     const context = (await call('Target.createBrowserContext')).browserContextId, s = await tab(context);
     await login(s, accounts.find(a => a.role === 'admin'));
     passed.push('fresh synthetic Admin login');
-    if (!process.argv.includes('--live-only')) {
+    if(process.argv.includes('--verify-only')){const expected=JSON.parse(fs.readFileSync('.artifacts/matching-preview-deployment.json')).sha;const runtime=await evaluate(s,"fetch('/api/admin/monitoring').then(r=>r.json())");assert.equal(runtime.release,expected);assert.equal(runtime.environment,'preview');assert.equal(runtime.db.ok,true);fs.writeFileSync(path.join(out,'runtime-proof.json'),JSON.stringify({release:runtime.release,environment:runtime.environment,dbOk:runtime.db.ok},null,2));passed.push('actual authenticated runtime SHA and Preview database read');}
+    if(process.argv.includes('--pdf-only'))await matchingPdfDownload({s,context,fixture,out,goto,query,set,button,until,evaluate,call,screenshot,passed});
+    if(process.argv.includes('--upload-fixtures')){await uploadMatchingFixtures({s,origin,out,evaluate});passed.push('existing authenticated upload into own branch prefix');}
+    if (!process.argv.includes('--live-only')&&!process.argv.includes('--upload-fixtures')&&!process.argv.includes('--pdf-only')&&!process.argv.includes('--verify-only')) {
         const game = fixture.games.find(g => !g.prepared), route = `/bingo/${game.gameId}/matching?round=${game.rounds[0]}`;
         await goto(s, route);
         await until(() => query(s, '[data-matching-number="1"]', '!==null'), 'matching editor');
@@ -95,7 +101,7 @@ try {
         await button(s, 'Zahl beibehalten deaktivieren');
         await until(() => evaluate(s, 'document.querySelectorAll("[data-matching-number]").length===12'), 'range 15–26');
         for (let n = 15; n <= 26; n++)
-            await set(s, `[aria-label="Präsentationstext Kugel ${n}"]`, `${rangePrefix} ${n}`);
+            {await set(s, `[aria-label="Präsentationstext Kugel ${n}"]`, `${rangePrefix} ${n}`);assert.equal(await query(s,`[aria-label="Eigener Kartentext Kugel ${n}"]`,'.value'),`${rangePrefix} ${n}`,'coupled card control displays its actual printed text');}
         await saveUi(s);
         await goto(s, route);
         await until(() => query(s, '[aria-label="Präsentationstext Kugel 15"]', '?.value===' + JSON.stringify(rangePrefix + ' 15')), 'range retained');
@@ -133,6 +139,7 @@ try {
                 await until(() => query(s, 'button[type=submit]', '.disabled===true'), 'saved baseline');
             }
         passed.push('all six original/reverse × artist/title/combination UI saves; variant preserves answer');
+        await set(s,'#kind-8','MEDIA');for(const [search,label]of [['Matching QA Browser-Sprachausgabe','Browser-Sprachausgabe ohne Aufnahme'],['Matching QA fehlende Aufnahme','fehlende gespeicherte Mediendatei']]){await button(s,'Kugel 8: Aus Quizbestand auswählen');await set(s,'[role=dialog] input[maxlength="120"]',search);await button(s,'Suchen');await until(()=>evaluate(s,`[...document.querySelectorAll('[role=dialog] button')].some(b=>b.textContent.includes(${JSON.stringify(search)}))`),'negative source result');await evaluate(s,`[...document.querySelectorAll('[role=dialog] button')].find(b=>b.textContent.includes(${JSON.stringify(search)})).click()`);await until(async()=>/keine ladbare Mediendatei/.test(await text(s)),'unavailable source explained');assert.equal(await evaluate(s,'[...[...document.querySelectorAll("[role=dialog] label")].find(l=>l.textContent.startsWith("Medium und Variante")).querySelector("select").options].length'),1);assert.equal(await evaluate(s,'[...document.querySelectorAll("[role=dialog] button")].find(b=>b.textContent==="Zuordnung übernehmen").disabled'),true);passed.push(label+' rejected without invented media');await button(s,'Schließen');}await goto(s,route);
         await button(s, '1–90');
         assert.equal(await evaluate(s, 'document.querySelectorAll("[data-matching-number]").length'), 90);
         assert.match(await text(s), /Außerhalb 75er-Modus/);
@@ -147,18 +154,19 @@ try {
         await until(async () => /inzwischen geändert/.test(await text(stale)), 'CAS visible');
         assert.equal(await query(stale, 'input[maxlength="80"]', '.value'), 'Konflikt bleibt erhalten');
         passed.push('two-tab CAS rejects stale save and preserves local edit');
+        const assetPath=await evaluate(s,"new URL(document.querySelector('[data-matching-number=\"1\"] audio').src).pathname");
         for (const role of ['manager', 'editor', 'management', 'none']) {
             const ctx = (await call('Target.createBrowserContext')).browserContextId, t = await tab(ctx);
             await login(t, accounts.find(a => a.role === role));
             await goto(t, route);
             await until(async () => role === 'manager' ? /Bingo-Matching-Tabelle|Zuordnungssatz/.test(await text(t)) : /404|not be found|nicht gefunden/i.test(await text(t)), 'role ' + role);
-            passed.push('fresh ' + role + ' direct-link policy');
+            if(role!=='manager')assert.equal(await evaluate(t,`fetch(${JSON.stringify(assetPath)}).then(r=>r.status)`),404,'known immutable asset still checks fresh role');passed.push('fresh ' + role + ' direct-link and immutable asset policy');
             await call('Target.disposeBrowserContext', { browserContextId: ctx });
         }
     }
-    if (!process.argv.includes('--editor-only'))
+    if (!process.argv.includes('--editor-only')&&!process.argv.includes('--upload-fixtures')&&!process.argv.includes('--pdf-only')&&!process.argv.includes('--verify-only'))
         await matchingLiveBrowser({ s, context, fixture, origin, out, tab, goto, query, text, set, button, until, evaluate, call, delay, screenshot, passed });
-    fs.writeFileSync(path.join(out, 'results.json'), JSON.stringify({ origin, passed, productionTouched: false, complete: false }, null, 2));
+    const phase=process.argv.includes('--pdf-only')?'pdf':process.argv.includes('--live-only')?'live':process.argv.includes('--editor-only')?'editor':process.argv.includes('--upload-fixtures')?'upload':'full';fs.writeFileSync(path.join(out,phase+'-results.json'),JSON.stringify({origin,phase,passed,phasePassed:true,productionTouched:false},null,2));
     console.log(JSON.stringify({ origin, passed }));
 }
 catch (e) {

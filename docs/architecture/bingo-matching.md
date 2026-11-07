@@ -156,3 +156,5 @@ vollständiger isolierter Snapshot-/Restorevergleich. Menschliche und automatisc
 Browsernachweise, konkrete Viewports, PDFs und DB-/HTTP-Messwerte getrennt im Bericht.
 Historische Bootstrap- und Backup-Betriebspunkte werden dadurch nicht als behoben
 markiert. Echtes 90er-Bingo, kleinerer Ziehungspool, OCR und neue TTS gehören nicht dazu.
+
+Abnahme, konkrete Nachweise, Transfermessungen und Grenzen: [bingo-matching-acceptance.md](./bingo-matching-acceptance.md). Die Kartenbeschriftung bei Textkopplung wird abgeleitet und auch im gesperrten Eingabefeld entsprechend angezeigt; die manuelle Alternative bleibt erhalten. Fehlende gespeicherte Medien werden nicht als Browser-TTS ausgegeben. Der Audio-Countdown besitzt einen eigenen Inline-Size-Container und keine scrollbare Innenfläche.

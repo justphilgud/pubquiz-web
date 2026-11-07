@@ -1,0 +1,13 @@
+import fs from 'node:fs';import path from 'node:path';import crypto from 'node:crypto';import {build} from 'esbuild';
+/** Uses the existing authenticated upload contract; no read/write credential is exported. */
+export async function uploadMatchingFixtures({s,origin,out,evaluate}){
+ if(origin!=='https://pubquiz-web-git-codex-bingo-matching-table-just-phil-gud.vercel.app')throw Error('EXACT_PREVIEW_REQUIRED');
+ const prefix='preview/'+crypto.createHash('sha256').update('codex/bingo-matching-table').digest('hex');
+ const bundle=await build({stdin:{contents:`import{uploadPresigned}from'@vercel/blob/client';window.__matchingUpload=async(pathname,base64,type,slotKey,templateId)=>{if(location.origin!==${JSON.stringify(origin)}||!pathname.startsWith(${JSON.stringify(prefix+'/question-media/')}))throw Error('OWN_PREVIEW_PREFIX_REQUIRED');const file=new File([Uint8Array.from(atob(base64),c=>c.charCodeAt(0))],'fixture.'+pathname.split('.').at(-1),{type});const mediaType=type.startsWith('image/')?'IMAGE':type.startsWith('video/')?'VIDEO':'AUDIO';const result=await uploadPresigned(pathname,file,{access:'public',handleUploadUrl:'/api/question-media-upload',clientPayload:JSON.stringify({target:'QUESTION',questionId:null,mediaType,slotKey,templateId})});return{url:result.url,pathname:result.pathname}};`,resolveDir:process.cwd()},bundle:true,write:false,platform:'browser',format:'iife'});
+ await evaluate(s,bundle.outputFiles[0].text);const uploaded=[];
+ for(const [id,name,slot,template,type]of [[920000,'original.wav','music_original_audio','musik_rueckwaerts','audio/wav'],[920001,'reverse.wav','question_audio','standard','audio/wav'],[920002,'bitcrush.wav','question_audio','standard','audio/wav'],[920003,'flag.png','question_image','standard','image/png'],[920004,'outline.png','question_image','standard','image/png'],[920005,'speech.wav','lyrics_tts_audio','uebersetzt_vorgelesen','audio/wav']]){
+  const bytes=fs.readFileSync(path.resolve('public/medien/bingo-matching-review',name)),pathname=`${prefix}/question-media/${slot}/${type.split('/')[0]}/matching-review-${crypto.randomUUID()}.${name.split('.').at(-1)}`;
+  const result=await evaluate(s,`window.__matchingUpload(${JSON.stringify(pathname)},${JSON.stringify(bytes.toString('base64'))},${JSON.stringify(type)},${JSON.stringify(slot)},${JSON.stringify(template)})`);if(!result.pathname.startsWith(prefix+'/question-media/'))throw Error('FOREIGN_PREFIX_RETURNED');uploaded.push({id,name,...result});
+ }
+ fs.writeFileSync(path.join(out,'uploaded-synthetic-media.json'),JSON.stringify({origin,prefix,uploaded,credentialsExported:false,foreignMediaModified:false},null,2));
+}

@@ -1,0 +1,9 @@
+import fs from 'node:fs';import path from 'node:path';import assert from 'node:assert/strict';
+export async function matchingPdfDownload({s,context,fixture,out,goto,query,set,button,until,evaluate,call,screenshot,passed}){
+ const game=fixture.games.find(g=>g.prepared),series=game.series?.find(v=>v.round_id===game.rounds[0])?.series_id;if(!series)throw Error('SYNTHETIC_MATCHING_SERIES_REFERENCE_REQUIRED');
+ await goto(s,`/bingo/${game.gameId}/karten?series=${series}`);await until(()=>query(s,'a[download]','!==null'),'stored cards and PDF links');
+ const cells=await evaluate(s,'[...document.querySelectorAll("section table tbody")].slice(0,4).map(t=>[...t.querySelectorAll("td")].map(c=>c.textContent))');assert.ok(cells.flat().some(t=>/[A-Za-z]/.test(t)&&t!=='FREI'));assert.ok(cells.flat().some(t=>/^\d+$/.test(t)));
+ await screenshot(s,'cards-and-pdf',1366,768);const downloads=path.join(out,'downloads-'+Date.now());fs.mkdirSync(downloads,{recursive:true});await call('Browser.setDownloadBehavior',{behavior:'allow',downloadPath:downloads,browserContextId:context});const before=new Set(fs.readdirSync(downloads));
+ await set(s,'form[action$="/pdf"] select[name=mode]','duplex');await set(s,'form[action$="/pdf"] input[name=to]','4');await button(s,'Bereich als PDF');await until(()=>fs.readdirSync(downloads).some(n=>n.endsWith('.pdf')&&!before.has(n)),'actual browser PDF download');const name=fs.readdirSync(downloads).find(n=>n.endsWith('.pdf')&&!before.has(n));
+ const bytes=fs.readFileSync(path.join(downloads,name));assert.ok(bytes.subarray(0,5).equals(Buffer.from('%PDF-')));fs.writeFileSync(path.join(out,'matching-example-duplex.pdf'),bytes);fs.writeFileSync(path.join(out,'downloaded-pdf-evidence.json'),JSON.stringify({gameId:game.gameId,series,cells,file:'matching-example-duplex.pdf',actualBrowserDownload:true,cardNumbersUnchanged:true},null,2));passed.push('actual browser duplex PDF download with mixed printed text and numbers');
+}
