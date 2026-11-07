@@ -1,0 +1,73 @@
+import {createHash} from "node:crypto";
+import {execFileSync} from "node:child_process";
+import {BINGO_MATCHING_PLAN as plan,assertBingoMatchingManifest} from "./production-preflight-bingo-matching-plan";
+import {migrationFiles} from "./production-preflight";
+import {compareFullSchema,DIAGNOSTIC_COLUMNS_SQL,DIAGNOSTIC_CATALOG_SQL,SCHEMA_OBJECTS_SQL,type SchemaEvidence} from "./production-preflight-schema";
+type Row=Record<string,unknown>;
+/** Exact candidate SQL only in the secret-free, network-isolated disposable database. */
+export function testBingoMatchingDelta(sql:(v:string|Buffer)=>string,query:(v:string)=>unknown,baselineSha:string,candidateSha:string,manifest:SchemaEvidence["manifest"],columns:unknown,catalog:unknown,objects:unknown){
+ const show=(sha:string,path:string)=>execFileSync("git",["show",`${sha}:${path}`],{encoding:"utf8"});
+ assertBingoMatchingManifest(baselineSha,candidateSha,manifest,migrationFiles(candidateSha),show(baselineSha,"prisma/schema.prisma"),show(candidateSha,"prisma/schema.prisma"));
+ const migration=show(candidateSha,`prisma/migrations/${plan.migrations[0].name}/migration.sql`);
+ const identifier=(v:string)=>{if(!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(v))throw Error("IDENTIFIER");return `"${v}"`;};
+ const oldTables=(objects as {relations:{schema:string;name:string;kind:string}[]}).relations.filter(r=>r.kind==="r"&&r.name!=="_prisma_migrations");
+ const rows=()=>sql(oldTables.map(t=>`SELECT '${t.schema}.${t.name}' AS name,coalesce(jsonb_agg(v ORDER BY v::text),'[]')::text AS rows FROM (SELECT to_jsonb(t)${t.name==='bingo_term_sets'?"-'config_hash'":""} v FROM ${identifier(t.schema)}.${identifier(t.name)} t) s`).join(" UNION ALL ")+" ORDER BY name");
+ const game="97000000-0000-4000-8000-000000000001",round="97000000-0000-4000-8000-000000000002",series="97000000-0000-4000-8000-000000000003",card="97000000-0000-4000-8000-000000000005",run="98000000-0000-4000-8000-000000000001",set="97000000-0000-4000-8000-000000000006",asset="99000000-0000-4000-8000-000000000001";
+ const cells=JSON.stringify(Array.from({length:5},(_,r)=>Array.from({length:5},(_,c)=>r===2&&c===2?null:c*15+r+1)));
+ sql(`BEGIN;INSERT INTO pubquiz.users(id,name,email,password_hash,role,updated_at) VALUES(97000,'Isolated Matching','matching@example.invalid','not-a-login-hash','USER',NOW());
+ INSERT INTO pubquiz.eventreihen(eventreihe_id,name,slug,bingo_print_config) VALUES(97000,'Isolated Matching','isolated-matching','{"version":2}');
+ INSERT INTO pubquiz.game_drafts(id,eventart,eventreihe_id,titel,bingo_print_config,updated_at) VALUES('${game}','BINGO',97000,'Isolated Matching','{"version":2}',NOW());
+ INSERT INTO pubquiz.bingo_preparations(game_id) VALUES('${game}');
+ INSERT INTO pubquiz.bingo_rounds(id,game_id,position,label,term_snapshot) VALUES('${round}','${game}',1,'Legacy round','{"version":1}');
+ INSERT INTO pubquiz.bingo_term_sets(id,game_id,config) VALUES('${set}','${game}','{"version":1}');
+ INSERT INTO pubquiz.bingo_card_series(id,game_id,origin_round_id,code,card_count,request_id,request_hash,print_snapshot,created_by) VALUES('${series}','${game}','${round}','BG-AAAAAAAAAAAA',1,'97000000-0000-4000-8000-000000000004','${"a".repeat(64)}','{"version":4}',97000);
+ INSERT INTO pubquiz.bingo_cards(id,series_id,ordinal,printed_code,cells,layout_hash) VALUES('${card}','${series}',1,'BG-AAAAAAAAAAAA-0001','${cells}','${"b".repeat(64)}');
+ INSERT INTO pubquiz.bingo_round_series(round_id,series_id,game_id) VALUES('${round}','${series}','${game}');
+ INSERT INTO pubquiz.bingo_print_versions(series_id,version,snapshot,created_by) VALUES('${series}',2,'{"version":4}',97000);
+ INSERT INTO pubquiz.bingo_live_runs(id,game_id,round_id,eventreihe_id,status,created_by,round_snapshot,design_snapshot,visual_assets,audience_key,start_request_id,start_request_hash) VALUES('${run}','${game}','${round}',97000,'RUNNING',97000,'{}','{}','{}','${run}','${run}','${"c".repeat(64)}');
+ INSERT INTO pubquiz.bingo_live_cards(run_id,game_id,card_id,series_id) VALUES('${run}','${game}','${card}','${series}');
+ INSERT INTO pubquiz.bingo_live_events(run_id,revision,request_id,request_hash,actor_id,command) VALUES('${run}',1,'${run}','${"d".repeat(64)}',97000,'{"kind":"pause"}');COMMIT;`);
+ const before=rows(),expected={baselineSha,manifest,major:17,columns,catalog,objects};
+ const readSchema=()=>({major:17,columns:query(DIAGNOSTIC_COLUMNS_SQL),catalog:query(DIAGNOSTIC_CATALOG_SQL),objects:query(SCHEMA_OBJECTS_SQL)});
+ sql("SET lock_timeout='2s'; SET statement_timeout='30s';\n"+migration.replace(/COMMIT;\s*$/,"ROLLBACK;"));
+ if(rows()!==before||compareFullSchema(expected,readSchema(),baselineSha,manifest).status!=="PASS")throw Error("MATCHING_ROLLBACK_CHANGED_BASELINE");
+ const started=Date.now();sql("SET lock_timeout='2s'; SET statement_timeout='30s';\n"+migration);
+ if(rows()!==before||sql("SELECT count(*) FROM pubquiz.bingo_matching_assets").trim()!=="0"||sql("SELECT count(*) FROM pubquiz.bingo_term_sets WHERE config_hash IS NOT NULL").trim()!=="0")throw Error("MATCHING_EXISTING_ROWS_CHANGED");
+ const rejected=(statement:string)=>{let failed=false;try{sql(statement);}catch{failed=true;}if(!failed)throw Error("MATCHING_CONSTRAINT_NOT_ENFORCED");};
+ const fixtureSha=createHash("sha256").update(Buffer.from("52494646","hex")).digest("hex");
+ const insertAsset=(id=asset,gameId=game,kind="AUDIO",hash=fixtureSha,bytes="52494646")=>`INSERT INTO pubquiz.bingo_matching_assets(id,game_id,source_question_id,source_media_id,source_revision,kind,variant,content_type,sha256,answers,content) VALUES('${id}','${gameId}',1,1,'${"a".repeat(64)}','${kind}','question_audio','audio/wav','${hash}','[]',decode('${bytes}','hex'))`;
+ sql(`BEGIN;INSERT INTO pubquiz.bingo_term_sets(id,game_id,config,config_hash) VALUES('${asset}','${game}','{"version":2}','${"a".repeat(64)}');UPDATE pubquiz.bingo_rounds SET term_snapshot='{"version":2}' WHERE id='${round}';${insertAsset()};ROLLBACK;`);
+ rejected(`INSERT INTO pubquiz.bingo_term_sets(id,game_id,config) VALUES('${asset}','${game}','{"version":2}')`);
+ rejected(`INSERT INTO pubquiz.bingo_term_sets(id,game_id,config,config_hash) VALUES('${asset}','${game}','{"version":2}','bad')`);
+ rejected(`INSERT INTO pubquiz.bingo_term_sets(id,game_id,config) VALUES('${asset}','${game}','{"version":3}')`);
+ rejected(`UPDATE pubquiz.bingo_rounds SET term_snapshot='{"version":3}' WHERE id='${round}'`);
+ rejected(insertAsset(asset,run));rejected(insertAsset(asset,game,"TEXT"));rejected(insertAsset(asset,game,"AUDIO","bad"));rejected(insertAsset(asset,game,"AUDIO","a".repeat(64),""));
+ rejected(`UPDATE pubquiz.bingo_term_sets SET config='{"version":1,"changed":true}' WHERE id='${set}'`);rejected(`DELETE FROM pubquiz.bingo_term_sets WHERE id='${set}'`);
+ // The transaction is always rolled back; immutability failures use a savepoint.
+ const immutable=(change:string)=>{const result=sql(`BEGIN;${insertAsset()};SAVEPOINT probe;DO $probe$ BEGIN BEGIN ${change}; RAISE EXCEPTION 'MUTATION_ACCEPTED' USING ERRCODE='ZX001'; EXCEPTION WHEN SQLSTATE '23514' THEN IF SQLERRM<>'BINGO_RECORD_IMMUTABLE' THEN RAISE; END IF; END; END $probe$;SELECT encode(content,'hex')||':'||sha256||':'||encode(sha256(content),'hex') FROM pubquiz.bingo_matching_assets WHERE id='${asset}';ROLLBACK;`);if(!result.includes('52494646:'+fixtureSha+':'+fixtureSha))throw Error('MATCHING_ASSET_LOST');};
+ immutable(`UPDATE pubquiz.bingo_matching_assets SET answers='["changed"]' WHERE id='${asset}'`);immutable(`DELETE FROM pubquiz.bingo_matching_assets WHERE id='${asset}'`);
+ if(rows()!==before)throw Error("MATCHING_PROBES_CHANGED_HISTORY");
+ const actual=readSchema(),actualCatalog=actual.catalog as Record<string,Row[]>,actualObjects=actual.objects as Record<string,Row[]>;
+ const definitions=JSON.parse(sql(`BEGIN;
+ CREATE TEMP TABLE matching_expected_round(term_snapshot jsonb,CONSTRAINT expected_round CHECK(term_snapshot IS NULL OR (jsonb_typeof(term_snapshot)='object' AND term_snapshot->>'version' IN ('1','2'))));
+ CREATE TEMP TABLE matching_expected_terms(config jsonb,config_hash varchar(64),CONSTRAINT expected_terms CHECK(jsonb_typeof(config)='object' AND config->>'version' IN ('1','2')),CONSTRAINT expected_hash CHECK(config_hash IS NULL OR config_hash ~ '^[a-f0-9]{64}$'),CONSTRAINT expected_matching_hash CHECK(config->>'version'<>'2' OR config_hash IS NOT NULL));
+ SELECT json_object_agg(conname,pg_get_constraintdef(oid)) FROM pg_constraint WHERE connamespace=pg_my_temp_schema();ROLLBACK;`).split('\n').find(line=>line.startsWith('{'))!) as Record<string,string>;
+ const changes=[['bingo_rounds','bingo_round_terms_shape','expected_round'],['bingo_term_sets','bingo_term_sets_config_check','expected_terms'],['bingo_term_sets','bingo_term_sets_config_hash_check','expected_hash'],['bingo_term_sets','bingo_matching_config_hash','expected_matching_hash']];
+ const isChanged=(r:Row)=>r.schema==='pubquiz'&&changes.some(([table,name])=>r.table===table&&r.name===name);
+ for(const [table,name,key]of changes){const found=actualCatalog.constraints.filter(r=>r.schema==='pubquiz'&&r.table===table&&r.name===name);if(found.length!==1||found[0].definition!==definitions[key]||found[0].validated!==true)throw Error('MATCHING_CHECK_DEFINITION_CHANGED');}
+ const signatures=JSON.parse(sql(`BEGIN;
+ CREATE TABLE public.matching_expected_assets(id uuid PRIMARY KEY,game_id uuid NOT NULL REFERENCES pubquiz.bingo_preparations(game_id) ON DELETE RESTRICT,source_question_id integer NOT NULL CHECK(source_question_id>0),source_media_id integer NOT NULL CHECK(source_media_id>0),source_revision varchar(64) NOT NULL CHECK(source_revision ~ '^[a-f0-9]{64}$'),kind varchar(5) NOT NULL CHECK(kind IN ('AUDIO','IMAGE','VIDEO')),variant varchar(80) NOT NULL CHECK(variant ~ '^[a-z_]{1,80}$'),content_type varchar(80) NOT NULL CHECK(content_type::text IN ('audio/mpeg'::text,'audio/mp4'::text,'audio/wav'::text,'audio/ogg'::text,'video/mp4'::text,'video/webm'::text,'image/png'::text,'image/jpeg'::text,'image/webp'::text)),sha256 varchar(64) NOT NULL CHECK(sha256 ~ '^[a-f0-9]{64}$'),answers jsonb NOT NULL CHECK(jsonb_typeof(answers)='array'),content bytea NOT NULL CHECK(octet_length(content)>0 AND octet_length(content)<=104857600),created_at timestamptz(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,UNIQUE(game_id,source_media_id,source_revision));
+ CREATE INDEX ON public.matching_expected_assets(game_id);
+ SELECT json_agg(json_build_object('columns',(SELECT jsonb_agg(jsonb_build_object('name',a.attname,'type',format_type(a.atttypid,a.atttypmod),'required',a.attnotnull,'identity',a.attidentity,'generated',a.attgenerated,'default',pg_get_expr(d.adbin,d.adrelid)) ORDER BY a.attnum) FROM pg_attribute a LEFT JOIN pg_attrdef d ON d.adrelid=a.attrelid AND d.adnum=a.attnum WHERE a.attrelid=t.id AND a.attnum>0 AND NOT a.attisdropped),'constraints',(SELECT jsonb_agg(jsonb_build_object('definition',pg_get_constraintdef(c.oid),'validated',c.convalidated,'deferrable',c.condeferrable,'deferred',c.condeferred) ORDER BY pg_get_constraintdef(c.oid)) FROM pg_constraint c WHERE c.conrelid=t.id),'indexes',(SELECT jsonb_agg(jsonb_build_object('unique',i.indisunique,'primary',i.indisprimary,'keys',i.indkey::text,'classes',i.indclass::text,'collations',i.indcollation::text,'options',i.indoption::text,'predicate',pg_get_expr(i.indpred,i.indrelid),'expressions',pg_get_expr(i.indexprs,i.indrelid),'valid',i.indisvalid,'ready',i.indisready,'live',i.indislive) ORDER BY i.indkey::text,i.indisunique) FROM pg_index i WHERE i.indrelid=t.id))) FROM (VALUES('pubquiz.bingo_matching_assets'::regclass),('public.matching_expected_assets'::regclass)) t(id);ROLLBACK;`).split('\n').find(line=>line.startsWith('['))!) as unknown[];
+ if(JSON.stringify(signatures[0])!==JSON.stringify(signatures[1]))throw Error('MATCHING_NEW_TABLE_DEFINITION_CHANGED');
+ const triggerNames=['bingo_matching_assets_immutable','bingo_term_sets_immutable'];
+ for(const [i,table]of ['bingo_matching_assets','bingo_term_sets'].entries()){const found=actualObjects.triggers.filter(r=>r.schema==='pubquiz'&&r.name===triggerNames[i]);if(found.length!==1||found[0].definition!==`CREATE TRIGGER ${triggerNames[i]} BEFORE DELETE OR UPDATE ON pubquiz.${table} FOR EACH ROW EXECUTE FUNCTION pubquiz.bingo_immutable_record()`)throw Error('MATCHING_IMMUTABILITY_TRIGGER_CHANGED');}
+ const newTable=(r:Row)=>(r.schema??r.schemaname)==='pubquiz'&&(r.table??r.tablename??r.name)==='bingo_matching_assets';
+ const newColumn=(r:Row)=>r.schema==='pubquiz'&&r.table==='bingo_term_sets'&&r.column==='config_hash';
+ const addedColumn=(actual.columns as Row[]).filter(newColumn);if(addedColumn.length!==1||addedColumn[0].nullable!==true||addedColumn[0].type!=='character varying(64)'||addedColumn[0].default!==null)throw Error('MATCHING_HASH_COLUMN_CHANGED');
+ const baselineConstraints=(catalog as Record<string,Row[]>).constraints;
+ const projectedCatalog=Object.fromEntries(Object.entries(actualCatalog).map(([key,values])=>[key,key==='constraints'?[...values.filter(r=>!newTable(r)&&!isChanged(r)),...baselineConstraints.filter(isChanged)]:values.filter(r=>!newTable(r))]));
+ const projectedObjects={...actualObjects,relations:actualObjects.relations.filter(r=>!newTable(r)),triggers:actualObjects.triggers.filter(r=>!(r.schema==='pubquiz'&&triggerNames.includes(String(r.name))))};
+ if(compareFullSchema(expected,{major:17,columns:(actual.columns as Row[]).filter(r=>!newTable(r)&&!newColumn(r)),catalog:projectedCatalog,objects:projectedObjects},baselineSha,manifest).status!=='PASS')throw Error('UNEXPECTED_MATCHING_SCHEMA_DELTA');
+ return {status:'PASS',baselineSha,candidateSha,migrations:plan.migrations,elapsedMs:Date.now()-started,rowsUnchanged:true,onlyExpectedSchemaChanges:true,oldColumnProjectionCompatible:true,constraintsEnforced:true,immutableHistory:true,legacyRunPreserved:true,v2Accepted:true,assetIntegrity:true,noBackfill:true,newMatchingObjectsVerified:true,rollbackProbe:true,lockTimeoutMs:2000,statementTimeoutMs:30000,applicationRollbackRequiresReview:true};
+}
