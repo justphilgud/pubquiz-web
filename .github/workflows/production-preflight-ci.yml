@@ -33,6 +33,8 @@ jobs:
             candidate: 94f442cedad38f67973f3f4e1714758e1c4f99bd
           - baseline: 192f27848f723559e3e18a0b9fdbbeb169a10ed3
             candidate: 1ff5854dd716d5fb2559e3d5f4cf970e5f5d1696
+          - baseline: e877959f12d6d9ba4cb07a43dc273516b577f4cf
+            candidate: 0143de26461070d08b701ffee01a8ca4b7db3eac
     services:
       postgres:
         image: postgres:17
@@ -51,7 +53,7 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: node --import tsx --test --test-concurrency=1 scripts/operations/production-preflight.test.ts scripts/operations/production-preflight-plan.test.ts scripts/operations/production-preflight-bingo.test.ts scripts/operations/production-preflight-bingo-live.test.ts scripts/operations/production-preflight-bingo-event.test.ts scripts/operations/production-preflight-bingo-card.test.ts scripts/operations/production-preflight.integration.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/production-preflight-schema.integration.test.ts
+      - run: node --import tsx --test --test-concurrency=1 scripts/operations/production-preflight.test.ts scripts/operations/production-preflight-plan.test.ts scripts/operations/production-preflight-bingo.test.ts scripts/operations/production-preflight-bingo-live.test.ts scripts/operations/production-preflight-bingo-event.test.ts scripts/operations/production-preflight-bingo-card.test.ts scripts/operations/production-preflight-bingo-print-v4.test.ts scripts/operations/production-preflight.integration.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/production-preflight-schema.integration.test.ts
         env:
           CI: 'true'
           PREFLIGHT_TEST_DATABASE_URL: postgresql://preflight_ci:isolated-only@127.0.0.1:5432/preflight_ci

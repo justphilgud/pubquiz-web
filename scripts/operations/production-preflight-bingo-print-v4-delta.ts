@@ -1,0 +1,55 @@
+import {execFileSync} from "node:child_process";
+import {BINGO_PRINT_V4_PLAN as plan,assertBingoPrintV4Manifest} from "./production-preflight-bingo-print-v4-plan";
+import {migrationFiles} from "./production-preflight";
+import {compareFullSchema,DIAGNOSTIC_COLUMNS_SQL,DIAGNOSTIC_CATALOG_SQL,SCHEMA_OBJECTS_SQL,type SchemaEvidence} from "./production-preflight-schema";
+type Row=Record<string,unknown>;
+/** Secret-free, network-isolated disposable PostgreSQL only. No candidate app code. */
+export function testBingoPrintV4Delta(sql:(v:string|Buffer)=>string,query:(v:string)=>unknown,baselineSha:string,candidateSha:string,manifest:SchemaEvidence["manifest"],columns:unknown,catalog:unknown,objects:unknown){
+ const show=(sha:string,path:string)=>execFileSync("git",["show",`${sha}:${path}`],{encoding:"utf8"});
+ assertBingoPrintV4Manifest(baselineSha,candidateSha,manifest,migrationFiles(candidateSha),show(baselineSha,"prisma/schema.prisma"),show(candidateSha,"prisma/schema.prisma"));
+ const migration=show(candidateSha,`prisma/migrations/${plan.migrations[0].name}/migration.sql`);
+ const identifier=(v:string)=>{if(!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(v))throw Error("IDENTIFIER");return `"${v}"`;};
+ const oldTables=(objects as {relations:{schema:string;name:string;kind:string}[]}).relations.filter(r=>r.kind==="r"&&r.name!=="_prisma_migrations");
+ const rows=()=>sql(oldTables.map(t=>`SELECT '${t.schema}.${t.name}' AS name,coalesce(jsonb_agg(v ORDER BY v::text),'[]')::text AS rows FROM (SELECT to_jsonb(t) v FROM ${identifier(t.schema)}.${identifier(t.name)} t) s`).join(" UNION ALL ")+" ORDER BY name");
+ const game="97000000-0000-4000-8000-000000000001",round="97000000-0000-4000-8000-000000000002",series="97000000-0000-4000-8000-000000000003",card="97000000-0000-4000-8000-000000000005",other="98000000-0000-4000-8000-000000000002",run="98000000-0000-4000-8000-000000000001";
+ const cells=JSON.stringify(Array.from({length:5},(_,r)=>Array.from({length:5},(_,c)=>r===2&&c===2?null:c*15+r+1)));
+ sql(`BEGIN;INSERT INTO pubquiz.users(id,name,email,password_hash,role,updated_at) VALUES(97000,'Isolated V4','v4@example.invalid','not-a-login-hash','USER',NOW());
+ INSERT INTO pubquiz.eventreihen(eventreihe_id,name,slug,bingo_print_config) VALUES(97000,'Isolated V4','isolated-v4','{"version":1}');
+ INSERT INTO pubquiz.game_drafts(id,eventart,eventreihe_id,titel,bingo_print_config,updated_at) VALUES('${game}','BINGO',97000,'Isolated V4','{"version":1}',NOW());
+ INSERT INTO pubquiz.bingo_preparations(game_id) VALUES('${game}');
+ INSERT INTO pubquiz.bingo_rounds(id,game_id,position,label) VALUES('${round}','${game}',1,'Isolated V4');
+ INSERT INTO pubquiz.bingo_card_series(id,game_id,origin_round_id,code,card_count,request_id,request_hash,print_snapshot,created_by) VALUES('${series}','${game}','${round}','BG-AAAAAAAAAAAA',1,'97000000-0000-4000-8000-000000000004','${"a".repeat(64)}','{"version":2}',97000);
+ INSERT INTO pubquiz.bingo_cards(id,series_id,ordinal,printed_code,cells,layout_hash) VALUES('${card}','${series}',1,'BG-AAAAAAAAAAAA-0001','${cells}','${"b".repeat(64)}');
+ INSERT INTO pubquiz.bingo_round_series(round_id,series_id,game_id) VALUES('${round}','${series}','${game}');
+ INSERT INTO pubquiz.bingo_print_versions(series_id,version,snapshot,created_by) VALUES('${series}',1,'{"version":2}',97000);
+ INSERT INTO pubquiz.bingo_live_runs(id,game_id,round_id,eventreihe_id,status,created_by,round_snapshot,design_snapshot,visual_assets,audience_key,start_request_id,start_request_hash) VALUES('${run}','${game}','${round}',97000,'RUNNING',97000,'{}','{}','{}','${run}','${run}','${"c".repeat(64)}');
+ INSERT INTO pubquiz.bingo_live_cards(run_id,game_id,card_id,series_id) VALUES('${run}','${game}','${card}','${series}');
+ INSERT INTO pubquiz.bingo_live_events(run_id,revision,request_id,request_hash,actor_id,command) VALUES('${run}',1,'${run}','${"d".repeat(64)}',97000,'{"kind":"pause"}');COMMIT;`);
+ const before=rows(),expected={baselineSha,manifest,major:17,columns,catalog,objects};
+ const readSchema=()=>({major:17,columns:query(DIAGNOSTIC_COLUMNS_SQL),catalog:query(DIAGNOSTIC_CATALOG_SQL),objects:query(SCHEMA_OBJECTS_SQL)});
+ sql("SET lock_timeout='2s'; SET statement_timeout='30s';\n"+migration.replace(/COMMIT;\s*$/,"ROLLBACK;"));
+ if(rows()!==before||compareFullSchema(expected,readSchema(),baselineSha,manifest).status!=="PASS")throw Error("PRINT_V4_ROLLBACK_CHANGED_BASELINE");
+ const started=Date.now();sql("SET lock_timeout='2s'; SET statement_timeout='30s';\n"+migration);
+ if(rows()!==before)throw Error("PRINT_V4_EXISTING_ROWS_CHANGED");
+ const rejected=(statement:string)=>{let failed=false;try{sql(statement);}catch{failed=true;}if(!failed)throw Error("PRINT_V4_CONSTRAINT_NOT_ENFORCED");};
+ const newSeries=(version:number)=>`INSERT INTO pubquiz.bingo_card_series(id,game_id,origin_round_id,code,card_count,request_id,request_hash,print_snapshot,created_by) VALUES('${other}','${game}','${round}','BG-BBBBBBBBBBBB',1,'${other}','${"a".repeat(64)}','{"version":${version}}',97000)`;
+ sql(`BEGIN;${newSeries(4)};INSERT INTO pubquiz.bingo_print_versions(series_id,version,snapshot,created_by) VALUES('${series}',2,'{"version":4}',97000);UPDATE pubquiz.eventreihen SET bingo_print_config='{"version":2}' WHERE eventreihe_id=97000;UPDATE pubquiz.game_drafts SET bingo_print_config='{"version":2}' WHERE id='${game}';ROLLBACK;`);
+ rejected(newSeries(5));rejected(`INSERT INTO pubquiz.bingo_print_versions(series_id,version,snapshot,created_by) VALUES('${series}',2,'{"version":5}',97000)`);
+ rejected("UPDATE pubquiz.eventreihen SET bingo_print_config='{\"version\":3}' WHERE eventreihe_id=97000");
+ rejected(`UPDATE pubquiz.game_drafts SET bingo_print_config='{"version":3}' WHERE id='${game}'`);
+ rejected(`UPDATE pubquiz.game_drafts SET eventart='POWERPOINT_KARAOKE',bingo_print_config='{"version":2}' WHERE id='${game}'`);
+ if(rows()!==before)throw Error("PRINT_V4_PROBES_CHANGED_HISTORY");
+ const actual=readSchema(),actualCatalog=actual.catalog as Record<string,Row[]>;
+ const definitions=JSON.parse(sql(`BEGIN;
+ CREATE TEMP TABLE v4_expected_series(LIKE pubquiz.bingo_card_series);ALTER TABLE v4_expected_series ADD CONSTRAINT expected_series CHECK(jsonb_typeof(print_snapshot)='object' AND print_snapshot->>'version' IN ('1','2','3','4'));
+ CREATE TEMP TABLE v4_expected_versions(LIKE pubquiz.bingo_print_versions);ALTER TABLE v4_expected_versions ADD CONSTRAINT expected_versions CHECK(jsonb_typeof(snapshot)='object' AND snapshot->>'version' IN ('2','3','4'));
+ CREATE TEMP TABLE v4_expected_reihen(LIKE pubquiz.eventreihen);ALTER TABLE v4_expected_reihen ADD CONSTRAINT expected_reihen CHECK(bingo_print_config IS NULL OR (jsonb_typeof(bingo_print_config)='object' AND bingo_print_config->>'version' IN ('1','2')));
+ CREATE TEMP TABLE v4_expected_games(LIKE pubquiz.game_drafts);ALTER TABLE v4_expected_games ADD CONSTRAINT expected_games CHECK(bingo_print_config IS NULL OR (eventart='BINGO' AND jsonb_typeof(bingo_print_config)='object' AND bingo_print_config->>'version' IN ('1','2')));
+ SELECT json_object_agg(conname,pg_get_constraintdef(oid)) FROM pg_constraint WHERE connamespace=pg_my_temp_schema();ROLLBACK;`).split('\n').find(line=>line.startsWith('{'))!) as Record<string,string>;
+ const changed=[['bingo_card_series','bingo_card_series_print_snapshot_check','expected_series'],['bingo_print_versions','bingo_print_versions_snapshot_check','expected_versions'],['eventreihen','bingo_series_print_config','expected_reihen'],['game_drafts','bingo_game_print_config','expected_games']];
+ const isChanged=(r:Row)=>r.schema==='pubquiz'&&changed.some(([table,name])=>r.table===table&&r.name===name);
+ for(const [table,name,key]of changed){const found=actualCatalog.constraints.filter(r=>r.schema==='pubquiz'&&r.table===table&&r.name===name);if(found.length!==1||found[0].definition!==definitions[key]||found[0].validated!==true)throw Error('PRINT_V4_CHECK_DEFINITION_CHANGED');}
+ const projected={...actual,catalog:{...actualCatalog,constraints:[...actualCatalog.constraints.filter(r=>!isChanged(r)),...(catalog as Record<string,Row[]>).constraints.filter(isChanged)]}};
+ if(compareFullSchema(expected,projected,baselineSha,manifest).status!=='PASS')throw Error('UNEXPECTED_PRINT_V4_SCHEMA_DELTA');
+ return {status:'PASS',baselineSha,candidateSha,migrations:plan.migrations,elapsedMs:Date.now()-started,rowsUnchanged:true,onlyExpectedSchemaChanges:true,oldColumnProjectionCompatible:true,constraintsEnforced:true,immutableHistory:true,legacyRunPreserved:true,v4Accepted:true,selectionV2Accepted:true,rollbackProbe:true,lockTimeoutMs:2000,statementTimeoutMs:30000,applicationRollbackRequiresReview:true};
+}
