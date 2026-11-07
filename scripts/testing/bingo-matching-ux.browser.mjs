@@ -13,7 +13,7 @@ if (!chrome)
     throw Error('CHROME_REQUIRED');
 const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'bingo-matching-browser-')), browser = spawn(chrome, ['--headless=new', '--no-sandbox', '--disable-gpu', '--disable-background-networking','--disable-background-timer-throttling','--disable-renderer-backgrounding', '--no-first-run', `--user-data-dir=${profile}`, '--remote-debugging-port=0', 'about:blank'], { stdio: 'ignore' });
 const network=[],idleWindows=[];let watch=false;
-let ws, id = 0, dialog = false, allowNavigation = false, closing = false;
+let ws, id = 0, dialog = false, allowNavigation = false;
 const retiredSessions = new Set(),targets=new Map();
 const requests = new Map(), passed = [];
 const appendProgress=passed.push.bind(passed);passed.push=(...items)=>{const count=appendProgress(...items);fs.writeFileSync(path.join(out,'progress.json'),JSON.stringify({origin,passed},null,2));return count;};
@@ -107,4 +107,4 @@ try {
     }
     await goto(s,'/bingo/'+fixture.lockedGameId+'/matching?round='+fixture.lockedRoundId);await until(()=>text(s).then(t=>t.includes('schreibgeschützt')),'locked round explained above table');assert.equal(await query(s,'input[maxlength="80"]',".matches(':disabled')"),true);await screenshot(s,'locked-1366',1366,768);passed.push('used-card round visibly explained and read-only');
     fs.writeFileSync(path.join(out,'results.json'),JSON.stringify({gitHead:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),origin,fixture,passed,network,idleWindows,productionTouched:false,realServerActions:true},null,2));console.log(JSON.stringify({passed}));
-}catch(e){console.error(e.stack);process.exitCode=1;}finally{closing=true;if(ws?.readyState===1){await call('Browser.close').catch(()=>{});ws.close();}browser.kill();}
+}catch(e){console.error(e.stack);process.exitCode=1;}finally{if(ws?.readyState===1){await call('Browser.close').catch(()=>{});ws.close();}browser.kill();}
