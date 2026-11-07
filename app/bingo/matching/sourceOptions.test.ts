@@ -15,7 +15,7 @@ test('template options use fresh permissions, page metadata and preserve source-
   {...base,fragen_id:202,geltungsbereich:'EVENT_SERIES',eventreihen:[{eventreihe_id:99}],source_vorlage:{code:'private',name:'Nicht berechtigt'}},
   {...base,fragen_id:203,vorlage:null}];
  const fixture={
-  prisma:{$transaction:async(fn:(tx:unknown)=>unknown)=>fn({fragen:{findMany:async(args:Record<string,unknown>)=>{calls.push(args);const where=args.where as {fragen_id?:{gt:number}};return where.fragen_id?rows.filter(r=>r.fragen_id>where.fragen_id!.gt).slice(0,200):[];}}})},
+  prisma:{$transaction:async(fn:(tx:unknown)=>unknown)=>fn({fragen:{findMany:async(args:Record<string,unknown>)=>{calls.push(args);const where=args.where as {AND?:{fragen_id?:{gt:number}}[]};const cursor=where.AND?.find(f=>f.fragen_id)?.fragen_id;return cursor?rows.filter(r=>r.fragen_id>cursor.gt).slice(0,200):[];}}})},
   actor:()=>actor,
   access:()=>{authorizations++;if(denied)throw Error('denied');return {game:{eventreihe_id:10}};},
  };
@@ -37,7 +37,7 @@ test('template options use fresh permissions, page metadata and preserve source-
  for(const call of calls){
   const fields=Object.keys(call.select as object);
   for(const forbidden of ['frage','medien','antworten','antwortfelder'])assert(!fields.includes(forbidden),'no heavy question or media content');
-  const where=call.where as Record<string,unknown>;assert.equal(where.freigegeben,true);assert.equal(where.ist_archiviert,false);
+  const where=call.where as Record<string,unknown>;assert.match(JSON.stringify(where),/freigegeben":true/);assert.match(JSON.stringify(where),/ist_archiviert":false/);
   assert.match(JSON.stringify(where),/gueltig_bis/);assert.match(JSON.stringify(where),/eventreihe_id":10/);
  }
  actor={userId:7,assignments:[]};assert.deepEqual(await api.listMatchingTemplates(7,'game'),[],'Bingo access alone grants no Quiz-source visibility');

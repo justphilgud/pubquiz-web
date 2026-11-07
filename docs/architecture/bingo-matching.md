@@ -184,3 +184,29 @@ Historische Bootstrap- und Backup-Betriebspunkte werden dadurch nicht als behobe
 markiert. Echtes 90er-Bingo, kleinerer Ziehungspool, OCR und neue TTS gehören nicht dazu.
 
 Abnahme, konkrete Nachweise, Transfermessungen und Grenzen: [bingo-matching-acceptance.md](./bingo-matching-acceptance.md). Die Kartenbeschriftung bei Textkopplung wird abgeleitet und auch im gesperrten Eingabefeld entsprechend angezeigt; die manuelle Alternative bleibt erhalten. Fehlende gespeicherte Medien werden nicht als Browser-TTS ausgegeben. Der Audio-Countdown besitzt einen eigenen Inline-Size-Container und keine scrollbare Innenfläche.
+
+### Quellensuche: Filterung vor Pagination (PR #160)
+
+Die Matching-eigene SQL-Projektion wendet Freigabe, Archivierung, Gültigkeit,
+Spielreihe, aktuelle effektive Quiz-Leserechte, Fragetext, ursprüngliche Vorlage
+(`source_vorlage` vor technischer Basis) und Medientyp **vor** `skip/take` an.
+Das verhindert leere Seiten trotz passender Quellen hinter den ersten 20 Fragen.
+Die abschließende Objektpolicy bleibt zusätzlich erhalten. Bingo-Zugriff allein
+berechtigt weiterhin nicht zu Quizquellen oder deren Vorlagenmetadaten.
+
+`sourceQuery.ts` bildet die vorhandene Policy ausschließlich für freigegebene
+Quellen ab und verwendet die vorhandenen Medienslotdefinitionen sowie die
+bestehende Typnamenspriorität Bild → Audio → Video. Antwortbilder zählen nur in
+passenden Antwortslots, bei einfachen Antworten nur für richtige Antworten.
+Die Suche liefert höchstens 20 Kennungen/Titel/Vorlagennamen und ein `more`-Flag;
+keine Antworten, Medienpfade, Bytes oder vollständigen Quelldetails. Erst die
+bewusste Auswahl lädt über den vorhandenen autorisierten Detailweg tatsächliche
+Varianten und Kartenantworten. Eine vorhandene Quelle bzw. Vorlage garantiert
+keine verfügbare Datei. Browser-Sprachausgabe bleibt ausdrücklich keine Audiodatei.
+
+Die Vorlagenliste lädt beim Öffnen oder ausdrücklichem Wiederholen ausschließlich
+Berechtigungs-/Vorlagenmetadaten in 200er-Seiten. Identische Namen verschmelzen
+keine unterschiedlichen Codes. Kein neuer Pollingpfad, Schema- oder Laufzeitvertrag.
+Automatische Nachweise: `sourceQuery.test.ts`, `sourceOptions.test.ts` und die echte
+PostgreSQL-Abnahme mit 210 Bild- und 50 Audioquellen (20/20/10), Vorlagen jenseits
+200, Produkt-/Quellenentzug und Kontrolle der tatsächlichen SQL-Projektion.
