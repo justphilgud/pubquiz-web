@@ -4,7 +4,7 @@ import {execFileSync} from "node:child_process";
 import {migrationFiles,assessMigrations} from "./production-preflight";
 import { readFileSync } from "node:fs";
 import { APPROVED_PREFLIGHT_PLANS, approvedPreflightPlan, hasApprovedDeltaEvidence, hasApprovedPendingDelta,
-  NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN, ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN, BINGO_POLLING_NO_DELTA_PREFLIGHT_PLAN, approvedNoDeltaPreflightPlan, assertNoDeltaManifest, hasCompleteNoDeltaHistory } from "./production-preflight-plan";
+  NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN, ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN, BINGO_POLLING_NO_DELTA_PREFLIGHT_PLAN, BINGO_MATCHING_UX_NO_DELTA_PREFLIGHT_PLAN, approvedNoDeltaPreflightPlan, assertNoDeltaManifest, hasCompleteNoDeltaHistory } from "./production-preflight-plan";
 import { needsApplicationDeployment } from "./deployment-scope";
 
 test("only exact reviewed release pairs and SQL checksums are eligible", () => {
@@ -160,4 +160,53 @@ test("Bingo polling release accepts only its exact 70-file/no-schema-delta pair 
  const files=["scripts/operations/production-preflight-plan.ts","scripts/operations/production-preflight-plan.test.ts",".github/workflows/production-preflight-ci.yml","docs/operations/bingo-polling-release-preflight.md"];
  assert.equal(needsApplicationDeployment(files),false);for(const file of ["app/bingo/live/repository.server.ts","prisma/schema.prisma","prisma/migrations/20261106210000_bingo_print_templates_v4/migration.sql"])assert.equal(needsApplicationDeployment([...files,file]),true);
  assert.deepEqual([NO_DELTA_PREFLIGHT_PLAN,BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN,ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN].map(v=>approvedNoDeltaPreflightPlan(v.baselineSha,v.candidateSha)),[NO_DELTA_PREFLIGHT_PLAN,BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN,ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN]);
+});
+
+test("Matching UX release binds the exact 72-file manifest and unchanged schema", () => {
+  const plan = BINGO_MATCHING_UX_NO_DELTA_PREFLIGHT_PLAN;
+  const {baselineSha, candidateSha} = plan;
+  const before = migrationFiles(baselineSha), after = migrationFiles(candidateSha);
+  const schema = (sha: string) => execFileSync("git", ["show", `${sha}:prisma/schema.prisma`], {encoding: "utf8"});
+  const baseSchema = schema(baselineSha), candidateSchema = schema(candidateSha);
+  const verify = (left = before, right = after, a = baseSchema, b = candidateSchema) =>
+    assertNoDeltaManifest(baselineSha, candidateSha, left, right, a, b);
+  assert.equal(approvedNoDeltaPreflightPlan(baselineSha, candidateSha), plan);
+  assert.equal(verify().migrationCount, 72);
+  for (const [base, candidate] of [
+    [candidateSha, baselineSha], [baselineSha, baselineSha],
+    ["a".repeat(40), candidateSha], [baselineSha, "b".repeat(40)],
+    [baselineSha, candidateSha.slice(0, 8)],
+  ]) {
+    assert.equal(approvedNoDeltaPreflightPlan(base, candidate), undefined);
+    assert.throws(() => assertNoDeltaManifest(base, candidate, before, after, baseSchema, candidateSchema));
+  }
+  const changed = after.map((file, i) => i === 0 ? {...file, checksum: "0".repeat(64)} : file);
+  assert.throws(() => verify(before, changed));
+  assert.throws(() => verify(changed, changed), /NO_DELTA_PINNED_BYTES_UNVERIFIED/);
+  assert.throws(() => verify(before, after.slice(1)));
+  assert.throws(() => verify(before, [...after, {name: "unexpected", checksum: "0".repeat(64), eolChecksums: {lf: "", crlf: ""}}]));
+  assert.throws(() => verify(before, after, baseSchema, candidateSchema + " "));
+  assert.throws(() => verify(before, after, baseSchema + " ", candidateSchema + " "), /NO_DELTA_PINNED_BYTES_UNVERIFIED/);
+  const rows = before.map(file => ({migration_name: file.name, checksum: file.checksum, finished_at: "done", rolled_back_at: null}));
+  const history = assessMigrations(after, before, rows);
+  assert.equal(hasCompleteNoDeltaHistory(history, after, plan), true);
+  assert.equal(hasCompleteNoDeltaHistory({...history, pending: [plan.lastMigration]}, after, plan), false);
+  assert.equal(hasCompleteNoDeltaHistory({...history, expected: [plan.lastMigration]}, after, plan), false);
+  assert.equal(assessMigrations(after, before, rows.slice(1)).gate.status, "FAIL");
+  assert.equal(assessMigrations(after, before, [...rows, {...rows[0], migration_name: "unexpected"}]).gate.status, "FAIL");
+  assert.equal(assessMigrations(after, before, [{...rows[0], finished_at: null}, ...rows.slice(1)]).gate.status, "FAIL");
+  assert.equal(assessMigrations(after, before, [{...rows[0], checksum: "0".repeat(64)}, ...rows.slice(1)]).gate.status, "FAIL");
+});
+
+test("Matching UX Operations change cannot deploy the application", () => {
+  const paths = [
+    "scripts/operations/production-preflight-plan.ts",
+    "scripts/operations/production-preflight-plan.test.ts",
+    ".github/workflows/production-preflight-ci.yml",
+    "docs/operations/bingo-matching-ux-release-preflight.md",
+  ];
+  assert.equal(needsApplicationDeployment(paths), false);
+  for (const path of ["app/bingo/matching/SourcePicker.tsx", "prisma/schema.prisma", "prisma/migrations/extra/migration.sql"]) {
+    assert.equal(needsApplicationDeployment([...paths, path]), true);
+  }
 });

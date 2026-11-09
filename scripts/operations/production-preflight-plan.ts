@@ -49,8 +49,18 @@ export const BINGO_POLLING_NO_DELTA_PREFLIGHT_PLAN = Object.freeze({
   schemaSha256: "df7cd584585ca2fab7fab2926a63f5c90790d461bbc1ac7270733efdc4dab7e8",
 });
 
+// PR #160: exact Matching UX release with no schema or migration delta.
+export const BINGO_MATCHING_UX_NO_DELTA_PREFLIGHT_PLAN = Object.freeze({
+  baselineSha: "b50a88e47d3c7ec7261f4e9fd3563a5e73995a58",
+  candidateSha: "a6c24d0aeca9b0ac73b24c9078f415402636e1f1",
+  migrationCount: 72,
+  lastMigration: "20261107150000_bingo_matching",
+  manifestSha256: "ab508665f958f0d124ce119b4c8ee5e30128679c7bd42d9d565829c3ef7fd535",
+  schemaSha256: "9d7d5860b8cd5a6fb497b880c283fe61e26993018200912fe6a71997803e6ac9",
+});
+
 export function approvedNoDeltaPreflightPlan(baseline: string, candidate: string) {
-  return [NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN, ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN, BINGO_POLLING_NO_DELTA_PREFLIGHT_PLAN]
+  return [NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN, ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN, BINGO_POLLING_NO_DELTA_PREFLIGHT_PLAN, BINGO_MATCHING_UX_NO_DELTA_PREFLIGHT_PLAN]
     .find(plan => baseline === plan.baselineSha && candidate === plan.candidateSha);
 }
 
