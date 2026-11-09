@@ -52,7 +52,7 @@ export const BINGO_POLLING_NO_DELTA_PREFLIGHT_PLAN = Object.freeze({
 // PR #160: exact Matching UX release with no schema or migration delta.
 export const BINGO_MATCHING_UX_NO_DELTA_PREFLIGHT_PLAN = Object.freeze({
   baselineSha: "b50a88e47d3c7ec7261f4e9fd3563a5e73995a58",
-  candidateSha: "a6c24d0aeca9b0ac73b24c9078f415402636e1f1",
+  candidateSha: "c184d231c03dab71972e6c98cd2e78c29c5a6d8e",
   migrationCount: 72,
   lastMigration: "20261107150000_bingo_matching",
   manifestSha256: "ab508665f958f0d124ce119b4c8ee5e30128679c7bd42d9d565829c3ef7fd535",

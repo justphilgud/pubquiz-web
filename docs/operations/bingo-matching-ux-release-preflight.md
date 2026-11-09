@@ -2,8 +2,8 @@
 
 Dieses Operations-Paket ergänzt ausschließlich das geprüfte No-Delta-Paar
 `b50a88e47d3c7ec7261f4e9fd3563a5e73995a58` →
-`a6c24d0aeca9b0ac73b24c9078f415402636e1f1`. Der Kandidat ist der fachlich
-abgenommene Head von PR #160. Am 9. November 2026 zeigten beide Production-Aliasse
+`c184d231c03dab71972e6c98cd2e78c29c5a6d8e`. Der Kandidat enthält den produktiven main-Stand und den fachlich
+abgenommenen Head `a6c24d0a` von PR #160. Der Binärdiff von PR #160 gegen seine Basis ist vor und nach dem regulären Abgleich bytegleich. Am 9. November 2026 zeigten beide Production-Aliasse
 und das Projektziel auf dasselbe READY-Deployment des Ausgangscommits.
 
 Prisma-Schema und der gesamte Migrationsbaum sind bytegleich. Der Vertrag bindet

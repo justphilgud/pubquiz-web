@@ -165,6 +165,7 @@ test("Bingo polling release accepts only its exact 70-file/no-schema-delta pair 
 test("Matching UX release binds the exact 72-file manifest and unchanged schema", () => {
   const plan = BINGO_MATCHING_UX_NO_DELTA_PREFLIGHT_PLAN;
   const {baselineSha, candidateSha} = plan;
+  execFileSync("git", ["merge-base", "--is-ancestor", baselineSha, candidateSha]);
   const before = migrationFiles(baselineSha), after = migrationFiles(candidateSha);
   const schema = (sha: string) => execFileSync("git", ["show", `${sha}:prisma/schema.prisma`], {encoding: "utf8"});
   const baseSchema = schema(baselineSha), candidateSchema = schema(candidateSha);
