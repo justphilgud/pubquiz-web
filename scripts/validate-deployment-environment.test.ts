@@ -177,3 +177,16 @@ test('Matching Preview binds its own database without opening the existing print
  assertValidationCode({...matching,deploymentRef:'refs/heads/codex/foreign'},'ISOLATED_PREVIEW_SCOPE_MISMATCH');
  assertValidationCode({...matching,deploymentRef:'refs/heads/codex/bingo-print-templates-ui'},'BINGO_PRINT_REVIEW_IDENTITY_MISMATCH');
 });
+
+test('Matching UX Preview requires its separately approved exact database and cannot reuse other targets',()=>{
+ const ux={...previewInput,deploymentRef:'refs/heads/codex/bingo-matching-ux-polish',expectedDatabaseHost:'ep-holy-term-baa881iq-pooler.c-8.eu-central-1.aws.neon.tech',expectedDatabaseName:'bingo_matching_ux_review',expectedDatabaseBranch:'ep-holy-term-baa881iq',databaseUrl:'postgresql://synthetic:fixture@ep-holy-term-baa881iq-pooler.c-8.eu-central-1.aws.neon.tech/bingo_matching_ux_review?sslmode=verify-full'};
+ assert.equal(validateDeploymentEnvironment(ux).databaseBranchVerified,true);
+ assert.equal(validateDeploymentEnvironment({...ux,expectedDatabaseHost:ux.expectedDatabaseHost.replace('-pooler.','.'),databaseUrl:ux.databaseUrl.replace('-pooler.','.')}).databaseBranchVerified,true);
+ for(const name of ['bingo_matching_review','bingo_print_v4_review','neondb','foreign'])assertValidationCode({...ux,expectedDatabaseName:name,databaseUrl:ux.databaseUrl.replace('bingo_matching_ux_review',name)},'BINGO_MATCHING_UX_REVIEW_IDENTITY_MISMATCH');
+ assertValidationCode({...ux,expectedDatabaseBranch:undefined},'BINGO_MATCHING_UX_REVIEW_IDENTITY_MISMATCH');
+ assertValidationCode({...previewInput,deploymentRef:ux.deploymentRef},'BINGO_MATCHING_UX_REVIEW_IDENTITY_MISMATCH');
+ assertValidationCode({...ux,deploymentEnvironment:'production',deploymentRef:'refs/heads/main'},'ISOLATED_PREVIEW_SCOPE_MISMATCH');
+ assertValidationCode({...ux,deploymentRef:'refs/heads/codex/foreign'},'ISOLATED_PREVIEW_SCOPE_MISMATCH');
+ assertValidationCode({...ux,deploymentRef:'refs/heads/codex/bingo-matching-table'},'BINGO_MATCHING_REVIEW_IDENTITY_MISMATCH');
+ assertValidationCode({...ux,deploymentRef:'refs/heads/codex/bingo-print-templates-ui'},'BINGO_PRINT_REVIEW_IDENTITY_MISMATCH');
+});

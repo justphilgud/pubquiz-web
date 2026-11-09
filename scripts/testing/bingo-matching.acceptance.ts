@@ -7,12 +7,14 @@ import {createRequire} from 'node:module';
 import sharp from 'sharp';
 import {runFfmpeg} from '../../app/fragen/editor/generators/processors/ffmpeg';
 import type {Client} from 'pg';
+import type {PrismaClient} from '../../app/generated/prisma/client';
 import {initialMatchingEntries,type MatchingSet} from '../../app/bingo/preparation/matching';
 import {termFor} from '../../app/bingo/preparation/termSet';
 type Api=typeof import('../../app/bingo/preparation/repository.server')&typeof import('../../app/bingo/preparation/pdf.server')&{creation:typeof import('../../app/bingo/eventCreation.server');eventRun:typeof import('../../app/bingo/live/eventRepository.server');matching:typeof import('../../app/bingo/matching/repository.server');sources:typeof import('../../app/bingo/matching/source.server');polling:typeof import('../../app/bingo/live/pollVersion.server')};
 function wav(){const size=8000*2*3,b=Buffer.alloc(44+size);b.write('RIFF');b.writeUInt32LE(36+size,4);b.write('WAVEfmt ',8);b.writeUInt32LE(16,16);b.writeUInt16LE(1,20);b.writeUInt16LE(1,22);b.writeUInt32LE(8000,24);b.writeUInt32LE(16000,28);b.writeUInt16LE(2,32);b.writeUInt16LE(16,34);b.write('data',36);b.writeUInt32LE(size,40);for(let i=44;i<b.length;i+=2)b.writeInt16LE(Math.round(Math.sin((i-44)/2/8000*440*Math.PI*2)*1000),i);return b;}
 /** Uses only the disposable existing AP2 test database, never an environment file. */
-export async function exerciseMatching(db:Client,api:Api,queries:string[]){
+export async function exerciseMatching(db:Client,api:Api,queries:string[],prisma:PrismaClient){
+ const resolveSource=async(userId:number,id:number)=>(await prisma.$transaction(tx=>api.sources.authorizedSource(tx,userId,10,id))).view;
  const pdfBundle=await build({stdin:{contents:"export * from './app/bingo/preparation/pdf.server';",resolveDir:process.cwd()},bundle:true,write:false,platform:'node',format:'cjs',packages:'external',plugins:[{name:'server-marker',setup(b){b.onResolve({filter:/^server-only$/},()=>({path:'marker',namespace:'fixture'}));b.onLoad({filter:/.*/,namespace:'fixture'},()=>({contents:''}));}}]});
  const pdfRuntime={exports:{}};new Function('require','module','exports',pdfBundle.outputFiles[0].text)(createRequire(import.meta.url),pdfRuntime,pdfRuntime.exports);
  const pdfApi=pdfRuntime.exports as typeof import('../../app/bingo/preparation/pdf.server');
@@ -36,8 +38,8 @@ export async function exerciseMatching(db:Client,api:Api,queries:string[]){
   await db.query("INSERT INTO pubquiz.medien(medien_id,fragen_id,medientyp_id,datei,slot_key)VALUES(910000,910000,910000,$1,'music_original_audio'),(910001,910000,910000,$2,'music_reverse_audio'),(910002,910000,910000,$3,'music_bitcrush_audio')",[relative,mediaBase+'reverse.wav',mediaBase+'bitcrush.wav']);
   const game=await api.creation.createBingoEvent(1,{seriesId:10,title:'Matching isolated acceptance',date:'',time:'',roundCount:2,requestId:randomUUID()});
   let prep=await api.readPreparation(1,game.id);const round=prep.rounds[0];
-  const search=await api.sources.searchMatchingSources(910003,game.id,{search:'Synthetische Musikquelle',template:'',kind:'',page:1}),source=search.items[0];assert.ok(source);assert.equal(source.media.length,3);assert.deepEqual(source.answers.map(a=>a.label),['Titel','Interpret','Interpret + Titel']);assert.ok(source.answers.every(a=>!a.text.includes('Nicht akzeptiert')));
-  const tts=await api.sources.searchMatchingSources(910003,game.id,{search:'Browser-Sprachausgabe',template:'',kind:'',page:1});assert.equal(tts.items[0].browserSpeechOnly,true);assert.equal(tts.items[0].media.length,0);
+  const search=await api.sources.searchMatchingSources(910003,game.id,{search:'Synthetische Musikquelle',template:'',kind:'',page:1}),summary=search.items[0];assert.ok(summary);assert.deepEqual(Object.keys(summary).sort(),['id','template','title']);const source=await resolveSource(910003,summary.id);assert.equal(source.media.length,3);assert.deepEqual(source.answers.map(a=>a.label),['Titel','Interpret','Interpret + Titel']);assert.ok(source.answers.every(a=>!a.text.includes('Nicht akzeptiert')));
+  const tts=await api.sources.searchMatchingSources(910003,game.id,{search:'Browser-Sprachausgabe',template:'',kind:'',page:1});const speech=await resolveSource(910003,tts.items[0].id);assert.equal(speech.browserSpeechOnly,true);assert.equal(speech.media.length,0);
   assert.equal((await api.sources.searchMatchingSources(910003,game.id,{search:'Fremde Quelle',template:'',kind:'',page:1})).items.length,0);
   for(const userId of [2,4,5,6])await assert.rejects(api.sources.searchMatchingSources(userId,game.id,{search:'',template:'',kind:'',page:1}));
   for(const variant of ['music_original_audio','music_reverse_audio'])for(const answer of source.answers){
@@ -56,8 +58,36 @@ export async function exerciseMatching(db:Client,api:Api,queries:string[]){
   await runFfmpeg(['-nostdin','-hide_banner','-loglevel','error','-y','-f','lavfi','-i','color=c=yellow:size=320x180:rate=10','-f','lavfi','-i','sine=frequency=330:duration=2','-t','2','-c:v','libx264','-pix_fmt','yuv420p','-c:a','aac','-metadata','title=Film A',join(directory,'intro.mp4')]);
   await db.query("INSERT INTO pubquiz.antworttyp(antworttyp_id,antworttyp)VALUES(910000,'Matching Text');INSERT INTO pubquiz.fragen(fragen_id,frage,freigegeben,review_status,geltungsbereich,updated_at)VALUES(910010,'Synthetische Flagge',true,'APPROVED','GLOBAL',now()),(910011,'Synthetischer Länderumriss',true,'APPROVED','GLOBAL',now()),(910012,'Gespeicherte Songtextaufnahme',true,'APPROVED','GLOBAL',now()),(910013,'Allgemeines Film-/Serienintro',true,'APPROVED','GLOBAL',now());INSERT INTO pubquiz.antworten(fragen_id,antwort,ist_richtig,antworttyp_id)VALUES(910010,'Japan',true,910000),(910010,'Falsch',false,910000),(910011,'Land A',true,910000),(910012,'Text A',true,910000),(910013,'Film A',true,910000)");
   await db.query("INSERT INTO pubquiz.medien(medien_id,fragen_id,medientyp_id,datei,slot_key)VALUES(910010,910010,910001,$1,'question_image'),(910011,910011,910001,$2,'question_image'),(910012,910012,910000,$3,'lyrics_tts_audio'),(910013,910013,910002,$4,'question_video')",[mediaBase+'flag.png',mediaBase+'outline.png',relative,mediaBase+'intro.mp4']);
+  // Filter all eligible, readable sources in PostgreSQL BEFORE the 20/200-row limits.
+  await db.query("INSERT INTO pubquiz.frage_vorlagen(vorlage_id,code,name,slide_typ,updated_at)VALUES(910100,'matching_images','Gleicher Name','FRAGE',now()),(910101,'matching_audio','Gleicher Name','FRAGE',now())");
+  await db.query("INSERT INTO pubquiz.fragen(fragen_id,frage,vorlage_id,source_vorlage_id,freigegeben,review_status,geltungsbereich,updated_at) SELECT 910100+i,'Matching Pagination '||i,910000,CASE WHEN i<210 THEN 910100 ELSE 910101 END,true,'APPROVED','GLOBAL',now() FROM generate_series(0,259) i");
+  await db.query("INSERT INTO pubquiz.medien(medien_id,fragen_id,medientyp_id,datei,slot_key) SELECT 910100+i,910100+i,CASE WHEN i<210 THEN 910001 ELSE 910000 END,CASE WHEN i<210 THEN $1 ELSE $2 END,CASE WHEN i<210 THEN 'question_image' ELSE 'music_original_audio' END FROM generate_series(0,259) i",[mediaBase+'flag.png',relative]);
+  const sqlStart=queries.length;
+  const options=await api.sources.listMatchingTemplates(910003,game.id);
+  assert.ok(options.some(o=>o.code==='matching_audio'),'template after first200 sources remains available');
+  assert.equal(options.filter(o=>o.name==='Gleicher Name').length,2,'same names keep independent stable identities');
+  for(let page=1;page<=3;page++){
+   const result=await api.sources.searchMatchingSources(910003,game.id,{search:'Matching Pagination',template:'',kind:'AUDIO',page});
+   assert.equal(result.items.length,page===3?10:20);assert.equal(result.more,page<3);
+   assert.ok(result.items.every(q=>q.id>=910310&&q.id<=910359));
+   assert.ok(result.items.every(q=>Object.keys(q).sort().join()==='id,template,title'));
+  }
+  const byCode=await api.sources.searchMatchingSources(910003,game.id,{search:'Matching Pagination',template:'',templateCode:'matching_audio',kind:'AUDIO',page:1});assert.equal(byCode.items.length,20);
+  const wrongBase=await api.sources.searchMatchingSources(910003,game.id,{search:'Matching Pagination',template:'',templateCode:'matching_qa',kind:'',page:1});assert.equal(wrongBase.items.length,0,'effective source template wins over technical base');
+  // Query payload itself excludes heavy media/answer data; WHERE predicates may use relations.
+  const reads=queries.slice(sqlStart).filter(q=>/SELECT.*fragen/.test(q));assert.ok(reads.length>=5);
+  for(const query of reads){const projection=query.split(/ FROM /i)[0];assert.doesNotMatch(projection,/datei|loesung_text|antwortfeld_id|medien_id|content|bingo_matching_assets/i);}
+  await db.query("UPDATE pubquiz.eventreihe_eventarten SET ist_freigeschaltet=false WHERE eventreihe_id=10 AND eventart='QUIZ'");
+  try{
+   assert.equal((await api.sources.listMatchingTemplates(910003,game.id)).length,0,'Bingo alone does not authorize Quiz metadata');
+   assert.equal((await api.sources.searchMatchingSources(910003,game.id,{search:'Matching Pagination',template:'',kind:'',page:1})).items.length,0);
+   await assert.rejects(resolveSource(910003,910310),/nicht.*berechtigt/);
+  }finally{await db.query("UPDATE pubquiz.eventreihe_eventarten SET ist_freigeschaltet=true WHERE eventreihe_id=10 AND eventart='QUIZ'");}
+  await db.query("UPDATE pubquiz.fragen SET freigegeben=false WHERE fragen_id=910310");
+  await assert.rejects(resolveSource(910003,910310),/nicht.*berechtigt/);
+  assert.equal((await api.sources.searchMatchingSources(910003,game.id,{search:'Matching Pagination',template:'',kind:'AUDIO',page:1})).items[0].id,910311,'fresh approval revocation affects subsequent reads');
   const otherEntries=initialMatchingEntries();
-  for(const [number,search,variant] of [[1,'Synthetische Flagge','question_image'],[2,'Synthetischer Länderumriss','question_image'],[3,'Gespeicherte Songtextaufnahme','lyrics_tts_audio'],[4,'Synthetische Musikquelle','music_bitcrush_audio'],[5,'Allgemeines Film-/Serienintro','question_video']] as const){const q=(await api.sources.searchMatchingSources(910003,game.id,{search,template:'',kind:'',page:1})).items[0],m=q.media.find(m=>m.variant===variant)!;assert.ok(m);assert.equal(q.browserSpeechOnly,false,'stored image/video/audio is not browser-only speech');const answer=q.answers[0];otherEntries[number-1]={...otherEntries[number-1],keepNumber:false,sameText:false,text:number===4?'8-Bit':answer.text,answerKey:number===4?'custom':answer.key,presentation:{kind:'MEDIA',source:{questionId:q.id,revision:q.revision,mediaId:m.id,variant:m.variant,kind:m.kind}}};}
+  for(const [number,search,variant] of [[1,'Synthetische Flagge','question_image'],[2,'Synthetischer Länderumriss','question_image'],[3,'Gespeicherte Songtextaufnahme','lyrics_tts_audio'],[4,'Synthetische Musikquelle','music_bitcrush_audio'],[5,'Allgemeines Film-/Serienintro','question_video']] as const){const summary=(await api.sources.searchMatchingSources(910003,game.id,{search,template:'',kind:'',page:1})).items[0],q=await resolveSource(910003,summary.id),m=q.media.find(m=>m.variant===variant)!;assert.ok(m);assert.equal(q.browserSpeechOnly,false,'stored image/video/audio is not browser-only speech');const answer=q.answers[0];otherEntries[number-1]={...otherEntries[number-1],keepNumber:false,sameText:false,text:number===4?'8-Bit':answer.text,answerKey:number===4?'custom':answer.key,presentation:{kind:'MEDIA',source:{questionId:q.id,revision:q.revision,mediaId:m.id,variant:m.variant,kind:m.kind}}};}
   prep=await api.readPreparation(1,game.id);const second=prep.rounds[1];await api.matching.writeMatching(910003,{gameId:game.id,roundId:second.id,revision:prep.revision,config:{version:2,name:'Gemischte Medien',publication:'HIDDEN',entries:otherEntries}});
   prep=await api.readPreparation(1,game.id);await api.writePreparation(1,{gameId:game.id,expectedSeriesId:10,revision:prep.revision,operation:'generate',roundId:second.id,count:7,requestId:randomUUID()});
   // Immutable retained copy survives source edit/archive/deletion. New source selection does not.

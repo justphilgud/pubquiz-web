@@ -309,7 +309,7 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   const withPrintTemplates=await snapshot();compareSnapshots(withPrintTemplates,await snapshot());
   await verifyBingoRestore(target,withPrintTemplates);
   await verifyEmptyPrintMigration(target,true);
-  await exerciseMatching(db,runtime.exports as Parameters<typeof exerciseMatching>[1],pollingQueries);
+  await exerciseMatching(db,runtime.exports as Parameters<typeof exerciseMatching>[1],pollingQueries,prisma);
   const withMatching=await snapshot();compareSnapshots(withMatching,await snapshot());
   await verifyBingoRestore(target,withMatching);
   console.info('Matching full populated snapshot and isolated restore integrity PASS');

@@ -147,6 +147,32 @@ deren Prüfungen bleiben unverändert. Kein manueller Production-Backup/Restore.
 
 ## Verifikation
 
+### Matching-Editor: Bedienung und Vorlagenfilter
+
+Die Matching-Seite gruppiert Einstellungen, Bereichsauswahl und Zuordnungszeilen.
+Die vorhandene Medien-Lupe steht bündig neben der Präsentationsauswahl. Auf kleinen
+Bildschirmen stehen Präsentation und Kartenantwort innerhalb jeder Kugel untereinander.
+Eine am unteren Rand sichtbare Leiste zeigt Speicherstatus, Konflikt-/Fehlermeldungen
+und Speichern/Abbrechen. Die Bereichsauswahl filtert ausschließlich die Ansicht;
+der gespeicherte Satz enthält weiterhin alle 90 Einträge und die 75er-Regel bleibt.
+
+Der Filter „Fragevorlage“ ist eine durchsuchbare Einzelauswahl. Er verwendet stabile
+Vorlagencodes und bevorzugt `source_vorlage` gegenüber der technischen Basisvorlage.
+Angeboten werden nur Vorlagen mindestens einer freigegebenen, gültigen, nicht
+archivierten und für Spielreihe sowie aktuellen Quiz-Zugriff sichtbaren Quelle.
+Fehlende Preview-Daten können daher Optionen reduzieren; sie erklären aber nicht das
+frühere Freitextfeld. Medienverfügbarkeit wird weiterhin bei der Quellenauswahl geprüft.
+
+Das Öffnen des Dialogs lädt einmalig Vorlagen- und Berechtigungsmetadaten in Seiten
+von 200 Datensätzen; Frageninhalte, Antworten und Medien werden dafür nicht geladen.
+Es gibt keine zusätzliche Pollingabhängigkeit. Die neue Serveraktion prüft Sitzung,
+Bingo-Spielzugriff und Quiz-Quellenrechte erneut. Die Freitext-Filteroption bleibt für
+bestehende Aufrufer kompatibel; die Oberfläche nutzt den exakten Codefilter.
+
+CSS bleibt lokal im Matching-Modul. Keine Änderung gemeinsamer UI-Komponenten,
+Quizansichten, Druckvorlagen, Laufzeit-, Speicher- oder Snapshot-Verträge.
+Lokale Nachweise und Prüfgrenzen: [Matching-UX](../reviews/bingo-matching-ux/README.md).
+
 Verbindlich: `test:bingo-preparation`, `test:bingo`, Typecheck, geänderte-Dateien-ESLint,
 vollständige erforderliche CI und Build. Die echte PostgreSQL-Abnahme erweitert
 `bingo-preparation.integration.test.ts`: leere/befüllte additive Migration, alte
@@ -158,3 +184,64 @@ Historische Bootstrap- und Backup-Betriebspunkte werden dadurch nicht als behobe
 markiert. Echtes 90er-Bingo, kleinerer Ziehungspool, OCR und neue TTS gehören nicht dazu.
 
 Abnahme, konkrete Nachweise, Transfermessungen und Grenzen: [bingo-matching-acceptance.md](./bingo-matching-acceptance.md). Die Kartenbeschriftung bei Textkopplung wird abgeleitet und auch im gesperrten Eingabefeld entsprechend angezeigt; die manuelle Alternative bleibt erhalten. Fehlende gespeicherte Medien werden nicht als Browser-TTS ausgegeben. Der Audio-Countdown besitzt einen eigenen Inline-Size-Container und keine scrollbare Innenfläche.
+
+### Quellensuche: Filterung vor Pagination (PR #160)
+
+Die Matching-eigene SQL-Projektion wendet Freigabe, Archivierung, Gültigkeit,
+Spielreihe, aktuelle effektive Quiz-Leserechte, Fragetext, ursprüngliche Vorlage
+(`source_vorlage` vor technischer Basis) und Medientyp **vor** `skip/take` an.
+Das verhindert leere Seiten trotz passender Quellen hinter den ersten 20 Fragen.
+Die abschließende Objektpolicy bleibt zusätzlich erhalten. Bingo-Zugriff allein
+berechtigt weiterhin nicht zu Quizquellen oder deren Vorlagenmetadaten.
+
+`sourceQuery.ts` bildet die vorhandene Policy ausschließlich für freigegebene
+Quellen ab und verwendet die vorhandenen Medienslotdefinitionen sowie die
+bestehende Typnamenspriorität Bild → Audio → Video. Antwortbilder zählen nur in
+passenden Antwortslots, bei einfachen Antworten nur für richtige Antworten.
+Die Suche liefert höchstens 20 Kennungen/Titel/Vorlagennamen und ein `more`-Flag;
+keine Antworten, Medienpfade, Bytes oder vollständigen Quelldetails. Erst die
+bewusste Auswahl lädt über den vorhandenen autorisierten Detailweg tatsächliche
+Varianten und Kartenantworten. Eine vorhandene Quelle bzw. Vorlage garantiert
+keine verfügbare Datei. Browser-Sprachausgabe bleibt ausdrücklich keine Audiodatei.
+
+Die Vorlagenliste lädt beim Öffnen oder ausdrücklichem Wiederholen ausschließlich
+Berechtigungs-/Vorlagenmetadaten in 200er-Seiten. Identische Namen verschmelzen
+keine unterschiedlichen Codes. Kein neuer Pollingpfad, Schema- oder Laufzeitvertrag.
+Automatische Nachweise: `sourceQuery.test.ts`, `sourceOptions.test.ts` und die echte
+PostgreSQL-Abnahme mit 210 Bild- und 50 Audioquellen (20/20/10), Vorlagen jenseits
+200, Produkt-/Quellenentzug und Kontrolle der tatsächlichen SQL-Projektion.
+
+### Dialog, Entwurf und lokale Bedienung (PR #160)
+
+`SourcePicker` verwendet die bestehende durchsuchbare Vorlagenauswahl und den
+vorhandenen Modal-/Medienplayer-Vertrag. Matching-eigene Request-Lanes lassen pro
+Leseweg nur eine Anfrage gleichzeitig laufen, ersetzen wartende überholte Suchen
+und ignorieren verspätete Antworten. Filterwechsel invalidieren Ergebnisse sofort,
+setzen die Seite zurück und suchen nach 250 ms Ruhe neu. Explizites Suchen bzw.
+Wiederholen bleibt möglich. Schließen invalidiert ausstehende UI-Aktualisierungen;
+bereits laufende serverseitige Leseanfragen werden dadurch nicht rückgängig gemacht.
+Es gibt kein zeitgesteuertes Quellenpolling.
+
+Laden, technischer Fehler mit Wiederholen, keine berechtigten Vorlagen und keine
+Suchtreffer sind getrennte sichtbare Zustände. Lange ausgewählte Vorlagennamen
+stehen zusätzlich vollständig unter der Auswahl; Variante und tatsächlich
+wirksamer Drucktext bleiben im Kontext sichtbar. Escape schließt zuerst die offene
+Vorlagenliste, danach den Dialog; der Fokus kehrt zur Medien-Lupe zurück.
+Unmittelbar vor Übernahme werden Quelle, Revision, Antworten und tatsächliche
+Dateiverfügbarkeit erneut über den vorhandenen autorisierten Detailweg geprüft.
+Entzug, Änderung oder Fehler übernehmen nichts und erhalten Auswahl und Entwurf.
+
+Der Editor behält seinen 90-Zeilen-Entwurf, CAS und Navigationsschutz. „Zahl
+beibehalten“ erklärt ausdrücklich die weiterhin gespeicherten Alternativen.
+Ausgeblendete ausgewählte Zeilen zählen sichtbar zu Sammelaktionen; Validierungsfehler
+außerhalb des Bereichs bleiben zusammengefasst. Schreibgeschützte Runden werden vor
+der Tabelle erklärt. Bestehende Zuordnungen/Karten werden nicht still neu erzeugt.
+Nur Matching-CSS ergänzt Scrollabstände für fokussierte Felder über der Speicherleiste.
+Vorhandene gemeinsame Quiz-/Modal-/Navigationskomponenten werden nicht verändert.
+
+Regressionen: `sourceRequests.test.ts`, `SourcePicker.browser.test.ts`, bestehender
+Combobox-Browsertest und `scripts/testing/bingo-matching-ux.browser.mjs` für die volle
+Next-Seite mit echtem AppHeader, realer Datenbank, frischen getrennten Rollensitzungen,
+nativem Abbruch/Tab/Escape, echtem Zwei-Fenster-CAS, Save/Reload und allen drei Viewports.
+Komponententests mit simulierten Actions sind getrennt von diesen lokalen echten
+Serveraktionen und der weiterhin offenen gehosteten Abnahme auszuweisen.

@@ -1,0 +1,753 @@
+{
+  "testedApplicationCommit": "8342344f5f52c1f8644093bfab4cf5e3e3610bfa",
+  "origin": "http://127.0.0.1:3058",
+  "realNextPage": true,
+  "realAppHeader": true,
+  "realServerActions": true,
+  "isolatedDatabase": "bingo_ap2_qa_1794063015627",
+  "viewports": [
+    [
+      1366,
+      768
+    ],
+    [
+      1280,
+      720
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "passed": [
+    "fresh synthetic Admin login",
+    "actual AppHeader and idle page without source/template POST polling",
+    "actual save immutable version and full document reload",
+    "native browser cancellation preserves page and actual unsaved input",
+    "15–26 bulk assignment persists, all90 retained, hidden original and inactive alternatives preserved",
+    "actual two-window PostgreSQL CAS conflict preserves second draft",
+    "duplicate validation blocks save with hidden-row error summary",
+    "actual 50 audio results beyond210images: pages20/20/10 with no false empty page",
+    "real template keyboard selection, complete long-name context, nested Escape and focus restoration",
+    "six actual source combinations Original/Reverse × artist/title/combined; fresh authorization, immutable save and reload",
+    "own card text independently selected, freshly verified, saved and reloaded",
+    "native Tab, visible focus and last row clear save toolbar at1366×768/1280×720/390×844",
+    "actual fresh manager routed permission check",
+    "actual fresh editor routed permission check",
+    "actual fresh management routed permission check",
+    "actual fresh none routed permission check",
+    "used-card round visibly explained and read-only"
+  ],
+  "network": {
+    "capturedFlowMs": 48125,
+    "totalMatchingPostActions": 45,
+    "idleWindows": [
+      {
+        "label": "page before opening dialog",
+        "durationMs": 10000,
+        "sourcePosts": 0
+      },
+      {
+        "label": "open dialog with settled filters",
+        "durationMs": 10009,
+        "sourcePosts": 0
+      },
+      {
+        "label": "page after closing dialog",
+        "durationMs": 10004,
+        "sourcePosts": 0
+      }
+    ],
+    "requests": [
+      {
+        "relativeMs": 0,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 304,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 605,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 622,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 627,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 894,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 919,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 1135,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 1313,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 1334,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 3514,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 3569,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 3747,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 3916,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 3940,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 4429,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 4683,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 4697,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 4895,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 4944,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 5256,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 5273,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 5304,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 5416,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 5797,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 5820,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 6220,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 6365,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 6388,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 6474,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 6961,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 17273,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 17792,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 18291,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 19684,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 20057,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 20193,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 20637,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 20754,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 20917,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 21220,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 21237,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 21250,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 21447,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 21470,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 21558,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 21910,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 22045,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 22509,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 22633,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 22754,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 22900,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 23047,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 23065,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 23128,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 23490,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 23625,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 24076,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 24200,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 24311,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 24461,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 24608,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 24626,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 24691,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 25058,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 25191,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 25644,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 25768,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 25886,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 26031,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 26177,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 26194,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 26255,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 26625,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 26761,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 27211,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 27332,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 27434,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 27569,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 27727,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 27743,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 27798,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 28159,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 28310,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 28760,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 28881,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 28992,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 29119,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 29260,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 29277,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 29339,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 29707,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 29842,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 30304,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 30419,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 30568,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 30797,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 30878,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 30995,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 31017,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 44304,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 44630,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 44687,
+        "method": "POST",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": true
+      },
+      {
+        "relativeMs": 44687,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 45827,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 46784,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 47695,
+        "method": "GET",
+        "path": "/bingo/efbfb531-015c-48a5-b6b6-2ee5ad751e64/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 47917,
+        "method": "GET",
+        "path": "/bingo/45c8f093-7ace-4abf-9e1a-d6f1a33d7dae/matching",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 48121,
+        "method": "GET",
+        "path": "/bingo/45c8f093-7ace-4abf-9e1a-d6f1a33d7dae/vorbereitung",
+        "serverAction": false
+      },
+      {
+        "relativeMs": 48125,
+        "method": "GET",
+        "path": "/bingo/45c8f093-7ace-4abf-9e1a-d6f1a33d7dae/vorbereitung",
+        "serverAction": false
+      }
+    ]
+  },
+  "build": {
+    "head": "8342344f5f52c1f8644093bfab4cf5e3e3610bfa",
+    "startedAt": "2026-11-07T18:16:51.932Z",
+    "command": "npm run build -- --webpack",
+    "localDatabaseOnly": true
+  },
+  "reviewCase": {
+    "gameId": "ef47865e-543b-417c-af50-930c91f710d7",
+    "roundId": "7c619599-1177-4d04-9165-d6fe0359b899",
+    "secondRoundId": "6ad22d55-b1a1-4026-bb2c-f58612c0e773",
+    "url": "http://127.0.0.1:3058/bingo/ef47865e-543b-417c-af50-930c91f710d7/matching?round=7c619599-1177-4d04-9165-d6fe0359b899",
+    "localOnly": true,
+    "unstarted": true,
+    "synthetic": true
+  },
+  "comparison": {
+    "head": "8342344f5f52c1f8644093bfab4cf5e3e3610bfa",
+    "comparison": {
+      "gameId": "09ddfa2a-f1e9-4dd2-83d0-618856360822",
+      "roundId": "b9f12b58-98f4-4da3-ac12-71984a853362",
+      "url": "http://127.0.0.1:3058/bingo/09ddfa2a-f1e9-4dd2-83d0-618856360822/matching?round=b9f12b58-98f4-4da3-ac12-71984a853362",
+      "compares": "same90entries/title/initialstate as original804 baseline; only immutable asset IDs are game-owned",
+      "productionTouched": false
+    },
+    "realNextPage": true,
+    "AppHeader": true
+  },
+  "hostedAcceptance": "BLOCKED: exact branch trust and Preview environment branch policy absent; not deployed",
+  "productionTouched": false
+}
