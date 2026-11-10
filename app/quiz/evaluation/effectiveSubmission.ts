@@ -62,7 +62,7 @@ function contentFromSubmission(
 ): EffectiveAnswerContent {
   const { interaction_type: interactionType, payload } = submission;
 
-  if (interactionType === "TEXT") {
+  if (interactionType === "TEXT" || interactionType === "MATCHING") {
     return {
       answerText: readStringProperty(payload, "text"),
       selectedAnswerIds: [],

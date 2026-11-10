@@ -1,7 +1,7 @@
 import "server-only";
 
 import { prisma } from "@/app/lib/prisma";
-import { loadQuestionEditorMessages } from "@/app/i18n/questionEditorMessages";
+import { createDerivedPixelQuestion } from "./createDerivedPixelQuestion.server";
 import { runQuestionGenerator } from "./generators/service";
 import {
   buildFaceMorphPixelQuestionPlan,
@@ -10,7 +10,6 @@ import {
   type FaceMorphPixelSource,
 } from "./faceMorphPixelQuestionPlan";
 import {
-  DEFAULT_PIXEL_TEMPLATE_CONFIG,
   normalizeQuestionTemplateConfig,
 } from "./pixelTemplateConfig";
 import {
@@ -27,14 +26,13 @@ type PreparedChild = {
   questionId: number;
 };
 
-const messages = loadQuestionEditorMessages("de");
-
 export async function synchronizeFaceMorphPixelQuestions(
   parentQuestionId: number,
   userId: number,
 ): Promise<FaceMorphPixelQuestionSyncResult> {
   try {
     const prepared = await prisma.$transaction(async (tx) => {
+      await tx.$queryRaw`SELECT fragen_id FROM pubquiz.fragen WHERE fragen_id = ${parentQuestionId} FOR UPDATE`;
       const parent = await tx.fragen.findUnique({
         where: { fragen_id: parentQuestionId },
         select: {
@@ -197,56 +195,7 @@ export async function synchronizeFaceMorphPixelQuestions(
         }
 
         if (entry.action === "CREATE") {
-          const child = await tx.fragen.create({
-            data: {
-              frage: messages.templates.pixelImage.defaultQuestion,
-              geltungsbereich: parent.geltungsbereich,
-              vorlage_id: pixelTemplate!.vorlage_id,
-              template_config_json: DEFAULT_PIXEL_TEMPLATE_CONFIG,
-              ist_archiviert: false,
-              ist_unfertig: true,
-              freigegeben: false,
-              review_status: "DRAFT",
-              created_by_user_id: userId,
-              last_modified_by_user_id: userId,
-              fragen_kategorien: {
-                create: parent.fragen_kategorien.map((category) => ({
-                  fragenkategorie: {
-                    connect: {
-                      fragenkategorie_id: category.fragenkategorie_id,
-                    },
-                  },
-                })),
-              },
-              eventreihen: parent.geltungsbereich === "EVENT_SERIES"
-                ? { create: parent.eventreihen.map((entry) => ({ eventreihe_id: entry.eventreihe_id })) }
-                : undefined,
-              antwortfelder: {
-                create: {
-                  label: messages.templateFields.solution,
-                  sortierung: 1,
-                  ist_pflicht: true,
-                  loesungen: {
-                    create: source.solutions.map((solution, index) => ({
-                      loesung_text: solution.text,
-                      sortierung: index + 1,
-                      ist_akzeptiert: true,
-                      zusatzinformation: solution.additionalInfo,
-                    })),
-                  },
-                },
-              },
-              medien: {
-                create: {
-                  medientyp_id: source.mediaTypeId,
-                  datei: source.imageUrl,
-                  slot_key: "pixel_original_image",
-                  sortierung: 1,
-                },
-              },
-            },
-            select: { fragen_id: true },
-          });
+          const child = await createDerivedPixelQuestion(tx, pixelTemplate!.vorlage_id, userId, parent, source);
           await tx.fragen_relationen.create({
             data: {
               quell_fragen_id: parentQuestionId,

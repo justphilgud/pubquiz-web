@@ -42,6 +42,8 @@ export const enQuestionEditorMessages = {
     ordering: { name: "Ordering", description: "Put terms into the correct order.", defaultQuestion: "" },
     translationReadAloud: { name: "Translated and read aloud", description: "Keep original text, translation and audio separately editable.", defaultQuestion: "Which song lyrics were translated here?" },
     anagram: { name: "Anagram", description: "Rearrange a name using exactly the same letters.", defaultQuestion: "Which name is hidden in this anagram?" },
+    factsPerson: { name: "Facts → Person", description: "Facts → Person", defaultQuestion: "Who is the person?" },
+    pairs: { name: "Match the pairs", description: "Match the pairs", defaultQuestion: "Which terms go together?" },
     factsYear: { name: "Fakten → Jahr", description: "Textuelle Fakten führen zu einer Jahreszahl.", defaultQuestion: "Welches Jahr wird gesucht?" },
     factsCountry: { name: "Fakten → Land", description: "Textuelle Fakten führen zu einem Land.", defaultQuestion: "Welches Land wird gesucht?" },
     factsText: { name: "Fakten → freie Antwort", description: "Textuelle Fakten mit freier Antwort oder sichtbaren Auswahloptionen.", defaultQuestion: "Welche Lösung wird gesucht?" },
@@ -101,6 +103,7 @@ export const enQuestionEditorMessages = {
   answers: { title: "Answers", answer: "Answer", answers: "Answers", correctShort: "correct", inputPlaceholder: "Enter answer", correct: "This answer is correct", add: "+ Add answer", removeConfirm: "This answer already contains data. Do you really want to remove it?", imageRequired: "An image is required for this FaceMorph answer.", createPixelQuestionLater: "Also create a pixel question from this image later" },
   media: { existingLabel: "Question media", replace: "Replace media", choose: "Choose file", chooseImage: "Choose image", takePhoto: "Take photo", uploading: "Uploading …", playbackError: "The audio file could not be loaded." },
   mediaSlots: {
+    factsPersonSolutionImage: { label: "Solution image", help: "Optional. The image appears with the reveal." },
     musicOriginalAudio: { label: "Original audio", help: "A reversed version is generated from this audio." },
     musicBitcrushAudio: { label: "Bitcrushed audio", help: "The original is digitally reduced to create a rougher sound." },
     pixelOriginalImage: { label: "Original image", help: "Three pixel stages are generated from this image." },
@@ -153,6 +156,7 @@ export const enQuestionEditorMessages = {
   save: { saving: "Saving …", saveQuestion: "Save question", saveDraft: "Save draft", saveDraftAndNew: "Save draft & new question", submit: "Submit for review", approve: "Approve question", saveAndApprove: "Save and approve" },
   review: { statuses: { DRAFT: "Draft", IN_REVIEW: "In review", CHANGES_REQUESTED: "Changes requested", APPROVED: "Approved" }, quality: "Quality review", blockers: "Blocking criteria", warnings: "Warnings" },
   quality: {
+    PAIRS_INVALID: "Enter complete pairs with unique terms on each side.",
     FACTS_INVALID: "Bitte pflege 2 bis 7 nicht leere Fakten und eine gültige Lösungskonfiguration.",
     QUESTION_TEXT_REQUIRED: "Question text is missing", TEMPLATE_MEDIA_REQUIRED: "{label} is missing or cannot be used", MEDIA_SLOT_REQUIRED: "{label} is missing or cannot be used", MEDIA_SLOT_TYPE_MISMATCH: "{label} has the wrong media type", MEDIA_SLOT_CONFLICT: "{label} has a conflicting assignment", MEDIA_SLOT_TOO_MANY_ITEMS: "{label} contains too many media items", MEDIA_UPLOAD_IN_PROGRESS: "The upload for {label} is still running", MEDIA_UPLOAD_FAILED: "The upload for {label} failed", MEDIA_OWNER_INVALID: "{label} has no unique owner", CORRECT_ANSWER_REQUIRED: "No completed correct answer is available", POLL_OPTIONS_REQUIRED: "At least two completed poll options are required", POLL_SCALE_INVALID: "Scale, step and labels must be complete and valid", ANSWER_MEDIA_REQUIRED: "Both FaceMorph answer images are required",
     REQUIRED_LABELED_ANSWER_EMPTY: "A required labelled answer field is empty", VALID_UNTIL_INVALID: "The expiry date is incomplete or invalid", REVIEW_FROM_INVALID: "The review date is incomplete or invalid", LIFECYCLE_DATE_CONFLICT: "Only one freshness mode can be active",

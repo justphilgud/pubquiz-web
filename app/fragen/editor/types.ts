@@ -20,9 +20,11 @@ export type QuestionEvaluationMode =
   | "NUMERIC_TOLERANCE"
   | "ORDER_EXACT"
   | "ORDER_POSITION"
+  | "PAIR_MATCH"
   | "NONE";
 
 export type QuestionTemplateSurfaceKind =
+  | "PAIRS"
   | "FACTS"
   | "STANDARD"
   | "TRUE_FALSE"
@@ -45,10 +47,15 @@ export type AnagramWordCountPreference =
 
 export type QuestionTemplateData =
   | {
+      kind: "PAIRS";
+      pairs: Array<{ leftId: string; rightId: string; left: string; right: string }>;
+    }
+  | {
       kind: "FACTS";
       facts: Array<{ id: string; text: string }>;
       response: "YEAR" | "COUNTRY" | "TEXT";
       solution: string;
+      createPixelQuestion?: boolean;
       acceptedVariants: string[];
       options: Array<{ id: string; text: string; isCorrect: boolean }>;
     }
@@ -151,6 +158,7 @@ export type MediaSlotKey =
   | "question_image"
   | "question_audio"
   | "question_video"
+  | "facts_person_solution_image"
   | "answer_image"
   | "face_morph_result"
   | "face_morph_person_a_original"
@@ -348,6 +356,8 @@ export type QuestionTemplateDefinition = {
   requiresAnswerImages: boolean;
   questionTextIsTemplateStatic?: boolean;
   translationKey:
+    | "factsPerson"
+    | "pairs"
     | "factsYear"
     | "factsCountry"
     | "factsText"
@@ -468,6 +478,7 @@ export type QuestionValidationTarget =
   | "reviewFrom";
 
 export type SaveQuestionPayload = {
+  creationRequestId?: string;
   questionId?: number;
   intent: QuestionSaveIntent;
   scope: "GLOBAL" | "EVENT_SERIES";

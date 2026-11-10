@@ -45,7 +45,7 @@ import {
 } from "./editor/questionLifecycle";
 import { getEventSeriesIdsForCapability } from "@/app/eventreihen/eventSeriesAccess.server";
 import { questionTemplateDefinitions } from "./editor/templates/questionTemplates";
-import { normalizeQuestionTemplateConfig } from "./editor/pixelTemplateConfig";
+import { getFactsPersonTransferConfig, normalizeQuestionTemplateConfig } from "./editor/pixelTemplateConfig";
 import { getQuestionTemplateValidationIssue } from "./editor/templates/questionTemplateData";
 import {
   getClosedQuestionTemplatePersistenceIds,
@@ -985,6 +985,7 @@ export async function exportFragenFuerTransfer(fragenIds: number[]) {
     include: {
       vorlage: { select: { code: true } },
       antworten: { orderBy: { antwort_id: "asc" } },
+      medien: { where: { slot_key: "facts_person_solution_image" }, orderBy: { sortierung: "asc" }, take: 1 },
       fragen_kategorien: {
         include: { fragenkategorie: { select: { kategorie: true } } },
       },
@@ -1002,8 +1003,11 @@ export async function exportFragenFuerTransfer(fragenIds: number[]) {
     template_id:
       resolveCanonicalQuestionTemplateId(question.vorlage?.code ?? null) ??
       "standard",
+    frage_medien_1: question.medien[0]?.datei ?? "",
     template_config_json: question.template_config_json
-      ? JSON.stringify(question.template_config_json)
+      ? JSON.stringify(question.vorlage?.code === "fakten_person"
+        ? getFactsPersonTransferConfig(question.template_config_json)
+        : question.template_config_json)
       : "",
   }));
 }
@@ -1019,7 +1023,8 @@ export async function importFragenAusDatei(zeilen: FragenImportZeile[]) {
     grund: string;
   }[] = [];
 
-  for (const [index, zeile] of zeilen.entries()) {
+  for (const [index, importedRow] of zeilen.entries()) {
+    let zeile = importedRow;
     const frageText = zeile.frage.trim();
 
     if (!frageText) {
@@ -1075,9 +1080,10 @@ export async function importFragenAusDatei(zeilen: FragenImportZeile[]) {
           })
         : null;
       let templateConfig: Prisma.InputJsonValue | undefined;
-      if (zeile.template_config_json?.trim()) {
+      const requiresTemplateData = templateId === "fakten_person" || templateId === "paare_bilden";
+      if (requiresTemplateData || zeile.template_config_json?.trim()) {
         try {
-          const parsedConfig: unknown = JSON.parse(zeile.template_config_json);
+          const parsedConfig: unknown = JSON.parse(zeile.template_config_json ?? "null");
           const specificIssue = getQuestionTemplateValidationIssue(
             parsedConfig && typeof parsedConfig === "object" &&
               !Array.isArray(parsedConfig) &&
@@ -1092,6 +1098,20 @@ export async function importFragenAusDatei(zeilen: FragenImportZeile[]) {
             templateId,
           );
           if (!normalizedConfig) throw new Error("invalid template config");
+          const data = normalizedConfig.templateData;
+          if (templateId === "fakten_person" && data?.kind === "FACTS") {
+            if (zeile.frage_medien.length > 1 || zeile.frage_medien.some((url) => getMedientypIdAusDatei(url.trim()) !== 1)) {
+              throw new Error("Das Lösungsbild muss eine einzelne Bilddatei sein.");
+            }
+            // CSV transfer does not carry a saved relation or request identity.
+            data.createPixelQuestion = false;
+            zeile = {
+              ...zeile, antworten: [data.solution, ...data.acceptedVariants],
+              richtige_antworten: [data.solution, ...data.acceptedVariants].map((_, index) => String(index + 1)),
+              antwort_medien: {},
+            };
+          }
+          if (templateId === "paare_bilden") zeile = { ...zeile, antworten: [], richtige_antworten: [], antwort_medien: {} };
           templateConfig = normalizedConfig as Prisma.InputJsonValue;
         } catch (error) {
           await prisma.fragen.delete({ where: { fragen_id: frage.fragen_id } });
@@ -1170,6 +1190,7 @@ export async function importFragenAusDatei(zeilen: FragenImportZeile[]) {
           fragen_id: frage.fragen_id,
           datei: trimmedDatei,
           medientyp_id: getMedientypIdAusDatei(trimmedDatei),
+          ...(templateId === "fakten_person" ? { slot_key: "facts_person_solution_image" } : {}),
           sortierung: mediumIndex + 1,
         },
       });

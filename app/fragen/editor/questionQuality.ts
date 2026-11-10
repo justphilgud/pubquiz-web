@@ -16,6 +16,7 @@ import { normalizeQuestionTemplateConfig } from "./pixelTemplateConfig";
 import { getQuestionTemplateValidationIssue } from "./templates/questionTemplateData";
 
 export type QuestionQualityIssueCode =
+  | "PAIRS_INVALID"
   | "FACTS_INVALID"
   | "QUESTION_TEXT_REQUIRED"
   | "TEMPLATE_MEDIA_REQUIRED"
@@ -241,6 +242,7 @@ export function evaluateQuestionQuality(
   if (
     !isPollQuestionTemplateId(draft.templateId) &&
     !isMemeCaptionQuestionTemplateId(draft.templateId) &&
+    draft.templateId !== questionTemplateIds.pairs &&
     !filledAnswers.some((answer) => answer.isCorrect)
   ) {
     blockers.push({ code: "CORRECT_ANSWER_REQUIRED", field: "answers" });

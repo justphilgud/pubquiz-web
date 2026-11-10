@@ -5,6 +5,7 @@ const resubmittableInteractionTypes = new Set([
   "SINGLE_CHOICE",
   "MULTI_CHOICE",
   "ORDER",
+  "MATCHING",
   "POLL_SINGLE",
   "POLL_MULTI",
   "POLL_SCALE",

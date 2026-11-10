@@ -11,6 +11,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, 
 import QRCode from "react-qr-code";
 import { ClassicalChoiceSlide } from "./ClassicalChoiceSlide";
 import { OrderingSolutionLayout } from "./OrderingSolutionLayout";
+import { PairsSlide } from "./PairsSlide";
 import { FactsPresentation } from "./FactsPresentation";
 import { TeamJoinWelcome } from "./TeamJoinWelcome";
 import { SponsorMoment } from "./SponsorMoment";
@@ -709,6 +710,7 @@ function renderFrageSlide(slide: Extract<Slide, { typ: "frage" }>) {
     ? pixelState?.effectivePixelStage ?? Math.min(pixelRevealMedia.length, Math.max(1, templateRevealCount))
     : null;
   const questionMedia = frage.templateId === "pixelbild" ? currentSlideMedia : frage.medien;
+  if (templateData?.kind === "PAIRS") return <PairsSlide question={frage.frage} data={templateData} reveal={false} />;
   if (templateData?.kind === "FACTS") {
     return <FactsPresentation question={frage.frage} facts={templateData.facts} options={hatAntwortmoeglichkeiten
       ? frage.antworten.map((answer) => ({ id: answer.antwort_id, text: answer.antwort })) : []} />;
@@ -1574,6 +1576,15 @@ function renderAufloesungSlide(slide: Extract<Slide, { typ: "aufloesung" }>) {
       media={images.length ? images.map(medium => renderMedienKarte(medium, "large")) : undefined} />;
   }
   const templateData = frage.templateConfig?.templateData;
+  if (templateData?.kind === "PAIRS") return <PairsSlide question={frage.frage} data={templateData} reveal />;
+  if (frage.templateId === "fakten_person" && templateData?.kind === "FACTS") {
+    const image = frage.medien.find(({ slotKey }) => slotKey === "facts_person_solution_image");
+    return <section className="flex h-full min-h-0 flex-col items-center justify-center gap-6 p-6 text-[var(--quiz-text)]">
+      <p className="text-xl">Auflösung</p>
+      <h1 className="break-words text-center text-[clamp(2rem,6vw,5rem)] font-bold">{templateData.solution}</h1>
+      {image && <div className="min-h-0 flex-1">{renderMedienKarte(image, "large")}</div>}
+    </section>;
+  }
   const layoutVariant = frage.presentationLayouts.solution.variant;
   const antworten = sortiereAntworten(frage);
   const richtigeAntworten = antworten.filter((antwort) => antwort.ist_richtig);

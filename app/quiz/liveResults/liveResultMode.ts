@@ -20,6 +20,7 @@ const EXCLUDED_TEXT_TEMPLATES = new Set([
   "pixelbild",
   "image_pixel",
   "facemorph",
+  "fakten_person",
   "face_morph",
 ]);
 

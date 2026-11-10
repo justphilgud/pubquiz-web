@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ComponentType } from "react";
+import { PairsEditor } from "./PairsEditor";
 import { FactsTemplateEditor } from "./FactsTemplateEditor";
 import { CharacterCount } from "./CharacterCount";
 import { PresentationContentWarning } from "@/app/rendering/presentation/PresentationContentWarning";
@@ -37,6 +38,7 @@ import type {
 } from "../types";
 
 type Props = {
+  openOnly?: boolean;
   kind: QuestionTemplateSurfaceKind;
   data: QuestionTemplateData | undefined;
   disabled: boolean;
@@ -618,6 +620,7 @@ function MemeCaptionEditor() {
 }
 
 const editors: Partial<Record<QuestionTemplateSurfaceKind, ComponentType<EditorProps>>> = {
+  PAIRS: PairsEditor,
   FACTS: FactsTemplateEditor,
   TRUE_FALSE: TrueFalseEditor,
   ESTIMATE: EstimateEditor,

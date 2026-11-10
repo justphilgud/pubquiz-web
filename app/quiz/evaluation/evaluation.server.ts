@@ -22,6 +22,7 @@ import {
   selectEvaluationBackfillBatch,
   summarizeIncompleteEvaluations,
 } from "./evaluationBackfillPolicy";
+import { parsePairs } from "@/app/fragen/editor/templates/pairsTemplate";
 import { getQuestionBaseMaximum } from "./questionPointPolicy";
 import { allocateRiskQuestionPoints } from "./riskQuestionAllocation";
 import {
@@ -264,13 +265,16 @@ async function recalculateQuizQuestionEvaluationInTransaction(
   const orderedItemIds = templateOrderingItems.length > 0
     ? assignment.fragen.antworten.map((answer) => String(answer.antwort_id))
     : [];
+  const rawConfig = assignment.fragen.template_config_json;
+  const pairs = rawConfig && typeof rawConfig === "object" && !Array.isArray(rawConfig)
+    ? parsePairs(rawConfig.templateData, true) ?? undefined : undefined;
   const maximum = getQuestionBaseMaximum({
     templateId,
     correctAnswerCount: assignment.fragen.antworten.filter(
       (answer) => answer.ist_richtig,
     ).length,
     structuredFieldCount: assignment.fragen.antwortfelder.length,
-    orderingItemCount: orderedItemIds.length,
+    orderingItemCount: pairs?.pairs.length ?? orderedItemIds.length,
   });
   const answerMode = resolveQuizQuestionAnswerMode({
     templateId,
@@ -310,6 +314,7 @@ async function recalculateQuizQuestionEvaluationInTransaction(
       })),
       structuredAnswers: effectiveSubmission?.structuredAnswers ?? new Map(),
       orderingItems: orderedItemIds,
+      pairs,
     });
     return {
       answer,

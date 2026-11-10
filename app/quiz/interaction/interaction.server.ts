@@ -1061,7 +1061,10 @@ export async function saveTeamAnswerDraft(input: {
     ) {
       return { success: false, reason: "FINALIZED" };
     }
-    const validated = validateInteractionPayload(resolved.interaction, input.draft);
+    const interaction = run.interaction_type === "MATCHING"
+      ? readInteractionSnapshot(run.config_snapshot)
+      : resolved.interaction;
+    const validated = validateInteractionPayload(interaction, input.draft);
 
     await tx.$queryRaw`
       SELECT "team_antwort_id"

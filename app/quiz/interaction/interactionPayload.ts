@@ -1,3 +1,4 @@
+import { readPairMatches } from "@/app/fragen/editor/templates/pairsTemplate";
 import { isCountryCode } from "@/app/lib/countries";
 import { isValidYear } from "@/app/fragen/editor/templates/factsTemplate";
 import type { ResolvedQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
@@ -59,6 +60,13 @@ export function validateInteractionPayload(
     throw new Error("Diese Interaktion nimmt keine Teamantwort entgegen.");
   }
 
+  if (interaction.type === "MATCHING") {
+    const matches = readPairMatches(draft.answerText, interaction.left, interaction.right);
+    if (!matches || draft.selectedAnswerIds.length > 0 || draft.structuredAnswers.length > 0) {
+      throw new Error("Die übermittelten Paare sind ungültig.");
+    }
+    return { payload: { text: JSON.stringify(matches) }, hasContent: matches.length > 0 };
+  }
   if (interaction.type === "TEXT") {
     const text = draft.answerText ?? "";
     if (interaction.selection === "COUNTRY" && text && !isCountryCode(text)) throw new Error("Die Länderauswahl ist ungültig.");
@@ -191,7 +199,7 @@ export function interactionPayloadToDraft(
   interaction: ResolvedQuizAnswerInteraction,
   payload: QuizInteractionPayload,
 ) {
-  if (interaction.type === "TEXT" && "text" in payload) {
+  if ((interaction.type === "TEXT" || interaction.type === "MATCHING") && "text" in payload) {
     return { antwortText: payload.text, antwortId: null, antwortfelder: {} };
   }
   if (interaction.type === "NUMBER" && "value" in payload) {

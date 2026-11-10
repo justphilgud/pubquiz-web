@@ -41,6 +41,8 @@ type MemeFitState = {
   fits: boolean;
 };
 
+import { PairsAnswer } from "./PairsAnswer";
+
 function textDraft(value: string): TeamAnswerDraft {
   return {
     antwortText: value,
@@ -227,6 +229,10 @@ export default function GenericAnswerRenderer({
     return <div className="mt-4" data-answer-interaction={interaction.type}><FactsAnswerSelect kind={interaction.selection} value={value?.antwortText ?? ""} disabled={disabled} onChange={(selected) => onChange(textDraft(selected))} /></div>;
   }
 
+  if (interaction.type === "MATCHING") {
+    return <PairsAnswer key={questionAssignmentId} {...interaction} value={value?.antwortText}
+      disabled={disabled} onChange={(text) => onChange(textDraft(text))} />;
+  }
   if (interaction.type === "TEXT") {
     return (
       <textarea

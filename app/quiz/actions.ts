@@ -1,5 +1,6 @@
 "use server";
 
+import { formatPairMatches, getPositionScoringItemCount } from "@/app/fragen/editor/templates/pairsTemplate";
 import { buildQuestionSolutionPreview } from "@/app/fragen/questionSolutionPreview";
 
 import { saveStandardIntroRules } from "@/app/quiz/flow/quizFlowRepository.server";
@@ -1218,10 +1219,7 @@ export async function getQuizDetails(
           (answer) => answer.ist_richtig,
         ).length,
         structuredFieldCount: eintrag.fragen.antwortfelder.length,
-        orderingItemCount:
-          config?.templateData?.kind === "ORDERING"
-            ? config.templateData.items.length
-            : 0,
+        orderingItemCount: getPositionScoringItemCount(config?.templateData),
       });
       const presentationMedia: PresentationLayoutMedium[] = [
         ...eintrag.fragen.medien.map((medium) => ({
@@ -3847,6 +3845,9 @@ export async function saveTeamAntwort(data: {
   const templateConfig = quizFrage.fragen.template_config_json as
     | QuestionTemplateConfig
     | null;
+  if (templateId === questionTemplateIds.pairs) {
+    throw new Error("Paarantworten benötigen eine aktive Antwortphase mit Entwurfsrevision.");
+  }
   const normalizedAnswerText =
     templateId === questionTemplateIds.ordering &&
     templateConfig?.templateData?.kind === "ORDERING"
@@ -4072,6 +4073,7 @@ export async function getQuizFrageAuswertung(
   const templateConfig = quizFrage.fragen.template_config_json as
     | QuestionTemplateConfig
     | null;
+  const pairs = templateConfig?.templateData?.kind === "PAIRS" ? templateConfig.templateData : null;
   const orderingItems = templateConfig?.templateData?.kind === "ORDERING"
     ? templateConfig.templateData.items
     : null;
@@ -4082,7 +4084,9 @@ export async function getQuizFrageAuswertung(
     frage: quizFrage.fragen.frage,
     istOffeneFrage,
 
-    richtigeAntworten: quizFrage.fragen.antworten
+    richtigeAntworten: pairs ? pairs.pairs.map(({ left, right }, index) => ({
+      antwort_id: -(index + 1), antwort: `${left} ↔ ${right}`,
+    })) : quizFrage.fragen.antworten
       .filter((antwort) => antwort.ist_richtig)
       .map((antwort) => ({
         antwort_id: antwort.antwort_id,
@@ -4099,7 +4103,7 @@ export async function getQuizFrageAuswertung(
       return {
         team_antwort_id: antwort.team_antwort_id,
         teamname: antwort.quiz_team_sessions.teamname,
-        antwortText: orderingItems
+        antwortText: pairs ? formatPairMatches(pairs, effectiveSubmission?.answerText ?? null) : orderingItems
           ? formatOrderingAnswerForEvaluation(
               quizFrage.fragen.antworten,
               orderingItems,
@@ -4642,7 +4646,8 @@ async function loadQuizAuswertungAlleAntworten(quizId: number, db: Prisma.Transa
     const orderingItems = templateConfig?.templateData?.kind === "ORDERING"
       ? templateConfig.templateData.items
       : null;
-    const richtigeAntworten = orderingItems
+    const pairs = templateConfig?.templateData?.kind === "PAIRS" ? templateConfig.templateData : null;
+    const richtigeAntworten = pairs ? pairs.pairs.map(({ left, right }) => `${left} ↔ ${right}`).join(" · ") : orderingItems
       ? orderingItems.map((item) => item.text).join(" → ")
       : richtigeAntwortenAusOptionen;
 
@@ -4765,7 +4770,7 @@ async function loadQuizAuswertungAlleAntworten(quizId: number, db: Prisma.Transa
         evaluationRevision: antwort ? evaluationRevision(antwort) : null,
         teamname: session.teamname,
         antwortText: offeneAntwortfelderText || (
-          orderingItems
+          pairs ? formatPairMatches(pairs, effectiveSubmission?.answerText ?? null) : orderingItems
             ? formatOrderingAnswerForEvaluation(
                 quizFrage.fragen.antworten,
                 orderingItems,
@@ -4857,10 +4862,7 @@ export async function updateQuizFragePunkteModus(data: {
     pointsMode: data.punkteModus,
     correctAnswerCount: question.fragen.antworten.filter((answer) => answer.ist_richtig).length,
     structuredFieldCount: question.fragen.antwortfelder.length,
-    orderingItemCount:
-      config?.templateData?.kind === "ORDERING"
-        ? config.templateData.items.length
-        : 0,
+    orderingItemCount: getPositionScoringItemCount(config?.templateData),
   });
 
   await prisma.quiz_fragen.update({

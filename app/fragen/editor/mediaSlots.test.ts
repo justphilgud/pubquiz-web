@@ -25,7 +25,7 @@ import {
 test("the semantic slot registry contains all package 3A slot ids", () => {
   assert.deepEqual(Object.keys(mediaSlotDefinitions).sort(), [
     "answer_image", "face_morph_person_a_original", "face_morph_person_b_original",
-    "face_morph_result", "lyrics_tts_audio", "music_bitcrush_audio",
+    "face_morph_result", "facts_person_solution_image", "lyrics_tts_audio", "music_bitcrush_audio",
     "music_original_audio", "music_reverse_audio", "pixel_original_image", "pixel_result_image",
     "pixel_stage_1_image", "pixel_stage_2_image", "pixel_stage_3_image",
     "question_audio", "question_image", "question_video", "sponsor_logo",

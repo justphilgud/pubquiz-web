@@ -127,6 +127,12 @@ export function parseQuestionTemplateConfigDraft(
   };
 }
 
+export function getFactsPersonTransferConfig(value: unknown) {
+  const config = parseQuestionTemplateConfigDraft(value, questionTemplateIds.factsPerson);
+  if (config?.templateData?.kind !== "FACTS") return undefined;
+  return { ...config, templateData: { ...config.templateData, createPixelQuestion: false } };
+}
+
 export function normalizeQuestionTemplateConfig(
   value: unknown,
   templateId: string | null = null,

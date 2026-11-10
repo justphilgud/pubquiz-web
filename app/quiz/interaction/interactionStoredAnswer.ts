@@ -19,7 +19,7 @@ export function resolveParticipantInteractionFromSnapshot(
 ) {
   if (!value) return currentInteraction;
   const snapshot = readInteractionSnapshot(value);
-  return snapshot.type === "MEME_CAPTION" ? snapshot : currentInteraction;
+  return snapshot.type === "MEME_CAPTION" || snapshot.type === "MATCHING" ? snapshot : currentInteraction;
 }
 
 export function draftInputFromStored(answer: {

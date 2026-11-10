@@ -1,3 +1,4 @@
+import { pairColumns } from "@/app/fragen/editor/templates/pairsTemplate";
 import type { QuestionTemplateData } from "@/app/fragen/editor/types";
 import { questionTemplateContractRegistry } from "@/app/fragen/editor/templates/questionTemplates";
 import { resolveTemplateContractCompatibility } from "@/app/rendering/templates/templateContractResolver";
@@ -37,6 +38,7 @@ type MemeCaptionInteraction = {
 };
 
 export type ResolvedQuizAnswerInteraction =
+  | ({ type: "MATCHING" } & ReturnType<typeof pairColumns>)
   | {
       type: "NO_ANSWER";
     }
@@ -106,6 +108,7 @@ export type ResolvedQuizAnswerInteraction =
         | "SINGLE_CHOICE"
         | "MULTI_CHOICE"
         | "ORDER"
+        | "MATCHING"
         | "POLL_SINGLE"
         | "POLL_MULTI"
         | "POLL_SCALE"
@@ -251,6 +254,11 @@ export function resolveQuizAnswerInteraction(
       selectionMode: answerForm.selectionMode,
       options: [...input.answerOptions],
     };
+  }
+  if (answerForm.type === "MATCHING") {
+    return input.templateData?.kind === "PAIRS"
+      ? { type: "MATCHING", ...pairColumns(input.templateData) }
+      : { type: "NO_ANSWER" };
   }
   if (answerForm.type === "ORDER") {
     return {

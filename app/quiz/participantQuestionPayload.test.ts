@@ -25,7 +25,7 @@ function execute(name: string, file: string, bindings: Record<string, unknown>) 
   vm.runInNewContext(code, { exports, Request, Response, Buffer, performance, ...bindings });
   return exports[name];
 }
-async function status(response: "YEAR" | "COUNTRY" | "TEXT" | "TRUE_FALSE", state: string, overrides: {
+async function status(response: "YEAR" | "COUNTRY" | "TEXT" | "TRUE_FALSE" | "PERSON" | "PAIRS", state: string, overrides: {
   hidden?: boolean; reset?: boolean; ownAnswer?: string; validSession?: boolean;
 } = {}) {
   const now = new Date("2026-10-05T08:00:00Z");
@@ -41,17 +41,25 @@ async function status(response: "YEAR" | "COUNTRY" | "TEXT" | "TRUE_FALSE", stat
     aufloesungsstrategie: "AFTER_EACH_QUESTION", quiz_abschnitte: [{ quiz_abschnitt_id: 20,
       titel: "Block", abschnitt_typ: "FRAGEN", quiz_block_freigaben: [release] }],
     quiz_fragen: [assignment, future], praesentation_status: { updated_at: now } };
-  const templateId = response === "YEAR" ? "fakten_jahr" : response === "COUNTRY" ? "fakten_land"
+  const pairs = [
+    { leftId: "left-1", left: "L1", rightId: "right-2", right: "R2" },
+    { leftId: "left-2", left: "L2", rightId: "right-1", right: "R1" },
+  ];
+  const templateId = response === "PERSON" ? "fakten_person" : response === "PAIRS" ? "paare_bilden"
+    : response === "YEAR" ? "fakten_jahr" : response === "COUNTRY" ? "fakten_land"
     : response === "TRUE_FALSE" ? "wahr_falsch" : "fakten_frei";
   const details = { ...assignment, fragen: { fragen_id: 10, frage: "Public question",
-    template_config_json: { templateData: response === "TRUE_FALSE"
+    template_config_json: { templateData: response === "PAIRS" ? { kind: "PAIRS", pairs } : response === "TRUE_FALSE"
       ? { kind: "TRUE_FALSE", correctAnswer: true, explanation: "private-explanation" }
-      : { kind: "FACTS", response, solution: "private-solution", acceptedVariants: ["private-alias"],
+      : { kind: "FACTS", response: response === "PERSON" ? "TEXT" : response, solution: "private-solution", acceptedVariants: ["private-alias"],
           facts: [{ id: "1", text: "Public clue" }], options: [], nestedFutureSolution: "private-future" } },
     vorlage: { code: templateId }, antworten: [
       { antwort_id: 1, antwort: "Wahr", ist_richtig: true, zusatzinformation: "private-answer-information", antworttyp: { antworttyp: "Auswahl" } },
       { antwort_id: 2, antwort: "Falsch", ist_richtig: false, antworttyp: { antworttyp: "Auswahl" } },
-    ], medien: [], antwortfelder: [] } };
+    ], medien: response === "PERSON" ? [{
+      medien_id: 1, slot_key: "facts_person_solution_image", datei: "private-portrait.png",
+      sortierung: 1, medientyp_id: 1,
+    }] : [], antwortfelder: [] } };
   const own = overrides.ownAnswer === undefined ? [] : [{ quiz_fragen_id: 1,
     interaction_run_id: 100, antwort_id: null, antwort_text: overrides.ownAnswer,
     antwortauswahlen: [], antwortfelder: [], submissions: [{ interaction_run_id: 100,
@@ -87,15 +95,19 @@ async function status(response: "YEAR" | "COUNTRY" | "TEXT" | "TRUE_FALSE", stat
   });
   return await fn(7, "test-session") as Payload;
 }
-for (const response of ["YEAR", "COUNTRY", "TEXT", "TRUE_FALSE"] as const) {
+for (const response of ["YEAR", "COUNTRY", "TEXT", "TRUE_FALSE", "PERSON", "PAIRS"] as const) {
   for (const state of ["OPEN", "COUNTDOWN", "CLOSED", "LOCKED"]) {
     test(`actual server status/HTTP: ${response} ${state} has no secret or future question`, async () => {
       const payload = await status(response, state, { ownAnswer: "private-solution" });
       assert.equal(payload.fragen.length, 1);
       assert.equal(payload.fragen[0].resolution ?? null, null);
       const editorial = { ...payload.fragen[0], gespeicherteAntwort: null };
-      assert.doesNotMatch(JSON.stringify(editorial), /private-solution|private-alias|private-explanation|nestedFutureSolution|private-answer-information|zusatzinformation/);
+      assert.doesNotMatch(JSON.stringify(editorial), /private-solution|private-alias|private-explanation|nestedFutureSolution|private-answer-information|zusatzinformation|private-portrait|leftId|rightId/);
       assert.equal(payload.fragen[0].gespeicherteAntwort?.antwortText, "private-solution");
+      if (response === "PAIRS") {
+        assert.equal(payload.fragen[0].interaction.type, "MATCHING");
+        assert.equal(payload.fragen[0].templateConfig, null);
+      }
       for (const light of [false, true]) {
         const route = execute("POST", "app/api/quiz/team-live-snapshot/route.ts", {
           getQuizAntwortStatus: async () => payload,
@@ -121,7 +133,7 @@ for (const response of ["YEAR", "COUNTRY", "TEXT", "TRUE_FALSE"] as const) {
     const payload = await status(response, "REVEALED");
     assert.equal(payload.fragen.length, 1);
     assert.deepEqual(JSON.parse(JSON.stringify(payload.fragen[0].resolution?.answers)),
-      [response === "TRUE_FALSE" ? "Wahr" : "private-solution"]);
+      response === "PAIRS" ? ["L1 ↔ R2", "L2 ↔ R1"] : [response === "TRUE_FALSE" ? "Wahr" : "private-solution"]);
     assert.doesNotMatch(JSON.stringify(payload), /private-alias|private-future|private-explanation/);
   });
 }

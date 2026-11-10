@@ -15,7 +15,7 @@ export type MediaSlotDefinition = {
   generatorInput: boolean;
   generatorOutput: boolean;
   previewType: "IMAGE" | "AUDIO" | "VIDEO";
-  labelKey: "questionImage" | "questionAudio" | "questionVideo" | "answerImage" | "faceMorphResult" | "musicOriginalAudio" | "musicReverseAudio" | "musicBitcrushAudio" | "pixelOriginalImage" | "pixelResultImage" | "pixelStage3Image" | "pixelStage2Image" | "pixelStage1Image" | "preparedSlot";
+  labelKey: "questionImage" | "questionAudio" | "questionVideo" | "answerImage" | "factsPersonSolutionImage" | "faceMorphResult" | "musicOriginalAudio" | "musicReverseAudio" | "musicBitcrushAudio" | "pixelOriginalImage" | "pixelResultImage" | "pixelStage3Image" | "pixelStage2Image" | "pixelStage1Image" | "preparedSlot";
   helpKey: MediaSlotDefinition["labelKey"];
 };
 
@@ -77,6 +77,7 @@ export const mediaSlotDefinitions = {
   question_image: slot("question_image", "QUESTION", "IMAGE", "questionImage"),
   question_audio: slot("question_audio", "QUESTION", "AUDIO", "questionAudio"),
   question_video: slot("question_video", "QUESTION", "VIDEO", "questionVideo"),
+  facts_person_solution_image: slot("facts_person_solution_image", "QUESTION", "IMAGE", "factsPersonSolutionImage"),
   answer_image: slot("answer_image", "ANSWER", "IMAGE", "answerImage"),
   face_morph_result: slot("face_morph_result", "QUESTION", "IMAGE", "faceMorphResult", { origin: "USER_OR_GENERATED", generatorOutput: true }),
   face_morph_person_a_original: slot("face_morph_person_a_original", "QUESTION", "IMAGE", "preparedSlot", { generatorInput: true }),

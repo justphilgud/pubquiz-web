@@ -136,6 +136,8 @@ type AntwortStatus = {
     fragen_id: number;
     frage: string;
     templateId: string | null;
+    templateConfig?: { templateData?: { kind: "FACTS"; facts: { id: string; text: string }[] } } | null;
+    resolution?: { answers: string[] } | null;
     interaction: ResolvedQuizAnswerInteraction;
     interactionRun: {
       id: number;
@@ -1039,6 +1041,20 @@ export default function QuizAntwortClient({
                       <h3 className="text-lg font-bold text-slate-900">
                         {frage.frage}
                       </h3>
+
+                      {frage.templateId === "fakten_person" && frage.templateConfig?.templateData?.facts && (
+                        <ul className="mt-3 list-disc space-y-1 break-words pl-5 text-sm">
+                          {frage.templateConfig.templateData.facts.map(({ id, text }) => <li key={id}>{text}</li>)}
+                        </ul>
+                      )}
+                      {(frage.templateId === "fakten_person" || frage.templateId === "paare_bilden") && frage.resolution && (
+                        <section className="mt-4 rounded-xl border border-slate-300 p-3 text-sm">
+                          <h4 className="font-semibold">Auflösung</h4>
+                          <ul className="mt-1 space-y-1 break-words">
+                            {frage.resolution.answers.map((answer, index) => <li key={index}>{answer}</li>)}
+                          </ul>
+                        </section>
+                      )}
 
                       {frage.templateId === "pixelbild" && questionPixelState && (
                         <div className="answer-special-panel mt-4 space-y-3 rounded-2xl border-2 border-fuchsia-300 bg-fuchsia-50 p-4 text-slate-900">

@@ -1,3 +1,4 @@
+import { pairColumns, readPairMatches } from "@/app/fragen/editor/templates/pairsTemplate";
 import { Prisma } from "@/app/generated/prisma/client";
 import {
   isPollQuestionTemplateId,
@@ -12,9 +13,11 @@ import type {
   EvaluationStatus,
 } from "./evaluationTypes";
 
+import { POSITION_ITEM_POINTS } from "./questionPointPolicy";
+
 const ZERO = new Prisma.Decimal(0);
 const HALF = new Prisma.Decimal("0.5");
-const QUARTER = new Prisma.Decimal("0.25");
+const QUARTER = new Prisma.Decimal(POSITION_ITEM_POINTS);
 
 function statusFor(points: Prisma.Decimal, maximum: Prisma.Decimal): EvaluationStatus {
   if (points.eq(0)) return "WRONG";
@@ -60,6 +63,26 @@ function evaluateStructuredFields(input: BaseAnswerInput): BaseAnswerEvaluation 
       correctComponents,
       totalComponents: input.structuredFields.length,
     },
+  };
+}
+
+function evaluatePairs(input: BaseAnswerInput): BaseAnswerEvaluation {
+  const pairs = input.pairs;
+  const totalComponents = pairs?.pairs.length ?? 0;
+  const maxPoints = QUARTER.mul(totalComponents);
+  if (!pairs || !hasText(input.answerText)) return unanswered(maxPoints, "PAIRS");
+  const { left, right } = pairColumns(pairs);
+  const matches = readPairMatches(input.answerText, left, right);
+  if (!matches) return {
+    basePoints: ZERO, maxPoints, status: "REVIEW_REQUIRED", details: { strategy: "PAIRS" },
+  };
+  if (!matches.length) return unanswered(maxPoints, "PAIRS");
+  const solution = new Map(pairs.pairs.map(({ leftId, rightId }) => [leftId, rightId]));
+  const correctComponents = matches.filter(([leftId, rightId]) => solution.get(leftId) === rightId).length;
+  const basePoints = QUARTER.mul(correctComponents);
+  return {
+    basePoints, maxPoints, status: statusFor(basePoints, maxPoints),
+    details: { strategy: "PAIRS", correctComponents, totalComponents },
   };
 }
 
@@ -157,6 +180,7 @@ export function isNormalizedExactOpenAnswer(
 
 export function evaluateBaseAnswer(input: BaseAnswerInput): BaseAnswerEvaluation {
   const templateId = resolveCanonicalQuestionTemplateId(input.templateId);
+  if (templateId === questionTemplateIds.pairs) return evaluatePairs(input);
 
   if (isPollQuestionTemplateId(templateId)) {
     return {
