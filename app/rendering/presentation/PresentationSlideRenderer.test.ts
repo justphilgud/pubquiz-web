@@ -5,6 +5,7 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { questionTemplateIds } from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import { newQuizIntroMedia } from "@/app/quiz/quizIntroMedia";
 import { buildStorybookExperienceRuntime } from "@/app/rendering/presentationTemplates/storybookExperienceFixture";
 import {
   ArtworkSolutionSlide,
@@ -155,6 +156,29 @@ test("default intro audio is controllable for flow and legacy slides with visibl
   }
   assert.equal(isIntroMusicSlide(undefined), false);
   assert.equal(isIntroMusicSlide({ typ: "fixer-slide", slideTyp: "regeln" }), false);
+});
+
+test("LOVD waiting video and synchronized countdown use stored sources and stay silent after removal", () => {
+  const fixture = buildPresentationQualityFixture("lovd-intro", "EDITORIAL");
+  const quiz = { ...fixture.quiz, intro_startsequenz_text: "Gleich geht’s los",
+    ...newQuizIntroMedia({ slug: "lovd", default_presentation_template_id: null }) };
+  const slides = buildPraesentationSlides(quiz);
+  const waiting = slides.find((slide) => slide.typ === "ablauf" && slide.element.type === "WAITING");
+  const countdown = slides.find(isIntroMusicSlide);
+  assert.ok(waiting && countdown && quiz.intro_video_url && quiz.intro_musik_url);
+  const render = (slide: Slide, stored = quiz) => renderToStaticMarkup(createElement(PresentationSlideRenderer, {
+    ...fixture, quiz: stored, slide, slides,
+  }));
+  assert.ok(render(waiting).includes(`<source src="${quiz.intro_video_url}" type="video/mp4"`));
+  for (const slide of [countdown, { typ: "fixer-slide", slideTyp: "startsequenz" } as const]) {
+    const configured = render(slide);
+    assert.ok(configured.includes(`src="${quiz.intro_musik_url}"`));
+    assert.match(configured, /class="lovd-start-countdown-slot"><audio/);
+    const removed = render(slide, { ...quiz, intro_musik_url: "" });
+    assert.doesNotMatch(removed, /<audio|mexico\.mp3|lovd-start-countdown-slot/);
+    assert.match(removed, /Gleich geht’s los/);
+  }
+  assert.doesNotMatch(render(waiting, { ...quiz, intro_video_url: "" }), /<video|<source/);
 });
 
 test("LOVD open text has no empty answer surface while closed choices and media remain", () => {

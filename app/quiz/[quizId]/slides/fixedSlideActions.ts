@@ -91,7 +91,7 @@ export async function saveIntroSlide(
         await prisma.quiz.update({
           where: { quiz_id: quizId },
           data: {
-            intro_video_url: text(formData, "introVideoUrl") || null,
+            ...(formData.has("introVideoUrl") ? { intro_video_url: text(formData, "introVideoUrl") } : {}),
             intro_startzeit: text(formData, "startzeit") || "19:30",
             intro_wartetext: text(formData, "wartetext") || null,
           },
@@ -101,7 +101,7 @@ export async function saveIntroSlide(
         await prisma.quiz.update({
           where: { quiz_id: quizId },
           data: {
-            intro_musik_url: text(formData, "introMusikUrl") || null,
+            ...(formData.has("introMusikUrl") ? { intro_musik_url: text(formData, "introMusikUrl") } : {}),
             intro_startsequenz_text: text(formData, "countdownText") || null,
           },
         });

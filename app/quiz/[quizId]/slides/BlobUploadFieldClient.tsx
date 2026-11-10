@@ -37,7 +37,7 @@ export default function BlobUploadFieldClient({
   accept,
   environmentPrefix,
 }: BlobUploadFieldClientProps) {
-  const [url, setUrl] = useState(currentUrl ?? "");
+  const [url, setUrl] = useState(currentUrl ?? (slot === "OUTRO_AUDIO" ? "" : null));
   const [uploading, setUploading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const definition = slideMediaUploadDefinitions[slot];
@@ -106,7 +106,8 @@ export default function BlobUploadFieldClient({
       <input
         type="hidden"
         name={hiddenFieldName}
-        value={url}
+        value={url ?? ""}
+        disabled={url === null}
         readOnly
       />
 

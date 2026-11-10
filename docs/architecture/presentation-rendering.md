@@ -132,9 +132,11 @@ sichtbar. Quellenwechsel werden trotz gleicher Befehlsnummer neu berücksichtigt
 Reload, PREPARATION/RUNNING-Wechsel und Reset verlangen die AP1-Aktivierung.
 STOPPED und Stopbefehle verwenden unverändert den vorhandenen Lifecycle-Vertrag.
 
-Die Startsequenz verwendet denselben synchronisierten HTML-Audiopfad. Ohne
-konfigurierte URL bleibt die versionierte Datei
-`/medien/audio/intro/mexico.mp3` der bewusste Fallback. Play-Markierung,
+Die Startsequenz verwendet denselben synchronisierten HTML-Audiopfad. Für
+unkonfigurierte Musikfelder (`NULL`) bleibt die versionierte Datei
+`/medien/audio/intro/mexico.mp3` der Fallback. Ein bewusst geleertes Musikfeld
+unterdrückt den Audioplayer, den musikbasierten Countdown und dessen Bedienung.
+Der Wartebildschirm zeigt ein Video nur mit gespeicherter URL. Play-Markierung,
 Aktivierungsknopf und Legacy-Kicker beziehen Farbe und Kontrast aus dem gewählten
 Theme; Komm.ONE erbt dadurch keine Neon-Pink-Akzente.
 

@@ -61,12 +61,12 @@ test("shared design additive migration, real policies, inheritance and frozen ru
   assert.deepEqual((await db.query("SELECT to_jsonb(t)-'shared_design_template_id' data FROM pubquiz.game_drafts t ORDER BY id")).rows.map(r=>r.data),gameBefore);
   const prisma=new PrismaClient({adapter:new PrismaPg({connectionString:target.toString()})});context.after(()=>prisma.$disconnect());
   let currentUser:number|null=1;
-  const bundle=await build({stdin:{contents:"export * from './app/rendering/sharedDesign/sharedDesignRepository.server'; export * as actions from './app/rendering/sharedDesign/actions'; export * from './app/rendering/resolveQuizTemplates.server'; export {starteQuiz} from './app/quiz/[quizId]/praesentation/statusActions'; export {updateQuiz} from './app/quiz/actions'; export {setPresentationTemplateArchived} from './app/rendering/presentationTemplates/actions'; export {listManagedPresentationTemplates} from './app/rendering/presentationTemplates/presentationTemplateRepository.server';",resolveDir:process.cwd()},bundle:true,write:false,platform:'node',format:'cjs',packages:'external',plugins:[{name:'real-database',setup(b){
-    b.onResolve({filter:/^(server-only|@\/auth|next\/cache|next\/navigation|@\/app\/generated\/prisma\/client|@\/app\/lib\/prisma)$/},a=>({path:a.path,namespace:'fixture'}));
+  const bundle=await build({stdin:{contents:"export * from './app/rendering/sharedDesign/sharedDesignRepository.server'; export * as actions from './app/rendering/sharedDesign/actions'; export * from './app/rendering/resolveQuizTemplates.server'; export {starteQuiz} from './app/quiz/[quizId]/praesentation/statusActions'; export {createQuiz, createSchnellQuiz, updateQuiz} from './app/quiz/actions'; export {saveIntroSlide} from './app/quiz/[quizId]/slides/fixedSlideActions'; export {setPresentationTemplateArchived} from './app/rendering/presentationTemplates/actions'; export {listManagedPresentationTemplates} from './app/rendering/presentationTemplates/presentationTemplateRepository.server';",resolveDir:process.cwd()},bundle:true,write:false,platform:'node',format:'cjs',packages:'external',plugins:[{name:'real-database',setup(b){
+    b.onResolve({filter:/^(server-only|@\/auth|next\/cache|next\/navigation|@\/app\/generated\/prisma\/client|@\/(app\/)?lib\/prisma)$/},a=>({path:a.path,namespace:'fixture'}));
     b.onLoad({filter:/.*/,namespace:'fixture'},a=>({contents:a.path==='@/app/generated/prisma/client'?'export const Prisma=globalThis.prismaValue;':a.path==='server-only'?'':a.path==='@/auth'?'export const auth=async()=>globalThis.session();':a.path==='next/cache'?'export function revalidatePath(){}':a.path==='next/navigation'?'export function redirect(path){throw new Error("REDIRECT:"+path)}':'export const prisma=globalThis.fixture;'}));
   }}]});
   const runtime={exports:{}};runInNewContext(bundle.outputFiles[0].text,{module:runtime,exports:runtime.exports,require:createRequire(import.meta.url),fixture:prisma,prismaValue:Prisma,session:()=>currentUser?{user:{id:String(currentUser)}}:null,console,process,Date,Buffer,setTimeout,clearTimeout,structuredClone});
-  const api=runtime.exports as typeof import('@/app/rendering/sharedDesign/sharedDesignRepository.server') & typeof import('@/app/rendering/resolveQuizTemplates.server') & Pick<typeof import('@/app/rendering/presentationTemplates/actions'),'setPresentationTemplateArchived'> & Pick<typeof import('@/app/rendering/presentationTemplates/presentationTemplateRepository.server'),'listManagedPresentationTemplates'> & Pick<typeof import('@/app/quiz/actions'),'updateQuiz'> & Pick<typeof import('@/app/quiz/[quizId]/praesentation/statusActions'),'starteQuiz'> & {actions:typeof import('@/app/rendering/sharedDesign/actions')};
+  const api=runtime.exports as typeof import('@/app/rendering/sharedDesign/sharedDesignRepository.server') & typeof import('@/app/rendering/resolveQuizTemplates.server') & Pick<typeof import('@/app/rendering/presentationTemplates/actions'),'setPresentationTemplateArchived'> & Pick<typeof import('@/app/rendering/presentationTemplates/presentationTemplateRepository.server'),'listManagedPresentationTemplates'> & Pick<typeof import('@/app/quiz/actions'),'createQuiz'|'createSchnellQuiz'|'updateQuiz'> & Pick<typeof import('@/app/quiz/[quizId]/slides/fixedSlideActions'),'saveIntroSlide'> & Pick<typeof import('@/app/quiz/[quizId]/praesentation/statusActions'),'starteQuiz'> & {actions:typeof import('@/app/rendering/sharedDesign/actions')};
   const series={kind:'SERIES' as const,id:'10'},quiz={kind:'QUIZ' as const,id:'11'},bingo={kind:'BINGO' as const,id:gameBefore[0].id as string},karaoke={kind:'POWERPOINT_KARAOKE' as const,id:gameBefore[1].id as string};
   async function save(t:typeof series|typeof quiz|typeof bingo|typeof karaoke,selection:string|null,user=1){currentUser=user;const old=await api.readDesign(user,t);const result=await api.actions.saveSharedDesign({target:t,selection,expectedSelection:old.selection,expectedSeriesId:old.seriesId});assert.equal(result.success,true,JSON.stringify(result));}
   const legacy=await api.resolveQuizTemplates(11);assert.equal(legacy?.presentation.template.id,'lovd-ungegoogelt');
@@ -124,4 +124,77 @@ test("shared design additive migration, real policies, inheritance and frozen ru
   auditColumns(cols); const catalog=(await db.query(CATALOG_SQL)).rows; assert.ok(catalog.length);
   assert.ok(cols.some(c=>c.column==='shared_design_snapshot'));
   console.info('AP3 empty/populated migration, real Actions, inheritance, runtime snapshot and access PASS:',name);
+
+  await context.test('LOVD intro defaults are written once; custom media and removals survive real saves and reloads', async () => {
+    currentUser = 1;
+    const lovdTemplate = 'lovd-ungegoogelt';
+    await db.query("UPDATE pubquiz.eventreihen SET slug='lovd' WHERE eventreihe_id=10");
+    const draft = { eventSeriesId: 10, titel: 'Intro QA', quizDatum: '2026-12-01', bemerkung: '' };
+    const readMedia = (quizId: number) => prisma.quiz.findUniqueOrThrow({
+      where: { quiz_id: quizId }, select: { intro_video_url: true, intro_musik_url: true },
+    });
+    async function create(input: Parameters<typeof api.createQuiz>[0]) {
+      const result = await api.createQuiz(input);
+      assert.ok(result.success && result.quizId, JSON.stringify(result));
+      return result.quizId;
+    }
+    async function saveIntro(quizId: number, slideId: 'waiting' | 'countdown', value?: string) {
+      const data = new FormData();
+      data.set('quizId', String(quizId)); data.set('slideId', slideId); data.set('enabled', 'on');
+      if (value !== undefined) data.set(slideId === 'waiting' ? 'introVideoUrl' : 'introMusikUrl', value);
+      const result = await api.saveIntroSlide({ status: 'idle', message: '' }, data);
+      assert.equal(result.status, 'success', result.message);
+    }
+
+    const before = await readMedia(11);
+    const lovd = await create(draft);
+    const defaults = await readMedia(lovd);
+    assert.match(defaults.intro_video_url ?? '', /\/587ad80f-926f-49a3-b412-b663ea3fcd3a-gudi_lovd_.*\.mp4$/);
+    assert.match(defaults.intro_musik_url ?? '', /\/2820758f-a93c-46fc-87cf-dd4dbb284b40-02-mexico-remastered-.*\.mp3$/);
+    const other = { ...draft, eventSeriesId: 20 };
+    const standard = await create(other);
+    const unconfigured = { intro_video_url: null, intro_musik_url: null };
+    assert.deepEqual(await readMedia(standard), unconfigured);
+    assert.deepEqual(await readMedia(await create({ ...other, presentationTemplateId: lovdTemplate })), defaults);
+
+    await prisma.eventreihen.update({ where: { eventreihe_id: 20 }, data: { default_presentation_template_id: lovdTemplate } });
+    assert.deepEqual(await readMedia(standard), unconfigured, 'changing the series default must not backfill');
+    assert.deepEqual(await readMedia(await create(other)), defaults);
+    assert.deepEqual(await readMedia(await create({ ...other, presentationTemplateId: 'phil-gud' })), unconfigured);
+    await prisma.eventreihen.update({ where: { eventreihe_id: 20 }, data: { default_presentation_template_id: 'ungegoogelt-default' } });
+
+    await prisma.fragen.create({ data: { frage: 'Schnellquiz QA', freigegeben: true } });
+    const quick = { anzahlBloecke: 1, fragenProBlock: 1, kategorieIds: [], medienFilter: 'alle' as const,
+      nurBereitsVerwendete: false, preisPlatz1: '', preisPlatz2: '', preisPlatz3: '' };
+    const lovdQuick = await api.createSchnellQuiz({ ...draft, ...quick });
+    const otherQuick = await api.createSchnellQuiz({ ...other, ...quick });
+    assert.ok(lovdQuick.success && lovdQuick.quizId, JSON.stringify(lovdQuick));
+    assert.ok(otherQuick.success && otherQuick.quizId, JSON.stringify(otherQuick));
+    assert.deepEqual(await readMedia(lovdQuick.quizId), defaults);
+    assert.deepEqual(await readMedia(otherQuick.quizId), { intro_video_url: '/medien/video/intro/intro.mp4', intro_musik_url: null });
+
+    await saveIntro(standard, 'countdown');
+    assert.deepEqual(await readMedia(standard), unconfigured);
+    await saveIntro(standard, 'waiting', '/own-intro.mp4');
+    const input = { ...other, quizId: standard, presentationTemplateId: lovdTemplate };
+    assert.equal((await api.updateQuiz(input)).success, true);
+    assert.deepEqual(await readMedia(standard), { ...defaults, intro_video_url: '/own-intro.mp4' });
+    await saveIntro(standard, 'countdown', '/own-countdown.mp3');
+    await saveIntro(standard, 'waiting', '');
+    assert.equal((await api.updateQuiz(input)).success, true);
+    assert.deepEqual(await readMedia(standard), { intro_video_url: '', intro_musik_url: '/own-countdown.mp3' });
+    const targetQuiz = { kind: 'QUIZ' as const, id: String(standard) };
+    await save(targetQuiz, lovdTemplate);
+    assert.deepEqual(await readMedia(standard), { intro_video_url: '', intro_musik_url: '/own-countdown.mp3' });
+    await saveIntro(standard, 'countdown', '');
+    await save(targetQuiz, 'phil-gud');
+    await save(targetQuiz, lovdTemplate);
+    assert.deepEqual(await readMedia(standard), { intro_video_url: '', intro_musik_url: '' });
+
+    const shared = await create(other);
+    await saveIntro(shared, 'countdown', '/own-countdown.mp3');
+    await save({ kind: 'QUIZ', id: String(shared) }, lovdTemplate);
+    assert.deepEqual(await readMedia(shared), { ...defaults, intro_musik_url: '/own-countdown.mp3' });
+    assert.deepEqual(await readMedia(11), before, 'existing quiz must stay untouched');
+  });
 });
