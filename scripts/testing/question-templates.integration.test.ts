@@ -124,6 +124,8 @@ test("real save action creates independent pixel drafts atomically and saves edi
     const withPixel = payload("Gesuchte Person", true, true);
     const [first, retry] = await Promise.all([save(withPixel), save(withPixel)]);
     assert.equal(first.questionId, retry.questionId);
+    const changedReplay = await saveQuestion({ ...withPixel, questionText: "Andere Frage mit derselben Kennung" });
+    assert.ok(!changedReplay.success && changedReplay.fallbackMessage?.includes("bereits gespeichert"));
     assert.equal(await prisma.fragen.count(), 4);
     const relation = await prisma.fragen_relationen.findFirstOrThrow({ where: { quell_fragen_id: first.questionId } });
     const child = await prisma.fragen.findUniqueOrThrow({
@@ -176,6 +178,7 @@ test("real save action creates independent pixel drafts atomically and saves edi
     const clonedPerson = await prisma.fragen.findUniqueOrThrow({ where: { fragen_id: personClone.questionId } });
     const cloneConfig = clonedPerson.template_config_json as unknown as SaveQuestionPayload["templateConfig"];
     assert.ok(!Object.hasOwn(cloneConfig, "factsPersonCreationRequestId"));
+    assert.ok(!Object.hasOwn(cloneConfig, "factsPersonCreationRequestHash"));
     assert.equal(cloneConfig.templateData?.kind === "FACTS" && cloneConfig.templateData.createPixelQuestion, false);
     assert.equal(await prisma.fragen_relationen.count({ where: { quell_fragen_id: personClone.questionId } }), 0);
     const pairClone = await cloneQuestion(paired.questionId);

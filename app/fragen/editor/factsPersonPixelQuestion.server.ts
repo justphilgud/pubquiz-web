@@ -7,6 +7,13 @@ import type { FactsTemplateData } from "./templates/factsTemplate";
 
 export const FACTS_PERSON_PIXEL_RELATION = "FACTS_PERSON_PIXEL";
 
+export function readFactsPersonCreationIdentity(value: Prisma.JsonValue) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+  const { factsPersonCreationRequestId, factsPersonCreationRequestHash } = value;
+  if (typeof factsPersonCreationRequestId !== "string" || typeof factsPersonCreationRequestHash !== "string") return undefined;
+  return { factsPersonCreationRequestId, factsPersonCreationRequestHash };
+}
+
 export async function findFactsPersonPixelChild(tx: Prisma.TransactionClient, questionId: number) {
   const relation = await tx.fragen_relationen.findUnique({
     where: { quell_fragen_id_typ_antwort_position: {

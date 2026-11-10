@@ -1,6 +1,6 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { transitionStoredQuestionStatus } from "./questionStatusPersistence";
 import type { QuestionStatusTarget } from "./questionStatus";
 import { copy, head } from "@vercel/blob";
@@ -66,7 +66,7 @@ import {
 import { getQuestionTemplateValidationIssue } from "./templates/questionTemplateData";
 import { evaluateQuestionQuality, hasRequiredTemplateAnswerImages } from "./questionQuality";
 import { isMusicAnswerStructure, supportsMusicAnswerScope } from "./templates/musicAnswerScope";
-import { ensureFactsPersonPixelChild, findFactsPersonPixelChild } from "./factsPersonPixelQuestion.server";
+import { ensureFactsPersonPixelChild, findFactsPersonPixelChild, readFactsPersonCreationIdentity } from "./factsPersonPixelQuestion.server";
 import { runFaceMorphPixelQuestionGenerators } from "./faceMorphPixelQuestionPlan";
 import { runQuestionGenerator } from "./generators/service";
 import { synchronizeFaceMorphPixelQuestions } from "./faceMorphPixelQuestions.server";
@@ -1259,6 +1259,10 @@ export async function saveQuestion(
         (typeof requestId !== "string" || !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(requestId))) {
       throw new DraftValidationError("Die Kennung für das Anlegen der Frage ist ungültig.");
     }
+    const creationIdentity = requestId ? {
+      factsPersonCreationRequestId: requestId,
+      factsPersonCreationRequestHash: createHash("sha256").update(JSON.stringify(payload)).digest("hex"),
+    } : undefined;
     const question = await prisma.$transaction(async (tx) => {
       async function createPixelChild(questionId: number) {
         if (!facts?.createPixelQuestion) return null;
@@ -1280,6 +1284,7 @@ export async function saveQuestion(
             fragen_id: true,
             geltungsbereich: true,
             ist_archiviert: true,
+            template_config_json: true,
             vorlage: { select: { code: true } },
             eventreihen: { select: { eventreihe_id: true } },
             medien: { select: {
@@ -1295,6 +1300,10 @@ export async function saveQuestion(
               previous.eventreihen.length !== targetContext.eventSeriesIds.length ||
               previous.eventreihen.some(({ eventreihe_id }) => !targetContext.eventSeriesIds.includes(eventreihe_id))) {
             throw new DraftValidationError("Die bereits gespeicherte Frage wurde inzwischen geändert.");
+          }
+          const previousIdentity = readFactsPersonCreationIdentity(previous.template_config_json);
+          if (previousIdentity?.factsPersonCreationRequestHash !== creationIdentity?.factsPersonCreationRequestHash) {
+            throw new DraftValidationError(`Frage ${previous.fragen_id} wurde bereits gespeichert. Öffne sie, um Änderungen zu speichern.`);
           }
           return {
             fragen_id: previous.fragen_id,
@@ -1713,8 +1722,8 @@ export async function saveQuestion(
             quelle: draft.sourceOrRemark || null,
             vorlage_id: persistedTemplate?.vorlage_id ?? null,
             source_vorlage_id: draft.sourceTemplateId,
-            template_config_json: requestId
-              ? { ...draft.templateConfig, factsPersonCreationRequestId: requestId }
+            template_config_json: creationIdentity
+              ? { ...draft.templateConfig, ...creationIdentity }
               : draft.templateConfig,
             ist_archiviert: false,
             ist_unfertig: payload.intent === "DRAFT",
@@ -2393,11 +2402,7 @@ export async function saveQuestion(
           source_vorlage_id: draft.sourceTemplateId,
           template_config_json: {
             ...draft.templateConfig,
-            ...(existingQuestion.template_config_json && typeof existingQuestion.template_config_json === "object" &&
-              !Array.isArray(existingQuestion.template_config_json) &&
-              typeof existingQuestion.template_config_json.factsPersonCreationRequestId === "string"
-              ? { factsPersonCreationRequestId: existingQuestion.template_config_json.factsPersonCreationRequestId }
-              : {}),
+            ...readFactsPersonCreationIdentity(existingQuestion.template_config_json),
           },
           ist_unfertig: payload.intent === "DRAFT",
           moderationsnotizen: draft.moderationNotes || null,
