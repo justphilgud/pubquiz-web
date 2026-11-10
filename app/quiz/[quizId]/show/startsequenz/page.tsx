@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getQuizDetails } from "@/app/quiz/actions";
+import { getQuizIntroAudioUrl } from "@/app/quiz/quizIntroMedia";
 import { IntroSlideStartsequenz } from "../../slides/startsequenz/IntroSlideStartsequenz";
 
 type Props = {
@@ -17,8 +18,7 @@ export default async function ShowStartsequenzPage({
     notFound();
   }
 
-  const audioUrl =
-    quiz.intro_musik_url || "/medien/audio/intro/mexico.mp3";
+  const audioUrl = getQuizIntroAudioUrl(quiz.intro_musik_url);
 
   return (
     <IntroSlideStartsequenz

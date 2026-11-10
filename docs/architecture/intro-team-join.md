@@ -1,5 +1,28 @@
 # Living Specification: Intro, QR und Teambeitritt (AP6)
 
+## LOVD-Standardmedien bei der Quizanlage
+
+Bei normaler Neuanlage und Schnellquiz speichert der Server die beiden vorhandenen
+Blob-URLs aus Quiz #31 „Oktober“ (21.10.2026) in `intro_video_url` und
+`intro_musik_url` („Mexico“), wenn der Reihenslug `lovd` ist oder die wirksame
+Präsentationsvorlage `lovd-ungegoogelt` ist. Die explizite Präsentationsvorlage hat
+Vorrang vor dem Präsentationsstandard der Reihe; das Antwortformular und andere
+Vorlagen mit demselben Stil sind kein Auslöser. Eine Quizkopie übernimmt weiterhin
+den Inhalt ihrer Quelle.
+
+Beim Wechsel auf die LOVD-Präsentationsvorlage über Quiz-Einstellungen oder
+Gemeinsames Design werden nur bisher unkonfigurierte Felder (`NULL`) ergänzt. Der
+Intro-Editor speichert Ersetzungen und Löschungen je Feld. Eine leere Zeichenfolge
+kennzeichnet die bewusste Entfernung und überlebt Speichern, Neuladen sowie erneute
+Vorlagenauswahl. Die Präsentation liest die gespeicherten URLs; sie greift für
+bewusst entfernte Musik auch in der Einzelvorschau nicht auf die Legacy-Datei zurück.
+Änderungen der Vorgabe wirken nur auf künftige Vorbelegungen. Es gibt keine Migration,
+keinen Backfill und keine Kopie der Mediendateien.
+
+`shared-design.integration.test.ts` prüft die echten Schreibpfade und das erneute
+Lesen aus PostgreSQL. `PresentationSlideRenderer.test.ts` prüft die Quellen der
+Warte- und Countdownfolie und die Darstellung nach der Entfernung.
+
 Verbindlich: [Lifecycle](quiz-lifecycle.md), [Presentation Rendering](presentation-rendering.md),
 [Submission-Live-State](submission-live-state.md), [Antwortinteraktion](answer-interaction.md).
 

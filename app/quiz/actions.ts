@@ -1,5 +1,7 @@
 "use server";
 
+import { newQuizIntroMedia, selectedQuizIntroMedia } from "./quizIntroMedia";
+
 import { formatPairMatches, getPositionScoringItemCount } from "@/app/fragen/editor/templates/pairsTemplate";
 import { buildQuestionSolutionPreview } from "@/app/fragen/questionSolutionPreview";
 
@@ -253,7 +255,7 @@ async function getEventSeriesForQuizSave(
 ) {
   const eventSeries = await prisma.eventreihen.findUnique({
     where: { eventreihe_id: eventSeriesId },
-    select: { eventreihe_id: true, ist_archiviert: true },
+    select: { eventreihe_id: true, ist_archiviert: true, slug: true, default_presentation_template_id: true },
   });
   if (!eventSeries) return { ok: false as const, message: "Eventreihe wurde nicht gefunden." };
   if (
@@ -520,6 +522,7 @@ export async function createQuiz(data: {
       bemerkung: validated.value.internalNote,
       presentation_template_id: validated.value.presentationTemplateId,
       answer_form_template_id: validated.value.presentationTemplateId,
+      ...newQuizIntroMedia(eventSeries.eventSeries, validated.value.presentationTemplateId),
       aufloesungsstrategie:
         data.solutionStrategy ?? DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY,
     },
@@ -592,7 +595,13 @@ export async function updateQuiz(data: {
   if (!eventSeries.ok) return { success: false, message: eventSeries.message };
 
   const saved = await withSerializableTransaction(async (tx) => {
-    const current = await tx.quiz.findUnique({ where: { quiz_id: data.quizId }, select: { eventreihe_id: true, shared_design_template_id:true } });
+    const current = await tx.quiz.findUnique({
+      where: { quiz_id: data.quizId },
+      select: {
+        eventreihe_id: true, shared_design_template_id: true, presentation_template_id: true,
+        intro_video_url: true, intro_musik_url: true,
+      },
+    });
     if (!current || current.eventreihe_id !== existing.eventreihe_id) {
       return { success: false, message: "Die Quizzuordnung wurde zwischenzeitlich geändert. Bitte neu laden." };
     }
@@ -602,6 +611,12 @@ export async function updateQuiz(data: {
       const blocker = await getQuizSeriesChangeBlocker(tx, data.quizId, validated.value.eventSeriesId);
       if (blocker) return { success: false, message: blocker };
     }
+    const introMedia = !current.shared_design_template_id && current.presentation_template_id !== validated.value.presentationTemplateId
+      ? selectedQuizIntroMedia(
+        validated.value.presentationTemplateId ?? eventSeries.eventSeries.default_presentation_template_id,
+        current,
+      )
+      : {};
     await tx.quiz.update({
       where: {
         quiz_id: data.quizId,
@@ -619,6 +634,7 @@ export async function updateQuiz(data: {
         oeffentliche_beschreibung_modus: data.publicDescriptionMode === undefined ? undefined : validated.value.publicDescriptionMode,
         bemerkung: validated.value.internalNote,
         presentation_template_id: validated.value.presentationTemplateId,
+        ...introMedia,
         ...(current.shared_design_template_id ? {} : { answer_form_template_id: validated.value.presentationTemplateId }),
         aufloesungsstrategie:
           data.solutionStrategy ??
@@ -5257,6 +5273,7 @@ export async function createSchnellQuiz(data: {
       bemerkung: validated.value.internalNote ?? "Automatisch erstelltes Schnellquiz",
       intro_startzeit: "19:30",
       intro_video_url: "/medien/video/intro/intro.mp4",
+      ...newQuizIntroMedia(eventSeries.eventSeries),
       aufloesungsstrategie: DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY,
     },
   });
@@ -5662,7 +5679,7 @@ async function createSchnellquizAbschnitte(
 }
 export async function updateIntroStartsequenz(data: {
   quizId: number;
-  audioUrl: string;
+  audioUrl?: string;
   text: string;
 }) {
   await requireQuizEditor(data.quizId);

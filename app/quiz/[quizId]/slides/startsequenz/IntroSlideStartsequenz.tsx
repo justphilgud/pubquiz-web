@@ -5,13 +5,13 @@ import { useRouter } from "next/navigation";
 
 type Props = {
   quizId: number;
-  audioUrl?: string;
+  audioUrl: string | null;
   text?: string;
 };
 
 export function IntroSlideStartsequenz({
   quizId,
-  audioUrl = "/medien/audio/intro/mexico.mp3",
+  audioUrl,
   text = "Ein guter Zeitpunkt, um seine Grundbedürfnisse zu befriedigen.",
 }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -71,7 +71,7 @@ export function IntroSlideStartsequenz({
 
   return (
     <section className="relative flex h-screen w-screen items-center justify-center overflow-hidden bg-[#050510] text-white">
-      <audio
+      {audioUrl && <audio
         ref={audioRef}
         src={audioUrl}
         preload="metadata"
@@ -81,7 +81,7 @@ export function IntroSlideStartsequenz({
           goToNextSlide();
         }}
         onError={() => setAudioFehlt(true)}
-      />
+      />}
 
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,0,140,0.2),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(0,245,255,0.18),transparent_40%)]" />
 
@@ -95,7 +95,11 @@ export function IntroSlideStartsequenz({
         </div>
 
         <div className="absolute bottom-6 right-20 flex items-center gap-2">
-          {!started ? (
+          {!audioUrl ? (
+            <button type="button" onClick={goToNextSlide} className="min-h-10 rounded-full border border-cyan-300 px-4 text-sm text-cyan-100">
+              Weiter zur Begrüßung
+            </button>
+          ) : !started ? (
             <button
               type="button"
               onClick={startIntro}

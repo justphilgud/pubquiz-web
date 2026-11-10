@@ -3,6 +3,7 @@ import { toRuntimeAnswerFormTemplate } from "../presentationTemplates/presentati
 import "server-only";
 import type { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
+import { selectedQuizIntroMedia } from "@/app/quiz/quizIntroMedia";
 import { getActorPermissions } from "@/app/roles/roleAssignments.server";
 import { canManageEventSeries, canViewEventSeries, hasEventTypeAccess } from "@/app/roles/roleAssignmentPolicy";
 import { isGameId } from "@/app/games/gameDraft";
@@ -105,9 +106,16 @@ export async function writeDesign(userId:number,input:unknown) {
       if(selection===null && answerSelection!==c.game.answer_form_template_id)throw new DesignError('Getrennte Auswahl benötigt ein ausdrücklich aktiviertes gemeinsames Design.');
       if(answerSelection && !getAnswerFormTemplate(answerSelection)?.selectable)await templateConfig(tx,answerSelection);
     }
-    if(selection!==null)await resolveSharedDesign(tx,selection,c.series);
+    const resolved = selection !== null ? await resolveSharedDesign(tx, selection, c.series) : null;
     if(target.kind==='SERIES')await tx.eventreihen.update({where:{eventreihe_id:Number(target.id)},data:{shared_design_template_id:selection}});
-    else if(target.kind==='QUIZ')await tx.quiz.update({where:{quiz_id:Number(target.id)},data:{shared_design_template_id:selection,...(changesAnswer?{answer_form_template_id:answerSelection}:{})}});
+    else if(target.kind==='QUIZ') {
+      if (!c.game || !('presentation_template_id' in c.game)) return deny();
+      const introMedia = c.selection !== selection ? selectedQuizIntroMedia(
+        resolved?.design.templateId ?? c.game.presentation_template_id ?? c.series.default_presentation_template_id,
+        c.game,
+      ) : {};
+      await tx.quiz.update({where:{quiz_id:Number(target.id)},data:{shared_design_template_id:selection,...(changesAnswer?{answer_form_template_id:answerSelection}:{}),...introMedia}});
+    }
     else await tx.game_drafts.update({where:{id:target.id},data:{shared_design_template_id:selection}});
     return {success:true as const};
   },{timeout:15000});

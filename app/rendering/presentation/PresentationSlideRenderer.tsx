@@ -1,5 +1,6 @@
 "use client";
 
+import { getQuizIntroAudioUrl } from "@/app/quiz/quizIntroMedia";
 /* eslint-disable @next/next/no-img-element -- Slides render dynamic quiz media whose URLs and dimensions are not known at build time. */
 
 import { countdownRemainingSeconds } from "@/app/quiz/blockCountdown";
@@ -1987,10 +1988,11 @@ function renderAnkommenSlide() {
 
 function renderStartsequenzSlide() {
   const editorial = theme.design.stylePreset === "EDITORIAL";
-  const introMedia = <SynchronizedMedia
+  const audioUrl = getQuizIntroAudioUrl(praesentationQuiz.intro_musik_url);
+  const introMedia = audioUrl && <SynchronizedMedia
     key={`intro:${quiz.quiz_id}:${displayState.mediaPlaybackRevision ?? 0}`}
     kind="audio"
-    src={praesentationQuiz.intro_musik_url?.trim() || "/medien/audio/intro/mexico.mp3"}
+    src={audioUrl}
     command={playbackCommand}
     commandId={playbackCommandId}
     renderMode={renderMode}
@@ -2006,14 +2008,14 @@ function renderStartsequenzSlide() {
       <div className="presentation-start-sequence-backdrop absolute inset-0" />
       <div className="presentation-start-sequence-content relative flex h-full w-full flex-col items-center justify-center rounded-[1.5rem] border-4 border-[var(--quiz-secondary)] bg-[var(--quiz-surface-strong)] p-12 text-center text-[var(--quiz-surface-strong-text)]">
         {editorial && <>
-          <div className="lovd-start-countdown-slot">{introMedia}</div>
+          {introMedia && <div className="lovd-start-countdown-slot">{introMedia}</div>}
           <h2 className="lovd-start-title">Gleich geht’s los</h2>
         </>}
         <p className="mb-10 max-w-5xl text-5xl font-black leading-tight">
           {praesentationQuiz.intro_startsequenz_text?.trim() ||
             "Ein guter Zeitpunkt, um seine Grundbedürfnisse zu befriedigen."}
         </p>
-        {!editorial && <div
+        {!editorial && introMedia && <div
           aria-hidden="true"
           className="presentation-start-play-mark rounded-3xl border-4 border-[var(--quiz-primary)] px-20 py-10 text-[7rem] font-black leading-none text-[var(--quiz-surface-strong-accent)]"
         >

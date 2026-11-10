@@ -1,6 +1,7 @@
 "use client";
 
 import { getMemeAdvanceLabel } from "@/app/quiz/memeVoting";
+import { getQuizIntroAudioUrl } from "@/app/quiz/quizIntroMedia";
 
 import { getPresentationSlideMedia, getSlideSpeech, isIntroMusicSlide } from "@/app/rendering/presentation/presentationSlideMetadata";
 import { mayApplyLiveSnapshot } from "../../liveSnapshotRevision";
@@ -258,7 +259,7 @@ export default function ModerationClient({
     aktuellerSlide.frage.templateId === "meme_beschriften"
   );
 
-  const istIntroMusikSlide = isIntroMusicSlide(aktuellerSlide);
+  const istIntroMusikSlide = isIntroMusicSlide(aktuellerSlide) && Boolean(getQuizIntroAudioUrl(quiz.intro_musik_url));
   const hatAudioAufFixemSlide =
     aktuellerSlide?.typ === "fixer-slide" &&
     ((aktuellerSlide.slideTyp === "qrcode" &&
