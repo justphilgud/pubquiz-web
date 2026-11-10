@@ -125,7 +125,8 @@ export type TemplateEvaluationType =
   | "CLOSEST_VALUE"
   | "ORDER_EXACT"
   | "ORDER_POSITION"
-  | "ORDER_ADJACENCY";
+  | "ORDER_ADJACENCY"
+  | "PAIR_MATCH";
 
 export const compatibleEvaluationTypes = {
   NO_ANSWER: ["NONE"],
@@ -135,7 +136,7 @@ export const compatibleEvaluationTypes = {
   SINGLE_CHOICE: ["CHOICE_MATCH"],
   MULTI_CHOICE: ["CHOICE_MATCH"],
   ORDER: ["ORDER_EXACT", "ORDER_POSITION", "ORDER_ADJACENCY"],
-  MATCHING: ["MANUAL"],
+  MATCHING: ["MANUAL", "PAIR_MATCH"],
   POLL_SINGLE: ["NONE"],
   POLL_MULTI: ["NONE"],
   POLL_SCALE: ["NONE"],

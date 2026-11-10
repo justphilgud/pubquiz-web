@@ -28,6 +28,7 @@ export function presentationContentWarning(text: string, role: PresentationTextR
 export function templatePresentationTexts(data: QuestionTemplateData | undefined): Array<{ text: string; role: PresentationTextRole }> {
   if (!data) return [];
   switch (data.kind) {
+    case "PAIRS": return data.pairs.flatMap(({ left, right }) => [{ text: left, role: "answer" }, { text: right, role: "answer" }]);
     case "FACTS": return data.facts.map((fact) => ({ text: fact.text, role: "information" as const }));
     case "TRUE_FALSE":
     case "ESTIMATE": return [{ text: data.explanation, role: "information" }];

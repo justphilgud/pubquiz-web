@@ -42,6 +42,7 @@ import {
 } from "./CreateDynamicQuestionTemplate";
 import { createDynamicQuestionTemplate } from "../templates/dynamicQuestionTemplateActions";
 import { remapDynamicTemplateRuleSelection } from "../templates/dynamicQuestionTemplate";
+import { FaceMorphPixelQuestionOption } from "./FaceMorphPixelQuestionOption";
 import { StructuredTemplateEditor } from "./StructuredTemplateEditor";
 import { MusicAnswerScope } from "./MusicAnswerScope";
 import { supportsMusicAnswerScope } from "../templates/musicAnswerScope";
@@ -237,6 +238,7 @@ export function QuestionEditor({
     text: string;
   } | null>(null);
   const saveInProgressRef = useRef(false);
+  const creationRequestRef = useRef<string | null>(null);
   const allowNavigationRef = useRef(false);
   const questionTextRef = useRef<HTMLTextAreaElement>(null);
   const [questionTextRevision, setQuestionTextRevision] = useState(0);
@@ -620,8 +622,13 @@ export function QuestionEditor({
 
     try {
       const submittedDraft = draft;
+      if (!savedQuestionId && draft.templateId === questionTemplateIds.factsPerson) {
+        creationRequestRef.current ??= crypto.randomUUID();
+      }
       const result = await saveQuestion({
         questionId: savedQuestionId ?? undefined,
+        creationRequestId: !savedQuestionId && draft.templateId === questionTemplateIds.factsPerson
+          ? creationRequestRef.current ?? undefined : undefined,
         intent,
         scope: draft.scope,
         eventSeriesIds: draft.eventSeriesIds,
@@ -718,12 +725,16 @@ export function QuestionEditor({
               (child) => child.status === "FAILED",
             ),
         );
+        if (pixelSyncFailed && draft.templateId === questionTemplateIds.factsPerson) {
+          setSaveMessage({ tone: "error", text: "Beide Fragen wurden gespeichert. Die Pixelbilder konnten noch nicht vorbereitet werden." });
+        }
         if (intent !== "DRAFT" && !pixelSyncFailed) {
           allowNavigationRef.current = true;
           setIsReviewFeedbackOpen(false);
           router.push(returnHref);
           router.refresh();
-        } else if (options?.resetAfterSuccess) {
+        } else if (options?.resetAfterSuccess && !pixelSyncFailed) {
+          creationRequestRef.current = null;
           const resetDraft = createInitialDraft(scopeOptions);
           retainedFaceMorphPixelOptionsRef.current = {
             ...NEW_FACE_MORPH_PIXEL_QUESTION_OPTIONS,
@@ -1119,10 +1130,11 @@ export function QuestionEditor({
           selectedTemplate.editorKind !== "POLL_OPTIONS" && (
           <StructuredTemplateEditor
             kind={selectedTemplate.editorKind}
+            openOnly={selectedTemplate.id === questionTemplateIds.factsPerson}
             data={draft.templateConfig.templateData}
             answers={draft.answers}
             disabled={isEditorDisabled}
-            validationError={(selectedTemplate.editorKind === "FACTS" && fieldError?.target === "answers") || fieldError?.target?.startsWith("template")
+            validationError={(["FACTS", "PAIRS"].includes(selectedTemplate.editorKind) && fieldError?.target === "answers") || fieldError?.target?.startsWith("template")
               ? fieldError.text
               : null}
             validationTarget={fieldError?.target}
@@ -1135,6 +1147,20 @@ export function QuestionEditor({
                 answers,
               }));
             }}
+          />
+        )}
+
+        {selectedTemplate?.id === questionTemplateIds.factsPerson && draft.templateConfig.templateData?.kind === "FACTS" && (
+          <FaceMorphPixelQuestionOption
+            label="Zusätzlich als Pixelbild-Frage speichern. Dafür sind ein Lösungsbild und ein Name erforderlich."
+            checked={draft.templateConfig.templateData.createPixelQuestion === true}
+            disabled={isEditorDisabled}
+            onChange={(checked) => setDraft((current) => {
+              const data = current.templateConfig.templateData;
+              return data?.kind === "FACTS"
+                ? { ...current, templateConfig: { ...current.templateConfig, templateData: { ...data, createPixelQuestion: checked } } }
+                : current;
+            })}
           />
         )}
 

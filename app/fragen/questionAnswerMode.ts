@@ -12,6 +12,8 @@ export type DerivedQuestionAnswerMode =
   | "UNCLASSIFIED";
 
 const openSpecialTemplateIds = [
+  questionTemplateIds.factsPerson,
+  questionTemplateIds.pairs,
   questionTemplateIds.factsYear,
   questionTemplateIds.factsCountry,
   questionTemplateIds.faceMorph,

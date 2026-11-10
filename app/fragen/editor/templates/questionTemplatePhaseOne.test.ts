@@ -400,10 +400,8 @@ test("migration, clone and transfer preserve template identity and config", () =
     "utf8",
   );
   assert.match(management, /vorlage_id:\s*source\.vorlage_id/);
-  assert.match(
-    management,
-    /template_config_json:\s*source\.template_config_json/,
-  );
+  assert.match(management, /getFactsPersonTransferConfig\(source\.template_config_json\)/);
+  assert.match(management, /:\s*source\.template_config_json\s*\?\? undefined/);
 
   const actions = readFileSync("app/fragen/actions.ts", "utf8");
   assert.match(actions, /exportFragenFuerTransfer/);

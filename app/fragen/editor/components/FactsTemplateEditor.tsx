@@ -5,7 +5,7 @@ import { FACTS_MAX, FACTS_MIN, FACT_TEXT_MAX_LENGTH, factsAnswers, type FactsTem
 import { SortableTemplateList } from "./SortableTemplateList";
 import { FactsAnswerSelect } from "./FactsAnswerSelect";
 
-type Props = { data: QuestionTemplateData | undefined; answers: readonly QuestionAnswerDraft[]; disabled: boolean; onChange: (data: QuestionTemplateData, answers: QuestionAnswerDraft[]) => void; validationError?: string | null };
+type Props = { openOnly?: boolean; data: QuestionTemplateData | undefined; answers: readonly QuestionAnswerDraft[]; disabled: boolean; onChange: (data: QuestionTemplateData, answers: QuestionAnswerDraft[]) => void; validationError?: string | null };
 const inputClass = "min-h-11 w-full rounded-xl border border-slate-300 px-3 py-2";
 
 export function FactsTemplateEditor(props: Props) {
@@ -41,10 +41,10 @@ export function FactsTemplateEditor(props: Props) {
         </div>)}
         <button type="button" className="min-h-11 px-3" disabled={props.disabled} onClick={() => update({ ...data, acceptedVariants: [...data.acceptedVariants, ""] })}>Schreibvariante hinzufügen</button>
       </>}
-      <button type="button" className="min-h-11 rounded-xl border border-slate-300 px-4" disabled={props.disabled}
+      {!props.openOnly && <button type="button" className="min-h-11 rounded-xl border border-slate-300 px-4" disabled={props.disabled}
         onClick={() => update({ ...data, acceptedVariants: [], options: data.options.length ? [] : [{ id: crypto.randomUUID(), text: data.solution, isCorrect: true }, { id: crypto.randomUUID(), text: "", isCorrect: false }] })}>
         {data.options.length ? "Zur offenen Antwort wechseln" : "Sichtbare Auswahloptionen verwenden"}
-      </button>
+      </button>}
       {data.options.length > 0 && <fieldset className="space-y-2"><legend className="mb-2 text-sm font-medium">Sichtbare Antwortoptionen – genau eine richtige Antwort</legend>
         {data.options.map((option, index) => <div key={option.id} className="flex items-center gap-2">
           <input type="radio" name="facts-correct-option" aria-label={`Option ${index + 1} ist richtig`} checked={option.isCorrect} disabled={props.disabled}

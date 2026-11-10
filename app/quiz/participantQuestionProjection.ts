@@ -38,7 +38,7 @@ export function projectParticipantQuestionContent(
       : data?.kind === "ESTIMATE" && data.correctValue !== null ? String(data.correctValue)
       : null;
     resolution = {
-      answers: canonical !== null ? [canonical] : correct.map(answer => answer.antwort),
+      answers: data?.kind === "PAIRS" ? data.pairs.map(({ left, right }) => `${left} ↔ ${right}`) : canonical !== null ? [canonical] : correct.map(answer => answer.antwort),
       correctOptionIds: correct.map(answer => answer.antwort_id),
     };
   }
@@ -51,7 +51,7 @@ const PARTICIPANT_HINT_MEDIA_SLOTS = new Set<string | null>([
   "music_reverse_audio", "music_bitcrush_audio",
 ]);
 const PARTICIPANT_SOLUTION_MEDIA_SLOTS = new Set([
-  "answer_image", "pixel_original_image", "face_morph_person_a_original", "face_morph_person_b_original",
+  "facts_person_solution_image", "answer_image", "pixel_original_image", "face_morph_person_a_original", "face_morph_person_b_original",
   "music_original_audio",
 ]);
 export function canPublishParticipantMedium(slot: string | null, context: ParticipantRevealContext) {

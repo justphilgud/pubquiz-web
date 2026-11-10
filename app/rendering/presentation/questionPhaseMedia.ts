@@ -3,6 +3,9 @@ export function questionPhaseMedia<T extends { slotKey?: string | null; datei: s
   templateId: string | null, media: readonly T[], phase: "QUESTION" | "SOLUTION",
 ): T[] {
   // The shared enlargement layer must not reveal solution portraits either.
+  if (templateId === "fakten_person" && phase === "QUESTION") {
+    return media.filter((item) => item.slotKey !== "facts_person_solution_image");
+  }
   if (templateId === "face_morph" && phase === "QUESTION") {
     return media.filter(item => item.slotKey === "face_morph_result");
   }

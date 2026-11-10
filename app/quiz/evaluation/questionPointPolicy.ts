@@ -6,6 +6,8 @@ import {
   resolveCanonicalQuestionTemplateId,
 } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 
+export const POSITION_ITEM_POINTS = "0.25";
+
 export function getQuestionBaseMaximum(input: {
   templateId: string | null;
   correctAnswerCount: number;
@@ -19,8 +21,8 @@ export function getQuestionBaseMaximum(input: {
   ) {
     return new Prisma.Decimal(0);
   }
-  if (templateId === questionTemplateIds.ordering) {
-    return new Prisma.Decimal(input.orderingItemCount).mul("0.25");
+  if ([questionTemplateIds.ordering, questionTemplateIds.pairs].some((id) => id === templateId)) {
+    return new Prisma.Decimal(input.orderingItemCount).mul(POSITION_ITEM_POINTS);
   }
   if (templateId === questionTemplateIds.pixelImage) {
     return new Prisma.Decimal(1);
@@ -47,7 +49,7 @@ export function isPartialPointsCapable(input: {
     input.structuredFieldCount > 1 ||
     (templateId === questionTemplateIds.multipleChoice &&
       input.correctAnswerCount > 1) ||
-    (templateId === questionTemplateIds.ordering &&
+    ([questionTemplateIds.ordering, questionTemplateIds.pairs].some((id) => id === templateId) &&
       input.orderingItemCount > 1)
   );
 }

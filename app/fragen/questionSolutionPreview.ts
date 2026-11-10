@@ -35,6 +35,7 @@ export function buildQuestionSolutionPreview(input: {
 }): QuestionSolutionPreview | null {
   const data = input.templateData;
   const canonical = data?.kind === "ORDERING" ? data.items.map((item, index) => `${index + 1}. ${item.text}`)
+    : data?.kind === "PAIRS" ? data.pairs.map(({ left, right }) => `${left} ↔ ${right}`)
     : data?.kind === "TRUE_FALSE" ? [data.correctAnswer ? "Wahr" : "Falsch"]
     : data?.kind === "ESTIMATE" ? data.correctValue === null ? [] : [`${data.correctValue}${data.unit ? ` ${data.unit}` : ""}`]
     : data?.kind === "FACTS" ? [data.response === "COUNTRY" ? countryName(data.solution) : data.solution]

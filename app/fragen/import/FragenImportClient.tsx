@@ -105,6 +105,11 @@ function pruefeZeilen(zeilen: ImportZeile[]) {
       fehler.push(`Zeile ${zeilennummer}: Pflichtfeld 'frage' fehlt.`);
     }
 
+    if (zeile.template_id === "fakten_person" || zeile.template_id === "paare_bilden") {
+      if (!zeile.template_config_json) fehler.push(`Zeile ${zeilennummer}: Template-Daten fehlen.`);
+      return;
+    }
+
     const istFreitext = zeile.antworten.length === 0;
     const istSchaetzfrage =
       zeile.kategorie.trim().toLowerCase() === "schätzfrage";

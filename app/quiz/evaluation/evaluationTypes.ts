@@ -16,6 +16,7 @@ export type EvaluationDetails = {
     | "SINGLE_CHOICE"
     | "MULTIPLE_CHOICE"
     | "STRUCTURED_FIELDS"
+    | "PAIRS"
     | "ORDERING"
     | "EXACT_OPEN_ANSWER"
     | "MANUAL"
@@ -54,6 +55,7 @@ export type BaseAnswerInput = {
   structuredFields: readonly StructuredAnswerField[];
   structuredAnswers: ReadonlyMap<number, string | null>;
   orderingItems: readonly string[];
+  pairs?: import("@/app/fragen/editor/templates/pairsTemplate").PairsData;
 };
 
 export type QuestionPointsEvaluation = BaseAnswerEvaluation & {

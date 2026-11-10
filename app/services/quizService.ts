@@ -4,6 +4,7 @@ import { FACE_MORPH_PIXEL_RELATION_TYPE } from "@/app/fragen/editor/faceMorphPix
 import { getBerlinDate } from "@/app/lib/berlinDate";
 import { buildQuestionEligibilityWhere } from "@/app/fragen/editor/questionEligibility.server";
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
+import { getPositionScoringItemCount } from "@/app/fragen/editor/templates/pairsTemplate";
 import { getQuestionBaseMaximum } from "@/app/quiz/evaluation/questionPointPolicy";
 import { resolveQuizSpecificOrderingAnswerIdOrder } from "@/app/quiz/orderingQuestionOrder";
 
@@ -96,7 +97,7 @@ export async function addQuestionToQuiz(
         templateId: frage.vorlage?.code ?? null,
         correctAnswerCount: frage.antworten.filter((answer) => answer.ist_richtig).length,
         structuredFieldCount: frage.antwortfelder.length,
-        orderingItemCount: orderingItems?.length ?? 0,
+        orderingItemCount: getPositionScoringItemCount(config?.templateData),
       }),
     },
   });

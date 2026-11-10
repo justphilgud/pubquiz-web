@@ -1,4 +1,6 @@
 export const questionTemplateIds = {
+  factsPerson: "fakten_person",
+  pairs: "paare_bilden",
   factsYear: "fakten_jahr",
   factsCountry: "fakten_land",
   factsText: "fakten_frei",

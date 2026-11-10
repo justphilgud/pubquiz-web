@@ -12,7 +12,7 @@ export const YEAR_MAX = 9999;
 export function factsResponse(templateId: string | null): FactsTemplateData["response"] | null {
   if (templateId === questionTemplateIds.factsYear) return "YEAR";
   if (templateId === questionTemplateIds.factsCountry) return "COUNTRY";
-  if (templateId === questionTemplateIds.factsText) return "TEXT";
+  if (templateId === questionTemplateIds.factsText || templateId === questionTemplateIds.factsPerson) return "TEXT";
   return null;
 }
 

@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/app/lib/prisma";
 import { requireQuestionEditor } from "@/app/lib/permissions";
 import { getCurrentUserId } from "@/app/services/questionService";
+import { getFactsPersonTransferConfig } from "./pixelTemplateConfig";
+import { questionTemplateIds } from "./templates/questionTemplateRegistry";
 import { getQuestionDeletionBlocker } from "./questionDeletionPolicy";
 import { getQuestionActor, mapQuestionAccessContext } from "./questionAccess.server";
 import { canApproveScopedQuestion, canCloneScopedQuestion, canEditScopedQuestion } from "./questionScopePolicy";
@@ -48,6 +50,7 @@ export async function cloneQuestion(questionId: number): Promise<ManagementResul
         fragentyp: true,
         schwierigkeitslevel: true,
         vorlage_id: true,
+        vorlage: { select: { code: true } },
         source_vorlage_id: true,
         moderationsnotizen: true,
         kategorienwunsch: true,
@@ -133,7 +136,9 @@ export async function cloneQuestion(questionId: number): Promise<ManagementResul
         kategorienwunsch: source.kategorienwunsch,
         gueltig_bis: source.gueltig_bis,
         pruefen_ab: source.pruefen_ab,
-        template_config_json: source.template_config_json ?? undefined,
+        template_config_json: source.vorlage?.code === questionTemplateIds.factsPerson
+          ? getFactsPersonTransferConfig(source.template_config_json)
+          : source.template_config_json ?? undefined,
         ist_archiviert: false,
         archivierungsgrund: null,
         ist_unfertig: true,

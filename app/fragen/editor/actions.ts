@@ -1,6 +1,6 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { transitionStoredQuestionStatus } from "./questionStatusPersistence";
 import type { QuestionStatusTarget } from "./questionStatus";
 import { copy, head } from "@vercel/blob";
@@ -66,6 +66,9 @@ import {
 import { getQuestionTemplateValidationIssue } from "./templates/questionTemplateData";
 import { evaluateQuestionQuality, hasRequiredTemplateAnswerImages } from "./questionQuality";
 import { isMusicAnswerStructure, supportsMusicAnswerScope } from "./templates/musicAnswerScope";
+import { ensureFactsPersonPixelChild, findFactsPersonPixelChild, readFactsPersonCreationIdentity } from "./factsPersonPixelQuestion.server";
+import { runFaceMorphPixelQuestionGenerators } from "./faceMorphPixelQuestionPlan";
+import { runQuestionGenerator } from "./generators/service";
 import { synchronizeFaceMorphPixelQuestions } from "./faceMorphPixelQuestions.server";
 import { getAffectedQuestionIds } from "./questionSaveResult";
 import {
@@ -660,6 +663,7 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     requiresCompleteQuestion &&
     !isPoll &&
     !isMemeCaption &&
+    canonicalTemplateId !== questionTemplateIds.pairs &&
     !answers.some((answer) => answer.text && answer.isCorrect)
   ) {
     throw new DraftValidationError(
@@ -755,6 +759,9 @@ function validateQuestion(payload: SaveQuestionPayload): NormalizedDraft {
     throw new DraftValidationError("Die Anzeigedauern der Pixelstufen sind ungültig.", "questionMedia");
   }
 
+  if (templateConfig.templateData?.kind === "PAIRS" && answers.length > 0) {
+    throw new DraftValidationError("Paare werden ausschließlich im Paar-Editor gepflegt.", "answers");
+  }
   if (templateConfig.templateData?.kind === "FACTS") {
     const data = templateConfig.templateData;
     const expected = data.response === "TEXT" && data.options.length
@@ -1244,7 +1251,70 @@ export async function saveQuestion(
 
   try {
     const userId = getCurrentUserId(session);
+    const isFactsPerson = draft.templateId === questionTemplateIds.factsPerson;
+    const facts = isFactsPerson && draft.templateConfig.templateData?.kind === "FACTS"
+      ? draft.templateConfig.templateData : null;
+    const requestId = isFactsPerson && payload.questionId === undefined ? payload.creationRequestId : undefined;
+    if (isFactsPerson && payload.questionId === undefined &&
+        (typeof requestId !== "string" || !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(requestId))) {
+      throw new DraftValidationError("Die Kennung für das Anlegen der Frage ist ungültig.");
+    }
+    const creationIdentity = requestId ? {
+      factsPersonCreationRequestId: requestId,
+      factsPersonCreationRequestHash: createHash("sha256").update(JSON.stringify(payload)).digest("hex"),
+    } : undefined;
     const question = await prisma.$transaction(async (tx) => {
+      async function createPixelChild(questionId: number) {
+        if (!facts?.createPixelQuestion) return null;
+        const child = await ensureFactsPersonPixelChild(tx, questionId, userId, facts);
+        if (child === null) throw new DraftValidationError(
+          "Für eine zusätzliche Pixelbild-Frage sind ein Lösungsbild und ein Name erforderlich.", "questionMedia",
+        );
+        return child;
+      }
+
+      if (requestId) {
+        await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`facts-person:${userId}:${requestId}`}, 0))::text`;
+        const previous = await tx.fragen.findFirst({
+          where: {
+            created_by_user_id: userId,
+            template_config_json: { path: ["factsPersonCreationRequestId"], equals: requestId },
+          },
+          select: {
+            fragen_id: true,
+            geltungsbereich: true,
+            ist_archiviert: true,
+            template_config_json: true,
+            vorlage: { select: { code: true } },
+            eventreihen: { select: { eventreihe_id: true } },
+            medien: { select: {
+              medien_id: true, datei: true, slot_key: true,
+              medientyp: { select: { medientyp: true } },
+            } },
+            antworten: { orderBy: { antwort_id: "asc" }, select: { antwort_id: true } },
+          },
+        });
+        if (previous) {
+          if (previous.ist_archiviert || previous.vorlage?.code !== questionTemplateIds.factsPerson ||
+              previous.geltungsbereich !== targetContext.scope ||
+              previous.eventreihen.length !== targetContext.eventSeriesIds.length ||
+              previous.eventreihen.some(({ eventreihe_id }) => !targetContext.eventSeriesIds.includes(eventreihe_id))) {
+            throw new DraftValidationError("Die bereits gespeicherte Frage wurde inzwischen geändert.");
+          }
+          const previousIdentity = readFactsPersonCreationIdentity(previous.template_config_json);
+          if (previousIdentity?.factsPersonCreationRequestHash !== creationIdentity?.factsPersonCreationRequestHash) {
+            throw new DraftValidationError(`Frage ${previous.fragen_id} wurde bereits gespeichert. Öffne sie, um Änderungen zu speichern.`);
+          }
+          return {
+            fragen_id: previous.fragen_id,
+            questionMedia: createQuestionMediaDraftFromStoredMedia(previous.medien, draft.templateId),
+            answers: classicAnswers.map((answer, index) => ({
+              clientId: answer.clientId, answerId: previous.antworten[index]?.antwort_id, media: null,
+            })),
+            pixelChildId: await findFactsPersonPixelChild(tx, previous.fragen_id),
+          };
+        }
+      }
       const selectedCategories = await tx.fragenkategorie.findMany({
         where: {
           fragenkategorie_id: {
@@ -1652,7 +1722,9 @@ export async function saveQuestion(
             quelle: draft.sourceOrRemark || null,
             vorlage_id: persistedTemplate?.vorlage_id ?? null,
             source_vorlage_id: draft.sourceTemplateId,
-            template_config_json: draft.templateConfig,
+            template_config_json: creationIdentity
+              ? { ...draft.templateConfig, ...creationIdentity }
+              : draft.templateConfig,
             ist_archiviert: false,
             ist_unfertig: payload.intent === "DRAFT",
             moderationsnotizen: draft.moderationNotes || null,
@@ -1762,6 +1834,7 @@ export async function saveQuestion(
 
         return {
           fragen_id: createdQuestion.fragen_id,
+          pixelChildId: await createPixelChild(createdQuestion.fragen_id),
           questionMedia:
             createQuestionMediaDraftFromStoredMedia(storedMedia, draft.templateId),
           answers: answerStates,
@@ -1777,6 +1850,7 @@ export async function saveQuestion(
           review_status: true,
           ist_archiviert: true,
           geltungsbereich: true,
+          template_config_json: true,
           vorlage: {
             select: { vorlage_id: true, code: true },
           },
@@ -2326,7 +2400,10 @@ export async function saveQuestion(
           quelle: draft.sourceOrRemark || null,
           vorlage_id: persistedTemplateForUpdate?.vorlage_id ?? null,
           source_vorlage_id: draft.sourceTemplateId,
-          template_config_json: draft.templateConfig,
+          template_config_json: {
+            ...draft.templateConfig,
+            ...readFactsPersonCreationIdentity(existingQuestion.template_config_json),
+          },
           ist_unfertig: payload.intent === "DRAFT",
           moderationsnotizen: draft.moderationNotes || null,
           kategorienwunsch: draft.categoryRequest || null,
@@ -2512,12 +2589,19 @@ export async function saveQuestion(
 
       return {
         fragen_id: updatedQuestion.fragen_id,
+        pixelChildId: await createPixelChild(updatedQuestion.fragen_id),
         questionMedia: createQuestionMediaDraftFromStoredMedia(storedMedia, draft.templateId),
         answers: answerStates,
       };
     });
 
-    const pixelQuestionSync = await synchronizeFaceMorphPixelQuestions(
+    const pixelQuestionSync = isFactsPerson ? {
+      children: await runFaceMorphPixelQuestionGenerators(
+        question.pixelChildId === null ? [] : [{ answerPosition: 1, questionId: question.pixelChildId }],
+        (questionId) => runQuestionGenerator(questionId, "image_pixelate"),
+      ),
+      detachedQuestionIds: [],
+    } : await synchronizeFaceMorphPixelQuestions(
       question.fragen_id,
       userId,
     );

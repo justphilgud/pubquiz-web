@@ -37,6 +37,7 @@ function interactionFromAnswerMode(
   ) {
     return "STRUCTURED_TEXT";
   }
+  if (definition.answerFormKind === "PAIRS") return "MATCHING";
   const answerMode = definition.answerMode;
   if (answerMode === "POLL_SINGLE") return "POLL_SINGLE";
   if (answerMode === "POLL_MULTI") return "POLL_MULTI";
@@ -60,6 +61,7 @@ function evaluationFromQuestionDefinition(
   if (evaluationMode === "NUMERIC_TOLERANCE") return "NUMERIC_TOLERANCE";
   if (evaluationMode === "ORDER_EXACT") return "ORDER_EXACT";
   if (evaluationMode === "ORDER_POSITION") return "ORDER_POSITION";
+  if (evaluationMode === "PAIR_MATCH") return "PAIR_MATCH";
   return interaction === "SINGLE_CHOICE" || interaction === "MULTI_CHOICE"
     ? "CHOICE_MATCH"
     : "NORMALIZED_TEXT_MATCH";
@@ -334,6 +336,7 @@ function contentFieldsForDefinition(
       },
     ];
   }
+  if (definition.editorKind === "PAIRS") return [prompt, { ...solution, key: "pairs" }];
   if (definition.editorKind === "ORDERING") {
     return [prompt, { ...solution, key: "items" }];
   }

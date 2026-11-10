@@ -1,3 +1,4 @@
+import { defaultPairs, parsePairs, PAIRS_MAX } from "./pairsTemplate";
 import { defaultFacts, factsResponse, parseFacts, factsAnswers } from "./factsTemplate";
 import type {
   QuestionAnswerDraft,
@@ -83,6 +84,7 @@ const defaults: Record<string, QuestionTemplateData> = {
 export function getDefaultQuestionTemplateData(
   templateId: string | null,
 ): QuestionTemplateData | undefined {
+  if (templateId === questionTemplateIds.pairs) return defaultPairs();
   const response = factsResponse(templateId);
   if (response) return defaultFacts(response);
   const value = templateId ? defaults[templateId] : undefined;
@@ -110,6 +112,7 @@ export const ANAGRAM_WORD_COUNT_PREFERENCES = ["AUTO", "2", "3", "4", "5", "ANY"
 
 export type QuestionTemplateValidationIssue = {
   code:
+    | "PAIRS_INVALID"
     | "FACTS_INVALID"
     | "ESTIMATE_UNIT_REQUIRED"
     | "GOOGLE_PLACE_AVERAGE_RATING_INVALID"
@@ -169,7 +172,11 @@ export function getQuestionTemplateValidationIssue(
   templateId: string | null,
 ): QuestionTemplateValidationIssue | null {
   const response = factsResponse(templateId);
-  if (response && parseFacts(value, response, false) === null) return {
+  if (templateId === questionTemplateIds.pairs && !parsePairs(value, true)) return {
+    code: "PAIRS_INVALID", field: "answers",
+    message: `Bitte pflege 2 bis ${PAIRS_MAX} vollständige Paare mit eindeutigen Begriffen auf jeder Seite.`,
+  };
+  if (response && (value === undefined || parseQuestionTemplateData(value, templateId, false) === null)) return {
     code: "FACTS_INVALID", field: "answers", message: "Bitte pflege 2 bis 7 nicht leere Fakten und eine gültige Lösungskonfiguration.",
   };
   if (
@@ -254,7 +261,16 @@ export function parseQuestionTemplateData(
   complete: boolean,
 ): QuestionTemplateData | undefined | null {
   const response = factsResponse(templateId);
-  if (response && value !== undefined) return parseFacts(value, response, complete);
+  if (templateId === questionTemplateIds.pairs) return value === undefined && !complete ? defaultPairs() : parsePairs(value, complete);
+  if (response && value !== undefined) {
+    const facts = parseFacts(value, response, complete);
+    if (!facts) return null;
+    if (templateId === questionTemplateIds.factsPerson) {
+      if (facts.options.length || (facts.createPixelQuestion !== undefined && typeof facts.createPixelQuestion !== "boolean")) return null;
+    } else if (facts.createPixelQuestion !== undefined) return null;
+    return facts;
+  }
+  if (templateId === questionTemplateIds.factsPerson && complete) return null;
   const expected = getDefaultQuestionTemplateData(templateId);
   if (!expected) return value === undefined ? undefined : null;
   if (value === undefined) return expected;
@@ -754,6 +770,7 @@ export function getAnswersForTemplateData(
     additionalInfo: "",
     media: null,
   });
+  if (data.kind === "PAIRS") return [];
   if (data.kind === "FACTS") return factsAnswers(data, current);
   if (data.kind === "TRUE_FALSE") {
     return [base(0, "Wahr", data.correctAnswer), base(1, "Falsch", !data.correctAnswer)];
