@@ -1883,3 +1883,16 @@ model bingo_term_sets {
  @@index([game_id],map:"bingo_term_sets_game")
  @@schema("pubquiz")
 }
+
+model excel_question_import_receipts {
+  actor_id       Int
+  request_id     String   @db.Uuid
+  plan_digest    String   @db.Char(64)
+  content_digest String   @db.Char(64)
+  result_json    Json
+  created_at     DateTime @default(now())
+
+  @@id([actor_id, request_id])
+  @@index([actor_id, content_digest])
+  @@schema("pubquiz")
+}

@@ -18,6 +18,12 @@ export default function FragenImportPage() {
 
           <div className="flex rounded-2xl border border-slate-200 bg-white p-1 shadow-sm">
             <Link
+              href="/fragen/import/excel"
+              className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+            >
+              Excel-Import
+            </Link>
+            <Link
               href="/fragen"
               className="rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
             >

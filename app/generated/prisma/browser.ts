@@ -416,3 +416,8 @@ export type bingo_event_round_cards = Prisma.bingo_event_round_cardsModel
  *
  */
 export type bingo_term_sets = Prisma.bingo_term_setsModel
+/**
+ * Model excel_question_import_receipts
+ *
+ */
+export type excel_question_import_receipts = Prisma.excel_question_import_receiptsModel

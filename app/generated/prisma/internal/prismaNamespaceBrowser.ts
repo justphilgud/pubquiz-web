@@ -128,7 +128,8 @@ export const ModelName = {
   bingo_event_round_plan: 'bingo_event_round_plan',
   bingo_event_rounds: 'bingo_event_rounds',
   bingo_event_round_cards: 'bingo_event_round_cards',
-  bingo_term_sets: 'bingo_term_sets'
+  bingo_term_sets: 'bingo_term_sets',
+  excel_question_import_receipts: 'excel_question_import_receipts'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1366,6 +1367,18 @@ export const Bingo_term_setsScalarFieldEnum = {
 } as const
 
 export type Bingo_term_setsScalarFieldEnum = (typeof Bingo_term_setsScalarFieldEnum)[keyof typeof Bingo_term_setsScalarFieldEnum]
+
+
+export const Excel_question_import_receiptsScalarFieldEnum = {
+  actor_id: 'actor_id',
+  request_id: 'request_id',
+  plan_digest: 'plan_digest',
+  content_digest: 'content_digest',
+  result_json: 'result_json',
+  created_at: 'created_at'
+} as const
+
+export type Excel_question_import_receiptsScalarFieldEnum = (typeof Excel_question_import_receiptsScalarFieldEnum)[keyof typeof Excel_question_import_receiptsScalarFieldEnum]
 
 
 export const SortOrder = {

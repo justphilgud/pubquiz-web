@@ -6,6 +6,10 @@ export type PairsData = Extract<QuestionTemplateData, { kind: "PAIRS" }>;
 export type PairOption = { id: string; text: string };
 export type PairMatch = [leftId: string, rightId: string];
 
+export function normalizePairTerm(text: string) {
+  return text.normalize("NFKC").trim().replace(/\s+/g, " ").toLowerCase();
+}
+
 export function defaultPairs(): PairsData {
   return {
     kind: "PAIRS",
@@ -31,7 +35,7 @@ export function parsePairs(value: unknown, complete: boolean): PairsData | null 
     }
     for (const [text, seen] of [[pair.left, leftTexts], [pair.right, rightTexts]] as const) {
       if (typeof text !== "string" || text.length > PAIR_TEXT_MAX) return null;
-      const normalized = text.normalize("NFKC").trim().replace(/\s+/g, " ").toLowerCase();
+      const normalized = normalizePairTerm(text);
       if (complete && (!normalized || seen.has(normalized))) return null;
       seen.add(normalized);
     }

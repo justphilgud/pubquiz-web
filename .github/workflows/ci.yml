@@ -48,6 +48,9 @@ jobs:
       - name: Tests
         run: npm test
 
+      - name: Excel question import workbook and validation
+        run: node --import tsx --test app/fragen/import/excel/import.test.ts
+
       - name: Question rewrite safety and stale-request regression
         run: npm run test:question-rewrite
 
@@ -181,3 +184,17 @@ jobs:
           BINGO_PREPARATION_TEST_DATABASE_URL: ${{ env.EDITORIAL_IMPORT_TEST_DATABASE_URL }}
           BINGO_PG_CONTAINER: ${{ job.services.postgres.id }}
         run: node --import tsx --test scripts/testing/bingo-preparation.integration.test.ts
+      - name: PostgreSQL Excel question import rollback, concurrency and 100 pair questions
+        env:
+          EXCEL_IMPORT_TEST_DATABASE_URL: ${{ env.EDITORIAL_IMPORT_TEST_DATABASE_URL }}
+        run: node --import tsx --test scripts/testing/excel-question-import.integration.test.ts
+      - name: Build application for Excel browser acceptance
+        env:
+          AUTH_SECRET: isolated-excel-ci-only
+          BLOB_READ_WRITE_TOKEN: isolated-excel-ci-only
+        run: npm run build
+      - name: Browser acceptance for Excel import and quiz surfaces
+        env:
+          EXCEL_IMPORT_TEST_DATABASE_URL: ${{ env.EDITORIAL_IMPORT_TEST_DATABASE_URL }}
+          EXCEL_IMPORT_BROWSER: "1"
+        run: node --import tsx --test scripts/testing/excel-question-import.browser.test.ts

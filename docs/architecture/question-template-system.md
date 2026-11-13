@@ -129,6 +129,11 @@ Ein generischer Templatefragetext allein erzeugt damit keine Warnung.
 
 ## Datentransfer und manuelle Regression
 
+Der [Excel-Fragenimport](excel-question-import.md) legt offene Standardfragen,
+Einfachauswahl und Paare als medienfreie Entwürfe mit der Editorvalidierung an.
+Die Paarzeilen behalten ihre Zuordnung. Die bestehende Laufzeit mischt beide
+Seiten unabhängig und bewertet jede richtige Verbindung mit 0,25 Basispunkten.
+
 Export und Import übertragen Template-ID und das vollständige normalisierte
 JSON. Der Klonpfad kopiert Template-Fremdschlüssel und Konfiguration.
 

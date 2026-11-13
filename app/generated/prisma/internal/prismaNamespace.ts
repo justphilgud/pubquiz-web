@@ -474,7 +474,8 @@ export const ModelName = {
   bingo_event_round_plan: 'bingo_event_round_plan',
   bingo_event_rounds: 'bingo_event_rounds',
   bingo_event_round_cards: 'bingo_event_round_cards',
-  bingo_term_sets: 'bingo_term_sets'
+  bingo_term_sets: 'bingo_term_sets',
+  excel_question_import_receipts: 'excel_question_import_receipts'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -490,7 +491,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "external_question_import_batches" | "external_question_import_items" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "meme_archive_sources" | "meme_archive_entries" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "live_polls" | "live_poll_revisions" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "live_poll_responses" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "meme_moderation_selections" | "meme_moderation_candidates" | "meme_presentations" | "meme_result_entries" | "meme_votes" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen" | "eventarten" | "eventreihe_eventarten" | "benutzer_eventartrollen" | "eventreihe_verwaltung" | "benutzer_reihenrollen" | "game_drafts" | "bingo_preparations" | "bingo_matching_assets" | "bingo_rounds" | "bingo_card_series" | "bingo_series_labels" | "bingo_print_versions" | "bingo_cards" | "bingo_round_series" | "bingo_issuance_changes" | "game_team_assignments" | "bingo_live_runs" | "bingo_live_cards" | "bingo_live_events" | "bingo_event_creation_requests" | "bingo_event_runs" | "bingo_event_round_plan" | "bingo_event_rounds" | "bingo_event_round_cards" | "bingo_term_sets"
+    modelProps: "antworten" | "antworttyp" | "fragen" | "public_question_submissions" | "public_question_rate_limits" | "external_question_import_batches" | "external_question_import_items" | "fragen_relationen" | "fragen_kategorien" | "fragenkategorie" | "medien" | "medien_generator_laefe" | "medien_generator_lauf_medien" | "medientyp" | "quiz" | "meme_archive_sources" | "meme_archive_entries" | "eventreihen" | "presentation_templates" | "story_elemente" | "story_element_revisionen" | "live_polls" | "live_poll_revisions" | "frage_story_elemente" | "quiz_fragen" | "quiz_teams" | "teams" | "quiz_abschnitte" | "quiz_ablauf_elemente" | "quiz_team_sessions" | "quiz_block_freigaben" | "team_antworten" | "quiz_interaction_runs" | "team_answer_submissions" | "live_poll_responses" | "frage_antwortfelder" | "team_antwortfelder" | "frage_antwortfeld_loesungen" | "frage_vorlagen" | "frage_vorlage_antwortfelder" | "quiz_praesentation_status" | "team_antwort_auswahlen" | "meme_moderation_selections" | "meme_moderation_candidates" | "meme_presentations" | "meme_result_entries" | "meme_votes" | "live_text_response_publications" | "public_text_replacement_rules" | "users" | "benutzer_rollenzuweisungen" | "eventreihe_benutzerrollen" | "fragen_eventreihen" | "eventarten" | "eventreihe_eventarten" | "benutzer_eventartrollen" | "eventreihe_verwaltung" | "benutzer_reihenrollen" | "game_drafts" | "bingo_preparations" | "bingo_matching_assets" | "bingo_rounds" | "bingo_card_series" | "bingo_series_labels" | "bingo_print_versions" | "bingo_cards" | "bingo_round_series" | "bingo_issuance_changes" | "game_team_assignments" | "bingo_live_runs" | "bingo_live_cards" | "bingo_live_events" | "bingo_event_creation_requests" | "bingo_event_runs" | "bingo_event_round_plan" | "bingo_event_rounds" | "bingo_event_round_cards" | "bingo_term_sets" | "excel_question_import_receipts"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -6266,6 +6267,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    excel_question_import_receipts: {
+      payload: Prisma.$excel_question_import_receiptsPayload<ExtArgs>
+      fields: Prisma.excel_question_import_receiptsFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.excel_question_import_receiptsFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$excel_question_import_receiptsPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.excel_question_import_receiptsFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$excel_question_import_receiptsPayload>
+        }
+        findFirst: {
+          args: Prisma.excel_question_import_receiptsFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$excel_question_import_receiptsPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.excel_question_import_receiptsFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$excel_question_import_receiptsPayload>
+        }
+        findMany: {
+          args: Prisma.excel_question_import_receiptsFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$excel_question_import_receiptsPayload>[]
+        }
+        create: {
+          args: Prisma.excel_question_import_receiptsCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$excel_question_import_receiptsPayload>
+        }
+        createMany: {
+          args: Prisma.excel_question_import_receiptsCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.excel_question_import_receiptsCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$excel_question_import_receiptsPayload>[]
+        }
+        delete: {
+          args: Prisma.excel_question_import_receiptsDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$excel_question_import_receiptsPayload>
+        }
+        update: {
+          args: Prisma.excel_question_import_receiptsUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$excel_question_import_receiptsPayload>
+        }
+        deleteMany: {
+          args: Prisma.excel_question_import_receiptsDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.excel_question_import_receiptsUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.excel_question_import_receiptsUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$excel_question_import_receiptsPayload>[]
+        }
+        upsert: {
+          args: Prisma.excel_question_import_receiptsUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$excel_question_import_receiptsPayload>
+        }
+        aggregate: {
+          args: Prisma.Excel_question_import_receiptsAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateExcel_question_import_receipts>
+        }
+        groupBy: {
+          args: Prisma.excel_question_import_receiptsGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Excel_question_import_receiptsGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.excel_question_import_receiptsCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.Excel_question_import_receiptsCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -7526,6 +7601,18 @@ export const Bingo_term_setsScalarFieldEnum = {
 export type Bingo_term_setsScalarFieldEnum = (typeof Bingo_term_setsScalarFieldEnum)[keyof typeof Bingo_term_setsScalarFieldEnum]
 
 
+export const Excel_question_import_receiptsScalarFieldEnum = {
+  actor_id: 'actor_id',
+  request_id: 'request_id',
+  plan_digest: 'plan_digest',
+  content_digest: 'content_digest',
+  result_json: 'result_json',
+  created_at: 'created_at'
+} as const
+
+export type Excel_question_import_receiptsScalarFieldEnum = (typeof Excel_question_import_receiptsScalarFieldEnum)[keyof typeof Excel_question_import_receiptsScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -8305,6 +8392,7 @@ export type GlobalOmitConfig = {
   bingo_event_rounds?: Prisma.bingo_event_roundsOmit
   bingo_event_round_cards?: Prisma.bingo_event_round_cardsOmit
   bingo_term_sets?: Prisma.bingo_term_setsOmit
+  excel_question_import_receipts?: Prisma.excel_question_import_receiptsOmit
 }
 
 /* Types for Logging */
