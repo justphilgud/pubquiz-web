@@ -9,6 +9,7 @@ import type { ConfirmResult, ImportQuestion, ImportReceipt, ImportTarget, Issue,
 import { findImportDuplicates } from "./importDuplicates";
 import { batchContentDigest, planDigest, signPlan, toDraft, verifyPlan, type ResolvedQuestion } from "./importPlan";
 import { parseImport } from "./parseImport";
+import { WorkbookError } from "./workbookError";
 
 class ImportError extends Error {
   constructor(readonly issues: Issue[]) {
@@ -105,8 +106,10 @@ function validateDrafts(questions: ResolvedQuestion[], target: ImportTarget) {
 export function readImport(bytes: Buffer) {
   try {
     return parseImport(bytes);
-  } catch {
-    throw new ImportError([fileIssue("Die XLSX-Datei ist beschädigt, unzulässig oder überschreitet die Dateigrenzen.")]);
+  } catch (error) {
+    throw new ImportError([fileIssue(error instanceof WorkbookError
+      ? error.message
+      : "Die Tabellenstruktur der XLSX-Datei ist ungültig. Bitte die Datei erneut als XLSX speichern.")]);
   }
 }
 

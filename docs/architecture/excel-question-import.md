@@ -15,6 +15,12 @@ Der Fragenbereich bietet unter „Excel-Fragenimport“ eine leere XLSX-Vorlage 
 
 ## Vorschau und Persistenz
 
+Der Inhaltstyp von `/xl/workbook.xml` ergibt sich zuerst aus dem expliziten
+`Override`, sonst aus dem `Default` für die Erweiterung `xml`. Der Import akzeptiert
+den XLSX-Arbeitsmappentyp ohne Makros. Dateifehler unterscheiden ZIP-Archiv,
+Arbeitsmappentyp, Größenlimits und ungültiges XML. Fachliche Fehler werden je Zelle
+ausgegeben.
+
 Der Server liest und prüft die gesamte Datei. Fehler nennen Blatt, Originalzeile und Feld, soweit ein konkreter Zellbezug besteht. Die Vorschau zeigt alle erkannten Fragen, Antworttexte, Richtig-Markierungen, Paarungen, Metadaten, Fehler und Hinweise. Sie schreibt keine Fragen oder Importbelege. Ein fehlerfreier Plan erhält eine signierte, benutzergebundene Bestätigung mit 30 Minuten Gültigkeit für den ersten Schreibversuch. Bei Bestätigung sendet der Browser die Datei erneut. Der Server berechnet den Plan neu und prüft Zugriff, Kategorien, Originaldaten und Dubletten erneut.
 
 Alle Fragen, Kategorien- und Reihenbeziehungen, klassischen Antworten und der Importbeleg werden in einer PostgreSQL-Transaktion geschrieben. Der Vorgang verwendet dieselbe vollständige Inhaltsvalidierung und dieselbe Feldzuordnung wie die Editor-Anlage. Alle Fragen sind unveröffentlichte Entwürfe und bleiben im Editor bearbeitbar. Der Import erstellt keine Quizzuordnungen, Medien, Generatoren, Freigaben oder Bewertungsdaten. Ein beliebiger Schreibfehler rollt den gesamten Batch zurück. Die Übersicht verlinkt erfolgreiche Entwürfe im Frageneditor.

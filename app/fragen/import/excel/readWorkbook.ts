@@ -1,7 +1,8 @@
 import { posix } from "node:path";
-import { XMLParser } from "fast-xml-parser";
+import { XMLParser, XMLValidator } from "fast-xml-parser";
 import { headers, maxDetailRows, maxQuestions, type Issue, type Sheet } from "./format";
 import { readWorkbookArchive } from "./workbookArchive";
+import { WorkbookError } from "./workbookError";
 
 type Xml = { [key: string]: Xml | Xml[] | string | undefined };
 type Cell = { value: string; error?: string };
@@ -15,8 +16,14 @@ const xmlParser = new XMLParser({
 });
 
 function xml(text: string | undefined): Xml {
-  if (!text || /<!\s*(DOCTYPE|ENTITY)/i.test(text)) throw new Error("Ungültiges Workbook-XML.");
-  return xmlParser.parse(text) as Xml;
+  if (text && !/<!\s*(DOCTYPE|ENTITY)/i.test(text) && XMLValidator.validate(text) === true) {
+    try {
+      return xmlParser.parse(text) as Xml;
+    } catch {
+      // Parser limits and raw parser diagnostics stay on the server.
+    }
+  }
+  throw new WorkbookError("Ein erforderlicher XML-Bestandteil fehlt oder ist ungültig. Bitte die Datei erneut als XLSX speichern.");
 }
 
 function objects(node: Xml[string]): Xml[] {
@@ -86,18 +93,20 @@ function rowsOf(sheet: Xml, shared: string[]) {
       if (value.error || value.value.trim()) cells.set(column, value);
     }
     if (cells.size) rows.push({ number, cells });
-    if (rows.length > maxDetailRows + 1) throw new Error("Zu viele befüllte Zeilen.");
+    if (rows.length > maxDetailRows + 1) throw new WorkbookError(`Ein Datenblatt enthält mehr als ${maxDetailRows} befüllte Zeilen.`);
   }
   return rows;
 }
 
 export function readTables(bytes: Buffer) {
   const read = readWorkbookArchive(bytes);
-  const contentTypes = xml(read("[Content_Types].xml"));
-  if (!objects(object(contentTypes.Types).Override).some(entry =>
-    entry["@_PartName"] === "/xl/workbook.xml" &&
-    entry["@_ContentType"] === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml")) {
-    throw new Error("Bitte eine XLSX-Arbeitsmappe ohne Makros auswählen.");
+  const contentTypes = object(xml(read("[Content_Types].xml")).Types);
+  const overrides = objects(contentTypes.Override).filter(entry => entry["@_PartName"] === "/xl/workbook.xml");
+  const defaults = objects(contentTypes.Default).filter(entry => string(entry["@_Extension"]).toLowerCase() === "xml");
+  const applicable = overrides.length ? overrides : defaults;
+  if (applicable.length !== 1 ||
+    applicable[0]["@_ContentType"] !== "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml") {
+    throw new WorkbookError("Der Arbeitsmappentyp wird nicht unterstützt. Bitte eine XLSX-Arbeitsmappe ohne Makros auswählen.");
   }
   const workbook = object(xml(read("xl/workbook.xml")).workbook);
   const sheets = objects(object(workbook.sheets).sheet);

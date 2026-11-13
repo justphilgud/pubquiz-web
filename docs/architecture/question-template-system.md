@@ -19,6 +19,12 @@ Fokusziele. Bei einer Schätzfrage ohne Einheit lautet der Fehler
 `ESTIMATE_UNIT_REQUIRED` und zeigt direkt auf das Einheitenfeld; er wird nicht
 als fehlende Antwort oder ungültige Pixelkonfiguration ausgegeben.
 
+Bei „Paare bilden“ stehen Lösungen ausschließlich in `templateData.pairs`.
+Der Editor lädt eine leere klassische Antwortliste ohne Platzhalter. Dadurch
+kann die Statusaktion die gespeicherte Paarfrage strikt validieren und ohne
+Inhaltsänderung freigeben. Tatsächlich gespeicherte klassische Antworten bleiben
+sichtbar für die Validierung und werden nicht stillschweigend verworfen.
+
 ## Übersetzung und Browserstimmen
 
 Original und Übersetzung werden getrennt gespeichert und sind auf je 2.000

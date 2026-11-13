@@ -162,6 +162,17 @@ test("real Next.js and Chromium: XLSX download, preview, import, editor and quiz
     const loaded = await loadQuestionForEditor(id, db);
     const pairs = loaded?.draft.templateConfig.templateData;
     assert.ok(pairs?.kind === "PAIRS");
+    // The unchanged draft must be approvable without manufacturing a classic answer.
+    await fixture.sql.query("UPDATE pubquiz.benutzer_reihenrollen SET rolle='EVENT_MANAGER' WHERE benutzer_id=1 AND eventreihe_id=10");
+    await navigate(resultLinks[5]);
+    await clickButton("Gespeicherten Inhalt freigeben");
+    await contains("Gespeicherter Inhalt freigegeben.");
+    const approved = await loadQuestionForEditor(id, db);
+    assert.equal(approved?.access.reviewStatus, "APPROVED");
+    assert.equal(approved?.record.approvedByName, "Excel Editor");
+    assert.deepEqual(approved?.draft.templateConfig.templateData, pairs);
+    assert.deepEqual(approved?.draft.answers, []);
+    assert.equal(await db.antworten.count({ where: { fragen_id: id } }), 0);
     const quiz = await db.quiz.create({ data: { titel: "Excel Browser-Quiz", eventreihe_id: 10 } });
     const quizId = quiz.quiz_id;
     const block = await db.quiz_abschnitte.create({ data: { quiz_id: quizId, titel: "Testblock", sortierung: 1, abschnitt_typ: "fragenblock" } });
@@ -193,8 +204,6 @@ test("real Next.js and Chromium: XLSX download, preview, import, editor and quiz
     await navigate(`/quiz/${quizId}/antworten`);
     await eventually(() => js(`document.querySelector('[data-answer-interaction="MATCHING"]')?.textContent.includes("Stoffmenge")`), "Paarfrage im Team-Antwortformular");
 
-    // Live controllers are a distinct permission. Grant it only after testing the editorial flow.
-    await fixture.sql.query("UPDATE pubquiz.benutzer_reihenrollen SET rolle='EVENT_MANAGER' WHERE benutzer_id=1 AND eventreihe_id=10");
     await navigate(`/quiz/${quizId}/praesentation`);
     await eventually(() => js(`Boolean(document.querySelector('[data-pairs-slide="question"]'))`), "Paarfrage in der Präsentation");
     assert.equal(await js(`Boolean(document.querySelector('[data-pairs-slide="solution"]'))`), false);

@@ -83,6 +83,7 @@ test("PostgreSQL import: preview, active categories, authorization, full rollbac
     assert.equal(closed.draft.answers.filter(answer => answer.isCorrect).length, 1);
     assert.ok([open, closed, pair].every(record => record.access.reviewStatus === "DRAFT" && !record.access.isApproved));
     assert.equal(await db.antworten.count({ where: { fragen_id: first.questions[5].id } }), 0);
+    assert.deepEqual(pair.draft.answers, [], "reopening a pair question must not add a classic answer placeholder");
     const pairs = pair.draft.templateConfig.templateData;
     assert.ok(pairs?.kind === "PAIRS");
     assert.deepEqual(pairs.pairs.map(({ left, right }) => [left, right]), [
