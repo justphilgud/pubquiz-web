@@ -12,8 +12,11 @@ function readRequest(form: FormData) {
   const targetValue = form.get("target");
   const target = typeof targetValue === "string" ? parseTarget(targetValue) : null;
   if (!target) return { issue: { sheet: "Zielbereich", field: "Eventreihe", message: "Bitte einen Zielbereich auswählen." } satisfies Issue };
-  if (!(file instanceof File) || !/\.xlsx$/i.test(file.name) || file.size < 1 || file.size > maxFileBytes) {
-    return { issue: { sheet: "Datei", field: "Datei", message: "Bitte eine XLSX-Datei bis 768 KiB auswählen." } satisfies Issue };
+  if (!(file instanceof File) || !/\.xlsx$/i.test(file.name)) {
+    return { issue: { sheet: "Datei", field: "Datei", message: "Bitte eine XLSX-Datei ohne Makros auswählen." } satisfies Issue };
+  }
+  if (file.size > maxFileBytes) {
+    return { issue: { sheet: "Datei", field: "Datei", message: "Die XLSX-Datei überschreitet 768 KiB." } satisfies Issue };
   }
   return { file, target };
 }
