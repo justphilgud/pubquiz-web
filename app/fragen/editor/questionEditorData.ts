@@ -9,7 +9,7 @@ import {
   createAnswerMediaDraftFromStoredMedia,
   createQuestionMediaDraftFromStoredMedia,
 } from "./questionMedia";
-import { resolveCanonicalQuestionTemplateId } from "./templates/questionTemplateRegistry";
+import { questionTemplateIds, resolveCanonicalQuestionTemplateId } from "./templates/questionTemplateRegistry";
 import { mapGeneratorRun } from "./generators/runState";
 import {
   DEFAULT_PIXEL_TEMPLATE_CONFIG,
@@ -229,7 +229,7 @@ export async function loadQuestionForEditor(questionId: number, db: Prisma.Trans
     generatorParameters,
     templateConfig,
     answers:
-      answers.length > 0
+      answers.length > 0 || templateId === questionTemplateIds.pairs
         ? answers
         : [
             {
