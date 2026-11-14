@@ -97,3 +97,35 @@ Testquiz, drei Teams und mindestens zehn Bewertungsaktionen abgenommen werden.
 
 Schema und Migration bleiben unverändert. Reset, Antwortzähler, Draft/Final,
 Frage aus-/einblenden, Blockclose und Lifecycle werden nicht neu modelliert.
+
+## Template-Punktehilfe und 8-Bit (14. November 2026)
+
+Der Template-Picker zeigt die Regel vor der Auswahl und am gewählten Template.
+Ein Link öffnet `/hilfe?topic=punkte` in einem neuen Tab, damit ein ungespeicherter
+Entwurf erhalten bleibt. Die vorhandene rollenabhängige Hilfe erlaubt den Zugriff
+für Editoren und Eventmanager einschließlich Eventreihenrollen sowie Admins.
+`questionScoringGuide.ts` liefert beide Anzeigetexte; `QuestionScoringOverview`
+ist reine Darstellung ohne eigene Berechnung, Datenbankabfrage oder Mutation.
+Eigene Vorlagen lösen ihren `baseTemplateId` auf, einschließlich `null` für Standard.
+
+Explizite fachliche Änderung: 8-Bit hat insgesamt 1 Basispunkt statt 0,5 pro
+Titelfeld. Policy und Evaluator verwenden dasselbe Maximum. Ein einzelnes
+korrektes Titelfeld ergibt 1; historische mehrteilige Fragen verteilen diesen
+Punkt gleichmäßig. Alias-IDs gelten identisch. Freitext-Altfälle bleiben binär.
+Expertenbonus verdoppelt das Ergebnis; mehrere Felder sperren weiterhin Risiko.
+Andere strukturierte Templates behalten 0,5 pro Feld. Keine Medien-, Antwort-,
+Submission-, Präsentations- oder Moderationsnavigation wird geändert.
+
+Die Datenmigration aktualisiert ausschließlich das Maximum von 8-Bit-Zuweisungen
+in noch nicht gestarteten Quizzen ohne Runs oder Teamantworten. Sie schreibt keine
+Teamwertung und keine Lösung. Bereits gespeicherte Spielergebnisse werden nicht
+automatisch neu bewertet; die Engine-Version wird nicht global erhöht. Eine später
+bewusst ausgelöste Neuberechnung nutzt die neue Regel und schützt wie bisher
+manuelle Overrides. Bei laufenden Quizzen deshalb erst nach dem Spiel ausrollen.
+
+Nachweise: `eightBitScoring.test.ts`, bestehende `evaluateBaseAnswer.test.ts`,
+`questionScoringGuide.test.tsx` und `helpContent.test.ts`.
+`eightBitMigration.integration.test.ts` prüft in einem zurückgerollten lokalen
+PostgreSQL-Schema Alias-IDs, Idempotenz und den Schutz laufender/gespielter Quizze;
+der bestehende PostgreSQL-CI-Job führt ihn aus. Die Hilfe beschreibt auch
+den Meme-Votingsiegerpunkt, Pixel-Challenge, Risiko und abweichende Musikfeldanzahl.
