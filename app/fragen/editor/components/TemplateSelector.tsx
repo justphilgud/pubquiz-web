@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { getTemplateScoringHint } from "../templates/questionScoringGuide";
 import { useMemo, useState } from "react";
 import { Modal } from "@/components/ui/Modal";
 import { SearchInput } from "@/components/ui/SearchInput";
@@ -97,6 +99,12 @@ export function TemplateSelector({
             {messages.templateSelector.select}
           </button>
         )}
+        <div className="mt-3 border-t border-slate-200 pt-3 text-sm text-slate-700">
+          <p><strong>Bewertung: </strong>{getTemplateScoringHint(selectedTemplate)}</p>
+          <Link href="/hilfe?topic=punkte" target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex min-h-11 items-center font-medium underline underline-offset-4">
+            Alle Punkte- und Bewertungsregeln (neuer Tab)
+          </Link>
+        </div>
       </section>
 
       <Modal
@@ -139,6 +147,7 @@ export function TemplateSelector({
           >
             <span className="block font-medium">Standardfrage</span>
             <span className={selectedTemplateId === null ? "mt-1 block text-sm text-slate-200" : "mt-1 block text-sm text-slate-600"}>Keine Spezialvorlage</span>
+            <span className="mt-2 block text-sm">Bewertung: {getTemplateScoringHint(null)}</span>
           </button>
           {filteredTemplates.map((template) => {
             const isSelected = template.id === selectedTemplateId;
@@ -165,6 +174,7 @@ export function TemplateSelector({
                 >
                   {template.description}
                 </span>
+                <span className="mt-2 block text-sm">Bewertung: {getTemplateScoringHint(template)}</span>
               </button>
             );
           })}

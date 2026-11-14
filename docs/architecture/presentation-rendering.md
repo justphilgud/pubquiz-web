@@ -257,7 +257,7 @@ immer Navigation, Folienzeit, Vorschau und vorhandene Freigabe-/Auswertungssteue
 | `face_morph` | Nur Morph, keine Originale/Namen | Original A, Morph, Original B nebeneinander; kanonische Namen | Strukturierte Namen; Spezialvertrag Runtime und Medienprojektion |
 | `musik` | Frage und Audio; keine Metadaten als Lösung | Interpret und Titel aus Antwortfeldern, Zusatzinformation | Bestehende Interpret-/Titelfelder |
 | `musik_rueckwaerts` | Verarbeitetes rückwärts abgespieltes Audio | Hinterlegte Musiklösung, vorhandenes Lösungsmedium | Wie Musik; keine Änderung der Audioverarbeitung |
-| `eight_bit` | Vorhandenes 8-Bit-Medium | Hinterlegter Songtitel und Interpret | Wie Musik; individuelle Medien erhalten |
+| `eight_bit` | Vorhandenes 8-Bit-Medium | Hinterlegter Songtitel; zusätzliche historische Felder bleiben erhalten | Songtitelfeld; insgesamt 1 Basispunkt, bei mehreren historischen Feldern gleichmäßig verteilt; individuelle Medien erhalten |
 | `kunstwerk` | Kunstbild im spezialisierten großen Medienbereich | Gespeicherter Künstler/Titel und Alternativen | Strukturierte Antwort; eigene Typografiegrenzen bleiben |
 | `pixelbild` | Live-Stufen, Countdown; Original streng verborgen | Original und gespeicherte Motivlösung | Stoppen/Antwort/Stufen nach [Pixel-Vertrag](pixel-question.md) |
 | `wahr_falsch` | Beide Möglichkeiten neutral | Konfigurierter Wahrheitswert und Erklärung | Einfachauswahl; bestehende Reihenfolge erhalten |

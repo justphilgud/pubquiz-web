@@ -6,6 +6,7 @@ import AppHeader from "@/app/components/AppHeader";
 import { requireUser } from "@/app/lib/auth-guard";
 import { getActorForSession } from "@/app/roles/roleAssignments.server";
 import { getVisibleHelpTopics } from "./helpContent";
+import { QuestionScoringOverview } from "./QuestionScoringOverview";
 import { MarkdownHelp } from "./MarkdownHelp";
 
 type Props = { searchParams: Promise<{ topic?: string }> };
@@ -36,6 +37,7 @@ export default async function HelpPage({ searchParams }: Props) {
         </aside>
         <section className="min-w-0 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-10">
           <MarkdownHelp source={markdown} />
+          {activeTopic?.slug === "punkte" && <QuestionScoringOverview />}
           {activeTopic?.screenshots?.map((screenshot) => <figure key={screenshot.fileName} className="mt-8 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
             <Image src={`/hilfe/screenshots/${screenshot.fileName}`} alt={screenshot.alt} width={1440} height={1000} unoptimized className="h-auto w-full" />
             <figcaption className="border-t border-slate-200 px-4 py-3 text-sm text-slate-600">{screenshot.caption}</figcaption>

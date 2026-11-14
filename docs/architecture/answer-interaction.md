@@ -220,7 +220,7 @@ Beim Schließen eines Runs beziehungsweise Blocks werden inhaltlich gefüllte Dr
 | Typ | UI und Draft | Submission-Payload | Produktive Bewertung und Reload |
 | --- | --- | --- | --- |
 | `TEXT` | Mehrzeiliges Textfeld; `antwort_text` | `{ text: string }` | Effektiv offene Antworten gehen in die manuelle Prüfung. Reload stellt den Text aus Draft oder finalem Snapshot wieder her. |
-| `STRUCTURED_TEXT` | Ein Textfeld je `frage_antwortfelder`; `team_antwortfelder` | `{ fields: Record<fieldId, string> }` | Zentraler Feldvergleich; derzeit 0,5 Basispunkte je korrekt normalisiertem Feld. Reload rekonstruiert die Feld-ID-Zuordnung. |
+| `STRUCTURED_TEXT` | Ein Textfeld je `frage_antwortfelder`; `team_antwortfelder` | `{ fields: Record<fieldId, string> }` | Zentraler Feldvergleich; 0,5 Basispunkte je korrekt normalisiertem Feld; Ausnahme 8-Bit: insgesamt 1 Basispunkt, gleichmäßig auf vorhandene Felder verteilt. Reload rekonstruiert die Feld-ID-Zuordnung. |
 | `NUMBER` | Numerisches Feld mit Schritt und optionaler Einheit; `antwort_text` | `{ value: string }` | Schätzfragen werden derzeit zur manuellen Prüfung markiert. Die Zeichenform des Werts bleibt im Snapshot erhalten. |
 | `SINGLE_CHOICE` | Radiogruppe; `antwort_id`/Auswahlrelation | `{ optionId: number | null }` | Binärer Abgleich gegen die richtige Option. Reload stellt die gewählte ID wieder her. |
 | `MULTI_CHOICE` | Checkboxen; `team_antwort_auswahlen` | `{ optionIds: number[] }` | Teilbewertung: aktuell +0,5 je richtiger und −0,5 je falscher Auswahl, mindestens 0; „alles auswählen“ kann nicht volle Punktzahl ergeben. |

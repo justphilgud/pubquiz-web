@@ -24,7 +24,7 @@ export function getQuestionBaseMaximum(input: {
   if ([questionTemplateIds.ordering, questionTemplateIds.pairs].some((id) => id === templateId)) {
     return new Prisma.Decimal(input.orderingItemCount).mul(POSITION_ITEM_POINTS);
   }
-  if (templateId === questionTemplateIds.pixelImage) {
+  if (templateId === questionTemplateIds.pixelImage || templateId === questionTemplateIds.musicEightBit) {
     return new Prisma.Decimal(1);
   }
   if (input.structuredFieldCount > 0) {

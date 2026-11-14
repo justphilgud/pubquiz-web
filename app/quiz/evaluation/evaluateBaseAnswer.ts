@@ -14,7 +14,7 @@ import type {
   EvaluationStatus,
 } from "./evaluationTypes";
 
-import { POSITION_ITEM_POINTS } from "./questionPointPolicy";
+import { getQuestionBaseMaximum, POSITION_ITEM_POINTS } from "./questionPointPolicy";
 
 const ZERO = new Prisma.Decimal(0);
 const HALF = new Prisma.Decimal("0.5");
@@ -36,7 +36,12 @@ function unanswered(maxPoints: Prisma.Decimal, strategy: BaseAnswerEvaluation["d
 }
 
 function evaluateStructuredFields(input: BaseAnswerInput): BaseAnswerEvaluation {
-  const maxPoints = HALF.mul(input.structuredFields.length);
+  const maxPoints = getQuestionBaseMaximum({
+    templateId: input.templateId,
+    structuredFieldCount: input.structuredFields.length,
+    correctAnswerCount: 0,
+    orderingItemCount: 0,
+  });
   const submitted = input.structuredFields.some((field) =>
     hasText(input.structuredAnswers.get(field.id)),
   );
@@ -53,7 +58,7 @@ function evaluateStructuredFields(input: BaseAnswerInput): BaseAnswerEvaluation 
       )
     );
   }).length;
-  const basePoints = HALF.mul(correctComponents);
+  const basePoints = maxPoints.mul(correctComponents).div(input.structuredFields.length);
 
   return {
     basePoints,
