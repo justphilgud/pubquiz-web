@@ -40,6 +40,7 @@ export function getQuestionScoringRule(templateId: string | null): QuestionScori
 }
 
 export function getTemplateScoringHint(template: QuestionTemplate | null): string {
-  const id = template?.baseTemplateId !== undefined ? template.baseTemplateId : template?.id ?? null;
+  const baseId = template?.baseTemplateId !== undefined ? template.baseTemplateId : template?.id ?? null;
+  const id = template?.scoringTemplateId ?? baseId;
   return getQuestionScoringRule(id)?.rule ?? "Die Bewertung richtet sich nach dem Basistemplate und den konfigurierten Antwortfeldern.";
 }

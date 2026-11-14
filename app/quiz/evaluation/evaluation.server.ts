@@ -23,7 +23,7 @@ import {
   summarizeIncompleteEvaluations,
 } from "./evaluationBackfillPolicy";
 import { parsePairs } from "@/app/fragen/editor/templates/pairsTemplate";
-import { getQuestionBaseMaximum } from "./questionPointPolicy";
+import { getQuestionBaseMaximum, getQuizQuestionScoringTemplateId } from "./questionPointPolicy";
 import { allocateRiskQuestionPoints } from "./riskQuestionAllocation";
 import {
   isRiskPoolEligible,
@@ -194,6 +194,7 @@ async function recalculateQuizQuestionEvaluationInTransaction(
       fragen: {
         include: {
           vorlage: { select: { code: true } },
+          source_vorlage: { select: { konfiguration_json: true } },
           antworten: {
             orderBy: { antwort_id: "asc" },
             select: { antwort_id: true, antwort: true, ist_richtig: true },
@@ -244,6 +245,11 @@ async function recalculateQuizQuestionEvaluationInTransaction(
   if (!assignment) throw new Error("Quizfrage nicht gefunden.");
 
   const templateId = assignment.fragen.vorlage?.code ?? null;
+  const scoringTemplateId = getQuizQuestionScoringTemplateId(
+    templateId,
+    assignment.fragen.source_vorlage?.konfiguration_json,
+    assignment.punkte_basis,
+  );
   if (isPollQuestionTemplateId(templateId)) {
     return { recalculatedAnswers: 0, recalculatedQuestions: 0 };
   }
@@ -269,7 +275,7 @@ async function recalculateQuizQuestionEvaluationInTransaction(
   const pairs = rawConfig && typeof rawConfig === "object" && !Array.isArray(rawConfig)
     ? parsePairs(rawConfig.templateData, true) ?? undefined : undefined;
   const maximum = getQuestionBaseMaximum({
-    templateId,
+    templateId: scoringTemplateId,
     correctAnswerCount: assignment.fragen.antworten.filter(
       (answer) => answer.ist_richtig,
     ).length,
@@ -291,7 +297,7 @@ async function recalculateQuizQuestionEvaluationInTransaction(
       submissions: answer.submissions,
     });
     const base = evaluateBaseAnswer({
-      templateId,
+      templateId: scoringTemplateId,
       effectiveAnswerMode: answerMode.effectiveMode,
       answerOptions: assignment.fragen.antworten.map((option) => ({
         id: option.antwort_id,

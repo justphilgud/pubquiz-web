@@ -9,6 +9,7 @@ import type {
 } from "../types";
 import { isMediaSlotKey } from "../mediaSlots";
 import { isMusicAnswerStructure } from "./musicAnswerScope";
+import { questionTemplateIds, resolveCanonicalQuestionTemplateId } from "./questionTemplateRegistry";
 
 export const dynamicQuestionTemplateRoles = [
   "FIXED",
@@ -45,6 +46,7 @@ export type PersistedDynamicQuestionTemplateRuleSelection = Omit<
 
 export type DynamicQuestionTemplateSnapshot = {
   version: 1;
+  scoringTemplateId?: "eight_bit";
   questionText: {
     role: DynamicQuestionTemplateRole;
     value: string;
@@ -82,6 +84,15 @@ function isMediaType(value: unknown): value is QuestionMediaType {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+export function getDynamicTemplateScoringId(baseTemplateId: string | null, snapshot: unknown) {
+  if (resolveCanonicalQuestionTemplateId(baseTemplateId) === questionTemplateIds.music &&
+      isRecord(snapshot) && snapshot.version === 1 &&
+      snapshot.scoringTemplateId === questionTemplateIds.musicEightBit) {
+    return questionTemplateIds.musicEightBit;
+  }
+  return undefined;
 }
 
 export function parseDynamicQuestionTemplateSnapshot(
@@ -135,6 +146,9 @@ export function parseDynamicQuestionTemplateSnapshot(
 
   return {
     version: 1,
+    ...(value.scoringTemplateId === questionTemplateIds.musicEightBit
+      ? { scoringTemplateId: value.scoringTemplateId }
+      : {}),
     questionText: {
       role: value.questionText.role,
       value: value.questionText.value,
@@ -279,6 +293,7 @@ export function buildDynamicQuestionTemplate(
     enabled: true,
     selectable: true,
     baseTemplateId: baseTemplate.id === "standard" ? null : baseTemplate.id,
+    scoringTemplateId: getDynamicTemplateScoringId(baseTemplate.id, snapshot),
     sourceTemplateId: input.id,
     name: input.name,
     description: isMusicAnswerStructure(snapshot.answers.filter(answer => answer.role !== "EXCLUDED").map(answer => answer.fieldLabel), snapshot.media.some(media => media.mediaType === "AUDIO" && media.role !== "EXCLUDED")) || snapshot.templateConfig.musicAnswerScope === "SINGLE"

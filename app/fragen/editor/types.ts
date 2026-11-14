@@ -303,6 +303,7 @@ export type QuestionEditorDraft = {
 export type QuestionTemplate = {
   id: string;
   baseTemplateId?: string | null;
+  scoringTemplateId?: "eight_bit";
   sourceTemplateId?: number;
   icon: string;
   enabled: boolean;

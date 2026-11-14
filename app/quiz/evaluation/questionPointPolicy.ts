@@ -1,4 +1,5 @@
 import { Prisma } from "@/app/generated/prisma/client";
+import { getDynamicTemplateScoringId } from "@/app/fragen/editor/templates/dynamicQuestionTemplate";
 import {
   isMemeCaptionQuestionTemplateId,
   isPollQuestionTemplateId,
@@ -7,6 +8,18 @@ import {
 } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 
 export const POSITION_ITEM_POINTS = "0.25";
+
+/** Existing assignments keep the scoring policy represented by their persisted maximum. */
+export function getQuizQuestionScoringTemplateId(
+  baseTemplateId: string | null,
+  dynamicTemplateSnapshot: unknown,
+  assignedMaximum?: Prisma.Decimal,
+) {
+  const override = getDynamicTemplateScoringId(baseTemplateId, dynamicTemplateSnapshot);
+  return override && (assignedMaximum === undefined || assignedMaximum.eq(1))
+    ? override
+    : baseTemplateId;
+}
 
 export function getQuestionBaseMaximum(input: {
   templateId: string | null;
