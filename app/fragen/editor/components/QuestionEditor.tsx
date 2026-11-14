@@ -91,6 +91,7 @@ import {
   applyQuestionRewriteToDraft,
 } from "../questionDraftState";
 import { findSimilarQuestions, type SimilarQuestion } from "../duplicateActions";
+import { getQuestionDuplicateFingerprint } from "../questionSimilarity";
 import type { GooglePlacesFeature } from "../googlePlacesFeature";
 import QuestionStoryElementDraftSection, { type QuestionStoryElementDraftOption } from "@/app/story-elemente/QuestionStoryElementDraftSection";
 import type { StoryElementEditorOptions } from "@/app/story-elemente/StoryElementEditor";
@@ -233,6 +234,7 @@ export function QuestionEditor({
     import("../types").FaceMorphPixelQuestionSyncResult | null
   >(null);
   const [similarQuestions, setSimilarQuestions] = useState<SimilarQuestion[]>([]);
+  const otherSimilarQuestions = similarQuestions.filter(question => question.questionId !== savedQuestionId);
   const [fieldError, setFieldError] = useState<{
     target: QuestionValidationTarget;
     text: string;
@@ -258,16 +260,21 @@ export function QuestionEditor({
     questionText: draft.questionText,
     templateId: draft.templateId,
     templateConfig: draft.templateConfig,
+    hasCustomTemplate: Boolean(draft.sourceTemplateId),
+    media: draft.questionMedia.map(({ slotKey, url, operation }) => ({ slotKey, url, operation })),
     answers: draft.answers.map((answer) => ({
       text: answer.text,
       isCorrect: answer.isCorrect,
-      additionalInfo: answer.additionalInfo,
+      fieldLabel: answer.fieldLabel,
+      media: answer.media && { slotKey: answer.media.slotKey, url: answer.media.url, operation: answer.media.operation },
     })),
   }), [
     draft.answers,
     draft.questionText,
+    draft.questionMedia,
     draft.templateConfig,
     draft.templateId,
+    draft.sourceTemplateId,
   ]);
   const currentDraftFingerprint = useMemo(
     () => getQuestionDraftFingerprint(draft),
@@ -284,9 +291,8 @@ export function QuestionEditor({
 
   useEffect(() => {
     let active = true;
-    const questionText = duplicateInput.questionText.trim();
     const timer = window.setTimeout(() => {
-      if (questionText.length < 12) {
+      if (!getQuestionDuplicateFingerprint(duplicateInput)) {
         setSimilarQuestions([]);
         return;
       }
@@ -1189,12 +1195,12 @@ export function QuestionEditor({
           }}
         />}
 
-        {similarQuestions.length > 0 && (
+        {otherSimilarQuestions.length > 0 && (
           <aside className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
             <h2 className="font-semibold">{messages.editor.duplicateTitle}</h2>
             <p className="mt-1">{messages.editor.duplicateHelp}</p>
             <ul className="mt-3 space-y-2">
-              {similarQuestions.map((question) => (
+              {otherSimilarQuestions.map((question) => (
                 <li key={question.questionId}>
                   <Link
                     href={`/content/questions/${question.questionId}`}

@@ -4,6 +4,12 @@ Quizze können erstellt, kopiert und archiviert werden. Der Editor bildet den Ab
 
 ![Quiz-Editor mit Fragen und Story-Elementen](screenshots/quiz-mixed-content-eventmanager.jpg)
 
+Unter **Quiz → Quizze** zeigen die Karten die Anzahl der zugeordneten Fragen und
+die geschätzte Quizdauer. Im Quizeditor zeigt **Zusammensetzung**, wie sich die
+Fragen auf Kategorien und Fragetemplates verteilen. Eine Frage mit mehreren
+Kategorien zählt in jeder davon. Die Dauer schließt Begrüßung und Spielpausen
+ein. Der Einlass samt Startcountdown findet davor statt.
+
 ## Gemischte Inhalte
 
 Ein Quiz kann drei eigenständige Inhaltstypen enthalten:

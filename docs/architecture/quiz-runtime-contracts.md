@@ -557,7 +557,9 @@ vorhandenen Moderations-Takt. Nur ihre Schriftfarbe ändert sich: <60 rot,
 Quiz-Gesamtzeit und Antwort-Countdowns erhalten diese Farblogik nicht.
 
 Restzeit ist die Summe der tatsächlich nach der aktuellen Folie verbleibenden
-Livefolien. Wartefolien tragen weder eine Dauer noch Trainingswerte bei. Für jede
+Livefolien. Einlass, Startsequenz und Countdown am Anker `BEFORE_QUIZ` tragen
+weder Dauer noch Trainingswerte bei. Begrüßung und weitere aktive Introfolien
+zählen ab dort zur Quizdauer. Für jede
 Kombination Fragetemplate/Frage beziehungsweise Fragetemplate/Auflösung wird der
 Durchschnitt der höchstens letzten 20 lokal beobachteten aufeinanderfolgenden
 Vorwärtswechsel verwendet; Rücksprünge, Überspringen und nicht beobachtete Phasen
@@ -565,13 +567,24 @@ trainieren nicht. Ein Reload verliert die laufende Beobachtung, bewahrt bereits
 beobachtete Werte im Browserstore pro Quiz/Quizstart. Ungültige Werte und Dauern
 über zwei Stunden werden verworfen. Kein neues DB-Feld, keine Laufzeitmutation,
 kein zweiter Timer und keine globale Aussage über alle Moderationsbrowser.
-Fallbacks: Frage 120s, Lösung 30s, sonstige Folie 20s. Pausen/Countdowns verwenden
-ihre konfigurierte Dauer statt eines gemessenen Mittelwerts. Nicht konfigurierte
-Pausen behalten den bestehenden 300s-Fallback. Beobachtete weitere Folien teilen
-eine Gruppe „other“; Meme-Voting-/Pixelinteraktionen innerhalb einer Folie sind Teil
-ihrer beobachteten Verweildauer, keine zusätzlich erfundene Folie. Teamdiskussion,
+Fallbacks: Frage 120s, Lösung 30s, sonstige Folie 20s. Konfigurierte Ablaufzeiten,
+feste Meme-Antwortzeiten und die Stufenzeiten im Pixel-Challenge-Modus ersetzen
+den jeweiligen Standardwert, solange keine Messwerte vorliegen. Pausen und
+Spielcountdowns verwenden ihre konfigurierte Dauer (Standard 300s) unabhängig
+von Messwerten. Beobachtete weitere Folien teilen eine Gruppe „other“;
+Meme-Voting und Pixelinteraktionen bleiben Teil der Verweildauer ihrer Folie.
+Teamdiskussion,
 Auswertung, spontane Unterbrechungen und künftige Navigation können die Schätzung
 wesentlich verändern. Kein Genauigkeitsversprechen.
+
+Quizübersicht und Quizeditor berechnen die voraussichtliche Dauer aus der gesamten
+aktiven Folienfolge mit demselben Schätzer und ohne Laufzeitmesswerte. Nicht einem
+spielbaren Block zugeordnete Fragen sowie ausgeblendete Elemente zählen zur
+redaktionellen Zuordnung, aber nicht zur spielbaren Folienfolge. Die Übersicht liest
+die nötigen Ablaufdaten für die berechtigten Quiz-IDs gesammelt, ohne Antworten
+oder Laufzeitbeiträge einzulesen. Die Anzeige rundet auf Minuten bzw. ab zehn
+Minuten auf Fünfminutenschritte. Die Moderation kann zusätzlich tatsächliche
+optionale Laufzeitfolien wie „Falsch aber lustig“ und lokale Beobachtungen einrechnen.
 
 Automatische Nachweise: `buildPraesentationSlides.test.ts`, `quizAnswerLiveState.test.ts`,
 `participantAnswerSequence.test.ts`, `presentationTiming.test.ts`,

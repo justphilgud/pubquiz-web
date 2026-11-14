@@ -4,7 +4,7 @@ Stand: 26.10.2026. Verbindliche fachliche Überarbeitung von PR #131. Die frühe
 
 ## Struktur und Verantwortung
 
-Die feste Reihenfolge lautet **Quiz · Bingo · PowerPoint-Karaoke · Teams · Templates · Eventreihen · Administration**. Quiz hat genau ein Dropdown mit **Inhalte** und **Quizze**. Es gibt keine zweite dauerhafte Quiz-Unterleiste. Auf kleinen Bildschirmen enthält die kompakte Hauptnavigation dieselben berechtigten Einträge in derselben Reihenfolge. Konto bleibt separat.
+Die feste Reihenfolge lautet **Quiz · Bingo · PowerPoint-Karaoke · Teams · Templates · Eventreihen · Administration**. Das Quiz-Dropdown enthält **Content** (`/content`) und **Quizze**. Es gibt keine zweite dauerhafte Quiz-Unterleiste. Auf kleinen Bildschirmen enthält die kompakte Hauptnavigation dieselben berechtigten Einträge in derselben Reihenfolge. Konto bleibt separat.
 
 - `workspacePolicy.ts:getNavigationCapabilities` bildet den Katalog aus bestehenden Policies und allen aktuell erlaubten Reihen. Der Seitenpfad bestimmt nur den Aktivmarker, keine zusätzlichen Rechte. Ein Reihenfilter verändert die Hauptpunkte nicht.
 - `workspace.server.ts:loadWorkspaceNavigation` liest den aktuellen Actor und Produktkatalog pro Request; keine gespeicherte letzte Auswahl überschreibt URLs. Der Header braucht keinen asynchronen Objektbesitz-Readback mehr. Tatsächlicher Besitz bleibt in den vorhandenen Objektseiten/Metadaten sichtbar.

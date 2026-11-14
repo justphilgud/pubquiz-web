@@ -2,6 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
+import { revalidateQuizPlanning } from "@/app/quiz/revalidateQuizPlanning.server";
 import { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
 import { requireActor } from "@/app/lib/permissions";
@@ -336,6 +337,6 @@ export async function addStoryElementToQuiz(input: {
   });
   if (!added) return { success: false, message: "Bereits in diesem Quiz vorhanden." };
   revalidateStoryElement(story.id);
-  revalidatePath(`/quiz/${input.quizId}`);
+  revalidateQuizPlanning(input.quizId);
   return { success: true, message: "Zum Quiz hinzugefügt. Die Blockzuordnung ist noch offen." };
 }

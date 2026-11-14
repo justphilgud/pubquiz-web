@@ -144,7 +144,7 @@ export default function ProgressPanel({
         </div>
       </div>
 
-      <p className="mt-3 text-xs text-zinc-500">Schätzung nach Fragetyp und Phase; lokale Beobachtungen, sonst 2:00 pro Frage, 0:30 pro Lösung und 0:20 pro weiterer Folie. Pausen gemäß Konfiguration. Wartebildschirm ausgenommen.</p>
+      <p className="mt-3 text-xs text-zinc-500">Schätzung nach Fragetyp und Phase. Ohne Messwerte oder Zeitvorgaben gelten 2:00 pro Frage, 0:30 pro Lösung und 0:20 pro weiterer Folie. Spielpausen gemäß Konfiguration. Die Einlassphase ist ausgenommen.</p>
       {!quizStartedAt && (
         <div className="mt-4 text-sm text-zinc-500">
           Prognose startet, sobald das Quiz gestartet wurde.

@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { revalidateQuizPlanning } from "../revalidateQuizPlanning.server";
 import { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
 import {
@@ -41,7 +42,7 @@ import {
 type FlowActionResult = { success: true } | { success: false; message: string };
 
 function revalidateQuizFlow(quizId: number) {
-  revalidatePath(`/quiz/${quizId}`);
+  revalidateQuizPlanning(quizId);
   revalidatePath(`/quiz/${quizId}/moderation`);
   revalidatePath(`/quiz/${quizId}/praesentation`);
   revalidatePath(`/quiz/${quizId}/antworten`);

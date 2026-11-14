@@ -48,8 +48,8 @@ jobs:
       - name: Tests
         run: npm test
 
-      - name: Excel question import workbook and validation
-        run: node --import tsx --test app/fragen/import/excel/import.test.ts
+      - name: Excel import validation and quiz planning
+        run: node --import tsx --test app/fragen/import/excel/import.test.ts app/quiz/quizPlanning.test.ts
 
       - name: Question rewrite safety and stale-request regression
         run: npm run test:question-rewrite

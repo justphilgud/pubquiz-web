@@ -10,6 +10,10 @@ export function normalizePairTerm(text: string) {
   return text.normalize("NFKC").trim().replace(/\s+/g, " ").toLowerCase();
 }
 
+export function pairContentEntries(pairs: readonly Pick<PairsData["pairs"][number], "left" | "right">[]) {
+  return pairs.map(({ left, right }) => JSON.stringify([normalizePairTerm(left), normalizePairTerm(right)])).sort();
+}
+
 export function defaultPairs(): PairsData {
   return {
     kind: "PAIRS",

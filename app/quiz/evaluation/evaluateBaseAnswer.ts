@@ -7,6 +7,7 @@ import {
   resolveCanonicalQuestionTemplateId,
 } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { hasText, normalizeEvaluationText } from "./evaluationDetails";
+import { normalizeExactOpenAnswer } from "./normalizeExactOpenAnswer";
 import type {
   BaseAnswerEvaluation,
   BaseAnswerInput,
@@ -163,9 +164,7 @@ function evaluateMultipleChoice(input: BaseAnswerInput): BaseAnswerEvaluation {
 
 // Runtime contract: docs/architecture/quiz-runtime-contracts.md
 // Exact open-answer grading intentionally performs only trim and de-DE case folding.
-export function normalizeExactOpenAnswer(value: string) {
-  return value.trim().toLocaleLowerCase("de-DE");
-}
+export { normalizeExactOpenAnswer };
 
 export function isNormalizedExactOpenAnswer(
   submitted: string,

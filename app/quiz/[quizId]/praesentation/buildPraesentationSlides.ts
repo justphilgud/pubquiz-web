@@ -36,6 +36,14 @@ export type PraesentationQuiz = QuizPraesentationResult & {
 };
 
 export type Abschnitt = QuizPraesentationResult["abschnitte"][number];
+type PresentationQuestion = QuizPraesentationResult["fragen"][number];
+export type QuizSlideQuestion = Pick<PresentationQuestion,
+  "quiz_fragen_id" | "quiz_abschnitt_id" | "sortierung" | "templateId" |
+  "templateConfig" | "memeConfig" | "funnyRevealAvailable">;
+export type QuizSlidePlan<TQuestion extends QuizSlideQuestion = QuizSlideQuestion> =
+  Omit<QuizPraesentationResult, "fragen" | "quiz_datum" | "intro_logo_url" | "outro_musik_url"> & {
+    fragen: TQuestion[];
+  };
 
 export type FixerSlideTyp =
   | "vor-dem-start"
@@ -46,16 +54,16 @@ export type FixerSlideTyp =
   | "qrcode"
   | "bekanntmachungen";
 
-export type Slide =
+export type Slide<TQuestion extends QuizSlideQuestion = PresentationQuestion> =
   | {
     typ: "meme-erklaerung";
     abschnitt: Abschnitt | null;
-    frage: QuizPraesentationResult["fragen"][number];
+    frage: TQuestion;
   }
   | {
     typ: "pixel-erklaerung";
     abschnitt: Abschnitt | null;
-    frage: QuizPraesentationResult["fragen"][number];
+    frage: TQuestion;
   }
   | {
     typ: "ablauf";
@@ -74,7 +82,7 @@ export type Slide =
   | {
     typ: "frage";
     abschnitt: Abschnitt | null;
-    frage: QuizPraesentationResult["fragen"][number];
+    frage: TQuestion;
     frageIndexImBlock: number;
     fragenAnzahlImBlock: number;
     blockItem?: QuizFlowItem | null;
@@ -83,7 +91,7 @@ export type Slide =
   | {
     typ: "aufloesung";
     abschnitt: Abschnitt | null;
-    frage: QuizPraesentationResult["fragen"][number];
+    frage: TQuestion;
     frageIndexImBlock: number;
     fragenAnzahlImBlock: number;
     blockItem?: QuizFlowItem | null;
@@ -92,7 +100,7 @@ export type Slide =
   | {
     typ: "funny";
     abschnitt: Abschnitt | null;
-    frage: QuizPraesentationResult["fragen"][number];
+    frage: TQuestion;
     frageIndexImBlock: number;
     fragenAnzahlImBlock: number;
     blockItem?: QuizFlowItem | null;
@@ -114,15 +122,15 @@ export type Slide =
 
 // Runtime contract: docs/architecture/quiz-runtime-contracts.md
 // Slide ordering and block/interaction finalization are separate responsibilities.
-export function buildPraesentationSlides(
-  quiz: QuizPraesentationResult,
+export function buildPraesentationSlides<TQuestion extends QuizSlideQuestion>(
+  quiz: QuizSlidePlan<TQuestion>,
   options: {
     includeDisabledFlowItems?: boolean;
     funnyQuestionAssignmentIds?: ReadonlySet<number>;
   } = {},
-): Slide[] {
-  const result: Slide[] = [];
-  const appendSponsor = (frage: QuizPraesentationResult["fragen"][number], abschnitt: Abschnitt | null) => {
+): Slide<TQuestion>[] {
+  const result: Slide<TQuestion>[] = [];
+  const appendSponsor = (frage: TQuestion, abschnitt: Abschnitt | null) => {
     const sponsor = parseQuestionSponsor(frage.templateConfig?.sponsor);
     if (!quiz.sponsorMomentsEnabled || !sponsor) return;
     result.push({
@@ -166,11 +174,11 @@ export function buildPraesentationSlides(
       result.push({ typ: "ablauf", element, abschnitt }),
     );
   };
-  const hasFunnyReveal = (question: QuizPraesentationResult["fragen"][number]) =>
+  const hasFunnyReveal = (question: TQuestion) =>
     options.funnyQuestionAssignmentIds?.has(question.quiz_fragen_id) ??
     question.funnyRevealAvailable;
   const appendSolution = (
-    shared: Omit<Extract<Slide, { typ: "aufloesung" }>, "typ">,
+    shared: Omit<Extract<Slide<TQuestion>, { typ: "aufloesung" }>, "typ">,
   ) => {
     if (hasFunnyReveal(shared.frage)) {
       result.push({ typ: "funny", ...shared });
@@ -379,7 +387,7 @@ export function getSlideFlowType(slide: Slide | undefined): QuizFlowItemType | n
   return slide?.typ === "ablauf" ? slide.element.type : null;
 }
 
-export function isPauseSlide(slide: Slide | undefined) {
+export function isPauseSlide(slide: Slide<QuizSlideQuestion> | undefined) {
   return (
     slide?.typ === "pause" ||
     (slide?.typ === "ablauf" &&
@@ -387,7 +395,7 @@ export function isPauseSlide(slide: Slide | undefined) {
   );
 }
 
-export function getPauseDurationSeconds(slide: Slide | undefined) {
+export function getPauseDurationSeconds(slide: Slide<QuizSlideQuestion> | undefined) {
   if (slide?.typ === "pause") return slide.dauerSekunden;
   if (isPauseSlide(slide) && slide?.typ === "ablauf") {
     return slide.element.config.durationSeconds ?? 300;

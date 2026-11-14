@@ -57,6 +57,8 @@ const flowQuizInclude = {
   },
 } satisfies Prisma.quizInclude;
 
+export const storedQuizFlowRelation = flowQuizInclude.quiz_ablauf_elemente;
+
 type StoredItemSource = {
   quiz_ablauf_element_id: number;
   typ: string;
