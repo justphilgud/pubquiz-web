@@ -271,6 +271,10 @@ immer Navigation, Folienzeit, Vorschau und vorhandene Freigabe-/Auswertungssteue
 | `umfrage_skala` | Frage, Endpunkte und Skala | Freigegebene Verteilung | Konfigurierte Werte/Schrittweite |
 | `meme_beschriften` | Erklärung, Bild/Zonen, maßgeblicher Erstellungs-Countdown | Finalisiertes Publikumsergebnis/Gewinner | Verbindliche Meme-Abgabe, Review, Vorstellung, Abstimmung, Abschluss; eigene Beiträge ausgeschlossen, bestehende Stimme ersetzbar |
 
+Die eigene Vorlage „8bit“ nutzt die Medien- und Antwortoberflächen von `musik`.
+Die Ein-Punkt-Regel für neue und gezielt aktualisierte Zuweisungen ist im
+[Bewertungsworkflow](evaluation-workflow.md) beschrieben.
+
 ### Informations- und Laufzeitfolien
 
 Intro/Outro, Rundenintro, Geschichte, Sponsor, Pause/Countdown, QR/Beitritt,

@@ -129,3 +129,18 @@ Nachweise: `eightBitScoring.test.ts`, bestehende `evaluateBaseAnswer.test.ts`,
 PostgreSQL-Schema Alias-IDs, Idempotenz und den Schutz laufender/gespielter Quizze;
 der bestehende PostgreSQL-CI-Job führt ihn aus. Die Hilfe beschreibt auch
 den Meme-Votingsiegerpunkt, Pixel-Challenge, Risiko und abweichende Musikfeldanzahl.
+
+Die eigene Vorlage „8bit“ bleibt für Redaktion, Medien und Antwortinteraktion
+eine Musikvorlage. Ihr Vorlagensnapshot setzt `scoringTemplateId` auf `eight_bit`.
+Der Editor verwendet damit den 8-Bit-Regeltext. Neue Quizzuweisungen speichern
+einen Basispunkt. Bei vorhandenen Zuweisungen bestimmt das gespeicherte Maximum,
+ob die 8-Bit-Regel gilt oder die bisherige Musikbewertung weiterverwendet wird.
+
+Die Folgemigration aktualisiert ausschließlich die Zuweisungen #466, #469 und
+#470, sofern sie weiterhin zu den geprüften Fragen und zur eigenen Vorlage
+gehören. Das Quiz muss in Vorbereitung sein und die konkrete Frage darf weder
+einen Interaktionslauf noch Teamantworten haben. Testläufe anderer Fragen im
+selben Quiz schließen die Zuweisung nicht aus. Die Migration sperrt die betroffenen
+Quizze gegen gleichzeitigen Start und schreibt ausschließlich den Vorlagensnapshot
+und das Basismaximum der berechtigten Zuweisungen. Der PostgreSQL-Test prüft die
+Auswahl, den Schutz von Spielergebnissen und die Wiederholbarkeit.

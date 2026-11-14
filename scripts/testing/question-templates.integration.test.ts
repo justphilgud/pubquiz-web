@@ -67,6 +67,7 @@ test("real save action creates independent pixel drafts atomically and saves edi
         contents: `export { saveQuestion } from "./app/fragen/editor/actions";
           export { cloneQuestion } from "./app/fragen/editor/managementActions";
           export { addQuestionToQuiz } from "./app/services/quizService";
+          export { recalculateQuizQuestionEvaluation } from "./app/quiz/evaluation/evaluation.server";
           export { saveTeamAnswerDraft, submitTeamAnswer } from "./app/quiz/interaction/interaction.server";`,
         resolveDir: process.cwd(),
       },
@@ -86,10 +87,11 @@ test("real save action creates independent pixel drafts atomically and saves edi
         return { ok: true };
       },
     });
-    const { saveQuestion, cloneQuestion, addQuestionToQuiz, saveTeamAnswerDraft, submitTeamAnswer } = runtime.exports as
+    const { saveQuestion, cloneQuestion, addQuestionToQuiz, recalculateQuizQuestionEvaluation, saveTeamAnswerDraft, submitTeamAnswer } = runtime.exports as
       typeof import("@/app/fragen/editor/actions") &
       typeof import("@/app/fragen/editor/managementActions") &
       typeof import("@/app/services/quizService") &
+      typeof import("@/app/quiz/evaluation/evaluation.server") &
       typeof import("@/app/quiz/interaction/interaction.server");
     const facts = {
       ...defaultFacts("TEXT"), solution: "Wilhelm Tell", acceptedVariants: ["Tell"],
@@ -231,6 +233,34 @@ test("real save action creates independent pixel drafts atomically and saves edi
     await prisma.quiz_interaction_runs.update({ where: { interaction_run_id: run.interaction_run_id }, data: { state: "CLOSED" } });
     assert.equal((await saveTeamAnswerDraft({ ...draftInput, expectedDraftRevision: evaluated.draft_revision })).success, false);
     assert.equal((await submitTeamAnswer(participantInput)).success, false);
+
+    const music = await prisma.frage_vorlagen.create({ data: { code: "musik", name: "Musik", slide_typ: "audio_guess" } });
+    const source = await prisma.frage_vorlagen.create({ data: {
+      code: "test-custom-music", name: "8bit", slide_typ: "DYNAMIC", art: "DYNAMIC", basis_code: music.code,
+      konfiguration_json: { version: 1, scoringTemplateId: "eight_bit" },
+    } });
+    const question = await prisma.fragen.create({ data: {
+      frage: "Welcher Testsong?", freigegeben: true, review_status: "APPROVED",
+      vorlage_id: music.vorlage_id, source_vorlage_id: source.vorlage_id,
+      antwortfelder: { create: { label: "Titel", sortierung: 1, loesungen: { create: { loesung_text: "Testsong", sortierung: 1 } } } },
+    }, include: { antwortfelder: true } });
+    const musicAssignment = await addQuestionToQuiz({
+      quiz_id: seriesQuiz.quiz_id, fragen_id: question.fragen_id, quiz_abschnitt_id: block.quiz_abschnitt_id,
+    }, session);
+    assert.equal(musicAssignment.punkte_basis.toString(), "1");
+    const answer = await prisma.team_antworten.create({ data: {
+      quiz_id: seriesQuiz.quiz_id, quiz_abschnitt_id: block.quiz_abschnitt_id,
+      quiz_fragen_id: musicAssignment.quiz_fragen_id, quiz_team_session_id: participant.quiz_team_session_id,
+      antwortfelder: { create: { antwortfeld_id: question.antwortfelder[0].antwortfeld_id, antwort_text: "Testsong" } },
+    } });
+    for (const [mode, maximum, expected] of [["standard", 1, "1"], ["expertenbonus", 1, "2"], ["standard", 0.5, "0.5"]] as const) {
+      await prisma.quiz_fragen.update({ where: { quiz_fragen_id: musicAssignment.quiz_fragen_id }, data: {
+        punkte_modus: mode, punkte_basis: maximum,
+      } });
+      await recalculateQuizQuestionEvaluation(musicAssignment.quiz_fragen_id);
+      const result = await prisma.team_antworten.findUniqueOrThrow({ where: { team_antwort_id: answer.team_antwort_id } });
+      assert.equal(result.vergebene_punkte.toString(), expected);
+    }
   } finally {
     await prisma.$disconnect();
     await db.end();

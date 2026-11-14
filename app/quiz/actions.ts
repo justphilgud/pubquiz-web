@@ -85,6 +85,7 @@ import { hasAnswerContentChanged } from "./evaluation/answerContent";
 import { resolveEffectiveSubmission } from "./evaluation/effectiveSubmission";
 import { resolveEvaluationReadState } from "./evaluation/evaluationReadModel";
 import {
+  getQuizQuestionScoringTemplateId,
   isPartialPointsCapable,
   validateQuestionPointsMode,
 } from "./evaluation/questionPointPolicy";
@@ -1079,7 +1080,7 @@ export async function getQuizDetails(
                   name: true,
                 },
               },
-              source_vorlage: { select: { name: true, code: true } },
+              source_vorlage: { select: { name: true, code: true, konfiguration_json: true } },
               fragen_kategorien: {
                 include: {
                   fragenkategorie: true,
@@ -1241,7 +1242,11 @@ export async function getQuizDetails(
           })),
       });
       const partialPointsCapable = isPartialPointsCapable({
-        templateId: eintrag.fragen.vorlage?.code ?? null,
+        templateId: getQuizQuestionScoringTemplateId(
+          eintrag.fragen.vorlage?.code ?? null,
+          eintrag.fragen.source_vorlage?.konfiguration_json,
+          eintrag.punkte_basis,
+        ),
         correctAnswerCount: eintrag.fragen.antworten.filter(
           (answer) => answer.ist_richtig,
         ).length,
@@ -4878,6 +4883,7 @@ export async function updateQuizFragePunkteModus(data: {
       fragen: {
         include: {
           vorlage: { select: { code: true } },
+          source_vorlage: { select: { konfiguration_json: true } },
           antworten: { select: { ist_richtig: true } },
           antwortfelder: { select: { antwortfeld_id: true } },
         },
@@ -4886,7 +4892,11 @@ export async function updateQuizFragePunkteModus(data: {
   });
   const config = question.fragen.template_config_json as QuestionTemplateConfig | null;
   validateQuestionPointsMode({
-    templateId: question.fragen.vorlage?.code ?? null,
+    templateId: getQuizQuestionScoringTemplateId(
+      question.fragen.vorlage?.code ?? null,
+      question.fragen.source_vorlage?.konfiguration_json,
+      question.punkte_basis,
+    ),
     pointsMode: data.punkteModus,
     correctAnswerCount: question.fragen.antworten.filter((answer) => answer.ist_richtig).length,
     structuredFieldCount: question.fragen.antwortfelder.length,

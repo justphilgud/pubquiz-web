@@ -5,7 +5,7 @@ import { getBerlinDate } from "@/app/lib/berlinDate";
 import { buildQuestionEligibilityWhere } from "@/app/fragen/editor/questionEligibility.server";
 import type { QuestionTemplateConfig } from "@/app/fragen/editor/types";
 import { getPositionScoringItemCount } from "@/app/fragen/editor/templates/pairsTemplate";
-import { getQuestionBaseMaximum } from "@/app/quiz/evaluation/questionPointPolicy";
+import { getQuestionBaseMaximum, getQuizQuestionScoringTemplateId } from "@/app/quiz/evaluation/questionPointPolicy";
 import { resolveQuizSpecificOrderingAnswerIdOrder } from "@/app/quiz/orderingQuestionOrder";
 
 type QuizQuestionCreateData = Parameters<
@@ -34,6 +34,7 @@ export async function addQuestionToQuiz(
       fragen_id: true,
       template_config_json: true,
       vorlage: { select: { code: true } },
+      source_vorlage: { select: { konfiguration_json: true } },
       antworten: {
         orderBy: { antwort_id: "asc" },
         select: { antwort_id: true, ist_richtig: true },
@@ -94,7 +95,10 @@ export async function addQuestionToQuiz(
       ...data,
       antwort_reihenfolge: answerOrder,
       punkte_basis: getQuestionBaseMaximum({
-        templateId: frage.vorlage?.code ?? null,
+        templateId: getQuizQuestionScoringTemplateId(
+          frage.vorlage?.code ?? null,
+          frage.source_vorlage?.konfiguration_json,
+        ),
         correctAnswerCount: frage.antworten.filter((answer) => answer.ist_richtig).length,
         structuredFieldCount: frage.antwortfelder.length,
         orderingItemCount: getPositionScoringItemCount(config?.templateData),

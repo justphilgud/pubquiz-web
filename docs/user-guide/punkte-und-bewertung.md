@@ -1,6 +1,6 @@
 # Punkte und Bewertung
 
-Die Übersicht beschreibt die Basispunkte der Fragetemplates. Beim Erstellen einer Frage steht die Regel auch direkt an der Vorlage. Eigene Vorlagen übernehmen die Regel ihres Basistemplates; konfigurierte Antwortfelder können das Maximum verändern.
+Die Übersicht beschreibt die Basispunkte der Fragetemplates. Beim Erstellen einer Frage steht die Regel auch direkt an der Vorlage. Eigene Vorlagen übernehmen standardmäßig die Regel ihres Basistemplates. Die konfigurierte Bewertung und die Antwortfelder bestimmen das Maximum.
 
 ## Expertenbonus und Risiko
 
@@ -13,6 +13,6 @@ Die Übersicht beschreibt die Basispunkte der Fragetemplates. Beim Erstellen ein
 
 Akzeptierte Schreibvarianten zählen als alternative richtige Lösungen. Bei normalen offenen Antworten werden eindeutige Treffer automatisch erkannt; abweichende Texte können eine manuelle Prüfung benötigen. Manuelle Entscheidungen können die vergebenen Punkte verändern.
 
-Die neue 8-Bit-Regel gilt für künftige Bewertungen. Bereits gespeicherte Spielergebnisse werden durch die Änderung nicht automatisch neu berechnet.
+Die eigene Vorlage „8bit“ verwendet für neue Quizzuweisungen ebenfalls die Ein-Punkt-Regel. Bei bestehenden Zuweisungen zeigt der Quizeditor das dort gespeicherte Punkte-Maximum. Bereits gespeicherte Spielergebnisse behalten ihre Wertung.
 
 ## Regeln je Template
