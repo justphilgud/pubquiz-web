@@ -51,12 +51,15 @@ function fixture() {
     "server-only": {}, "@/app/generated/prisma/client": { Prisma: {} }, "@/app/lib/prisma": { prisma: db }, "./quizFlow": flow,
     "./quizBlockSequence": {}, "@/app/story-elemente/storyPlacement": {},
   });
+  const invalidatedPaths: string[] = [];
+  const nextCache = { revalidatePath: (path: string) => { invalidatedPaths.push(path); } };
+  const planning = load("./revalidateQuizPlanning.server.ts", { "server-only": {}, "next/cache": nextCache });
   const actions = load("./[quizId]/slides/fixedSlideActions.ts", {
-    "next/cache": { revalidatePath: () => {} }, "@/app/quiz/bookingSlide": booking,
+    "next/cache": nextCache, "../../revalidateQuizPlanning.server": planning, "@/app/quiz/bookingSlide": booking,
     "@/lib/prisma": { prisma: db }, "@/app/quiz/quizAccess.server": { requireQuizEditor: async () => { if (denied) throw new Error("Denied"); }, requireQuizViewer: async () => {} },
     "@/app/quiz/fixedSlidesPolicy": policy, "@/app/quiz/flow/quizFlowRepository.server": repository, "@/app/quiz/flow/quizFlow": flow,
   });
-  return { quiz, fail: () => { fail = true; }, deny: () => { denied = true; }, transactions: () => transactions,
+  return { quiz, invalidatedPaths, fail: () => { fail = true; }, deny: () => { denied = true; }, transactions: () => transactions,
     saveSlide: async (outro: boolean, slideId: string, values: Record<string, string>) => {
       const data = new FormData(); data.set("quizId", "1"); data.set("slideId", slideId); data.set("enabled", "on");
       Object.entries(values).forEach(([key, value]) => data.set(key, value));
@@ -97,6 +100,9 @@ test("saving after materialization synchronizes legacy and standard flow, preser
   const data = fixture();
   const custom = JSON.stringify(data.quiz.quiz_ablauf_elemente[1]);
   assert.equal((await data.save("Neue Regel\r\nNoch eine Regel", false)).status, "success");
+  assert.ok(data.invalidatedPaths.includes("/quiz/1"));
+  assert.ok(data.invalidatedPaths.includes("/quiz"));
+  assert.ok(data.invalidatedPaths.includes("/workspaces/[seriesId]/[eventType]/[[...area]]"));
   assert.equal(data.quiz.intro_regeln, "Neue Regel\nNoch eine Regel");
   const standard = data.quiz.quiz_ablauf_elemente[0];
   assert.equal(standard.ist_sichtbar, false);
@@ -159,7 +165,9 @@ test("PostgreSQL: real materialization, committed reload, rollback and READ ONLY
       } })));
     } });
     const repository = load("./flow/quizFlowRepository.server.ts", { "server-only": {}, "@/app/generated/prisma/client": { Prisma: {} }, "@/app/lib/prisma": { prisma: guarded }, "./quizFlow": flow, "./quizBlockSequence": {}, "@/app/story-elemente/storyPlacement": {} });
-    const actions = load("./[quizId]/slides/fixedSlideActions.ts", { "next/cache": { revalidatePath: () => {} }, "@/app/quiz/bookingSlide": booking, "@/lib/prisma": { prisma: guarded }, "@/app/quiz/quizAccess.server": { requireQuizEditor: async () => {}, requireQuizViewer: async () => {} }, "@/app/quiz/fixedSlidesPolicy": policy, "@/app/quiz/flow/quizFlowRepository.server": repository, "@/app/quiz/flow/quizFlow": flow });
+    const nextCache = { revalidatePath: () => {} };
+    const planning = load("./revalidateQuizPlanning.server.ts", { "server-only": {}, "next/cache": nextCache });
+    const actions = load("./[quizId]/slides/fixedSlideActions.ts", { "next/cache": nextCache, "../../revalidateQuizPlanning.server": planning, "@/app/quiz/bookingSlide": booking, "@/lib/prisma": { prisma: guarded }, "@/app/quiz/quizAccess.server": { requireQuizEditor: async () => {}, requireQuizViewer: async () => {} }, "@/app/quiz/fixedSlidesPolicy": policy, "@/app/quiz/flow/quizFlowRepository.server": repository, "@/app/quiz/flow/quizFlow": flow });
     const save = (text: string) => { const data = new FormData(); data.set("quizId", String(quiz.quiz_id)); data.set("slideId", "rules"); data.set("regeln", text); data.set("enabled", "on"); return actions.saveIntroSlide({}, data) as Promise<{ status: string }>; };
     assert.equal((await save("Erste Speicherung")).status, "success");
     assert.equal((await save("Neue Regel\nZweite Zeile")).status, "success");
