@@ -234,6 +234,7 @@ export function QuestionEditor({
     import("../types").FaceMorphPixelQuestionSyncResult | null
   >(null);
   const [similarQuestions, setSimilarQuestions] = useState<SimilarQuestion[]>([]);
+  const otherSimilarQuestions = similarQuestions.filter(question => question.questionId !== savedQuestionId);
   const [fieldError, setFieldError] = useState<{
     target: QuestionValidationTarget;
     text: string;
@@ -1194,12 +1195,12 @@ export function QuestionEditor({
           }}
         />}
 
-        {similarQuestions.length > 0 && (
+        {otherSimilarQuestions.length > 0 && (
           <aside className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950">
             <h2 className="font-semibold">{messages.editor.duplicateTitle}</h2>
             <p className="mt-1">{messages.editor.duplicateHelp}</p>
             <ul className="mt-3 space-y-2">
-              {similarQuestions.map((question) => (
+              {otherSimilarQuestions.map((question) => (
                 <li key={question.questionId}>
                   <Link
                     href={`/content/questions/${question.questionId}`}
