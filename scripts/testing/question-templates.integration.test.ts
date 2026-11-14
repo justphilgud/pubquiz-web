@@ -36,7 +36,7 @@ test("real save action creates independent pixel drafts atomically and saves edi
       "--from-empty", "--to-schema", "prisma/schema.prisma", "--script"], {
       encoding: "utf8", env: { ...process.env, DATABASE_URL: url.toString() }, maxBuffer: 10_000_000,
     });
-    await db.query(schema.slice(schema.indexOf("-- CreateSchema")));
+    await db.query(`SET search_path TO pubquiz, public;\n${schema.slice(schema.indexOf("-- CreateSchema"))}`);
     const migration = readFileSync("prisma/migrations/20261110120000_add_person_and_pairs_question_templates/migration.sql", "utf8");
     await db.query(migration);
     await db.query(migration);

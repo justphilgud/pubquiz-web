@@ -25,6 +25,26 @@ kann die Statusaktion die gespeicherte Paarfrage strikt validieren und ohne
 Inhaltsänderung freigeben. Tatsächlich gespeicherte klassische Antworten bleiben
 sichtbar für die Validierung und werden nicht stillschweigend verworfen.
 
+## Dublettenhinweise
+
+Der Frageneditor vergleicht Standardfragen und klassische Auswahlfragen weiterhin
+über normalisierte Textähnlichkeit. Für Spezialtemplates vergleicht er die
+vollständige fachliche Signatur des jeweiligen Templates. Dazu gehören bei
+Paarfragen die sortierten Links-Rechts-Tupel, bei Fakten Hinweise und Lösungen
+einschließlich Varianten sowie bei Reihenfolgen die kanonische Reihenfolge.
+Mediengebundene Templates benötigen die Referenz auf ihr inhaltliches Medium.
+Technische IDs, Frage-Metadaten und abgeleitete Pixel- bzw. Audiovarianten mit
+vorhandener Originalreferenz werden ignoriert. Fehlende Vergleichsdaten erzeugen
+keine exakte Meldung. Ein gleicher Platzhaltertext genügt bei Spezialtemplates nie.
+
+Der Server begrenzt Treffer auf die bestehende Sichtbarkeit und bei
+Nichtadministratoren weiterhin auf eigene Fragen. Archivierte und die aktuell
+bearbeitete Frage sind ausgeschlossen. Die Suche ist ein redaktioneller Hinweis
+und ändert keinen Speicher- oder Freigabestatus. Der Excel-Import nutzt dieselbe
+Paar-Normalisierung. Standardtextimporte vergleichen keine generischen
+Spezialvorlagentexte. Regressionen prüfen `questionSimilarity.test.ts`,
+`excel-question-import.integration.test.ts` und den dazugehörigen Browsertest.
+
 ## Übersetzung und Browserstimmen
 
 Original und Übersetzung werden getrennt gespeichert und sind auf je 2.000

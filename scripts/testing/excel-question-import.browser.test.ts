@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -8,6 +8,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { loadQuestionForEditor } from "@/app/fragen/editor/questionEditorData";
 import { pairColumns } from "@/app/fragen/editor/templates/pairsTemplate";
 import { issueTeamSessionToken } from "@/app/quiz/teamSessionToken";
+import { formatQuizDuration } from "@/app/quiz/quizPlanning";
 import { fixtureEmail, fixturePassword, fixtureSecret, fixtureWorkbook, openExcelFixture, testDatabase } from "./excelImportFixture";
 
 type Reply = {
@@ -26,8 +27,8 @@ async function eventually<T>(read: () => T | Promise<T>, description: string): P
   throw new Error(`Zeitlimit: ${description}`);
 }
 
-test("real Next.js and Chromium: XLSX download, preview, import, editor and quiz surfaces", {
-  skip: !testDatabase || process.env.EXCEL_IMPORT_BROWSER !== "1", timeout: 240_000,
+test("real Next.js and Chromium: XLSX, template duplicates, quiz planning and quiz surfaces", {
+  skip: !testDatabase || process.env.EXCEL_IMPORT_BROWSER !== "1", timeout: 300_000,
 }, async () => {
   const chrome = [process.env.CHROME_BIN, "C:/Program Files/Google/Chrome/Application/chrome.exe",
     "/usr/bin/google-chrome", "/usr/bin/chromium"].find(path => path && existsSync(path));
@@ -46,6 +47,7 @@ test("real Next.js and Chromium: XLSX download, preview, import, editor and quiz
   const browser = spawn(chrome, ["--headless=new", "--no-sandbox", "--disable-gpu", "--disable-background-networking",
     "--no-first-run", `--user-data-dir=${profile}`, "--remote-debugging-port=0", "about:blank"], { stdio: "ignore" });
   let socket: WebSocket | undefined;
+  const artifacts = process.env.QUIZ_PLANNING_SCREENSHOT_DIR;
   try {
     const origin = await eventually(() => {
       if (server.exitCode !== null) throw new Error(serverOutput);
@@ -104,6 +106,15 @@ test("real Next.js and Chromium: XLSX download, preview, import, editor and quiz
         field.files = files.files;
         field.dispatchEvent(new Event("change", { bubbles: true }));
       })()`);
+    }
+    const resize = (width: number, height: number) => call("Emulation.setDeviceMetricsOverride", {
+      width, height, deviceScaleFactor: 1, mobile: false,
+    }, sessionId);
+    async function screenshot(name: string, selector: string) {
+      if (!artifacts) return;
+      await js(`document.querySelector(${JSON.stringify(selector)}).scrollIntoView({block:"start"})`);
+      const { data } = await call("Page.captureScreenshot", { format: "png" }, sessionId) as Reply & { data: string };
+      writeFileSync(join(artifacts, name), Buffer.from(data, "base64"));
     }
 
     await navigate("/login");
@@ -173,6 +184,143 @@ test("real Next.js and Chromium: XLSX download, preview, import, editor and quiz
     assert.deepEqual(approved?.draft.templateConfig.templateData, pairs);
     assert.deepEqual(approved?.draft.answers, []);
     assert.equal(await db.antworten.count({ where: { fragen_id: id } }), 0);
+    await navigate(resultLinks[5]);
+    await eventually(() => js(`document.querySelector('input[aria-label="Paar 4, links"]')?.value === "Stoffmenge"`), "freigegebener Paarentwurf");
+    await delay(900);
+    assert.equal(await js(`document.body.innerText.includes("Mögliche Dublette")`), false);
+    const firstPair = Number(resultLinks[4].split("/").pop());
+    await db.fragen.update({ where: { fragen_id: firstPair }, data: { frage: approved.draft.questionText } });
+    await navigate(resultLinks[5]);
+    await eventually(() => js(`document.querySelector('input[aria-label="Paar 4, links"]')?.value === "Stoffmenge"`), "identischer Text mit anderen Paaren");
+    await delay(900);
+    assert.equal(await js(`document.body.innerText.includes("Mögliche Dublette")`), false);
+    await db.fragen.update({ where: { fragen_id: firstPair }, data: {
+      template_config_json: JSON.parse(JSON.stringify({ ...approved.draft.templateConfig,
+        templateData: { kind: "PAIRS", pairs: [...pairs.pairs].reverse().map(pair => ({
+          ...pair, leftId: crypto.randomUUID(), rightId: crypto.randomUUID(),
+        })) },
+      })),
+    } });
+    await navigate(resultLinks[5]);
+    await contains("Mögliche Dublette");
+    await contains(`#${firstPair}`);
+    await db.fragen_eventreihen.updateMany({ where: { fragen_id: firstPair }, data: { eventreihe_id: 20 } });
+    await navigate(resultLinks[5]);
+    await eventually(() => js(`document.querySelector('input[aria-label="Paar 4, links"]')?.value === "Stoffmenge"`), "sichtbare Frage nach Wechsel des Vergleichsbereichs");
+    await delay(900);
+    assert.equal(await js(`document.body.innerText.includes("Mögliche Dublette")`), false);
+
+    await resize(1366, 768);
+    const empty = await db.quiz.create({ data: { titel: "Planung · Leer", eventreihe_id: 10 } });
+    const single = await db.quiz.create({ data: { titel: "Planung · Eine Frage", eventreihe_id: 10 } });
+    const large = await db.quiz.create({ data: { titel: "Planung · Viele Fragen", eventreihe_id: 10 } });
+    await db.quiz.create({ data: { titel: "Fremdes Quiz · unsichtbar", eventreihe_id: 20 } });
+    const rounds = await Promise.all([single, large].map(quiz => db.quiz_abschnitte.create({ data: {
+      quiz_id: quiz.quiz_id, titel: "Planungsrunde", abschnitt_typ: "fragenblock", sortierung: 1,
+    } })));
+    const questionFixture = await db.fragen.create({
+      data: { frage: "Was zeigt der Planungs-Browsertest?", freigegeben: true },
+    });
+    await db.fragenkategorie.create({ data: { kategorie: "Geografie", status: "ACTIVE" } });
+    await db.fragen_kategorien.createMany({ data: [
+      { fragen_id: id, fragenkategorie_id: 10 },
+      { fragen_id: id, fragenkategorie_id: (await db.fragenkategorie.findFirstOrThrow({ where: { kategorie: "Geografie" } })).fragenkategorie_id },
+    ] });
+    await db.quiz_fragen.create({ data: { quiz_id: single.quiz_id, fragen_id: id, quiz_abschnitt_id: rounds[0].quiz_abschnitt_id, sortierung: 1 } });
+    const extras = await Promise.all(Array.from({ length: 22 }, (_, i) => db.fragen.create({ data: { frage: `Planungsfrage ${i + 1}` } })));
+    await db.quiz_fragen.createMany({ data: [id, questionFixture.fragen_id, ...extras.map(question => question.fragen_id)]
+      .map((fragen_id, index) => ({ quiz_id: large.quiz_id, fragen_id, quiz_abschnitt_id: rounds[1].quiz_abschnitt_id, sortierung: index + 1 })) });
+    await db.quiz_ablauf_elemente.createMany({ data: [
+      { quiz_id: single.quiz_id, typ: "COUNTDOWN", anker_typ: "BEFORE_QUIZ", anker_schluessel: "QUIZ",
+        sortierung: 25, konfiguration: { version: 1, title: "Einlass", durationSeconds: 600 } },
+      { quiz_id: single.quiz_id, typ: "BREAK", anker_typ: "ROUND_END", anker_schluessel: String(rounds[0].quiz_abschnitt_id),
+        quiz_abschnitt_id: rounds[0].quiz_abschnitt_id, sortierung: 30, konfiguration: { version: 1, title: "Spielpause", durationSeconds: 180 } },
+    ] });
+    const cardText = (title: string) => js<string>(`[...document.querySelectorAll("article")].find(card =>
+      card.querySelector("h2")?.textContent === ${JSON.stringify(title)})?.innerText ?? ""`);
+    const summary = () => js<string>(`document.querySelector('section[aria-labelledby="quiz-composition"]')?.innerText ?? ""`);
+    const planned = (text: string) => text.match(/(?:ca\. |unter )?\d+ (?:Std\.(?: \d+ Min\.)?|Min\.)/)?.[0];
+    await navigate("/quiz");
+    await contains("Bestehende Quizze");
+    for (const [title, expected] of [["Planung · Leer", "0 Fragen"], ["Planung · Eine Frage", "1 Frage"], ["Planung · Viele Fragen", "24 Fragen"]]) {
+      assert.match(await cardText(title), new RegExp(expected));
+    }
+    assert.equal(await cardText("Fremdes Quiz · unsichtbar"), "");
+    const oneDuration = planned(await cardText("Planung · Eine Frage"));
+    assert.ok(oneDuration);
+    await screenshot("quizkarten-1366.png", 'article:has(a[href^="/quiz/"])');
+    await eventually(() => js(`document.querySelector('nav[aria-label="Hauptnavigation"] button')?.textContent.includes("Quiz")`), "Desktop-Quiznavigation");
+    await js(`document.querySelector('nav[aria-label="Hauptnavigation"] button').click()`);
+    await eventually(() => js(`[...document.querySelectorAll('nav[aria-label="Quiz"] a')].some(a => a.getAttribute("href") === "/content" && a.innerText === "Content")`), "Desktop-Link Content");
+    await navigate(`/quiz/${single.quiz_id}`);
+    await contains("Zusammensetzung");
+    assert.equal(planned(await summary()), oneDuration);
+    assert.match(await summary(), /Alltagsphysik[\s\S]*100 %/);
+    assert.match(await summary(), /Geografie[\s\S]*100 %/);
+    assert.match(await summary(), /Paare bilden[\s\S]*100 %/);
+    await screenshot("quizeditor-1366.png", 'section[aria-labelledby="quiz-composition"]');
+    await resize(390, 844);
+    await screenshot("quizeditor-390.png", 'section[aria-labelledby="quiz-composition"]');
+    assert.ok(await js(`(() => {
+      const section = document.querySelector('section[aria-labelledby="quiz-composition"]');
+      return section.scrollWidth <= section.clientWidth + 1 && section.getBoundingClientRect().right <= innerWidth;
+    })()`));
+    await js(`document.querySelector('button[aria-label="Navigation öffnen"]').click()`);
+    await js(`document.querySelector('nav[aria-label="Hauptnavigation"] button').click()`);
+    await eventually(() => js(`[...document.querySelectorAll('nav[aria-label="Quiz"] a')].some(a => a.getAttribute("href") === "/content" && a.innerText === "Content" && a.getBoundingClientRect().width > 0)`), "Mobil-Link Content");
+    await resize(1366, 768);
+    const pause = await db.quiz_ablauf_elemente.findFirstOrThrow({
+      where: { quiz_id: single.quiz_id, typ: "BREAK", ist_standard: false },
+    });
+    await db.quiz_ablauf_elemente.update({ where: { quiz_ablauf_element_id: pause.quiz_ablauf_element_id },
+      data: { konfiguration: { version: 1, title: "Spielpause", durationSeconds: 780 } } });
+    await navigate(`/quiz/${single.quiz_id}`);
+    await contains("Zusammensetzung");
+    const changedDuration = planned(await summary());
+    assert.ok(changedDuration);
+    assert.notEqual(changedDuration, oneDuration);
+    await navigate("/quiz");
+    assert.equal(planned(await cardText("Planung · Eine Frage")), changedDuration);
+    // Compare a run with zero observations, positioned on its excluded entry countdown.
+    await db.quiz_praesentation_status.create({ data: {
+      quiz_id: single.quiz_id, quiz_started_at: new Date(),
+      slide_key: `flow:${(await db.quiz_ablauf_elemente.findFirstOrThrow({
+        where: { quiz_id: single.quiz_id, typ: "COUNTDOWN" },
+      })).quiz_ablauf_element_id}:COUNTDOWN`, slide_index: 0,
+    } });
+    await navigate(`/quiz/${single.quiz_id}/moderation`);
+    await contains("Prognose Rest");
+    const rest = await eventually(() => js<string>(`[...document.querySelectorAll("div")].find(node =>
+      node.textContent === "Prognose Rest")?.previousElementSibling?.textContent.match(/^\\d{2}(?::\\d{2})+$/)?.[0]`),
+    "berechnete Restzeit in der Moderation");
+    const seconds = rest.split(":").reduce((total, part) => total * 60 + Number(part), 0);
+    assert.equal(formatQuizDuration(seconds), changedDuration);
+    await navigate(`/quiz/${large.quiz_id}`);
+    await contains("Zusammensetzung");
+    await screenshot("quizeditor-1366.png", 'section[aria-labelledby="quiz-composition"]');
+    await navigate(`/quiz/${empty.quiz_id}`);
+    await contains("Für die Verteilung sind noch keine Fragen zugeordnet.");
+    await clickButton("Quiz-Element hinzufügen");
+    await clickButton("Suchen");
+    await eventually(() => js(`(() => {
+      const row = [...document.querySelectorAll("article")].find(a => a.innerText.includes("Was zeigt der Planungs-Browsertest?"));
+      const button = [...row?.querySelectorAll("button") ?? []].find(b => b.textContent === "Hinzufügen");
+      if (!button || button.disabled) return false;
+      button.click();
+      return true;
+    })()`), "Frage über Editor hinzufügen");
+    await eventually(async () => (await summary()).includes("1 Frage"), "aktualisierte Zusammensetzung");
+    assert.match(await summary(), /Ohne Kategorie[\s\S]*100 %/);
+    assert.match(await summary(), /Standardfrage[\s\S]*100 %/);
+    await navigate("/quiz");
+    assert.match(await cardText("Planung · Leer"), /1 Frage/);
+    await navigate(`/quiz/${empty.quiz_id}`);
+    await js(`window.confirm = () => true; document.querySelector('[data-quiz-element-kind="QUESTION"] summary').click()`);
+    await clickButton("Entfernen");
+    await eventually(async () => (await summary()).includes("0 Fragen"), "Frage entfernt");
+    await navigate("/quiz");
+    assert.match(await cardText("Planung · Leer"), /0 Fragen/);
+
     const quiz = await db.quiz.create({ data: { titel: "Excel Browser-Quiz", eventreihe_id: 10 } });
     const quizId = quiz.quiz_id;
     const block = await db.quiz_abschnitte.create({ data: { quiz_id: quizId, titel: "Testblock", sortierung: 1, abschnitt_typ: "fragenblock" } });

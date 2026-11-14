@@ -1,12 +1,13 @@
 import type { Prisma } from "@/app/generated/prisma/client";
 import type { AuthorizationActor } from "@/app/roles/roleAssignmentPolicy";
-import { normalizeExactOpenAnswer } from "@/app/quiz/evaluation/evaluateBaseAnswer";
+import { normalizeExactOpenAnswer } from "@/app/quiz/evaluation/normalizeExactOpenAnswer";
 import { questionVisibilityWhere } from "../../editor/questionVisibility";
 import { calculateQuestionSimilarity, normalizeQuestionForSimilarity } from "../../editor/questionSimilarity";
+import { questionTextSimilarityWhere } from "../../editor/questionSimilarityQuery";
 import { parsePairs } from "../../editor/templates/pairsTemplate";
 import { questionTemplateIds, resolveCanonicalQuestionTemplateId } from "../../editor/templates/questionTemplateRegistry";
 import type { ImportQuestion, ImportTarget, Issue } from "./format";
-import { contentFingerprint } from "./parseImport";
+import { importDuplicateKey } from "./parseImport";
 
 export async function findImportDuplicates(
   db: Prisma.TransactionClient, actor: AuthorizationActor, target: ImportTarget,
@@ -15,7 +16,8 @@ export async function findImportDuplicates(
   const errors: Issue[] = [];
   const warnings: Issue[] = [];
   const visible = questionVisibilityWhere(actor);
-  const exact = new Map(questions.map(question => [contentFingerprint(question), question]));
+  const exact = new Map(questions.map(question => [importDuplicateKey(question), question]));
+  const hasPairs = questions.some(question => question.type === "Paare bilden");
   const targetNames = new Set(questions.map(question => normalizeExactOpenAnswer(question.text)));
   const exactMatches = new Map<number, number>();
   const scopeFilter: Prisma.fragenWhereInput = {
@@ -32,9 +34,15 @@ export async function findImportDuplicates(
   for (;;) {
     const page = await db.fragen.findMany({
       where: { ...where, fragen_id: { gt: after } },
-      orderBy: { fragen_id: "asc" }, take: 500, select: { fragen_id: true, frage: true },
+      orderBy: { fragen_id: "asc" }, take: 500,
+      select: { fragen_id: true, frage: true, vorlage: { select: { code: true } } },
     });
-    const ids = page.filter(row => targetNames.has(normalizeExactOpenAnswer(row.frage))).map(row => row.fragen_id);
+    const ids = page.filter(row => {
+      const template = resolveCanonicalQuestionTemplateId(row.vorlage?.code ?? null);
+      return template === questionTemplateIds.pairs
+        ? hasPairs
+        : template === null && targetNames.has(normalizeExactOpenAnswer(row.frage));
+    }).map(row => row.fragen_id);
     if (ids.length) {
       const candidates = await db.fragen.findMany({
         where: { ...where, fragen_id: { in: ids } },
@@ -52,7 +60,7 @@ export async function findImportDuplicates(
         const pairs = templateId === questionTemplateIds.pairs && config && typeof config === "object" && !Array.isArray(config)
           ? parsePairs(config.templateData, true)?.pairs : undefined;
         if (templateId === questionTemplateIds.pairs && !pairs) continue;
-        const question = exact.get(contentFingerprint({
+        const question = exact.get(importDuplicateKey({
           text: candidate.frage,
           type: pairs ? "Paare bilden" : candidate.antworten.some(answer => !answer.ist_richtig) ? "Geschlossen" : "Offen",
           pairs: (pairs ?? []).map(pair => ({ row: 0, ...pair })),
@@ -66,7 +74,8 @@ export async function findImportDuplicates(
   }
 
   const recent = includeWarnings ? (await db.fragen.findMany({
-    where: { AND: [visible], ist_archiviert: false }, orderBy: { updated_at: "desc" }, take: 200,
+    where: { AND: [visible, questionTextSimilarityWhere], ist_archiviert: false },
+    orderBy: { updated_at: "desc" }, take: 200,
     select: { fragen_id: true, frage: true },
   })).map(candidate => ({ id: candidate.fragen_id, text: normalizeQuestionForSimilarity(candidate.frage) })) : [];
   for (const question of questions) {

@@ -12,7 +12,7 @@ export default function WorkspaceNavigation({ capabilities }: { capabilities: Na
   const [open, setOpen] = useState(false);
   const close = useCallback(() => setOpen(false), []);
   const { containerRef, triggerRef } = useDismissiblePopover({ open, onClose: close });
-  const quizLinks = [...(capabilities.content ? [{ href: "/content", label: "Inhalte", active: active === "Quiz" && !/^\/(?:quiz|workspaces\/\d+\/quiz\/events)/.test(pathname) }] : []), ...(capabilities.quizzes ? [{ href: "/quiz", label: "Quizze", active: active === "Quiz" && /^\/(?:quiz|workspaces\/\d+\/quiz\/events)/.test(pathname) }] : [])];
+  const quizLinks = [...(capabilities.content ? [{ href: "/content", label: "Content", active: active === "Quiz" && !/^\/(?:quiz|workspaces\/\d+\/quiz\/events)/.test(pathname) }] : []), ...(capabilities.quizzes ? [{ href: "/quiz", label: "Quizze", active: active === "Quiz" && /^\/(?:quiz|workspaces\/\d+\/quiz\/events)/.test(pathname) }] : [])];
   const links = [
     ...(capabilities.bingo ? [{ href: "/bingo", label: "Bingo" }] : []),
     ...(capabilities.karaoke ? [{ href: "/karaoke", label: "PowerPoint-Karaoke" }] : []),

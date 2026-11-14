@@ -91,6 +91,7 @@ import {
   applyQuestionRewriteToDraft,
 } from "../questionDraftState";
 import { findSimilarQuestions, type SimilarQuestion } from "../duplicateActions";
+import { getQuestionDuplicateFingerprint } from "../questionSimilarity";
 import type { GooglePlacesFeature } from "../googlePlacesFeature";
 import QuestionStoryElementDraftSection, { type QuestionStoryElementDraftOption } from "@/app/story-elemente/QuestionStoryElementDraftSection";
 import type { StoryElementEditorOptions } from "@/app/story-elemente/StoryElementEditor";
@@ -258,16 +259,21 @@ export function QuestionEditor({
     questionText: draft.questionText,
     templateId: draft.templateId,
     templateConfig: draft.templateConfig,
+    hasCustomTemplate: Boolean(draft.sourceTemplateId),
+    media: draft.questionMedia.map(({ slotKey, url, operation }) => ({ slotKey, url, operation })),
     answers: draft.answers.map((answer) => ({
       text: answer.text,
       isCorrect: answer.isCorrect,
-      additionalInfo: answer.additionalInfo,
+      fieldLabel: answer.fieldLabel,
+      media: answer.media && { slotKey: answer.media.slotKey, url: answer.media.url, operation: answer.media.operation },
     })),
   }), [
     draft.answers,
     draft.questionText,
+    draft.questionMedia,
     draft.templateConfig,
     draft.templateId,
+    draft.sourceTemplateId,
   ]);
   const currentDraftFingerprint = useMemo(
     () => getQuestionDraftFingerprint(draft),
@@ -284,9 +290,8 @@ export function QuestionEditor({
 
   useEffect(() => {
     let active = true;
-    const questionText = duplicateInput.questionText.trim();
     const timer = window.setTimeout(() => {
-      if (questionText.length < 12) {
+      if (!getQuestionDuplicateFingerprint(duplicateInput)) {
         setSimilarQuestions([]);
         return;
       }

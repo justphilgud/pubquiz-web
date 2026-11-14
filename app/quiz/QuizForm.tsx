@@ -19,6 +19,7 @@ import { resolvePublicEventContent } from "@/app/eventreihen/publicEventContent"
 import { QuizEventImageEditor } from "./QuizEventImageEditor";
 import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import { QuizCopyDialog } from "./QuizCopyDialog";
+import { formatQuizDuration, formatQuizQuestionCount } from "./quizPlanning";
 import { isEventSeriesSelectable } from "@/app/eventreihen/eventSeriesPolicy";
 import {
   ArchiveBoxIcon,
@@ -372,7 +373,13 @@ export default function QuizForm({
         <div className="mt-5 grid gap-4 lg:grid-cols-2">
           {filteredQuizzes.map((quiz) => (
             <EventRow key={quiz.quiz_id} entry={{id:String(quiz.quiz_id),title:quiz.titel??`Quiz ${quiz.quiz_id}`,seriesName:quiz.eventreihe_name,typeLabel:"Quiz",date:quiz.quiz_datum,time:quiz.veranstaltungszeit,status:quiz.live_status??"Vorbereitung",prepareTitle:"Quizinhalt bearbeiten",prepareHref:`/quiz/${quiz.quiz_id}?returnTo=${encodeURIComponent(returnTo)}`,moderationHref:`/quiz/${quiz.quiz_id}/moderation`,presentationHref:`/quiz/${quiz.quiz_id}/praesentation`}}>
-              <p className="mt-3 text-sm text-slate-600">Terminstatus: {statusLabels[quiz.temporal_status]}</p>
+              <p className="mt-3 text-sm font-semibold text-slate-800">
+                {formatQuizQuestionCount(quiz.fragen_anzahl)}
+                {quiz.plannedDurationSeconds !== undefined && (
+                  <> · {formatQuizDuration(quiz.plannedDurationSeconds)} <span className="font-normal text-slate-600">inkl. Spielpausen, ohne Einlass und Startcountdown</span></>
+                )}
+              </p>
+              <p className="mt-2 text-sm text-slate-600">Terminstatus: {statusLabels[quiz.temporal_status]}</p>
               <dl className="mt-3 grid gap-1 text-sm text-slate-600 sm:grid-cols-2">
                 <div><dt className="inline font-semibold">Datum: </dt><dd className="inline">{quiz.quiz_datum ?? "Datum fehlt"}{quiz.veranstaltungszeit ? `, ${quiz.veranstaltungszeit}` : ""}</dd></div>
                 <div><dt className="inline font-semibold">Ort: </dt><dd className="inline">{quiz.veranstaltungsname ?? "–"}</dd></div>

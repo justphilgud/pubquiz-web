@@ -1,6 +1,7 @@
 import "server-only";
 
 import { Prisma } from "@/app/generated/prisma/client";
+import { questionTextSimilarityWhere } from "../../editor/questionSimilarityQuery";
 import { prisma } from "@/app/lib/prisma";
 import { getLogicalEnvironment } from "@/config/environment";
 import { normalizeCategoryComparisonKey } from "@/app/fragen/editor/categoryPolicy";
@@ -149,7 +150,7 @@ export async function startOpenTdbPilot(input: { userId: number }) {
         select: { external_reference: true },
       }),
       prisma.fragen.findMany({
-        where: { ist_archiviert: false },
+        where: { ist_archiviert: false, ...questionTextSimilarityWhere },
         select: { fragen_id: true, frage: true },
       }),
       prisma.fragenkategorie.findMany({
@@ -355,7 +356,7 @@ export async function processOpenTdbPhaseTwo(input: {
       take: PHASE_TWO_CHUNK_SIZE,
     }),
     prisma.fragen.findMany({
-      where: { ist_archiviert: false },
+      where: { ist_archiviert: false, ...questionTextSimilarityWhere },
       select: { fragen_id: true, frage: true },
     }),
     prisma.fragenkategorie.findMany({
@@ -499,7 +500,7 @@ export async function saveExternalQuestionPreparation(input: {
     throw new Error("EXTERNAL_IMPORT_ITEM_NOT_EDITABLE");
   }
   const existingQuestions = await prisma.fragen.findMany({
-    where: { ist_archiviert: false },
+    where: { ist_archiviert: false, ...questionTextSimilarityWhere },
     select: { fragen_id: true, frage: true },
   });
   const existingIssues = new Set(stringArray(item.issue_codes) as ExternalQuestionIssueCode[]);

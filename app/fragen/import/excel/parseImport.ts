@@ -1,8 +1,8 @@
 import { createHash } from "node:crypto";
-import { normalizeExactOpenAnswer } from "@/app/quiz/evaluation/evaluateBaseAnswer";
+import { normalizeExactOpenAnswer } from "@/app/quiz/evaluation/normalizeExactOpenAnswer";
 import { CATEGORY_NAME_MAX_LENGTH, normalizeCategoryComparisonKey, normalizeCategoryName } from "../../editor/categoryPolicy";
 import { isDateInput } from "../../editor/questionLifecycle";
-import { normalizePairTerm, PAIRS_MAX, PAIR_TEXT_MAX } from "../../editor/templates/pairsTemplate";
+import { normalizePairTerm, pairContentEntries, PAIRS_MAX, PAIR_TEXT_MAX } from "../../editor/templates/pairsTemplate";
 import { questionTypes, type ImportQuestion, type Issue, type QuestionType, type Sheet } from "./format";
 import { readTables, type Table } from "./readWorkbook";
 
@@ -142,7 +142,7 @@ export function parseImport(bytes: Buffer) {
       if (answers.length > 6) warnings.push({ sheet: "Fragen", row, field: "Auswahlmodus", message: "Mehr als sechs Optionen. Bitte später die Präsentationsvorschau prüfen." });
     }
     if (!question.text) continue;
-    const key = contentFingerprint(question);
+    const key = importDuplicateKey(question);
     const prior = exact.get(key);
     if (prior) report("Fragen", row, "Fragetext", `Inhalt identisch mit Zeile ${prior.row} (${prior.key}).`);
     else exact.set(key, question);
@@ -152,9 +152,15 @@ export function parseImport(bytes: Buffer) {
 
 export function contentFingerprint(question: Pick<ImportQuestion, "type" | "text" | "pairs" | "answers">) {
   const details = question.type === "Paare bilden"
-    ? question.pairs.map(pair => JSON.stringify([normalizePairTerm(pair.left), normalizePairTerm(pair.right)]))
+    ? pairContentEntries(question.pairs)
     : question.answers.map(answer => JSON.stringify([normalizeExactOpenAnswer(answer.text), answer.correct]));
   return createHash("sha256").update(JSON.stringify([
     question.type, normalizeExactOpenAnswer(question.text), [...new Set(details)].sort(),
   ])).digest("hex");
+}
+
+export function importDuplicateKey(question: Pick<ImportQuestion, "type" | "text" | "pairs" | "answers">) {
+  return question.type === "Paare bilden"
+    ? JSON.stringify(pairContentEntries(question.pairs))
+    : contentFingerprint(question);
 }

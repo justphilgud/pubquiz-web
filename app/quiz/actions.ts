@@ -184,6 +184,9 @@ import {
   parseMemeQuestionConfig,
   type MemeQuestionConfig,
 } from "@/app/quiz/memeCaption";
+import { loadQuizPlanningDurations } from "./quizPlanning.server";
+import { supportsSponsorMoments } from "./presentationTiming";
+import { revalidateQuizPlanning } from "./revalidateQuizPlanning.server";
 
 const localizedQuestionTemplates = localizeQuestionTemplates(
   loadQuestionEditorMessages(getDefaultLocale()),
@@ -245,6 +248,7 @@ export type QuizResult = {
   ist_archiviert: boolean;
   archivierungsgrund: string | null;
   fragen_anzahl: number;
+  plannedDurationSeconds?: number;
   presentation_template_id: string | null;
   answer_form_template_id: string | null;
 };
@@ -351,6 +355,7 @@ export type QuizDetailsResult = QuizResult & {
     effektiver_antwortmodus: "OPEN" | "CLOSED" | "UNCLASSIFIED";
     vorlagenname: string;
     templateId: string | null;
+    compositionTemplateId?: string;
     teilpunkte_faehig: boolean;
     kategorien: string[];
     storyElements: Array<{
@@ -364,10 +369,12 @@ export type QuizDetailsResult = QuizResult & {
   }[];
 };
 
-export async function getQuizListe(): Promise<QuizResult[]> {
+export async function getQuizListe(options: { includePlanning?: boolean; eventSeriesId?: number } = {}): Promise<QuizResult[]> {
   const manageableIds = await getEventSeriesIdsForCapability("MANAGE_QUIZZES");
+  const visibleIds = options.eventSeriesId === undefined ? manageableIds :
+    manageableIds === null || manageableIds.includes(options.eventSeriesId) ? [options.eventSeriesId] : [];
   const quizze = await prisma.quiz.findMany({
-    where: manageableIds === null ? undefined : { eventreihe_id: { in: manageableIds } },
+    where: visibleIds === null ? undefined : { eventreihe_id: { in: visibleIds } },
     orderBy: {
       quiz_datum: "desc",
     },
@@ -382,6 +389,9 @@ export async function getQuizListe(): Promise<QuizResult[]> {
     },
   });
 
+  const durations = options.includePlanning
+    ? await loadQuizPlanningDurations(quizze.map(quiz => quiz.quiz_id))
+    : undefined;
   return sortQuizResults(quizze.map((quiz) => ({
     live_status:quiz.praesentation_status?.quiz_stopped_at?"Beendet" as const:quiz.praesentation_status?.quiz_started_at?"Läuft" as const:"Vorbereitung" as const,
     quiz_id: quiz.quiz_id,
@@ -410,6 +420,7 @@ export async function getQuizListe(): Promise<QuizResult[]> {
     ist_archiviert: quiz.ist_archiviert,
     archivierungsgrund: quiz.archivierungsgrund,
     fragen_anzahl: quiz._count.quiz_fragen,
+    plannedDurationSeconds: durations?.get(quiz.quiz_id),
     presentation_template_id: quiz.presentation_template_id,
     answer_form_template_id: quiz.answer_form_template_id,
   })));
@@ -648,8 +659,7 @@ export async function updateQuiz(data: {
   });
   if (!saved.success) return saved;
 
-  revalidatePath("/quiz");
-  revalidatePath(`/quiz/${data.quizId}`);
+  revalidateQuizPlanning(data.quizId);
   return { success: true, message: "Quiz wurde aktualisiert." };
 }
 
@@ -1069,6 +1079,7 @@ export async function getQuizDetails(
                   name: true,
                 },
               },
+              source_vorlage: { select: { name: true, code: true } },
               fragen_kategorien: {
                 include: {
                   fragenkategorie: true,
@@ -1303,11 +1314,12 @@ export async function getQuizDetails(
         kann_freie_antwort_aktivieren: answerMode.canEnableFreeAnswer,
         effektiver_antwortmodus: answerMode.effectiveMode,
         vorlagenname:
-          findQuestionTemplate(
+          eintrag.fragen.source_vorlage?.name ?? findQuestionTemplate(
             localizedQuestionTemplates,
             eintrag.fragen.vorlage?.code ?? null,
           )?.name ?? eintrag.fragen.vorlage?.name ?? "Standardfrage",
         templateId: eintrag.fragen.vorlage?.code ?? null,
+        compositionTemplateId: eintrag.fragen.source_vorlage?.code,
         teilpunkte_faehig: partialPointsCapable,
         schwierigkeitslevel:
           eintrag.fragen.schwierigkeitslevel?.toString() ?? null,
@@ -1546,7 +1558,7 @@ export async function addFrageToQuiz(data: {
     );
   }
 
-  revalidatePath(`/quiz/${data.quizId}`);
+  revalidateQuizPlanning(data.quizId);
   revalidatePath("/fragen");
   return {
     coupledQuestionAlreadyInQuiz: assignment.coupledQuestionAlreadyInQuiz,
@@ -1575,7 +1587,7 @@ export async function removeFrageFromQuiz(data: {
     });
   });
 
-  revalidatePath(`/quiz/${data.quizId}`);
+  revalidateQuizPlanning(data.quizId);
 }
 
 export async function moveQuizFrage(data: {
@@ -1806,7 +1818,7 @@ export async function removeFrageFromQuizByFrageId(data: {
     },
   });
 
-  revalidatePath(`/quiz/${data.quizId}`);
+  revalidateQuizPlanning(data.quizId);
   revalidatePath("/fragen");
 }
 export type QuizPraesentationResult = {
@@ -2048,7 +2060,7 @@ export async function getQuizPraesentation(
 
   const templates = await resolveQuizTemplates(quizId);
   return {
-    sponsorMomentsEnabled: templates?.theme.design.stylePreset === "EDITORIAL" || templates?.theme.design.stylePreset === "KOMM_ONE",
+    sponsorMomentsEnabled: supportsSponsorMoments(templates?.theme.design.stylePreset),
     quiz_id: quiz.quiz_id,
     intro_begruessungstitel: quiz.intro_begruessungstitel,
     intro_begruessungstext: quiz.intro_begruessungstext,
@@ -2383,7 +2395,7 @@ export async function updateQuizQuestionMemeConfig(data: {
     where: { quiz_fragen_id: data.quizFragenId },
     data: { meme_config_json: config },
   });
-  revalidatePath(`/quiz/${data.quizId}`);
+  revalidateQuizPlanning(data.quizId);
   revalidatePath(`/quiz/${data.quizId}/antworten`);
   revalidatePath(`/quiz/${data.quizId}/moderation`);
   revalidatePath(`/quiz/${data.quizId}/praesentation`);
@@ -2479,7 +2491,7 @@ export async function updateQuizFrageAbschnitt(data: {
     await materializeQuizBlockQuestionItems(data.quizId, data.quizAbschnittId);
   }
 
-  revalidatePath(`/quiz/${data.quizId}`);
+  revalidateQuizPlanning(data.quizId);
 }
 export async function updateQuizFragenBlockSortierung(data: {
   quizId: number;
@@ -5456,7 +5468,7 @@ export async function createQuizAbschnitt(data: {
     };
   });
 
-  revalidatePath(`/quiz/${data.quizId}`);
+  revalidateQuizPlanning(data.quizId);
   revalidatePath(`/quiz/${data.quizId}/praesentation`);
 
   return {
@@ -5494,7 +5506,7 @@ export async function updateQuizAbschnitt(data: {
     },
   });
 
-  revalidatePath(`/quiz/${data.quizId}`);
+  revalidateQuizPlanning(data.quizId);
 
   return {
     success: true,
@@ -5557,7 +5569,7 @@ export async function deleteQuizAbschnitt(data: {
     await synchronizeQuizAutomaticBlockTitles(tx, data.quizId);
   });
 
-  revalidatePath(`/quiz/${data.quizId}`);
+  revalidateQuizPlanning(data.quizId);
 
   return {
     success: true,

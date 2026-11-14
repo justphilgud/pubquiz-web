@@ -77,7 +77,7 @@ test("rejects invalid sheet columns, question keys, references, lengths, dates a
 
 test("a Default-only workbook preserves 100 pair questions plus open and single-choice questions", () => {
   const entries = Array.from({ length: 100 }, (_, index) => [`P-${index}`, "Paare bilden", `Zuordnung ${index}`]);
-  const pairs = entries.flatMap(([key], index) => Array.from({ length: 2 + index % 9 }, (_, pair) => [key, `Links ${pair}`, `Rechts ${pair}`]));
+  const pairs = entries.flatMap(([key], index) => Array.from({ length: 2 + index % 9 }, (_, pair) => [key, `Links ${index}-${pair}`, `Rechts ${pair}`]));
   const file = workbook({
     Fragen: [...entries, ["O1", "Offen", "Offene Frage"], ["G1", "Geschlossen", "Geschlossene Frage", "Einfachauswahl"]],
     Antworten: [["O1", "Lösung"], ["O1", "Schreibvariante"], ["G1", "Richtige Antwort", "Ja"], ["G1", "Falsche Antwort", "Nein"]],

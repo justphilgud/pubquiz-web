@@ -105,12 +105,27 @@ test("PostgreSQL import: preview, active categories, authorization, full rollbac
     assert.equal(score.basePoints.toString(), "0.5");
     assert.equal(score.maxPoints.toString(), "1");
 
+    const reworded = fixtureWorkbook({
+      Fragen: [["P", "Paare bilden", "Anderer Fragetext mit denselben Paaren"]],
+      Paare: [...pairs.pairs].reverse().map(({ left, right }) => ["P", left, right]),
+    });
+    const duplicate = await preview(reworded);
+    assert.equal(duplicate.token, undefined);
+    assert.ok(duplicate.errors.some(issue => issue.message.includes(`#${first.questions[5].id}`)));
+    const rearranged = fixtureWorkbook({
+      Fragen: [["P", "Paare bilden", first.questions[5].text]],
+      Paare: pairs.pairs.map(({ left }, index) => ["P", left, pairs.pairs[(index + 1) % pairs.pairs.length].right]),
+    });
+    const newPairs = await preview(rearranged);
+    assert.ok(newPairs.token, JSON.stringify(newPairs.errors));
+    assert.ok(newPairs.warnings.every(issue => issue.field !== "Fragetext"));
+
     const bulkQuestions = Array.from({ length: 100 }, (_, i) => [
       `P-${i}`, "Paare bilden", `Fixture-Zuordnung ${i}`, "", " alltagsphysik ", "", "", "", "2028-01-02", "",
     ]);
     const bulk = fixtureWorkbook({
       Fragen: bulkQuestions,
-      Paare: bulkQuestions.flatMap(([key], index) => Array.from({ length: 2 + index % 9 }, (_, i) => [key, `L ${i}`, `R ${i}`])),
+      Paare: bulkQuestions.flatMap(([key], index) => Array.from({ length: 2 + index % 9 }, (_, i) => [key, `L ${index}-${i}`, `R ${i}`])),
     });
     const bulkPlan = await preview(bulk);
     assert.ok(bulkPlan.token);

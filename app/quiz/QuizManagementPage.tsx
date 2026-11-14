@@ -24,7 +24,7 @@ export default async function QuizPage({ searchParams, workspaceSeriesId, hideHe
 
   const resolvedSearchParams = await searchParams;
   const [quizze, kategorien, eventSeries, presentationTemplates] = await Promise.all([
-    getQuizListe(),
+    getQuizListe({ includePlanning: true, eventSeriesId: workspaceSeriesId }),
     getSchnellQuizKategorien(),
     getEventSeriesOptions(true),
     listAssignablePresentationTemplates(),
@@ -39,7 +39,7 @@ export default async function QuizPage({ searchParams, workspaceSeriesId, hideHe
     <>{!hideHeader && <AppHeader />}<QuizWorkspace workspaceSeriesId={workspaceSeriesId} key={workspaceSeriesId ?? "cross-series"}
       workspaceSeriesName={workspaceSeriesId === undefined ? undefined : eventSeries.find(series => series.id === workspaceSeriesId)?.name}
       environmentPrefix={getBlobEnvironmentPrefix()}
-      quizze={quizze.filter(quiz => workspaceSeriesId === undefined || quiz.eventreihe_id === workspaceSeriesId)}
+      quizze={quizze}
       kategorien={kategorien}
       eventSeries={eventSeries.filter(series => workspaceSeriesId === undefined || series.id === workspaceSeriesId)}
       initialEventSeriesId={initialEventSeriesId}

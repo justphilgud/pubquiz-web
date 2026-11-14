@@ -27,6 +27,22 @@ Die persistierte Reihenfolge verwendet die vorhandenen
 `quiz_ablauf_elemente.sortierung`-Werte. `Kein Block` bleibt ein ausgeblendeter
 Auffangbereich und der letzte Editor-Abschnitt.
 
+Quizkarten zählen die tatsächlichen Datensätze in `quiz_fragen`, einschließlich
+Fragen ohne Block. Story-Elemente, eigenständige Umfragen und Präsentationsphasen
+erhöhen diese Zahl nicht. Der Quizeditor zeigt unter „Zusammensetzung“ denselben
+Bestand. Jede Frage zählt einmal pro zugeordneter Kategorie und einmal für ihr
+Template. Ohne Kategorie erscheint „Ohne Kategorie“, ohne Spezialtemplate
+„Standardfrage“. Eigene Vorlagen erscheinen mit ihrem Namen. Die Zahl aller
+Zuordnungen dient je Balken als Nenner, deshalb können Kategorien zusammen über
+100 % erreichen. Die Anzeige erfindet keine redaktionelle Bewertung.
+
+Das Lesen speichert keine Planungsdaten. Die Anzeige folgt dem serverseitig
+bestätigten Stand. Zuordnungs- und Ablaufaktionen aktualisieren Quizeditor und
+Quizübersichten. Dauer und Abgrenzung zum Einlass sind im
+[Runtime-Vertrag](quiz-runtime-contracts.md) dokumentiert. Prüfnachweise:
+`quizPlanning.test.ts`, `presentationTiming.test.ts` und
+`scripts/testing/excel-question-import.browser.test.ts`.
+
 ## Runtime
 
 `resolveQuizBlockSequence` ist die kanonische Blocksequenz. Es verbindet die

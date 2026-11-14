@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { isExactAnagram, normalizeAnagramLetters, parseQuestionTemplateData } from "../../editor/templates/questionTemplateData";
-import { calculateQuestionSimilarity, normalizeQuestionForSimilarity } from "../../editor/questionSimilarity";
+import { calculateQuestionSimilarity, normalizeQuestionForSimilarity, usesQuestionTextSimilarity } from "../../editor/questionSimilarity";
 
 export type EditorialCandidate = {
   externalId: string; templateId: string; question: string; solution: string; variants: string[];
@@ -104,8 +104,11 @@ export function previewEditorialImport(source: EditorialSource, existing: Editor
     const duplicates: EditorialDecision["duplicates"] = [];
     for (const q of [...existing, ...accepted]) {
       let reason: string | null = null;
-      if (textKey(candidate.question) === textKey(q.question)) reason = q.solutions.some(s => nameKey(s) === nameKey(candidate.solution)) ? "IDENTICAL_QUESTION" : "IDENTICAL_QUESTION_SOLUTION_REVIEW";
       const other = parseQuestionTemplateData(q.templateData, q.templateId, true);
+      const comparePrompt = usesQuestionTextSimilarity(q.templateId) || other?.kind === "ESTIMATE";
+      if (comparePrompt && textKey(candidate.question) === textKey(q.question)) {
+        reason = q.solutions.some(s => nameKey(s) === nameKey(candidate.solution)) ? "IDENTICAL_QUESTION" : "IDENTICAL_QUESTION_SOLUTION_REVIEW";
+      }
       if (data?.kind === "ANAGRAM") {
         if (q.solutions.some(s => nameKey(s) === nameKey(data.name))) reason ??= "SAME_PERSON_OR_SOLUTION";
         if (other?.kind === "ANAGRAM" && normalizeAnagramLetters(other.selectedSolution) === normalizeAnagramLetters(data.selectedSolution) && reason !== "IDENTICAL_QUESTION") reason = nameKey(other.name) === nameKey(data.name) ? "SAME_ANAGRAM" : "SAME_ANAGRAM_PERSON_REVIEW";
@@ -116,7 +119,8 @@ export function previewEditorialImport(source: EditorialSource, existing: Editor
         reason ??= candidate.metadata.referenceDate === q.metadata?.referenceDate ? "SAME_MEASUREMENT_PERIOD" : "MEASUREMENT_PERIOD_REVIEW";
       }
       // Anagram prompts share boilerplate; the person's name/stimulus is the content.
-      if (data?.kind !== "ANAGRAM" && calculateQuestionSimilarity(candidate.question, q.question) >= 0.58) reason ??= "SEMANTIC_SIMILARITY";
+      if (data?.kind === "ESTIMATE" && comparePrompt &&
+          calculateQuestionSimilarity(candidate.question, q.question) >= 0.58) reason ??= "SEMANTIC_SIMILARITY";
       if (reason) duplicates.push({ questionId: q.id, reason });
     }
     const exact = duplicates.some(d => d.reason === "IDENTICAL_QUESTION" || d.reason === "SAME_ANAGRAM");

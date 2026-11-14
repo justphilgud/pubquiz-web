@@ -2,6 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
+import { revalidateQuizPlanning } from "@/app/quiz/revalidateQuizPlanning.server";
 import { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
 import { requireActor } from "@/app/lib/permissions";
@@ -210,7 +211,7 @@ export async function attachLivePollToQuiz(input: { pollId: number; quizId: numb
     }
     return { placementId: created.quiz_ablauf_element_id, alreadyAssigned: false };
   });
-  revalidatePath(`/quiz/${input.quizId}`);
+  revalidateQuizPlanning(input.quizId);
   return {
     success: true,
     placementId: placement.placementId,

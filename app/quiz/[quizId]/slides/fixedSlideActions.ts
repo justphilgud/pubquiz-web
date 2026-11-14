@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { revalidateQuizPlanning } from "../../revalidateQuizPlanning.server";
 import { BOOKING_LIMITS, validateBooking } from "@/app/quiz/bookingSlide";
 import { prisma } from "@/lib/prisma";
 import {
@@ -145,7 +146,7 @@ export async function saveIntroSlide(
       } : undefined,
     );
 
-    revalidatePath(`/quiz/${quizId}`);
+    revalidateQuizPlanning(quizId);
     revalidatePath(`/quiz/${quizId}/slides/intro`);
     return { status: "success", message: "Änderungen wurden gespeichert." };
   } catch {
@@ -200,7 +201,7 @@ export async function saveOutroSlide(
           : bookingPatch,
     );
 
-    revalidatePath(`/quiz/${quizId}`);
+    revalidateQuizPlanning(quizId);
     revalidatePath(`/quiz/${quizId}/slides/outro`);
     return { status: "success", message: "Änderungen wurden gespeichert." };
   } catch {

@@ -17,3 +17,21 @@ test("waiting never trains or contributes; questions and solutions have independ
   const pause = { typ: "ablauf", element: { type: "BREAK", config: { durationSeconds: 180 } } } as Slide;
   assert.equal(estimateRemainingSeconds([pause], { pause: [1] }), 180);
 });
+
+test("the planning baseline excludes the entry countdown and uses configured time once per active slide", () => {
+  const flow = (type: string, anchorType: string, durationSeconds?: number) =>
+    ({ typ: "ablauf", element: { type, anchorType, config: { durationSeconds } } }) as Slide;
+  const meme = { typ: "frage", frage: { templateId: "meme_beschriften", memeConfig: {
+    timerEnabled: true, responseDurationSeconds: 180,
+  } } } as Slide;
+  const slides = [
+    flow("WAITING", "BEFORE_QUIZ"), flow("START_SEQUENCE", "BEFORE_QUIZ", 600),
+    flow("COUNTDOWN", "BEFORE_QUIZ", 600), flow("WELCOME", "BEFORE_QUIZ"),
+    slide("frage"), meme, slide("aufloesung"),
+    flow("BREAK", "ROUND_END", 240), flow("COUNTDOWN", "ROUND_END", 90),
+    flow("IMAGE", "AFTER_QUIZ", 50),
+  ];
+  assert.equal(estimateRemainingSeconds(slides, {}), 20 + 120 + 180 + 30 + 240 + 90 + 50);
+  assert.equal(estimateRemainingSeconds(slides, { "frage:meme_beschriften": [240] }), 20 + 120 + 240 + 30 + 240 + 90 + 50);
+  assert.equal(estimateRemainingSeconds([flow("BREAK", "ROUND_END"), flow("IMAGE", "AFTER_QUIZ")], {}), 320);
+});
