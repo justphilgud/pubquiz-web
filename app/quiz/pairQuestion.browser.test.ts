@@ -12,7 +12,7 @@ import tailwindcss from "@tailwindcss/postcss";
 
 type ProtocolResult = { targetId?: string; sessionId?: string; result?: { value?: unknown }; exceptionDetails?: unknown };
 
-test("pair editing, mouse and touch matching, reload, locks and presentation fit", { timeout: 45_000 }, async () => {
+test("pair editing, mouse and touch matching, reload, locks and presentation fit", { timeout: 60_000 }, async () => {
   const chrome = [process.env.CHROME_BIN, "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
     "/usr/bin/google-chrome", "/usr/bin/chromium"].find((path) => path && existsSync(path));
   assert.ok(chrome, "Chrome required");
@@ -71,11 +71,20 @@ test("pair editing, mouse and touch matching, reload, locks and presentation fit
   const url = `http://127.0.0.1:${address.port}`;
   const profile = mkdtempSync(join(tmpdir(), "pubquiz-pairs-"));
   const browser = spawn(chrome, ["--headless=new", "--no-sandbox", "--disable-gpu", "--disable-background-networking",
-    "--no-first-run", `--user-data-dir=${profile}`, "--remote-debugging-port=0", "about:blank"], { stdio: "ignore" });
+    "--disable-dev-shm-usage", "--no-first-run", `--user-data-dir=${profile}`, "--remote-debugging-port=0", "about:blank"],
+    { stdio: ["ignore", "ignore", "pipe"] });
+  let browserDiagnostic = "";
+  let browserError: Error | undefined;
+  browser.stderr.on("data", (chunk) => { browserDiagnostic = (browserDiagnostic + String(chunk)).slice(-4000); });
+  browser.on("error", (error) => { browserError = error; });
   let socket: WebSocket | undefined;
   try {
     const portFile = join(profile, "DevToolsActivePort");
-    for (let attempt = 0; attempt < 200 && !existsSync(portFile); attempt++) await delay(50);
+    for (let attempt = 0; attempt < 400 && !existsSync(portFile); attempt++) {
+      if (browserError || browser.exitCode !== null || browser.signalCode !== null) break;
+      await delay(50);
+    }
+    assert.ok(existsSync(portFile), `Chrome did not start: ${browserError?.message ?? browserDiagnostic}`);
     const [port, endpoint] = readFileSync(portFile, "utf8").trim().split(/\r?\n/);
     const ws = new WebSocket(`ws://127.0.0.1:${port}${endpoint}`);
     socket = ws;
