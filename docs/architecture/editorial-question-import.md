@@ -48,7 +48,7 @@ Die vorhandenen `external_question_import_batches` und `external_question_import
 
 ## Verantwortlichkeiten
 
-Die bestehende Importoberfläche behält Dateiauswahl und Benutzerinteraktion; Server Actions behalten die zentrale Administratorprüfung. Ein gemeinsamer redaktioneller Service unter dem vorhandenen Importmodul kapselt Normalisierung, vollständige Templatevalidierung, Kandidatenentscheidungen, Transaktion und Manifest. Bestehende Template-Parser, Antwortableitung, Dublettenheuristik und Berechtigungsregeln werden verwendet. Der OpenTDB-Pilot bleibt unverändert; seine Multiple-Choice-Annahmen dürfen diese Pools nicht verändern.
+Die bestehende Importoberfläche behält Dateiauswahl und Benutzerinteraktion; Server Actions behalten die zentrale Administratorprüfung. Ein gemeinsamer redaktioneller Service unter dem vorhandenen Importmodul kapselt Normalisierung, vollständige Templatevalidierung, Kandidatenentscheidungen, Transaktion und Manifest. Bestehende Template-Parser, Antwortableitung, Dublettenheuristik und Berechtigungsregeln werden verwendet. Die OpenTDB-Aufbereitung bleibt von diesen Pools getrennt. Der redaktionelle Pool erkennt Anagramme anhand der gezeigten Buchstaben und der gesuchten Person. Der Textvergleich mit klassischen Bestandsfragen sowie die Prüfung von Messgröße, Bezugszeitraum und Referenzwert bei Schätzfragen bleiben erhalten.
 
 ## Sicherheitsvertrag
 

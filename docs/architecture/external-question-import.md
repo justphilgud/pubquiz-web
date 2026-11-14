@@ -70,6 +70,9 @@ Deterministische Regeln markieren unter anderem zeitabhängige,
 sprachabhängige, lokal stark gebundene, strukturell ungültige und doppelte
 Inhalte. Exakte Dubletten blockieren die Übernahme. Semantische Treffer werden
 angezeigt und bleiben eine redaktionelle Entscheidung.
+Der Datenbankabgleich der OpenTDB-Aufbereitung beschränkt den Textvergleich auf
+klassische Fragen und Auswahlfragen. Spezialvorlagen mit wiederholten
+Aufgabenstellungen werden dabei nicht als Textdubletten behandelt.
 
 ## Lizenz
 

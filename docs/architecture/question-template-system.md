@@ -141,17 +141,13 @@ Fassung und führen keine Google-Anfrage aus.
 
 ## Dubletten-Fingerprints
 
-`getQuestionDuplicateFingerprint` bildet die fachliche Kernfrage zentral ab:
-
-- Standard und Wahr/Falsch: Fragentext beziehungsweise Aussage
-- Übersetzt vorgelesen: Originaltext und gesuchte Lösung
-- Google-Rezensionen: Ortsname oder Ortslink plus Reviewtexte beziehungsweise
-  Reviewlinks; die Place ID bleibt nur ein Legacy-Fallback
-- Anagramm: Ursprungsname
-- Schätzfrage: Fragentext, Zielwert und Einheit
-- Reihenfolge: Aufgabenstellung und normalisierte Elementmenge
-
-Ein generischer Templatefragetext allein erzeugt damit keine Warnung.
+`getQuestionDuplicateFingerprint` bildet die fachliche Kernfrage zentral ab.
+Wahr/Falsch vergleicht Aussage und Wahrheitswert. Schätzfragen vergleichen
+Aufgabe, Zielwert und Einheit. „Übersetzt vorgelesen“ vergleicht Original,
+Übersetzung, Sprachen und akzeptierte Lösungen. Google-Rezensionen vergleichen
+redaktionellen Ortsnamen und Rezensionstexte. Anagramme vergleichen Ursprungsname
+und das gezeigte Anagramm. Eigene Vorlagen auf Standardbasis vergleichen ihre
+Antwortfelder und relevanten Medien.
 
 ## Datentransfer und manuelle Regression
 
