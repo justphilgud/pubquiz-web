@@ -24,9 +24,10 @@ Tabelle und keine Änderung bestehender Datensätze oder des Submission-Lifecycl
 ## Antwortvertrag und Bewertung
 
 Jahre verwenden `NUMBER` mit `selection: YEAR`, Länder `TEXT` mit
-`selection: COUNTRY`. Die UI bietet Auswahl statt Freitexteingabe. Jahre 1–9999
-werden in einer einzigen Jahresauswahl von 1 bis 9999 angeboten.
-Jahr 0 und vorchristliche Jahre sind nicht Bestandteil dieses Bereichs.
+`selection: COUNTRY`. Editor und Teilnehmerformular verwenden dasselbe Jahresfeld
+mit direkter Ganzzahleingabe. Zulässig sind positive und negative sichere
+Ganzzahlen sowie 0. Dezimalstellen, Exponenten und Buchstaben sind ungültig.
+Ein einzelnes Minuszeichen bleibt beim Tippen vorübergehend im Feld.
 Länder verwenden ISO-3166-1-alpha-2-Codes; die Nutzerentscheidung beschränkt
 `app/lib/countries.ts` auf 193 UN-Mitgliedstaaten. Deutsche Namen stammen aus
 `Intl.DisplayNames`. Quelle: https://www.un.org/about-us/member-states.

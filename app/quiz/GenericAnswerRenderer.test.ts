@@ -59,6 +59,13 @@ test("NUMBER renders a decimal-friendly numeric input and its unit", () => {
   assert.match(html, />km</);
 });
 
+test("facts year renders a direct input with a stored negative year", () => {
+  const interaction = { type: "NUMBER", selection: "YEAR", inputMode: "decimal", step: 1, unit: "" } as const;
+  const html = render(interaction, { ...emptyDraft, antwortText: "-3600" });
+  assert.match(html, /<input[^>]+value="-3600"/);
+  assert.doesNotMatch(html, /<select|<option/);
+});
+
 test("SINGLE_CHOICE renders one radio group", () => {
   const html = render(
     {

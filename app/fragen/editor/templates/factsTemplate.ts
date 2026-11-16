@@ -6,8 +6,6 @@ export type FactsTemplateData = Extract<QuestionTemplateData, { kind: "FACTS" }>
 export const FACTS_MIN = 2;
 export const FACTS_MAX = 7;
 export const FACT_TEXT_MAX_LENGTH = 300;
-export const YEAR_MIN = 1;
-export const YEAR_MAX = 9999;
 
 export function factsResponse(templateId: string | null): FactsTemplateData["response"] | null {
   if (templateId === questionTemplateIds.factsYear) return "YEAR";
@@ -21,7 +19,7 @@ export function defaultFacts(response: FactsTemplateData["response"]): FactsTemp
 }
 
 export function isValidYear(value: string): boolean {
-  return /^[1-9]\d{0,3}$/.test(value) && Number(value) >= YEAR_MIN && Number(value) <= YEAR_MAX;
+  return /^(?:0|-?[1-9][0-9]*)$/u.test(value) && Number.isSafeInteger(Number(value));
 }
 
 export function factsAnswers(data: FactsTemplateData, current: readonly QuestionAnswerDraft[]): QuestionAnswerDraft[] {

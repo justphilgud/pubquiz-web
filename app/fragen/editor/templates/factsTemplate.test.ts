@@ -31,8 +31,8 @@ test("facts boundaries, nonempty content, IDs and ordered reload", () => {
 });
 
 test("year boundaries and country membership", () => {
-  for (const value of ["1", "1994", "9999"]) assert.equal(isValidYear(value), true);
-  for (const value of ["0", "-1", "10000", "1994.5", "01994", "1e3"]) assert.equal(isValidYear(value), false);
+  for (const value of ["0", "1", "1994", "9999", "10000", "-3600"]) assert.equal(isValidYear(value), true);
+  for (const value of ["-", "-0", "9007199254740992", "1994.5", "01994", "1e3", "Jahr"]) assert.equal(isValidYear(value), false);
   assert.equal(COUNTRY_OPTIONS.length, 193);
   assert.equal(new Set(COUNTRY_OPTIONS.map((country) => country.value)).size, 193);
   assert.equal(isCountryCode("CH"), true);
@@ -41,7 +41,7 @@ test("year boundaries and country membership", () => {
 });
 
 test("year and country use shared payload, reload and exact evaluation", () => {
-  for (const [templateId, response, solution, wrong] of [[questionTemplateIds.factsYear, "YEAR", "1994", "1995"], [questionTemplateIds.factsCountry, "COUNTRY", "CH", "DE"]] as const) {
+  for (const [templateId, response, solution, wrong] of [[questionTemplateIds.factsYear, "YEAR", "1994", "1995"], [questionTemplateIds.factsYear, "YEAR", "-3600", "3600"], [questionTemplateIds.factsCountry, "COUNTRY", "CH", "DE"]] as const) {
     const templateData = { ...data, response, solution };
     const interaction = resolveQuizAnswerInteraction({ templateId, templateData, originalAnswerMode: "OPEN", effectiveAnswerMode: "OPEN", answerFields: [], answerOptions: [] });
     assert.equal(interaction.type, response === "YEAR" ? "NUMBER" : "TEXT");
