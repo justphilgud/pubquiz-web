@@ -249,7 +249,7 @@ immer Navigation, Folienzeit, Vorschau und vorhandene Freigabe-/Auswertungssteue
 |---|---|---|---|
 | `standard` | Basis; offene oder geschlossene Form gemäß Quiz | Richtige klassische/strukturierte Antworten und Zusatzinformation | Text, Felder oder Auswahl gemäß effektiver Form |
 | `multiple_choice` | Basis; alle Optionen, neutral | Alle Optionen, richtige markiert, zugeordnete Zusatzinformation | Bestehende Einfach-/Mehrfachauswahl; Regeln unverändert |
-| `fakten_jahr` | Hinweise in Reihenfolge, keine Jahreslösung | Jahr, gespeicherte Erklärung/Antwortinformation | Jahres-/Zahleneingabe; keine versteckten Lösungsdaten |
+| `fakten_jahr` | Hinweise in Reihenfolge, keine Jahreslösung | Jahr, gespeicherte Erklärung/Antwortinformation | Direktes Eingabefeld für ganze Jahreszahlen einschließlich negativer Jahre; keine versteckten Lösungsdaten |
 | `fakten_land` | Hinweise, gegebenenfalls konfigurierte Optionen | Gespeichertes Land lesbar, keine erratene Lösung | Länder-/Auswahlinteraktion gemäß Konfiguration |
 | `fakten_person` | Hinweise ohne Lösungsbild | Gesuchter Name und optionales Lösungsbild | Freitext; akzeptierte Schreibvarianten bleiben intern |
 | `paare_bilden` | Zwei unabhängig sortierte Begriffsspalten | Je eine Zeile pro richtigem Paar | Eindeutige Eins-zu-eins-Zuordnungen mit Teilpunkten |
