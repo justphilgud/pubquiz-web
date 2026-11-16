@@ -13,8 +13,8 @@ export const MEME_CAPTION_MIN_FONT_CQW = 4.5;
 export const MEME_CAPTION_EXTERNAL_MIN_FONT_CQW = 2.25;
 export const MEME_CAPTION_PREFERRED_FONT_CQW = 7.5;
 export const MEME_CAPTION_FONT_STEP_CQW = 0.25;
-export const MEME_CAPTION_TOO_LONG_MESSAGE =
-  "Dein Text ist zu lang. Kürze ihn, damit er im Meme gut lesbar bleibt.";
+export const MEME_CAPTION_OVERFLOW_WARNING =
+  "Dein Text passt möglicherweise nicht vollständig in die Bildzone. Du kannst ihn trotzdem abgeben.";
 
 const LINE_CAPACITY_AT_MIN_FONT = 26;
 export const MEME_CAPTION_SINGLE_LINE_ROW_PERCENT = 13;

@@ -49,28 +49,16 @@ Für SSR, Tests und serverseitige Finalisierung bildet
 
 Die DOM-Messung kann die Größe innerhalb dieser Grenzen noch präziser
 anpassen. Unterschreitet der Text selbst bei Mindestgröße die Lesbarkeitsgrenze,
-meldet die Vorschau den Warnzustand und sperrt die verbindliche Abgabe.
+meldet die Vorschau einen unverbindlichen Warnzustand.
 
 ## Client- und Servervalidierung
 
-Drafts bleiben speicherbar, damit ein Team beim Kürzen keinen eingegebenen Text
-verliert. Ein unlesbarer Draft darf jedoch weder ausdrücklich submitted noch
-beim Schließen automatisch finalisiert werden:
-
-- `GenericAnswerRenderer` zeigt den konkreten Warntext und meldet den Zustand
-  an `QuizAntwortClient`;
-- die Abgabeschaltfläche ist gesperrt und `handleSubmit` prüft den Zustand
-  nochmals;
-- `submitTeamAnswer` wiederholt die deterministische Lesbarkeitsprüfung in der
-  gesperrten Servertransaktion;
-- `autoFinalizeDrafts` überspringt unlesbare Meme-Drafts.
-
-Die fachliche Grenze von 80 Zeichen je Standardfeld ist zugleich die einzige
-Längengrenze: Auch breite Grenzfälle mit exakt 80 Zeichen bleiben speicherbar.
-Freie AP6-Bildzonen behalten zusätzlich ihre explizite geometrische
-Lesbarkeitsprüfung. Die erlaubten Payload-Felder und die Nichtleerprüfung
-bleiben bestehen. Historische Submissions werden beim Lesen nicht nachträglich
-abgewiesen oder verändert.
+Je Feld und je freier Bildzone sind bis zu 80 Zeichen zulässig. Für die
+ausdrückliche Abgabe und die automatische Finalisierung gelten der zentrale
+Payload-Vertrag sowie die bestehenden Lauf- und Fristprüfungen. Die
+geometrische Passform beeinflusst ausschließlich die Darstellung. Der
+PNG-Export verwendet bei Bedarf eine kleinere Darstellung des vollständigen
+Texts.
 
 ## Vorbereitung für AP6
 

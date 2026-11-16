@@ -2,7 +2,7 @@ import sharp from "sharp";
 import { resolve } from "node:path";
 import { parseMemeCaptionPayload, memeCaptionPayloadValues } from "../memeCaption";
 import { resolveMemeCaptionLayout } from "../memeCaptionZones";
-import { getExternalMemeCaptionRowPercent, analyzeMemeCaptionLayout, isMemeCaptionPayloadReadable } from "../memeCaptionLayout";
+import { getExternalMemeCaptionRowPercent, analyzeMemeCaptionLayout } from "../memeCaptionLayout";
 
 const WIDTH = 1200;
 const HEIGHT = 900;
@@ -10,12 +10,23 @@ const HEIGHT = 900;
 const FONT_FILE = resolve(process.cwd(), "assets/fonts/arimo/Arimo.ttf");
 const escapeMarkup = (text: string) => text.replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" })[c]!);
 
-/** Render only the immutable confirmed payload and layout, never a client screenshot. */
-export async function renderArchivedMeme(image: Uint8Array, rawPayload: unknown, rawLayout: unknown) {
+
+export function readArchivedMemeCaptions(rawPayload: unknown, rawLayout: unknown) {
   const payload = parseMemeCaptionPayload(rawPayload);
   const layout = resolveMemeCaptionLayout(rawLayout);
-  if (!payload || !isMemeCaptionPayloadReadable(payload, layout)) throw new Error("Ungültige Meme-Abgabe.");
+  if (!payload) throw new Error("Ungültige Meme-Abgabe.");
   const values = memeCaptionPayloadValues(payload).captions;
+  const zoneIds = new Set(layout.zones.map((zone) => zone.id));
+  if (
+    Object.keys(values).some((id) => !zoneIds.has(id)) ||
+    layout.zones.some((zone) => zone.required && !values[zone.id]?.trim())
+  ) throw new Error("Ungültige Meme-Abgabe.");
+  return { layout, values };
+}
+
+/** Render only the immutable confirmed payload and layout, never a client screenshot. */
+export async function renderArchivedMeme(image: Uint8Array, rawPayload: unknown, rawLayout: unknown) {
+  const { layout, values } = readArchivedMemeCaptions(rawPayload, rawLayout);
   const top = layout.zones.find(z => z.placement === "EXTERNAL_TOP");
   const bottom = layout.zones.find(z => z.placement === "EXTERNAL_BOTTOM");
   const topHeight = Math.round(HEIGHT * getExternalMemeCaptionRowPercent(values[top?.id ?? ""] ?? "", top) / 100);
@@ -38,13 +49,31 @@ export async function renderArchivedMeme(image: Uint8Array, rawPayload: unknown,
     const analysis = analyzeMemeCaptionLayout(text, zone, imageHeight / 12, h / 12);
     const minimum = overlay ? 54 : 27;
     let rendered: Buffer | null = null;
-    let dimensions: sharp.Metadata | null = null;
+    let dimensions: Pick<sharp.Metadata, "width" | "height"> | null = null;
     for (let size = Math.min(76, Math.round(analysis.fontSizeCqw * 12)); size >= minimum; size--) {
       const candidate = await sharp({ text: { text: `<span foreground="white" weight="bold">${escapeMarkup(text)}</span>`, font: `Arimo Bold ${size}`, fontfile: FONT_FILE, width, align: "centre", wrap: "word-char", rgba: true, dpi: 72 } }).png().toBuffer();
       const metadata = await sharp(candidate).metadata();
       if (metadata.height! <= availableHeight && metadata.height! <= size * 1.3 * zone.maxLines) { rendered = candidate; dimensions = metadata; break; }
     }
-    if (!rendered || !dimensions) throw new Error("Beschriftung passt nicht lesbar in das gespeicherte Layout.");
+    if (!rendered || !dimensions) {
+      // The preview's preferred minimum is advisory. Preserve the full
+      // caption in the export by scaling the rendered text into the zone.
+      const caption = await sharp({ text: {
+        text: '<span foreground="white" weight="bold">' + escapeMarkup(text) + '</span>',
+        font: "Arimo Bold 54",
+        fontfile: FONT_FILE,
+        width: Math.max(width, 360),
+        align: "centre",
+        wrap: "word-char",
+        rgba: true,
+        dpi: 72,
+      } }).png().toBuffer();
+      const scaled = await sharp(caption)
+        .resize(width, availableHeight, { fit: "inside", withoutEnlargement: true })
+        .png().toBuffer({ resolveWithObject: true });
+      rendered = scaled.data;
+      dimensions = scaled.info;
+    }
     composites.push({ input: rendered, left: x + Math.round((w - dimensions.width!) / 2), top: y + Math.round((h - dimensions.height!) / 2) });
   }
   return sharp({ create: { width: WIDTH, height: HEIGHT, channels: 3, background: "black" } }).composite(composites).png().toBuffer();

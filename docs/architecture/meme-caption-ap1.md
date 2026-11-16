@@ -44,7 +44,7 @@ type MemeQuestionConfig = {
 };
 ```
 
-Standard sind ein aktiver Timer mit 90 Sekunden und maximal fünf später
+Standard sind ein aktiver Timer mit 120 Sekunden und maximal vier später
 präsentierte Memes. Bestehende Konfigurationen ohne `timerEnabled` werden aus
 Kompatibilitätsgründen als zeitbegrenzt gelesen. AP1 zeigt den Zeitmodus auf der
 Introfolie und speichert ihn; eine Auswahl findet noch nicht statt.

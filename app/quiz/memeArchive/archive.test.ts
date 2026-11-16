@@ -30,6 +30,11 @@ test("real PNG: 4:3, black bands, white text, umlauts, empty bands, long text an
   ] });
   const custom = await renderArchivedMeme(image, { captions: { zone: "Ärger? Nein!" } }, layout);
   assert.equal((await sharp(custom).metadata()).width, 1200);
+  const narrowLayout = { ...layout, zones: layout.zones.map(zone => ({
+    ...zone, width: 8, height: 8, maxLines: 1,
+  })) };
+  const overflowing = await renderArchivedMeme(image, { captions: { zone: "W".repeat(80) } }, narrowLayout);
+  assert.equal((await sharp(overflowing).metadata()).width, 1200);
   await assert.rejects(renderArchivedMeme(image, { topText: "X".repeat(81), bottomText: "" }, null), /Ungültige/);
 });
 

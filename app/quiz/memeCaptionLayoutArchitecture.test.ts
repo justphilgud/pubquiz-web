@@ -23,12 +23,11 @@ test("AP5 keeps one shared renderer and reusable AutoFitText", () => {
   assert.doesNotMatch(renderer, /Impact|WebkitTextStroke|textShadow/);
 });
 
-test("client and server both block unreadable final meme submissions", () => {
-  assert.match(answerRenderer, /MEME_CAPTION_TOO_LONG_MESSAGE/);
-  assert.match(answerRenderer, /onValidationChange/);
-  assert.match(interactionServer, /MEME_CAPTION_TOO_LONG/);
-  assert.match(interactionServer, /isReadableMemeSubmission/);
-  assert.match(interactionServer, /continue;/);
+test("caption overflow warns independently of submission validation", () => {
+  assert.match(answerRenderer, /validationError \?\? MEME_CAPTION_OVERFLOW_WARNING/);
+  assert.match(answerRenderer, /onValidationChange\?\.\(validationError\)|current\?\.\(validationError\)/);
+  assert.doesNotMatch(interactionServer, /MEME_CAPTION_TOO_LONG|isReadableMemeSubmission/);
+  assert.match(interactionServer, /validateInteractionPayload/);
 });
 
 test("AP6 participant forms receive custom zones and preserve the immutable run snapshot", () => {

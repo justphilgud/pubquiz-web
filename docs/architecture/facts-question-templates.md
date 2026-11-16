@@ -25,7 +25,7 @@ Tabelle und keine Änderung bestehender Datensätze oder des Submission-Lifecycl
 
 Jahre verwenden `NUMBER` mit `selection: YEAR`, Länder `TEXT` mit
 `selection: COUNTRY`. Die UI bietet Auswahl statt Freitexteingabe. Jahre 1–9999
-werden in Jahresbereich/Jahreszahl ausgewählt, ohne redaktionelle Jahreslisten.
+werden in einer einzigen Jahresauswahl von 1 bis 9999 angeboten.
 Jahr 0 und vorchristliche Jahre sind nicht Bestandteil dieses Bereichs.
 Länder verwenden ISO-3166-1-alpha-2-Codes; die Nutzerentscheidung beschränkt
 `app/lib/countries.ts` auf 193 UN-Mitgliedstaaten. Deutsche Namen stammen aus
