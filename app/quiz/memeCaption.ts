@@ -36,7 +36,7 @@ export const DEFAULT_MEME_QUESTION_CONFIG: MemeQuestionConfig = {
   version: 1,
   timerEnabled: true,
   responseDurationSeconds: 120,
-  maxPresentedMemes: 5,
+  maxPresentedMemes: 4,
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {

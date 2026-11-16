@@ -20,7 +20,6 @@ import {
   interactionPayloadToDraft,
   type QuizInteractionPayload,
 } from "@/app/quiz/interaction/interactionPayload";
-import { MEME_CAPTION_TOO_LONG_MESSAGE } from "@/app/quiz/memeCaptionLayout";
 import {
   isDraftChangedSinceSubmission,
   resolveInteractionSubmissionPolicy,
@@ -642,8 +641,6 @@ export default function QuizAntwortClient({
         setMeldung(
           submitted.reason === "EMPTY_DRAFT"
             ? "Bitte zuerst eine Antwort eintragen."
-            : submitted.reason === "MEME_CAPTION_TOO_LONG"
-              ? MEME_CAPTION_TOO_LONG_MESSAGE
             : "Die Antwortzeit ist inzwischen beendet.",
         );
         return;

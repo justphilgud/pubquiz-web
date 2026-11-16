@@ -12,8 +12,7 @@ import {
 } from "@/app/quiz/memeCaption";
 import {
   analyzeMemeCaptionLayout,
-  isMemeCaptionPayloadReadable,
-  MEME_CAPTION_TOO_LONG_MESSAGE,
+  MEME_CAPTION_OVERFLOW_WARNING,
 } from "@/app/quiz/memeCaptionLayout";
 import { resolveMemeCaptionLayout } from "@/app/quiz/memeCaptionZones";
 
@@ -114,11 +113,11 @@ function MemeCaptionAnswer({
   const missingRequired = layout.zones.some(
     (zone) => zone.required && !(values[zone.id] ?? "").trim(),
   );
+  const exceedsLength = Object.values(values).some((text) => text.length > interaction.maxLength);
   const validationError = missingRequired
     ? "Bitte fülle alle erforderlichen Caption-Zonen aus."
-    : isMemeCaptionPayloadReadable({ captions: values }, layout) && Object.values(zoneFit).every(Boolean)
-      ? null
-      : MEME_CAPTION_TOO_LONG_MESSAGE;
+    : exceedsLength ? "Je Caption sind maximal 80 Zeichen möglich." : null;
+  const hasOverflow = Object.values(zoneFit).some((fits) => !fits);
 
   useEffect(() => {
     validationCallbackRef.current = onValidationChange;
@@ -186,7 +185,7 @@ function MemeCaptionAnswer({
               maxLength={interaction.maxLength}
               required={zone.required}
               disabled={disabled}
-              aria-invalid={!zoneFit[zone.id] || (zone.required && !text.trim())}
+              aria-invalid={text.length > interaction.maxLength || (zone.required && !text.trim())}
               value={text}
               onChange={(event) => update({ ...values, [zone.id]: event.target.value })}
               className="min-h-11 w-full rounded-xl border border-slate-300 px-4 py-3 outline-none focus:border-slate-900 focus:ring-2 focus:ring-slate-200 disabled:bg-slate-100"
@@ -195,13 +194,13 @@ function MemeCaptionAnswer({
           </label>
         );
       })}
-      {validationError ? (
+      {validationError || hasOverflow ? (
         <p
-          role="alert"
+          role={validationError ? "alert" : "status"}
           data-meme-caption-validation="overflow"
           className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-950"
         >
-          {validationError}
+          {validationError ?? MEME_CAPTION_OVERFLOW_WARNING}
         </p>
       ) : (
         <p className="text-xs text-slate-500">Je Caption sind maximal 80 Zeichen möglich.</p>

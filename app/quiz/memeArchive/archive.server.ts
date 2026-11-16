@@ -7,11 +7,8 @@ import { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
 import { lockQuizLifecycle } from "../quizLifecycle.server";
 import { buildMediaUploadPathname, getMediaVerificationServerConfig } from "@/app/fragen/editor/mediaUploadEnvironment";
-import { renderArchivedMeme } from "./png";
+import { readArchivedMemeCaptions, renderArchivedMeme } from "./png";
 import { memeFilename, openPng, sealPng } from "./files";
-import { parseMemeCaptionPayload } from "../memeCaption";
-import { resolveMemeCaptionLayout } from "../memeCaptionZones";
-import { isMemeCaptionPayloadReadable } from "../memeCaptionLayout";
 
 const MAX_BYTES = 12_000_000;
 async function lockArchive(tx: Prisma.TransactionClient, quizId: number, wait = false) {
@@ -193,9 +190,8 @@ export async function captureExistingMemes(quizId: number) {
     await lockQuizLifecycle(tx, quizId);
     const submissions = await tx.team_answer_submissions.findMany({ where: { interaction_type: "MEME_CAPTION", status: { in: ["SUBMITTED", "AUTO_FINALIZED"] }, interaction_run: { quiz_id: quizId } }, include: { interaction_run: true } });
     for (const submission of submissions) {
-      const payload = parseMemeCaptionPayload(submission.payload);
       const config = submission.interaction_run.config_snapshot as { interaction?: { layout?: unknown } };
-      if (!payload || !isMemeCaptionPayloadReadable(payload, resolveMemeCaptionLayout(config.interaction?.layout))) throw new Error("Eine ältere Meme-Abgabe ist nicht lesbar validierbar. Bitte redaktionell prüfen; der Lauf bleibt erhalten.");
+      readArchivedMemeCaptions(submission.payload, config.interaction?.layout);
       await tx.$queryRaw`SELECT pubquiz.archive_meme_submission(a) FROM pubquiz.team_answer_submissions a WHERE a.team_answer_submission_id=${submission.team_answer_submission_id}`;
     }
   }, { timeout: 30_000 });
