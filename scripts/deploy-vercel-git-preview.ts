@@ -359,6 +359,24 @@ export function verifyPreviewEnvironmentConfiguration(
     );
   }
 
+  if (branch === "codex/meme-facts-year-release") {
+    for (const key of ["DATABASE_URL", "AUTH_SECRET"]) {
+      const matching = variables.filter((variable) =>
+        variable.key === key &&
+        variable.gitBranch === branch &&
+        variable.target?.length === 1 &&
+        variable.target.includes("preview") &&
+        (variable.type === "sensitive" || variable.type === "encrypted"),
+      );
+      if (matching.length !== 1) {
+        throw new GitPreviewDeploymentError(
+          "PR169_BRANCH_SECRET_MISSING",
+          `PR169 requires one branch-scoped Preview secret for ${key}.`,
+        );
+      }
+    }
+  }
+
   // Audit all metadata; reject every override effective for the target branch.
   // Other branches cannot affect this branch: this permits central acceptance
   // before the approved removal of legacy overrides on the existing branch.

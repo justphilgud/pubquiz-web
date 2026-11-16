@@ -39,3 +39,17 @@ Der gezielte Poll-Vertragstest erwartet weiterhin take: 12. Die Stelle
 fehlt bereits auf der verifizierten Basis. Der Test blieb unverändert.
 Production-Preflight, Backup, Migration auf Production, Preview- und
 Production-Abnahme stehen aus.
+
+## Isolierte Preview für PR 169
+
+Der manuelle Workflow Deploy Preview erwartet für diesen Branch
+isolated_pr169=true. Er prüft erfolgreiche Push-CI für den exakten Commit,
+verlangt branchspezifische Vercel-Secret-Metadaten und bindet die Migration
+an den dedizierten Neon-Endpunkt ep-lucky-tooth-baxy5bhy und pr169_review.
+Bei fehlendem GitHub-Secret PR169_DATABASE_URL bricht er vor Migrationen ab.
+
+Im Vercel-Projekt pubquiz die beiden Secrets DATABASE_URL und AUTH_SECRET
+nur für Preview und nur für den Git-Branch codex/meme-facts-year-release
+hinterlegen. DATABASE_URL verbindet die Laufzeit per gepooltem Neon-Endpunkt
+mit pr169_review. AUTH_SECRET erhält einen eigenen kryptografisch zufälligen
+Wert. Die zentralen Nonproduction-Medienvariablen werden geerbt.

@@ -258,6 +258,23 @@ test("new branches inherit central Preview variables without branch configuratio
   }
 });
 
+test("PR169 requires both branch-scoped Vercel Preview secrets", () => {
+  const gitBranch = "codex/meme-facts-year-release";
+  const database = { key: "DATABASE_URL", gitBranch, target: ["preview"], type: "sensitive" };
+  const auth = { ...database, key: "AUTH_SECRET" };
+  const verify = (overrides: (typeof database | { gitBranch: null; key: string; target: string[]; type: string })[]) => verifyPreviewEnvironmentConfiguration({ envs: [...branchEnvironment, ...overrides] }, gitBranch);
+  assert.doesNotThrow(() => verify([database, auth]));
+  for (const missingOrInvalid of [
+    [database],
+    [{ ...database, gitBranch: null }, auth],
+    [database, { ...auth, target: ["production", "preview"] }],
+    [database, auth, auth],
+  ]) {
+    assert.throws(() => verify(missingOrInvalid),
+      assertErrorCode("PR169_BRANCH_SECRET_MISSING"));
+  }
+});
+
 test("media overrides on any branch block deployment", () => {
   for (const key of deploymentEnvironmentKeys) {
     assert.throws(() => verifyPreviewEnvironmentConfiguration({ envs: [
