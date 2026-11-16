@@ -28,10 +28,6 @@ on:
         description: 'Use only the isolated synthetic navigation review database (navigation branch required)'
         type: boolean
         default: false
-      isolated_pr169:
-        description: 'Use the dedicated PR169 review database'
-        type: boolean
-        default: false
       isolated_pr130:
         description: 'Use only the dedicated PR130 review database (PR130 branch required)'
         type: boolean
@@ -78,8 +74,6 @@ jobs:
       (!inputs.isolated_philgud || github.ref == 'refs/heads/codex/philgud-admin-design') &&
       (github.ref != 'refs/heads/codex/multi-event-navigation' || inputs.isolated_navigation) &&
       (!inputs.isolated_navigation || github.ref == 'refs/heads/codex/multi-event-navigation') &&
-      (github.ref != 'refs/heads/codex/meme-facts-year-release' || inputs.isolated_pr169) &&
-      (!inputs.isolated_pr169 || (github.ref == 'refs/heads/codex/meme-facts-year-release' && !inputs.isolated_shared_design && !inputs.isolated_game_teams && !inputs.isolated_games && !inputs.isolated_philgud && !inputs.isolated_navigation && !inputs.isolated_pr130)) &&
       (github.ref != 'refs/heads/codex/event-type-permissions' || inputs.isolated_pr130) &&
       (!inputs.isolated_pr130 || github.ref == 'refs/heads/codex/event-type-permissions') &&
       (
@@ -108,10 +102,10 @@ jobs:
       DEPLOYMENT_REPOSITORY: ${{ github.repository }}
       DEPLOYMENT_REPOSITORY_ID: ${{ github.repository_id }}
       DEPLOYMENT_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
-      DATABASE_URL: ${{ inputs.isolated_pr169 && secrets.PR169_DATABASE_URL || !inputs.isolated_pr169 && (inputs.isolated_shared_design && secrets.SHARED_DESIGN_MIGRATION_DATABASE_URL || inputs.isolated_game_teams && secrets.GAME_TEAMS_MIGRATION_DATABASE_URL || inputs.isolated_games && secrets.GAMES_MIGRATION_DATABASE_URL || inputs.isolated_philgud && secrets.PR130_DATABASE_URL || inputs.isolated_navigation && secrets.PR130_DATABASE_URL || inputs.isolated_pr130 && secrets.PR130_DATABASE_URL || secrets.DATABASE_URL) }}
-      EXPECTED_DATABASE_HOST: ${{ inputs.isolated_pr169 && 'ep-lucky-tooth-baxy5bhy-pooler.c-8.eu-central-1.aws.neon.tech' || !inputs.isolated_pr169 && (inputs.isolated_shared_design && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_game_teams && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_games && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_philgud && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_navigation && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_pr130 && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || vars.EXPECTED_DATABASE_HOST) }}
-      EXPECTED_DATABASE_NAME: ${{ inputs.isolated_pr169 && 'pr169_review' || !inputs.isolated_pr169 && (inputs.isolated_shared_design && 'shared_design_review_20261026' || inputs.isolated_game_teams && 'game_teams_review_20261026' || inputs.isolated_games && 'games_review_20261026c' || inputs.isolated_philgud && 'pr130_review_20261025' || inputs.isolated_navigation && 'pr130_review_20261025' || inputs.isolated_pr130 && 'pr130_review_20261025' || vars.EXPECTED_DATABASE_NAME) }}
-      EXPECTED_DATABASE_BRANCH: ${{ inputs.isolated_pr169 && 'ep-lucky-tooth-baxy5bhy' || !inputs.isolated_pr169 && (inputs.isolated_shared_design && 'dry-dust' || inputs.isolated_game_teams && 'dry-dust' || inputs.isolated_games && 'dry-dust' || inputs.isolated_philgud && 'dry-dust' || inputs.isolated_navigation && 'dry-dust' || inputs.isolated_pr130 && 'dry-dust' || vars.EXPECTED_DATABASE_BRANCH) }}
+      DATABASE_URL: ${{ inputs.isolated_shared_design && secrets.SHARED_DESIGN_MIGRATION_DATABASE_URL || inputs.isolated_game_teams && secrets.GAME_TEAMS_MIGRATION_DATABASE_URL || inputs.isolated_games && secrets.GAMES_MIGRATION_DATABASE_URL || inputs.isolated_philgud && secrets.PR130_DATABASE_URL || inputs.isolated_navigation && secrets.PR130_DATABASE_URL || inputs.isolated_pr130 && secrets.PR130_DATABASE_URL || secrets.DATABASE_URL }}
+      EXPECTED_DATABASE_HOST: ${{ inputs.isolated_shared_design && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_game_teams && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_games && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_philgud && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_navigation && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || inputs.isolated_pr130 && 'ep-dry-dust-aljik09f-pooler.c-3.eu-central-1.aws.neon.tech' || vars.EXPECTED_DATABASE_HOST }}
+      EXPECTED_DATABASE_NAME: ${{ inputs.isolated_shared_design && 'shared_design_review_20261026' || inputs.isolated_game_teams && 'game_teams_review_20261026' || inputs.isolated_games && 'games_review_20261026c' || inputs.isolated_philgud && 'pr130_review_20261025' || inputs.isolated_navigation && 'pr130_review_20261025' || inputs.isolated_pr130 && 'pr130_review_20261025' || vars.EXPECTED_DATABASE_NAME }}
+      EXPECTED_DATABASE_BRANCH: ${{ inputs.isolated_shared_design && 'dry-dust' || inputs.isolated_game_teams && 'dry-dust' || inputs.isolated_games && 'dry-dust' || inputs.isolated_philgud && 'dry-dust' || inputs.isolated_navigation && 'dry-dust' || inputs.isolated_pr130 && 'dry-dust' || vars.EXPECTED_DATABASE_BRANCH }}
       VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -167,18 +161,6 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.PHIL_GUD_DATABASE_URL }}
         run: npm run deployment:validate
-
-      - name: Require a dedicated PR169 database target
-        if: inputs.isolated_pr169
-        env:
-          SHARED_PREVIEW_DATABASE_HOST: ${{ vars.EXPECTED_DATABASE_HOST }}
-        shell: bash
-        run: |
-          test -n "$DATABASE_URL"
-          test -n "$EXPECTED_DATABASE_HOST"
-          test -n "$EXPECTED_DATABASE_BRANCH"
-          test -n "$SHARED_PREVIEW_DATABASE_HOST"
-          test "$EXPECTED_DATABASE_HOST" != "$SHARED_PREVIEW_DATABASE_HOST"
 
       - name: Validate GitHub Preview database identity
         run: npm run deployment:validate
