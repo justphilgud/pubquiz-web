@@ -1,0 +1,302 @@
+[
+  {
+    "step": 0,
+    "slide": 1,
+    "publicHeader": "WARTEBILDSCHIRM 01 / 60"
+  },
+  {
+    "step": 1,
+    "slide": 2,
+    "publicHeader": "BEGRÜSSUNG 02 / 60"
+  },
+  {
+    "step": 2,
+    "slide": 3,
+    "publicHeader": "REGELN 03 / 60"
+  },
+  {
+    "step": 3,
+    "slide": 4,
+    "publicHeader": "QR-CODE 04 / 60"
+  },
+  {
+    "step": 4,
+    "slide": 5,
+    "publicHeader": "RUNDENINTRO 05 / 60"
+  },
+  {
+    "step": 5,
+    "slide": 6,
+    "publicHeader": "FRAGE 1 06 / 60"
+  },
+  {
+    "step": 6,
+    "slide": 7,
+    "publicHeader": "AUFLÖSUNG 07 / 60"
+  },
+  {
+    "step": 7,
+    "slide": 8,
+    "publicHeader": "FRAGE 2 08 / 60"
+  },
+  {
+    "step": 8,
+    "slide": 9,
+    "publicHeader": "AUFLÖSUNG 09 / 60"
+  },
+  {
+    "step": 9,
+    "slide": 10,
+    "publicHeader": "FRAGE 3 10 / 60"
+  },
+  {
+    "step": 10,
+    "slide": 11,
+    "publicHeader": "AUFLÖSUNG 11 / 60"
+  },
+  {
+    "step": 11,
+    "slide": 12,
+    "publicHeader": "FRAGE 4 12 / 60"
+  },
+  {
+    "step": 12,
+    "slide": 13,
+    "publicHeader": "AUFLÖSUNG 13 / 60"
+  },
+  {
+    "step": 13,
+    "slide": 14,
+    "publicHeader": "FRAGE 5 14 / 60"
+  },
+  {
+    "step": 14,
+    "slide": 15,
+    "publicHeader": "AUFLÖSUNG 15 / 60"
+  },
+  {
+    "step": 15,
+    "slide": 16,
+    "publicHeader": "FRAGE 6 16 / 60"
+  },
+  {
+    "step": 16,
+    "slide": 17,
+    "publicHeader": "AUFLÖSUNG 17 / 60"
+  },
+  {
+    "step": 17,
+    "slide": 18,
+    "publicHeader": "FRAGE 7 18 / 60"
+  },
+  {
+    "step": 18,
+    "slide": 19,
+    "publicHeader": "AUFLÖSUNG 19 / 60"
+  },
+  {
+    "step": 19,
+    "slide": 20,
+    "publicHeader": "FRAGE 8 20 / 60"
+  },
+  {
+    "step": 20,
+    "slide": 21,
+    "publicHeader": "AUFLÖSUNG 21 / 60"
+  },
+  {
+    "step": 21,
+    "slide": 22,
+    "publicHeader": "FRAGE 9 22 / 60"
+  },
+  {
+    "step": 22,
+    "slide": 23,
+    "publicHeader": "AUFLÖSUNG 23 / 60"
+  },
+  {
+    "step": 23,
+    "slide": 24,
+    "publicHeader": "FRAGE 10 24 / 60"
+  },
+  {
+    "step": 24,
+    "slide": 25,
+    "publicHeader": "AUFLÖSUNG 25 / 60"
+  },
+  {
+    "step": 25,
+    "slide": 26,
+    "publicHeader": "FRAGE 11 26 / 60"
+  },
+  {
+    "step": 26,
+    "slide": 27,
+    "publicHeader": "AUFLÖSUNG 27 / 60"
+  },
+  {
+    "step": 27,
+    "slide": 28,
+    "publicHeader": "FRAGE 12 28 / 60"
+  },
+  {
+    "step": 28,
+    "slide": 29,
+    "publicHeader": "AUFLÖSUNG 29 / 60"
+  },
+  {
+    "step": 29,
+    "slide": 30,
+    "publicHeader": "FRAGE 13 30 / 60"
+  },
+  {
+    "step": 30,
+    "slide": 31,
+    "publicHeader": "AUFLÖSUNG 31 / 60"
+  },
+  {
+    "step": 31,
+    "slide": 32,
+    "publicHeader": "FRAGE 14 32 / 60"
+  },
+  {
+    "step": 32,
+    "slide": 33,
+    "publicHeader": "AUFLÖSUNG 33 / 60"
+  },
+  {
+    "step": 33,
+    "slide": 34,
+    "publicHeader": "FRAGE 15 34 / 60"
+  },
+  {
+    "step": 34,
+    "slide": 35,
+    "publicHeader": "AUFLÖSUNG 35 / 60"
+  },
+  {
+    "step": 35,
+    "slide": 36,
+    "publicHeader": "FRAGE 16 36 / 60"
+  },
+  {
+    "step": 36,
+    "slide": 37,
+    "publicHeader": "AUFLÖSUNG 37 / 60"
+  },
+  {
+    "step": 37,
+    "slide": 38,
+    "publicHeader": "PIXELBILD · SPIELREGELN 38 / 60"
+  },
+  {
+    "step": 38,
+    "slide": 39,
+    "publicHeader": "FRAGE 17 39 / 60"
+  },
+  {
+    "step": 39,
+    "slide": 40,
+    "publicHeader": "AUFLÖSUNG 40 / 60"
+  },
+  {
+    "step": 40,
+    "slide": 41,
+    "publicHeader": "MEME-RUNDE · ERKLÄRUNG 41 / 60"
+  },
+  {
+    "step": 41,
+    "slide": 42,
+    "publicHeader": "FRAGE 18 42 / 60"
+  },
+  {
+    "step": 42,
+    "slide": 43,
+    "publicHeader": "AUFLÖSUNG 43 / 60"
+  },
+  {
+    "step": 43,
+    "slide": 44,
+    "publicHeader": "PAUSE 44 / 60"
+  },
+  {
+    "step": 44,
+    "slide": 45,
+    "publicHeader": "ZWISCHENSTAND 45 / 60"
+  },
+  {
+    "step": 45,
+    "slide": 46,
+    "publicHeader": "RUNDENINTRO 46 / 60"
+  },
+  {
+    "step": 46,
+    "slide": 47,
+    "publicHeader": "FRAGE 1 47 / 60"
+  },
+  {
+    "step": 47,
+    "slide": 48,
+    "publicHeader": "AUFLÖSUNG 48 / 60"
+  },
+  {
+    "step": 48,
+    "slide": 49,
+    "publicHeader": "MEME-RUNDE · ERKLÄRUNG 49 / 60"
+  },
+  {
+    "step": 49,
+    "slide": 50,
+    "publicHeader": "FRAGE 2 50 / 60"
+  },
+  {
+    "step": 50,
+    "slide": 51,
+    "publicHeader": "AUFLÖSUNG 51 / 60"
+  },
+  {
+    "step": 51,
+    "slide": 52,
+    "publicHeader": "MEME-RUNDE · ERKLÄRUNG 52 / 60"
+  },
+  {
+    "step": 52,
+    "slide": 53,
+    "publicHeader": "FRAGE 3 53 / 60"
+  },
+  {
+    "step": 53,
+    "slide": 54,
+    "publicHeader": "AUFLÖSUNG 54 / 60"
+  },
+  {
+    "step": 54,
+    "slide": 55,
+    "publicHeader": "PAUSE 55 / 60"
+  },
+  {
+    "step": 55,
+    "slide": 56,
+    "publicHeader": "GEWINNER 56 / 60"
+  },
+  {
+    "step": 56,
+    "slide": 56,
+    "publicHeader": "GEWINNER 56 / 60"
+  },
+  {
+    "step": 57,
+    "slide": 56,
+    "publicHeader": "GEWINNER 56 / 60"
+  },
+  {
+    "step": 58,
+    "slide": 56,
+    "publicHeader": "GEWINNER 56 / 60"
+  },
+  {
+    "step": 59,
+    "slide": 57,
+    "publicHeader": "ENDSTAND 57 / 60"
+  }
+]

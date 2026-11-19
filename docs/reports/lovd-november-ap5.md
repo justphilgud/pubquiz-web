@@ -171,11 +171,70 @@ keine zusätzlichen Antworten.
   strukturierte JSON-Schlüsselreihenfolge, Bewertungskonflikt und Nichtmutation geprüft.
 - Neue Unit-Tests sind in `test:analysis` und damit `npm test`; PostgreSQL-Test ist
   im bestehenden PostgreSQL-CI-Job verdrahtet. Keine neue Abhängigkeit oder Migration.
-- Typecheck und ESLint der neuen Quellen erfolgreich. Production-Build und Browser-
-  abnahme werden vor Übergabe ergänzt.
-- Preview-URL, PR und gehostete Abnahme folgen nach grünem exaktem Quellstand.
+- Typecheck, ESLint der neuen Quellen und Production-Build erfolgreich.
+- Push-CI [44513572967](https://github.com/justphilgud/pubquiz-web/actions/runs/44513572967)
+  und PR-CI [44513617412](https://github.com/justphilgud/pubquiz-web/actions/runs/44513617412)
+  für die deployte Quellrevision vollständig grün, einschließlich aller bestehenden
+  Tests und des neuen PostgreSQL-Analysetests.
 
-Ein kompletter Intro-bis-Siegerehrung-Durchlauf gehört zum AP1–4-Abnahmenachweis
-`docs/reports/lovd-november.md`; AP5 verändert diesen Runtime-Vertrag nicht.
-Der AP5-Preview-Durchlauf prüft stattdessen Anmeldung, Bericht, alle Fragen,
-Zählgleichheit sowie Laptop-/Mobilansicht und unberechtigten Zugriff.
+## Pull Request und isolierte Preview
+
+- [PR #172](https://github.com/justphilgud/pubquiz-web/pull/172), Ziel main.
+- [Gehosteter Bericht](https://pubquiz-h3140hsw3-just-phil-gud.vercel.app/berichte/lovd-november-ap5).
+- Vercel `READY`: `dpl_9xRZz6S6pprKj49EQreyd3rWchw5`, exakte Quellrevision
+  `51190eabc6e225e7c8e3c6641206728878aa54ac`. Erfolgreiche Push-CI und sechs
+  zentrale Medienvariablen durch bestehendes Deploymentskript bestätigt.
+- Ausschließlich synthetische Datenbank `lovd_november_review_20261119`, bestehender
+  eingeschränkter Runtime-Benutzer. Kein Production-Secret und keine Produktions-
+  Rohantworten an Vercel übertragen. Branchbezogene Variablen, Preview-Trustliste
+  und exakt benannte Branchpolicy ausdrücklich autorisiert; Production unverändert.
+- Vercel-Anmeldeschutz bleibt aktiv. Sein bestehender Automation-Zugang wurde nach
+  ausdrücklicher Zustimmung ausschließlich per HTTP-Header für diese Abnahme genutzt.
+  Lokale temporäre Tokenkopie nach dem Test entfernt, keine Zugangsdaten versioniert.
+- Nachfolgende Änderungen betreffen ausschließlich Bericht, Screenshots und Ablauf-
+  protokoll. Der deployte Anwendungscode ist identisch; kein Merge ausgeführt.
+
+## Lokale und gehostete Browserabnahme · 19.11.2026
+
+Lokaler Production-Build auf Port 3060 und gehostete Preview, jeweils frisches
+isoliertes Chrome-Profil. Synthetischer Admin kann den Bericht öffnen. Die
+Kennzahlen sind **112 / 1 / 6**. Erste Tabelle: 18 Fragen mit manuellem Befund;
+aufgeklappte Gesamttabelle: 49 Fragen. Deren Spaltensummen ergeben
+**126 sichtbar / 112 manuell / 1 offen / 6 Freitext-Einsparungen**, identisch zum
+Analysator. Aufklappen funktioniert ohne zusätzliche Datenbank-/Analyseaktion.
+
+1366 × 768, 1920 × 1080 und 390 × 844 lokal und gehostet geprüft. Kein horizontaler
+Seitenüberlauf; auf Mobilgröße scrollt ausschließlich der breite Tabellenbereich.
+Kennzahlen, Einschränkungen und Empfehlung bleiben lesbar. Visuelle Screenshotprüfung
+auf Laptop und Mobilgröße. [Lokal 1366](assets/lovd-november-ap5/local-1366.png),
+[lokal 1920](assets/lovd-november-ap5/local-1920.png),
+[lokal 390](assets/lovd-november-ap5/local-390.png),
+[gehostet 1366](assets/lovd-november-ap5/hosted-1366.png),
+[gehostet 1920](assets/lovd-november-ap5/hosted-1920.png),
+[gehostet 390](assets/lovd-november-ap5/hosted-390.png).
+
+Unangemeldeter Besuch in separatem Browserkontext landet beim App-Login, ohne
+Berichtsinhalt. Ein eigener synthetischer Benutzer ohne Adminzuweisung kann sich
+anmelden, wird beim anschließenden direkten Berichtaufruf jedoch abgewiesen
+(Redirect zur Startseite, kein Berichtsinhalt). Beide Fälle lokal und gehostet
+geprüft. Die bestehende serverseitige `requireAdmin`-Prüfung bleibt maßgeblich.
+
+Zusammenhängender gehosteter Quizdurchlauf in getrennten Fenstern für Moderation
+und öffentliche Präsentation: erstes Intro, Begrüßung, Regeln, QR, beide Runden,
+Standard-/Spezialfragen mit Auflösungen, Pixel 17, bestehende Meme-Ergebnisse,
+Pausen/Zwischenstand, Siegerehrung und finale Tabelle. Das
+[Ablaufprotokoll](assets/lovd-november-ap5/hosted-walk.json) enthält **60 Zustände
+über 57 unterschiedliche Folien**, keine Abweichung zwischen Moderationsposition
+und öffentlichem Folienheader. Folie 56 erscheint viermal: leer plus drei
+bewusst getrennte Enthüllungen; erst danach Folie 57. Datenbank-Endkontrolle:
+`FINAL_STANDINGS`, `podium_snapshot = null`. Keine Bewertungsaktion durchgeführt.
+Ein erster Testskriptlauf las eine während des Ladens kurz ersetzte Toolbar zu
+früh. Nach Korrektur nur der Test-Wartebedingung lief die vollständige Aufzeichnung
+erfolgreich; keine Anwendungsänderung war dafür nötig.
+
+Dies ist ein zusätzlicher Smoke-Durchlauf des unveränderten Runtime-Vertrags.
+Der ausführliche zehnminütige Intro-/Verzögerungsnachweis und die AP1–4-Einzelprüfungen
+bleiben im [vorherigen Bericht](lovd-november.md); sie wurden nicht als neue AP5-
+Messung ausgegeben. Kein physischer TV oder Handyscan. Historische Klickzahlen,
+Zeitersparnis und zusätzliches Feld-/Schreibvariantenpotenzial sind weiterhin nicht
+verifiziert; diese Grenzen schränken die dokumentierte Aggregatanalyse nicht heimlich ein.
