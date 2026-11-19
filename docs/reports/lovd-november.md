@@ -165,10 +165,19 @@ enthüllt und die Navigation war wieder frei. Kein zusätzliches Reveal wurde ge
   einem Fragewechsel eine alte „Bestätigte Antwort“ als JSON anzeigen. Außerdem
   warnt `pg` vor bereits vorhandenen parallelen Queries innerhalb einer Transaktion
   im Hinblick auf pg 9. Beides ist von den neuen Änderungen zu unterscheiden.
-- **Gehostete Preview noch nicht bereitgestellt:** Die automatische Freigabeprüfung
-  hat das Übertragen der neu erzeugten isolierten Datenbank-URL und des neuen
-  Auth-Secrets an Vercel sowie die Ergänzung der GitHub-Preview-Branchfreigabe
-  abgelehnt. Dafür ist eine ausdrückliche Zustimmung nötig. Production bleibt unberührt.
+- **Gehostete Preview bereitgestellt:** Nach ausdrücklicher Freigabe wurden die neue
+  isolierte Runtime-Datenbank-URL und das neue Auth-Secret ausschließlich für
+  `codex/lovd-november` als Preview-Variablen gesetzt. Die bestehende Preview-Trustliste
+  und Branchpolicy wurden um genau diesen Branch ergänzt; Production blieb unberührt.
+  [Preview](https://pubquiz-b0ova47qr-just-phil-gud.vercel.app), Deployment
+  `dpl_2wUC1hXGpDQmLdxM4VnDPyQBLT38`, geprüfte Quellrevision
+  `e601dcd5905934d06e9546bc128e367dab97755a`, Status `READY`.
+  Die erfolgreiche Push-CI derselben Revision sowie sechs zentrale Preview-Medienkeys
+  wurden vom vorhandenen Deploymentskript bestätigt. Push- und PR-CI sind grün.
+  Vercel-Anmeldeschutz bleibt aktiv. Der frische Browser wurde vor dem App-Login
+  auf Vercel Login umgeleitet; das ist kein erfolgreicher gehosteter Anwendungstest.
+  Die automatische Freigabeprüfung verlangt für die Verwendung des vorhandenen
+  Automation-Bypass zur weiteren Browserabnahme eine gesonderte Zustimmung.
 
 Lokale Screenshots und ausführliche Messausgaben liegen unter
 `.artifacts/lovd-november/` im Auftragsworktree; Zugangsdaten werden nicht versioniert.
