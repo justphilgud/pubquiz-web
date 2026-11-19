@@ -4,6 +4,7 @@ import { useState, type ComponentType } from "react";
 import { PairsEditor } from "./PairsEditor";
 import { FactsTemplateEditor } from "./FactsTemplateEditor";
 import { CharacterCount } from "./CharacterCount";
+import { estimateReadingDuration, formatReadingDuration } from "../readingDuration";
 import { PresentationContentWarning } from "@/app/rendering/presentation/PresentationContentWarning";
 import { templatePresentationTexts } from "@/app/rendering/presentation/presentationReadability";
 import { SortableTemplateList } from "./SortableTemplateList";
@@ -171,6 +172,7 @@ function TranslationEditor(props: EditorProps) {
   if (props.data?.kind !== "TRANSLATION_READ_ALOUD") return null;
   const data = props.data;
   const voices = [...voiceGroups.matching, ...voiceGroups.others];
+  const reading = estimateReadingDuration(data.translation, data.speed);
   const selectedVoice = voices.some((voice) => voice.id === data.voiceId)
     ? data.voiceId
     : "default";
@@ -222,6 +224,10 @@ function TranslationEditor(props: EditorProps) {
     </label>
     <button type="button" className="min-h-11 rounded-xl border border-slate-300 px-3" disabled={props.disabled || !data.translation.trim()}
       onClick={() => previewSpeech(data.translation, data.speed, selectedVoice)}>Audio-Vorschau abspielen</button>
+    <div role="status" aria-live="polite" className="rounded-xl bg-slate-50 p-3 text-sm sm:col-span-2">
+      <p className="font-semibold">Geschätzte Vorlesedauer: {reading.words ? `ca. ${formatReadingDuration(reading.seconds)}` : "Noch kein Übersetzungstext"}</p>
+      <p className="mt-1 text-xs text-slate-600">Orientierung mit 150 Wörtern pro Minute bei 1×; die gewählte Geschwindigkeit fließt ein. Stimme und Pausen können abweichen. Der Text bleibt unverändert.</p>
+    </div>
     <label className="text-sm font-medium sm:col-span-2">Gesuchte Lösung
       <input maxLength={200} className={`${inputClass} mt-1`} value={props.answers[0]?.text ?? ""} disabled={props.disabled}
         onChange={(event) => updateSolution(event.target.value)} />

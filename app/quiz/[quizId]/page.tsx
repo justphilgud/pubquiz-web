@@ -32,6 +32,7 @@ import { listSelectableStoryElementsForQuiz } from "@/app/story-elemente/storyEl
 import QuizConfigurationPanel from "./QuizConfigurationPanel";
 import QuizPlanningSummary from "./QuizPlanningSummary";
 import { loadQuizPlanningDurations } from "../quizPlanning.server";
+import { loadQuizBalances } from "../quizBalance.server";
 import { searchContent } from "@/app/components/content/actions";
 import { parseContentFilters } from "@/app/components/content/contentLibrary";
 import { localizeQuestionTemplates } from "@/app/fragen/editor/templates/questionTemplates";
@@ -67,7 +68,7 @@ export default async function QuizDetailPage({
   const baseQuestionTemplates = localizeQuestionTemplates(
     loadQuestionEditorMessages(getDefaultLocale()),
   ).filter((template) => template.enabled);
-  const [quiz, actorContext, pollSearch, questionCategories, questionTemplates, durations] = await Promise.all([
+  const [quiz, actorContext, pollSearch, questionCategories, questionTemplates, durations, balances] = await Promise.all([
     getQuizDetails(Number(quizId)),
     requireActor(),
     searchContent(parseContentFilters(new URLSearchParams("contentType=POLL"))),
@@ -78,6 +79,7 @@ export default async function QuizDetailPage({
     }),
     loadDynamicQuestionTemplates(baseQuestionTemplates),
     loadQuizPlanningDurations([Number(quizId)]),
+    loadQuizBalances([Number(quizId)]),
   ]);
 
   if (!quiz) {
@@ -279,7 +281,7 @@ export default async function QuizDetailPage({
           />
         </section>
 
-        <QuizPlanningSummary questions={quiz.fragen} durationSeconds={durations.get(quiz.quiz_id)} />
+        <QuizPlanningSummary questions={quiz.fragen} durationSeconds={durations.get(quiz.quiz_id)} balance={balances.get(quiz.quiz_id)} />
 
         <QuizConfigurationPanel
           quizId={quiz.quiz_id}

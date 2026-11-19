@@ -20,6 +20,7 @@ import { QuizEventImageEditor } from "./QuizEventImageEditor";
 import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import { QuizCopyDialog } from "./QuizCopyDialog";
 import { formatQuizDuration, formatQuizQuestionCount } from "./quizPlanning";
+import QuizBalanceSummary from "./planning/QuizBalanceSummary";
 import { isEventSeriesSelectable } from "@/app/eventreihen/eventSeriesPolicy";
 import {
   ArchiveBoxIcon,
@@ -379,6 +380,7 @@ export default function QuizForm({
                   <> · {formatQuizDuration(quiz.plannedDurationSeconds)} <span className="font-normal text-slate-600">inkl. Spielpausen, ohne Einlass und Startcountdown</span></>
                 )}
               </p>
+              {quiz.balance && <QuizBalanceSummary balance={quiz.balance} title="Fragenmix" />}
               <p className="mt-2 text-sm text-slate-600">Terminstatus: {statusLabels[quiz.temporal_status]}</p>
               <dl className="mt-3 grid gap-1 text-sm text-slate-600 sm:grid-cols-2">
                 <div><dt className="inline font-semibold">Datum: </dt><dd className="inline">{quiz.quiz_datum ?? "Datum fehlt"}{quiz.veranstaltungszeit ? `, ${quiz.veranstaltungszeit}` : ""}</dd></div>

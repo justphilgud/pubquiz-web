@@ -1,3 +1,5 @@
+import QuizBalanceSummary from "../planning/QuizBalanceSummary";
+import type { QuizBalance } from "../quizBalance";
 import { formatQuizDuration, formatQuizQuestionCount, getQuizComposition } from "../quizPlanning";
 
 type Composition = ReturnType<typeof getQuizComposition>;
@@ -23,9 +25,10 @@ function Distribution({ title, rows }: { title: string; rows: Composition["categ
   );
 }
 
-export default function QuizPlanningSummary({ questions, durationSeconds }: {
+export default function QuizPlanningSummary({ questions, durationSeconds, balance }: {
   questions: Parameters<typeof getQuizComposition>[0];
   durationSeconds: number | undefined;
+  balance?: QuizBalance;
 }) {
   const { categories, templates } = getQuizComposition(questions);
   return (
@@ -44,7 +47,7 @@ export default function QuizPlanningSummary({ questions, durationSeconds }: {
         <summary className="inline-flex min-h-11 cursor-pointer items-center underline">Wie wird geschätzt?</summary>
         <p>Ohne Zeitvorgabe rechnen wir mit 2 Minuten je Frage, 30 Sekunden je Auflösung, 20 Sekunden je weiterer Folie und 5 Minuten je Pause. Geplante Zeiten im Ablauf und feste Antwortzeiten fließen ein. Fragen ohne Block zählen zur Zusammensetzung, aber noch nicht zur Spielzeit. In der Moderation können gemessene Zeiten die Prognose verändern.</p>
       </details>
-      {questions.length ? (
+      {balance ? <QuizBalanceSummary balance={balance} /> : questions.length ? (
         <>
           <p className="mb-3 mt-2 text-sm text-slate-600">
             Eine Frage zählt in jeder ihrer Kategorien. Die Anteile beziehen sich auf alle zugeordneten Fragen und können bei Kategorien zusammen über 100 % ergeben.

@@ -40,7 +40,7 @@ import type {
   ContentSearchItem,
   ContentType,
 } from "./contentLibrary";
-import { getQuestionStatusesForContentFilter, serializeContentFilters } from "./contentLibrary";
+import { getQuestionStatusesForContentFilter, serializeContentFilters, selectedContentTemplateIds } from "./contentLibrary";
 import { compareContent, readContentCursor, CONTENT_PAGE_SIZE } from "./contentPaging";
 import { changeQuestionStatus } from "@/app/fragen/editor/actions";
 
@@ -49,7 +49,7 @@ export async function searchContent(filters: ContentFiltersState, pageCursor?: s
   const signature = serializeContentFilters(filters).toString();
   const cursor = readContentCursor(pageCursor, signature);
   const quizzes = await getAktiveQuizListe();
-  const restrictToQuestionTemplate = filters.templateId !== null;
+  const restrictToQuestionTemplate = selectedContentTemplateIds(filters).length > 0;
   const includeQuestions = filters.contentType !== "STORY_ELEMENT" && filters.contentType !== "POLL";
   const includeStories = !restrictToQuestionTemplate && filters.contentType !== "QUESTION" && filters.contentType !== "POLL";
   const includePolls = !restrictToQuestionTemplate && filters.contentType !== "QUESTION" && filters.contentType !== "STORY_ELEMENT";
@@ -78,9 +78,9 @@ export async function searchContent(filters: ContentFiltersState, pageCursor?: s
           kategorieIds: filters.categoryIds,
           sourceState: null,
           mediaState: filters.media === "ALL" ? null : filters.media === "WITH" ? "with" : "without",
-          answerMode: null,
+          answerMode: filters.answerMode ?? null,
           statuses: [...getQuestionStatusesForContentFilter(filters.status)],
-          templateIds: filters.templateId ? [filters.templateId] : [],
+          templateIds: selectedContentTemplateIds(filters),
           eventSeriesId: filters.eventSeriesId,
           usageState: filters.usage === "ALL" ? null : filters.usage,
           lifecycleFilter: filters.questionLifecycle,

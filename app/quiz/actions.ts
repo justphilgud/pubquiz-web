@@ -186,6 +186,8 @@ import {
   type MemeQuestionConfig,
 } from "@/app/quiz/memeCaption";
 import { loadQuizPlanningDurations } from "./quizPlanning.server";
+import { loadQuizBalances } from "./quizBalance.server";
+import type { QuizBalance } from "./quizBalance";
 import { supportsSponsorMoments } from "./presentationTiming";
 import { revalidateQuizPlanning } from "./revalidateQuizPlanning.server";
 
@@ -250,6 +252,7 @@ export type QuizResult = {
   archivierungsgrund: string | null;
   fragen_anzahl: number;
   plannedDurationSeconds?: number;
+  balance?: QuizBalance;
   presentation_template_id: string | null;
   answer_form_template_id: string | null;
 };
@@ -390,9 +393,9 @@ export async function getQuizListe(options: { includePlanning?: boolean; eventSe
     },
   });
 
-  const durations = options.includePlanning
-    ? await loadQuizPlanningDurations(quizze.map(quiz => quiz.quiz_id))
-    : undefined;
+  const [durations, balances] = options.includePlanning
+    ? await Promise.all([loadQuizPlanningDurations(quizze.map(quiz => quiz.quiz_id)), loadQuizBalances(quizze.map(quiz => quiz.quiz_id))])
+    : [undefined, undefined];
   return sortQuizResults(quizze.map((quiz) => ({
     live_status:quiz.praesentation_status?.quiz_stopped_at?"Beendet" as const:quiz.praesentation_status?.quiz_started_at?"Läuft" as const:"Vorbereitung" as const,
     quiz_id: quiz.quiz_id,
@@ -422,6 +425,7 @@ export async function getQuizListe(options: { includePlanning?: boolean; eventSe
     archivierungsgrund: quiz.archivierungsgrund,
     fragen_anzahl: quiz._count.quiz_fragen,
     plannedDurationSeconds: durations?.get(quiz.quiz_id),
+    balance: balances?.get(quiz.quiz_id),
     presentation_template_id: quiz.presentation_template_id,
     answer_form_template_id: quiz.answer_form_template_id,
   })));
@@ -1406,9 +1410,9 @@ export async function searchFragenForQuiz(data: {
     mediaState: data.filters.media === "ALL"
       ? null
       : data.filters.media === "WITH" ? "with" : "without",
-    answerMode: null,
+    answerMode: data.filters.answerMode ?? null,
     statuses: [...getQuestionStatusesForContentFilter(data.filters.status)],
-    templateIds: data.filters.templateId ? [data.filters.templateId] : [],
+    templateIds: data.filters.templateIds ?? (data.filters.templateId ? [data.filters.templateId] : []),
     usageState: data.filters.usage === "ALL" ? null : data.filters.usage,
     lifecycleFilter: data.filters.questionLifecycle,
     limit: 25,

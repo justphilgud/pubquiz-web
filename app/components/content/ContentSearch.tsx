@@ -115,7 +115,7 @@ export function ContentSearchState({ initialType, quizzes, categories, eventSeri
     else router.push(params.size > 0 ? `${pathname}?${params}` : pathname);
   }
   function reset() { const next = parseContentFilters(new URLSearchParams(), initialType, filterableTemplateIds); updateFilters(next); apply(next); }
-  function changeTemplate(templateId: string | null) { const next = { ...filters, templateId }; updateFilters(next); apply(next); }
+  function changeTemplate(templateIds: string[]) { const next = { ...filters, templateId: templateIds[0] ?? null, templateIds }; updateFilters(next); apply(next); }
 
   const searchReady = resultContext === searchContext;
   const searching = pending || !searchReady;

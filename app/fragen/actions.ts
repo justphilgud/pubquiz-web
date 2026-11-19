@@ -48,7 +48,6 @@ import { questionTemplateDefinitions } from "./editor/templates/questionTemplate
 import { getFactsPersonTransferConfig, normalizeQuestionTemplateConfig } from "./editor/pixelTemplateConfig";
 import { getQuestionTemplateValidationIssue } from "./editor/templates/questionTemplateData";
 import {
-  getClosedQuestionTemplatePersistenceIds,
   getQuestionAnswerMode,
   getQuestionAnswerModeWhereInput,
   type DerivedQuestionAnswerMode,
@@ -328,13 +327,6 @@ export async function searchFragen(data: {
               OR: [
                 { vorlage_id: null },
                 { vorlage: { code: "standard" } },
-                {
-                  vorlage: {
-                    code: {
-                      in: [...getClosedQuestionTemplatePersistenceIds()],
-                    },
-                  },
-                },
               ],
             }
           : {
