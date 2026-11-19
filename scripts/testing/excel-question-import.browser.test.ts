@@ -239,6 +239,15 @@ test("real Next.js and Chromium: XLSX, template duplicates, quiz planning and qu
     const cardText = (title: string) => js<string>(`[...document.querySelectorAll("article")].find(card =>
       card.querySelector("h2")?.textContent === ${JSON.stringify(title)})?.innerText ?? ""`);
     const summary = () => js<string>(`document.querySelector('section[aria-labelledby="quiz-composition"]')?.innerText ?? ""`);
+    const balanceText = () => js<string>(`document.querySelector('[role="dialog"]')?.innerText ?? ""`);
+    async function openBalance() {
+      await js(`document.querySelector('button[aria-label="Fragenmix: Ampeldetails öffnen"]').click()`);
+      await contains("Verteilung je Block");
+    }
+    async function closeBalance() {
+      await call("Input.dispatchKeyEvent", { type: "keyDown", key: "Escape", code: "Escape" }, sessionId);
+      await eventually(() => js(`!document.querySelector('[role="dialog"]')`), "Ampeldialog geschlossen");
+    }
     const planned = (text: string) => text.match(/(?:ca\. |unter )?\d+ (?:Std\.(?: \d+ Min\.)?|Min\.)/)?.[0];
     await navigate("/quiz");
     await contains("Bestehende Quizze");
@@ -255,9 +264,12 @@ test("real Next.js and Chromium: XLSX, template duplicates, quiz planning and qu
     await navigate(`/quiz/${single.quiz_id}`);
     await contains("Zusammensetzung");
     assert.equal(planned(await summary()), oneDuration);
-    assert.match(await summary(), /Alltagsphysik[\s\S]*100 %/);
-    assert.match(await summary(), /Geografie[\s\S]*100 %/);
-    assert.match(await summary(), /Paare bilden[\s\S]*100 %/);
+    await openBalance();
+    assert.match(await balanceText(), /Alltagsphysik[\s\S]*100 %/);
+    assert.match(await balanceText(), /Geografie[\s\S]*100 %/);
+    assert.match(await balanceText(), /Paare[\s\S]*100 %/);
+    await screenshot("quizampel-1366.png", '[role="dialog"]');
+    await closeBalance();
     await screenshot("quizeditor-1366.png", 'section[aria-labelledby="quiz-composition"]');
     await resize(390, 844);
     await screenshot("quizeditor-390.png", 'section[aria-labelledby="quiz-composition"]');
@@ -299,7 +311,10 @@ test("real Next.js and Chromium: XLSX, template duplicates, quiz planning and qu
     await contains("Zusammensetzung");
     await screenshot("quizeditor-1366.png", 'section[aria-labelledby="quiz-composition"]');
     await navigate(`/quiz/${empty.quiz_id}`);
-    await contains("Für die Verteilung sind noch keine Fragen zugeordnet.");
+    await contains("0 Fragen");
+    await openBalance();
+    await contains("Noch keine Fragenblöcke vorhanden.");
+    await closeBalance();
     await clickButton("Quiz-Element hinzufügen");
     await clickButton("Suchen");
     await eventually(() => js(`(() => {
@@ -310,8 +325,10 @@ test("real Next.js and Chromium: XLSX, template duplicates, quiz planning and qu
       return true;
     })()`), "Frage über Editor hinzufügen");
     await eventually(async () => (await summary()).includes("1 Frage"), "aktualisierte Zusammensetzung");
-    assert.match(await summary(), /Ohne Kategorie[\s\S]*100 %/);
-    assert.match(await summary(), /Standardfrage[\s\S]*100 %/);
+    await openBalance();
+    // Questions without a block have no block denominator or invented percentages.
+    assert.match(await balanceText(), /1 Fragen sind noch keinem Fragenblock zugeordnet/);
+    await closeBalance();
     await navigate("/quiz");
     assert.match(await cardText("Planung · Leer"), /1 Frage/);
     await navigate(`/quiz/${empty.quiz_id}`);
