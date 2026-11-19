@@ -51,7 +51,7 @@ Eine anfangs unvollständige eigene Ordering-Fixture wurde vor der Detailprüfun
 mit gültigen kanonischen Antworten und Teilnehmerreihenfolge ergänzt. Dafür wurde
 keine Anwendungsregel geändert.
 
-## Bisherige Prüfungen
+## Lokale Prüfungen
 
 - TypeScript und ESLint der geänderten Quellen erfolgreich.
 - 88 gezielte Vertragsregressionen zunächst erfolgreich, einschließlich aller
@@ -63,10 +63,75 @@ keine Anwendungsregel geändert.
   Ampeln, Blockdetails und getrennten Kategorien geladen. Echte Neuanlage und
   Bearbeitung zeigen 150 Wörter → 1:00, 75 Wörter → 0:30; 150 Wörter bei 2× → 0:30.
   Weder Original noch Übersetzung automatisch geändert, keine Speicherung ausgelöst.
-- Die echte Suche deckte die zuvor ausgeblendeten MC-/8-Bit-Filter und den unnötigen
-  Reihenfilter auf. Beide Ursachen sind im gemeinsamen Implementierungsstand korrigiert;
-  die abschließende positive Trefferprüfung erfolgt auf dessen neuem Build/Preview.
+- Vollständiger Testlauf: 1923 Tests, keine Fehler. Abschließender Next-Build erfolgreich.
+- Echte Suche nach vier Audio-Templates und Film: genau Fragen #82–85, vier ausgewählte
+  Templates. Geschlossene Standard-/MC-Suche: genau #86 und #87, kein Wahr/Falsch #88.
+  Der echte Empfehlungsklick öffnete einen neuen Tab; Quiz-URL und Dialog blieben erhalten.
+- Desktop 1366×768 und 1920×1080 sowie Mobil 390×844 ohne Seitenüberlauf.
+  Der mobile Dialog bleibt innerhalb der Bildschirmränder; die breite Regeltabelle
+  scrollt intern. Leere Blöcke bleiben neutral; fehlende drei Audio-Fragen werden rot.
+- Die bestehende Excel-/Quiz-Browserabnahme erwartete zunächst die alte breite
+  Inline-Verteilung. Die Assertions prüfen nun die beauftragte Detailansicht per
+  Ampelklick. Dauervergleich sowie Hinzufügen/Entfernen bleiben geprüft; Fragen ohne
+  Block werden ausdrücklich ohne erfundene Blockprozente ausgewiesen.
 
-Gesamttests, abschließender Build, gehostete Treffer-/Tab-/Größenprüfungen sowie
-Preview- und PR-Link werden vor Übergabe ergänzt. Die Vorlesedauer bleibt eine
-Schätzung mit offen benannter 150-Wörter/Minute-Annahme, keine gemessene Audiodauer.
+## Gemeinsame Preview und technische Abnahme
+
+- [Pull Request #173](https://github.com/justphilgud/pubquiz-web/pull/173).
+- [Gemeinsame Preview / Quizliste](https://pubquiz-4ugu195wb-just-phil-gud.vercel.app/quiz).
+- [Testquiz mit zwei Blöcken](https://pubquiz-4ugu195wb-just-phil-gud.vercel.app/quiz/2).
+- Vercel-Deployment `dpl_F9UQh22vctLA4zpcGaEcJL69Zv3V`, Environment `preview`,
+  Quellstand `37ddc4ed89b2964b7ce63812105c55f195a22ae2`, bereit am 19.11.2026.
+- Vollständig erfolgreiche exakte [Push-CI](https://github.com/justphilgud/pubquiz-web/actions/runs/44527800908)
+  und [PR-CI](https://github.com/justphilgud/pubquiz-web/actions/runs/44527811180):
+  Prisma, TypeScript, Gesamttests, striktes Changed-file-ESLint, Build, HTTP-Prüfung,
+  PostgreSQL-Integration und echte Excel-/Quiz-Browserabnahme.
+
+Die folgenden Prüfungen wurden anschließend im gehosteten Deployment mit echtem
+Next-Server, Datenbank und isoliertem Chromium erfolgreich wiederholt:
+
+| Prüfung | Beobachtetes Ergebnis |
+|---|---|
+| Quizliste und Vorbereitung | Kompakter Status für beide Blöcke; Klick öffnet dieselbe Detailansicht. |
+| Blockweise Werte | Audio 3/20 grün, 2/20 gelb; Politik 6/20 rot, Kultur 2/20 gelb; Präsenzgruppen ohne Gelb. Schätzfrage/Umfragen ohne Ampel. |
+| Empfehlung mit zwei Filterarten | Audio + Film öffnet echten neuen Tab; vier Templateparameter und Kategorie 4. Genau #82–85, keine verlorenen MC-/8-Bit-Filter. |
+| Geschlossene Suche | Standard + MC + Film + geschlossen liefert ausschließlich #86/#87; Wahr/Falsch #88 ausgeschlossen. |
+| Quizzustand und Tastatur | Quiz-URL und offener Dialog bleiben nach Empfehlungsklick erhalten. Escape schließt, Fokus kehrt auf den Ampelbutton zurück. |
+| Audio-Zusatzregel | Quiz #2 grün, weil ein Block drei Audio-Fragen enthält. Quiz #3 rot trotz 20 % Audio in beiden Blöcken, weil jeweils nur zwei vorhanden. |
+| Leere Blöcke | Quiz #4 neutral, keine erfundenen Prozente oder NaN-Werte. |
+| Bearbeiten | Frage #33: 150 Wörter → 1:00, Eingabe von 75 → 0:30; Original unverändert. |
+| Neuanlage | Leerhinweis, dann 150 Wörter → 1:00; Geschwindigkeit 2× → 0:30 bei unverändertem Text. Kein Speichern/Generatoraufruf ausgelöst. |
+| Größen und Sichtprüfung | 1366×768, 1920×1080, 390×844; kein Seitenüberlauf. Mobiler Dialog links/rechts 16 px, interne Scrollbereiche; Regeln horizontal scrollbar. |
+
+Die vollständigen Grenzwerte und Nachbarbereiche einschließlich Rundungsfallen
+werden durch die reinen Unit-Tests geprüft; die Browserprüfung ergänzt diese um
+echte Datenanbindung, Interaktion und Darstellung. Es gibt keine offenen technischen
+Abnahmefehler. Die gemeinsame fachliche Preview-Abnahme durch den Auftraggeber
+steht vor einem späteren Production-Schritt noch aus.
+
+### Bildnachweise
+
+| Ansicht | Nachweis |
+|---|---|
+| Desktopdialog | [1366 px](assets/quiz-ampeln-vorlesedauer/ampel-preview-dialog-1366.png) |
+| Mobiler Dialog | [390 px](assets/quiz-ampeln-vorlesedauer/ampel-preview-dialog-390.png) |
+| Kompakte Quizkarte | [390 px](assets/quiz-ampeln-vorlesedauer/ampel-preview-compact-390.png) |
+| Vorgefilterte echte Suche | [Vier Audio-Templates + Film](assets/quiz-ampeln-vorlesedauer/ampel-preview-search-1366.png) |
+| Vorlesedauer bei Neuanlage | [150 Wörter, 2×, 0:30](assets/quiz-ampeln-vorlesedauer/reading-preview-create-1366.png) |
+
+### Zugriff, Grenzen und Release
+
+Ausdrücklich freigegeben waren die Wiederverwendung der synthetischen Review-DB,
+branchbezogene Runtime-/AUTH-Variablen und genau dieser Preview-Branch. Der vorhandene
+Automation-Bypass wurde ausschließlich per HTTP-Header benutzt; der Deployment-Schutz
+bleibt aktiv. Tokens, Passwörter und Verbindungsstrings sind nicht Bestandteil dieses
+Berichts oder des PR. Eine lokale temporäre Bypass-Kopie wurde nach der Prüfung entfernt.
+
+Die Vorlesedauer bleibt eine Schätzung mit offen benannter 150-Wörter/Minute-Annahme,
+keine gemessene Audiodauer. Die technische Abnahme verwendet synthetische Daten;
+historische AP5-Aussagen und Production-Daten wurden nicht verändert. Kein Backup,
+kein Production-Deployment und kein Merge wurden ausgeführt.
+
+Der abschließende Dokumentationscommit ergänzt ausschließlich Bericht und Bildnachweise;
+Anwendung, Tests und Konfiguration bleiben gegenüber dem geprüften Preview-Quellstand
+identisch. Die finale PR-CI wird vor Übergabe ebenfalls abgewartet.
