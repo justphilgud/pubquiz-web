@@ -159,6 +159,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run db:generate
+      - name: PostgreSQL LOVD manual review analysis (rollback-only synthetic fixture)
+        env:
+          LOVD_AP5_TEST_DATABASE_URL: ${{ env.DATABASE_URL }}
+        run: node --import tsx --test scripts/analysis/lovd-manual-review.integration.test.ts
       - run: node --import tsx --test app/fragen/import/external/editorialImport.test.ts app/fragen/import/external/editorialImport.integration.test.ts
       - name: PostgreSQL 8-bit planned maxima and historical score protection
         env:

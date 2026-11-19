@@ -1,0 +1,2175 @@
+[
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 497,
+    "position": 1,
+    "section": 123,
+    "template": "anagramm",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 8,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 4,
+    "pending": 0,
+    "automatic_correct": 8,
+    "filtered": 0,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 496,
+    "position": 2,
+    "section": 123,
+    "template": "wahr_falsch",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": true
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 9,
+    "filtered": 3,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 392,
+    "position": 3,
+    "section": 123,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 2,
+    "filtered": 10,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 385,
+    "position": 4,
+    "section": 123,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 8,
+    "filtered": 4,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 326,
+    "position": 5,
+    "section": 123,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 10,
+    "unsubmitted_drafts": 1,
+    "legacy": 0,
+    "unanswered": 2,
+    "pending": 0,
+    "automatic_correct": 1,
+    "filtered": 9,
+    "manual": 9,
+    "unresolved": 0,
+    "groups": [
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      }
+    ]
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 475,
+    "position": 6,
+    "section": 123,
+    "template": "musik_rueckwaerts",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 2,
+    "options": [],
+    "played": true,
+    "cells": 12,
+    "answered": 7,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 5,
+    "pending": 0,
+    "automatic_correct": 1,
+    "filtered": 6,
+    "manual": 6,
+    "unresolved": 0,
+    "groups": [
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      }
+    ]
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 469,
+    "position": 7,
+    "section": 123,
+    "template": "musik",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 1,
+    "options": [],
+    "played": true,
+    "cells": 12,
+    "answered": 11,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 1,
+    "pending": 0,
+    "automatic_correct": 0,
+    "filtered": 11,
+    "manual": 10,
+    "unresolved": 0,
+    "groups": [
+      {
+        "members": 6,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 5
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      }
+    ]
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 481,
+    "position": 8,
+    "section": 123,
+    "template": "uebersetzt_vorgelesen",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 10,
+    "unsubmitted_drafts": 1,
+    "legacy": 0,
+    "unanswered": 2,
+    "pending": 0,
+    "automatic_correct": 1,
+    "filtered": 9,
+    "manual": 9,
+    "unresolved": 0,
+    "groups": [
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      }
+    ]
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 328,
+    "position": 9,
+    "section": 123,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 2,
+    "filtered": 10,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 395,
+    "position": 10,
+    "section": 123,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 5,
+    "filtered": 7,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 378,
+    "position": 11,
+    "section": 123,
+    "template": "paare_bilden",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 5,
+    "filtered": 7,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 391,
+    "position": 12,
+    "section": 123,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 8,
+    "filtered": 4,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 431,
+    "position": 13,
+    "section": 123,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": true
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 11,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 1,
+    "pending": 0,
+    "automatic_correct": 9,
+    "filtered": 2,
+    "manual": 1,
+    "unresolved": 1,
+    "groups": [
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 1,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      }
+    ]
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 485,
+    "position": 14,
+    "section": 123,
+    "template": "pixelbild",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 1,
+    "options": [],
+    "played": true,
+    "cells": 12,
+    "answered": 5,
+    "unsubmitted_drafts": 1,
+    "legacy": 0,
+    "unanswered": 7,
+    "pending": 0,
+    "automatic_correct": 0,
+    "filtered": 5,
+    "manual": 5,
+    "unresolved": 0,
+    "groups": [
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      }
+    ]
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 400,
+    "position": 15,
+    "section": 123,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 12,
+    "filtered": 0,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 393,
+    "position": 16,
+    "section": 123,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 11,
+    "filtered": 1,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 494,
+    "position": 17,
+    "section": 123,
+    "template": "reihenfolge",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": true
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 1,
+    "filtered": 11,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 376,
+    "position": 18,
+    "section": 123,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 1,
+    "filtered": 11,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 444,
+    "position": 19,
+    "section": 123,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 2,
+    "filtered": 10,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 453,
+    "position": 20,
+    "section": 123,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 3,
+    "filtered": 9,
+    "manual": 9,
+    "unresolved": 0,
+    "groups": [
+      {
+        "members": 2,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 2
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      }
+    ]
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 486,
+    "position": 21,
+    "section": 123,
+    "template": "fakten_land",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 7,
+    "filtered": 5,
+    "manual": 5,
+    "unresolved": 0,
+    "groups": [
+      {
+        "members": 2,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 2
+      },
+      {
+        "members": 2,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 2
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      }
+    ]
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 406,
+    "position": 22,
+    "section": 123,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 10,
+    "filtered": 2,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 327,
+    "position": 23,
+    "section": 123,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 9,
+    "filtered": 3,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 499,
+    "position": 24,
+    "section": 123,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 9,
+    "filtered": 3,
+    "manual": 3,
+    "unresolved": 0,
+    "groups": [
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      }
+    ]
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 452,
+    "position": 26,
+    "section": 123,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 11,
+    "filtered": 1,
+    "manual": 1,
+    "unresolved": 0,
+    "groups": [
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      }
+    ]
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 379,
+    "position": 27,
+    "section": 180,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 5,
+    "filtered": 7,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 434,
+    "position": 28,
+    "section": 180,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 1,
+    "filtered": 11,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 388,
+    "position": 29,
+    "section": 180,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 4,
+    "filtered": 8,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 476,
+    "position": 30,
+    "section": 180,
+    "template": "face_morph",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 2,
+    "options": [],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 0,
+    "filtered": 12,
+    "manual": 12,
+    "unresolved": 0,
+    "groups": [
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      }
+    ]
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 463,
+    "position": 31,
+    "section": 180,
+    "template": "musik_rueckwaerts",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 2,
+    "options": [],
+    "played": true,
+    "cells": 12,
+    "answered": 10,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 2,
+    "pending": 0,
+    "automatic_correct": 3,
+    "filtered": 7,
+    "manual": 7,
+    "unresolved": 0,
+    "groups": [
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      }
+    ]
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 480,
+    "position": 32,
+    "section": 180,
+    "template": "musik",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 1,
+    "options": [],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 3,
+    "filtered": 9,
+    "manual": 9,
+    "unresolved": 0,
+    "groups": [
+      {
+        "members": 2,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 2
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      }
+    ]
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 390,
+    "position": 33,
+    "section": 180,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 4,
+    "filtered": 8,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 408,
+    "position": 35,
+    "section": 180,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 8,
+    "filtered": 4,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 493,
+    "position": 36,
+    "section": 180,
+    "template": "paare_bilden",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 7,
+    "filtered": 5,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 382,
+    "position": 37,
+    "section": 180,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 11,
+    "filtered": 1,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 394,
+    "position": 38,
+    "section": 180,
+    "template": "wahr_falsch",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 9,
+    "filtered": 3,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 488,
+    "position": 39,
+    "section": 180,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": true
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 5,
+    "filtered": 7,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 377,
+    "position": 40,
+    "section": 180,
+    "template": "fakten_person",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 9,
+    "filtered": 3,
+    "manual": 3,
+    "unresolved": 0,
+    "groups": [
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      }
+    ]
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 387,
+    "position": 41,
+    "section": 180,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": true,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 5,
+    "filtered": 7,
+    "manual": 7,
+    "unresolved": 0,
+    "groups": [
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      }
+    ]
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 423,
+    "position": 42,
+    "section": 180,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": true
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 11,
+    "filtered": 1,
+    "manual": 1,
+    "unresolved": 0,
+    "groups": [
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      }
+    ]
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 371,
+    "position": 43,
+    "section": 180,
+    "template": "reihenfolge",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": true
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 6,
+    "filtered": 6,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 386,
+    "position": 44,
+    "section": 180,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 10,
+    "filtered": 2,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 495,
+    "position": 45,
+    "section": 180,
+    "template": "fakten_jahr",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 11,
+    "unsubmitted_drafts": 1,
+    "legacy": 0,
+    "unanswered": 1,
+    "pending": 0,
+    "automatic_correct": 4,
+    "filtered": 7,
+    "manual": 7,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 403,
+    "position": 46,
+    "section": 180,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 4,
+    "filtered": 8,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 401,
+    "position": 47,
+    "section": 180,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 5,
+    "filtered": 7,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 491,
+    "position": 48,
+    "section": 180,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 7,
+    "filtered": 5,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 396,
+    "position": 49,
+    "section": 180,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 8,
+    "filtered": 4,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 398,
+    "position": 50,
+    "section": 180,
+    "template": "meme_beschriften",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 1,
+    "filtered": 11,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 498,
+    "position": 51,
+    "section": 180,
+    "template": "standard",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 0,
+    "options": [
+      {
+        "isCorrect": true
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      },
+      {
+        "isCorrect": false
+      }
+    ],
+    "played": true,
+    "cells": 12,
+    "answered": 12,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 0,
+    "pending": 0,
+    "automatic_correct": 8,
+    "filtered": 4,
+    "manual": 0,
+    "unresolved": 0,
+    "groups": []
+  },
+  {
+    "captured_at": "2026-11-19T11:13:55.645Z",
+    "id": 484,
+    "position": 52,
+    "section": 180,
+    "template": "pixelbild",
+    "points_mode": "standard",
+    "allow_free": false,
+    "field_count": 1,
+    "options": [],
+    "played": true,
+    "cells": 12,
+    "answered": 8,
+    "unsubmitted_drafts": 0,
+    "legacy": 0,
+    "unanswered": 4,
+    "pending": 0,
+    "automatic_correct": 0,
+    "filtered": 8,
+    "manual": 8,
+    "unresolved": 0,
+    "groups": [
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      },
+      {
+        "members": 1,
+        "conflict": false,
+        "unresolved": 0,
+        "manualOrReview": 1
+      }
+    ]
+  }
+]
