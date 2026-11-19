@@ -174,10 +174,28 @@ enthüllt und die Navigation war wieder frei. Kein zusätzliches Reveal wurde ge
   `e601dcd5905934d06e9546bc128e367dab97755a`, Status `READY`.
   Die erfolgreiche Push-CI derselben Revision sowie sechs zentrale Preview-Medienkeys
   wurden vom vorhandenen Deploymentskript bestätigt. Push- und PR-CI sind grün.
-  Vercel-Anmeldeschutz bleibt aktiv. Der frische Browser wurde vor dem App-Login
-  auf Vercel Login umgeleitet; das ist kein erfolgreicher gehosteter Anwendungstest.
-  Die automatische Freigabeprüfung verlangt für die Verwendung des vorhandenen
-  Automation-Bypass zur weiteren Browserabnahme eine gesonderte Zustimmung.
+  Vercel-Anmeldeschutz bleibt aktiv. Nach gesonderter ausdrücklicher Zustimmung
+  wurde der vorhandene Automation-Bypass ausschließlich per HTTP-Header für diese
+  Browserabnahme verwendet; weder Token noch App-Zugangsdaten sind versioniert.
+
+## Gehostete Browserabnahme · 19. November 2026
+
+Frisches isoliertes Chrome-Profil auf obiger Preview; Anmeldung mit synthetischem
+Admin erfolgreich, Moderation und öffentliches Fenster geöffnet. Beide zeigen
+die drei synthetischen Teams und denselben Stand. Rücknavigation von Folie 57
+auf 56 öffnet drei leere Podiumsstufen. Doppelklick auf Weiter plus ArrowRight
+enthüllt genau Platz 3 und bleibt auf Folie 56. Nach Animation und Renderquittung
+ist Weiter wieder freigegeben. Zwei weitere bewusst getrennte Klicks enthüllen
+Platz 2 und Platz 1, weiterhin auf Folie 56. Lange Namen sind bei 1366 × 768
+vollständig sichtbar; kein horizontaler Overflow.
+[Gehosteter Screenshot](assets/lovd-november/hosted-podium-1366.png).
+
+Erst der nächste bewusste Klick öffnet die finale Tabelle auf Folie 57; die
+anschließende Datenbankprüfung bestätigt `podium_snapshot = null` und den
+zugehörigen `FINAL_STANDINGS`-Schlüssel. Keine App-Änderung seit der vollständig
+grünen Push-/PR-CI von `e601dcd5`; spätere Commits ergänzen ausschließlich diesen
+Abnahmebericht und Screenshot. Gehosteter Smoke-Test bestanden. Die ausführlichen
+AP-1–4-Prüfungen oben bleiben lokale Abnahmen mit den ausdrücklich genannten Grenzen.
 
 Lokale Screenshots und ausführliche Messausgaben liegen unter
 `.artifacts/lovd-november/` im Auftragsworktree; Zugangsdaten werden nicht versioniert.
