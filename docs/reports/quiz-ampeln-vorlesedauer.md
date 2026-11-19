@@ -1,5 +1,9 @@
 # Gemeinsame Preview: Quiz-Ampeln und Vorlesedauer
 
+**Aktuelle gemeinsame Preview einschließlich Quizmodus:**
+[Quizliste](https://pubquiz-e4r3wo9dt-just-phil-gud.vercel.app/quiz).
+Die abschließende technische Abnahme der Ergänzung steht am Ende dieses Berichts.
+
 Basis: main `e456764a` nach PR #171 und #172. AP5 bleibt unverändert und wird
 nicht erneut implementiert. Keine neue Abhängigkeit oder Änderung
 von Spielbetrieb, Antworten oder Bewertung. **Kein Production-Backup und kein
@@ -75,7 +79,7 @@ keine Anwendungsregel geändert.
   Ampelklick. Dauervergleich sowie Hinzufügen/Entfernen bleiben geprüft; Fragen ohne
   Block werden ausdrücklich ohne erfundene Blockprozente ausgewiesen.
 
-## Gemeinsame Preview und technische Abnahme
+## Ursprüngliche gemeinsame Preview und technische Abnahme
 
 - [Pull Request #173](https://github.com/justphilgud/pubquiz-web/pull/173).
 - [Gemeinsame Preview / Quizliste](https://pubquiz-4ugu195wb-just-phil-gud.vercel.app/quiz).
@@ -158,6 +162,42 @@ die echte Upgrade-Migration einschließlich Altbestand, Default, Wechsel, Erhalt
 anderen Updates und ungültigen/NULL-Werten. Die echte Next-/Chromium-Abnahme prüft
 Neuanlage mit Standardauswahl, Speichern als Themenquiz, Reload und Rückwechsel.
 
-Der aktualisierte gemeinsame Preview-Link und die gehosteten Ergebnisse dieser
-Ergänzung folgen nach erfolgreicher exakter CI. Die bisherige Preview oben belegt
-bis dahin ausschließlich den ursprünglichen Stand. Kein Production-Schritt.
+### Aktuelle gemeinsame Preview und Ergebnisse der Ergänzung
+
+- [Gemeinsame Preview](https://pubquiz-e4r3wo9dt-just-phil-gud.vercel.app/quiz),
+  Quellstand `9057199b65394fa360c55e24675e3311b89b5a1d`, Deployment
+  `dpl_4m1ZYCALd4u2YZ1CRzYV2LGGiHiv`, Environment `preview`, 19.11.2026.
+- Exakte [Push-CI](https://github.com/justphilgud/pubquiz-web/actions/runs/44540549385)
+  und [PR-CI](https://github.com/justphilgud/pubquiz-web/actions/runs/44540560016)
+  vollständig grün: TypeScript, Tests, Changed-file-ESLint, Build, HTTP,
+  PostgreSQL-Migration und echte Formular-/Quiz-Browserabnahme.
+- Zwei historische Action-Fixtures benötigten zusätzlich die neue additive
+  Migration, bevor sie den aktuellen Prisma-Client verwenden. Ihre fachlichen
+  Erhaltungs- und Rechteassertions wurden beibehalten; kein Produktionsfehler.
+- Nur die synthetische Review-Datenbank wurde migriert. Quiz #1–4 erhielten
+  nachweislich `VARIED`. Die Migration wurde transaktional mit Prüfsumme in der
+  vorhandenen Migrationshistorie erfasst. Keine Production-Verbindung wurde genutzt.
+
+| Gehostete Prüfung | Ergebnis |
+|---|---|
+| Standard in Neuanlage | Abwechslungsreiches Quiz vorausgewählt; beide verlangten Bezeichnungen vorhanden. |
+| [Filmquiz #5](https://pubquiz-e4r3wo9dt-just-phil-gud.vercel.app/quiz/5) | 20/20 Filmfragen, ausgeglichene Templates: Gesamtstatus grün, Film 100 % „Nicht bewertet“, keine Ausgleichsempfehlungen. |
+| [Filmquiz #6](https://pubquiz-e4r3wo9dt-just-phil-gud.vercel.app/quiz/6) | 20/20 offene Standardfragen: Gesamtstatus rot wegen Templates; Film neutral. Template-Empfehlungen aktiv, jeweils neuer Tab, ohne Kategorie-Ausgleichsfilter. |
+| Bearbeiten / Reload | #5 per echtem Formular auf abwechslungsreich geändert: nach Reload gespeichert, Film rot und Kategorie-Ausgleich wieder aktiv. Danach per Formular zurück auf Themenquiz: nach Reload wieder grün/neutral. |
+| Echte Neuanlage | #7 „Quizmodus QA Formularanlage“ als Themenquiz angelegt; Editformular nach Reload zeigt weiterhin Themenquiz. |
+| Regelansicht | Modus erklärt; eigene neutrale Zeile für Sachkategorien im Themenquiz neben unveränderten Standardgrenzen. |
+| Größen / Sichtprüfung | 1366×768, 1920×1080 und 390×844 ohne Seitenüberlauf. Mobiler Dialog weiterhin 16 px Rand; Auswahl und Erklärung passen im Formular. |
+| Vorlesedauer | #33 im neuen Deployment weiterhin 150 Wörter → 1:00; Original unverändert. Bestehende dynamische Editor-/Such-/Ampelregressionen zusätzlich in CI grün. |
+
+Bildnachweise: [grüner Themenquiz-Dialog](assets/quiz-ampeln-vorlesedauer/mode-preview-green-1366.png),
+[neutrale Filmkategorie](assets/quiz-ampeln-vorlesedauer/mode-preview-category-1366.png),
+[gespeicherter Modus im mobilen Formular](assets/quiz-ampeln-vorlesedauer/mode-preview-form-390.png),
+[aktive Templatewarnung auf Mobil](assets/quiz-ampeln-vorlesedauer/mode-preview-warning-390.png).
+
+Die technische Abnahme der Ergänzung ist erfolgreich, keine offenen technischen
+Fehler. Die gemeinsame fachliche Preview-Abnahme bleibt beim Auftraggeber.
+Der vorhandene Schutz und Header-Bypass wurden wie zuvor freigegeben verwendet;
+Testbrowser und temporäre lokale Bypass-Kopie sind nach der Abnahme entfernt.
+Der abschließende Dokumentationscommit enthält ausschließlich diese Ergebnisse
+und Bilder; Anwendung, Schema und Tests entsprechen dem geprüften Deployment.
+AP5 bleibt unverändert. Kein Merge, Production-Backup oder Production-Deployment.

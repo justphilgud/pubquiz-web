@@ -138,6 +138,13 @@ Kürzung und Umformulierung bleiben vollständig beim Nutzer.
 - `quizBalance.test.ts`: alle Grenzen und Nachbarbereiche, ungerundete Berechnung,
   Blocknenner, Kategorien, vollständige Registry, Aliase, Präsenzgruppen, Audio-
   Zusatzregel, fehlende Blöcke und kombinierte Suchlinks.
+  Quizmodus: Film-only grün bei ausgeglichenen Templates, neutrale Kategorien,
+  weiterhin rote Templatewarnungen, keine Kategorie-Ausgleichsfilter, Rückwechsel.
+- `excel-question-import.integration.test.ts`: echte additive Quizmodus-Migration,
+  Altbestands-/Insertstandard, dauerhafter Wechsel, Erhalt bei anderen Updates und
+  DB-Constraints gegen ungültige/NULL-Werte.
+- `excel-question-import.browser.test.ts`: echte Quiz-Neuanlage und Bearbeitung
+  über Next-Actions, Standardauswahl, Themenquiz speichern, Reload und Rückwechsel.
 - `readingDuration.test.ts`: Textmenge, Geschwindigkeit, Leerzustand, Format und
   Unverändertheit der Eingaben.
 - `quizPlanning.browser.test.ts`: echte Clientkomponenten, dynamische Dauer,
