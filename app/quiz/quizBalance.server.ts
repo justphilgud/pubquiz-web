@@ -3,6 +3,7 @@ import { prisma } from "@/app/lib/prisma";
 import { resolveQuizQuestionAnswerMode } from "./quizQuestionAnswerMode";
 import { isQuestionSection } from "./quizSectionPolicy";
 import { getQuizBalance, type BalanceCategory } from "./quizBalance";
+import { normalizeQuizMode } from "./quizMode";
 
 /** Only IDs returned by the caller's authorized quiz reader. No runtime writes. */
 export async function loadQuizBalances(authorizedIds: readonly number[]) {
@@ -10,6 +11,7 @@ export async function loadQuizBalances(authorizedIds: readonly number[]) {
   const [quizzes, activeCategories] = await Promise.all([
     prisma.quiz.findMany({ where: { quiz_id: { in: [...authorizedIds] } }, select: {
       quiz_id: true,
+      quiz_modus: true,
       quiz_abschnitte: { orderBy: [{ sortierung: "asc" }, { quiz_abschnitt_id: "asc" }], select: { quiz_abschnitt_id: true, titel: true, abschnitt_typ: true } },
       quiz_fragen: { select: { quiz_abschnitt_id: true, freie_antwort_erlaubt: true, fragen: { select: {
         vorlage: { select: { code: true } }, antworten: { select: { ist_richtig: true } },
@@ -30,6 +32,6 @@ export async function loadQuizBalances(authorizedIds: readonly number[]) {
         categoryIds: q.fragen.fragen_kategorien.map(c => c.fragenkategorie.fragenkategorie_id),
       };
     });
-    return [quiz.quiz_id, getQuizBalance({ questions, sections: quiz.quiz_abschnitte.filter(isQuestionSection).map(s => ({ id: s.quiz_abschnitt_id, title: s.titel })), categories: [...categories.values()] })];
+    return [quiz.quiz_id, getQuizBalance({ mode: normalizeQuizMode(quiz.quiz_modus), questions, sections: quiz.quiz_abschnitte.filter(isQuestionSection).map(s => ({ id: s.quiz_abschnitt_id, title: s.titel })), categories: [...categories.values()] })];
   }));
 }

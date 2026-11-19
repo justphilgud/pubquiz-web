@@ -1,4 +1,5 @@
 import { questionTemplateIds as T, resolveCanonicalQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
+import { normalizeQuizMode, type QuizMode } from "./quizMode";
 
 export type BalanceStatus = "RED" | "YELLOW" | "GREEN" | "NONE";
 export type BalanceGroup = "open" | "closed" | "audio" | "facts" | "image" | "creative" | "ordering" | "pairs" | "trueFalse" | "estimate" | "poll";
@@ -68,7 +69,8 @@ function templatesForGroup(group: BalanceGroup) {
   return Object.entries(BALANCE_TEMPLATE_GROUPS).filter(([, value]) => value === group).map(([id]) => id);
 }
 
-export function getQuizBalance(input: { questions: readonly BalanceQuestion[]; sections: readonly BalanceSection[]; categories: readonly BalanceCategory[] }) {
+export function getQuizBalance(input: { questions: readonly BalanceQuestion[]; sections: readonly BalanceSection[]; categories: readonly BalanceCategory[]; mode?: QuizMode }) {
+  const mode = normalizeQuizMode(input.mode);
   const blocks = input.sections.map(section => {
     const questions = input.questions.filter(q => q.sectionId === section.id);
     const groups = BALANCE_RULES.map(rule => {
@@ -78,7 +80,7 @@ export function getQuizBalance(input: { questions: readonly BalanceQuestion[]; s
     });
     const categories = input.categories.map(category => {
       const count = questions.filter(q => q.categoryIds.includes(category.id)).length;
-      return { ...category, count, status: balanceStatus("category", count, questions.length) };
+      return { ...category, count, status: mode === "THEMED" ? "NONE" as const : balanceStatus("category", count, questions.length) };
     });
     const displayedCategories = categories.filter(category => category.count > 0);
     const overCategory = displayedCategories.some(c => c.status === "RED" || c.status === "YELLOW");
@@ -103,7 +105,7 @@ export function getQuizBalance(input: { questions: readonly BalanceQuestion[]; s
     label: "Mindestens ein Block enthält mindestens drei Audio-Fragen.",
     recommendations: blocks.filter(b => b.groups.find(g => g.id === "audio")!.count < 3).map(b => ({ label: `${b.title}: Audio-Fragen suchen`, href: balanceSearchHref({ templateIds: templatesForGroup("audio") }) })),
   } : null;
-  return { blocks, audioRule, unassigned: input.questions.filter(q => !input.sections.some(s => s.id === q.sectionId)).length,
+  return { mode, blocks, audioRule, unassigned: input.questions.filter(q => !input.sections.some(s => s.id === q.sectionId)).length,
     status: worstBalanceStatus([...blocks.map(b => b.status), ...(audioRule ? [audioRule.status] : [])]),
   };
 }

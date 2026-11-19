@@ -8,7 +8,26 @@ Empfehlungen. `quizBalance.ts` berechnet rein aus Zuweisungen, Block- und
 Kategoriemetadaten. `quizBalance.server.ts` liest nur bereits autorisierte Quiz-IDs
 und keine Teamantworten, Bewertungen oder Submissions. Die bestehende Dauerprognose,
 Zuordnung, Sortierung, Berechtigung und Laufzeit bleiben in ihren bisherigen Pfaden.
-Es gibt keine Migration, Persistenz der Ampel oder neue Projektabhängigkeit.
+Die Ampel wird nicht persistiert; nur der Quizmodus ist ein dauerhaftes Stammdatum.
+Es gibt keine neue Projektabhängigkeit.
+
+## Quizmodus
+
+Neuanlage und Bearbeitung verwenden die vorhandenen Quiz-Stammdatenformulare.
+`quiz_modus` speichert `VARIED` (Abwechslungsreiches Quiz, Standard) oder `THEMED`
+(Themenquiz). Die additive Migration `20261119150000_add_quiz_mode` ergänzt eine
+NOT-NULL-Spalte mit Standard `VARIED`; damit erhalten Bestandsquiz denselben Modus.
+Ein Check-Constraint und die Actions verhindern andere Werte. Bei Update ohne
+Modusparameter bleibt der gespeicherte Wert erhalten; Kopien übernehmen ihn.
+Schnellquiz verwendet den Datenbankstandard. Rechte, Navigation und Laufzeit ändern
+sich nicht. Ein bewusster Moduswechsel wird gespeichert und beim Neuladen wirksam.
+
+Im abwechslungsreichen Quiz bleiben alle bisherigen Regeln unverändert. Im
+Themenquiz bleiben Sachkategorien mit Anzahl und Blockanteil sichtbar, aber neutral:
+keine grüne/gelbe/rote Kategorieampel, kein Einfluss auf Block-/Gesamtstatus und
+keine Kategorie-Ausgleichsempfehlung oder daraus abgeleiteter Kategorie-Suchfilter.
+Template-Ampeln, Template-Empfehlungen und die Drei-Audio-Regel bleiben aktiv.
+Der kompakte Einstieg nennt den Modus; Detailansicht und Regeltabelle erklären ihn.
 
 Der Auftraggeber hat überschneidungsfreie Templategruppen bestätigt: Standardfragen
 werden nach ihrem effektiven quizbezogenen Antwortmodus aufgeteilt. Multiple Choice
@@ -33,7 +52,8 @@ zur Fragenzahl, erhalten selbst aber keine Ampel.
 | Offene Fragen | Standard, effektiv offen | <5 % oder >25 % | 5–10 % oder >20–25 % | >10–20 % |
 | Geschlossene Fragen | Standard, effektiv geschlossen; Multiple Choice | <10 % oder >60 % | 10–<15 % oder >50–60 % | 15–50 % |
 | Audio-Fragen | Musik rückwärts, normale Musik, 8-Bit-Musik, Übersetzt-vorgelesen | <10 % oder >30 % | 10–<15 % oder >25–30 % | 15–25 % |
-| Sachkategorien | Bestehende zugeordnete Kategorien, z. B. Politik, Wirtschaft, Kultur, Film, Geografie | >20 % | 10–20 % | >0–<10 % |
+| Sachkategorien, abwechslungsreiches Quiz | Bestehende zugeordnete Kategorien, z. B. Politik, Wirtschaft, Kultur, Film, Geografie | >20 % | 10–20 % | >0–<10 % |
+| Sachkategorien, Themenquiz | Dieselben Kategorien und Anteile; neutrale Anzeige ohne Ausgleichsempfehlung | — | — | — |
 | Fakten | Person, Jahr, Land, Freitext | 0 Fragen | — | ≥1 Frage |
 | Bild | FaceMorph, Pixelbild, Kunstwerk | 0 Fragen | — | ≥1 Frage |
 | Kreativität | Anagramm, Meme beschriften, Google-Rezensionen | 0 Fragen | — | ≥1 Frage |

@@ -21,6 +21,7 @@ import type { BlobEnvironmentPrefix } from "@/app/lib/blobPath";
 import { QuizCopyDialog } from "./QuizCopyDialog";
 import { formatQuizDuration, formatQuizQuestionCount } from "./quizPlanning";
 import QuizBalanceSummary from "./planning/QuizBalanceSummary";
+import { DEFAULT_QUIZ_MODE, QUIZ_MODES, normalizeQuizMode, type QuizMode } from "./quizMode";
 import { isEventSeriesSelectable } from "@/app/eventreihen/eventSeriesPolicy";
 import {
   ArchiveBoxIcon,
@@ -71,6 +72,7 @@ type FormState = {
   publicDescriptionMode: string;
   presentationTemplateId: string;
   solutionStrategy: QuizSolutionStrategy;
+  mode: QuizMode;
 };
 
 function emptyForm(initialEventSeriesId?: number): FormState {
@@ -86,6 +88,7 @@ function emptyForm(initialEventSeriesId?: number): FormState {
     reservationUrl: "", publicDescription: "", publicDescriptionMode: "APPEND",
     presentationTemplateId: "",
     solutionStrategy: DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY,
+    mode: DEFAULT_QUIZ_MODE,
   };
 }
 
@@ -104,6 +107,7 @@ function formFromQuiz(quiz: QuizResult): FormState {
     publicDescriptionMode: quiz.oeffentliche_beschreibung_modus ?? "APPEND",
     presentationTemplateId: quiz.presentation_template_id ?? "",
     solutionStrategy: quiz.aufloesungsstrategie,
+    mode: normalizeQuizMode(quiz.quiz_modus),
   };
 }
 
@@ -213,6 +217,7 @@ export default function QuizForm({
       publicDescriptionMode: form.publicDescriptionMode,
       presentationTemplateId: form.presentationTemplateId || null,
       solutionStrategy: form.solutionStrategy,
+      mode: form.mode,
     };
     const result = editingQuizId === null
       ? await createQuiz(data)
@@ -282,6 +287,13 @@ export default function QuizForm({
             <label className="block">
               <span className="mb-1 block text-sm font-semibold">Name *</span>
               <input required maxLength={200} value={form.title} onChange={(event) => updateField("title", event.target.value)} className={inputClass} />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-sm font-semibold">Quizmodus</span>
+              <select name="quizMode" value={form.mode} onChange={(event) => updateField("mode", normalizeQuizMode(event.target.value))} className={inputClass}>
+                {Object.entries(QUIZ_MODES).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+              </select>
+              <span className="mt-2 block text-sm text-slate-600">Themenquiz: Sachkategorien werden angezeigt, aber nicht auf Ausgewogenheit geprüft. Template-Ampeln bleiben aktiv.</span>
             </label>
             <label className="block">
               <span className="mb-1 block text-sm font-semibold">Datum *</span>

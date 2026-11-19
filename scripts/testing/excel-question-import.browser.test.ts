@@ -338,6 +338,35 @@ test("real Next.js and Chromium: XLSX, template duplicates, quiz planning and qu
     await navigate("/quiz");
     assert.match(await cardText("Planung · Leer"), /0 Fragen/);
 
+    // Actual create/edit actions persist the mode, including reload and default.
+    await js(`document.querySelector('select[name="quizMode"]').closest('details').open = true`);
+    assert.equal(await js(`document.querySelector('select[name="quizMode"]').value`), "VARIED");
+    await js(`(() => {
+      const mode = document.querySelector('select[name="quizMode"]');
+      const form = mode.closest('form');
+      const set = (field, value) => {
+        Object.getOwnPropertyDescriptor(field.tagName === 'SELECT' ? HTMLSelectElement.prototype : HTMLInputElement.prototype, 'value').set.call(field, value);
+        field.dispatchEvent(new Event(field.tagName === 'SELECT' ? 'change' : 'input', {bubbles:true}));
+      };
+      set(form.querySelector('select'), '10');
+      set(form.querySelector('input[required][maxlength="200"]'), 'Quizmodus Browser');
+      set(form.querySelector('input[type="date"]'), '2030-01-02');
+      set(mode, 'THEMED');
+    })()`);
+    await clickButton("Quiz anlegen");
+    const modeQuiz = await eventually(() => db.quiz.findFirst({ where: { titel: "Quizmodus Browser" } }), "Themenquiz gespeichert");
+    assert.equal(modeQuiz.quiz_modus, "THEMED");
+    await eventually(() => js(`location.pathname === ${JSON.stringify(`/quiz/${modeQuiz.quiz_id}`)}`), "Neuanlage abgeschlossen");
+    await navigate(`/quiz?editQuizId=${modeQuiz.quiz_id}`);
+    await eventually(() => js(`document.querySelector('select[name="quizMode"]')?.value === 'THEMED'`), "Themenquiz nach Reload");
+    await js(`(() => { const field = document.querySelector('select[name="quizMode"]');
+      Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value').set.call(field, 'VARIED');
+      field.dispatchEvent(new Event('change', {bubbles:true})); })()`);
+    await clickButton("Änderungen speichern");
+    await eventually(async () => (await db.quiz.findUniqueOrThrow({ where: { quiz_id: modeQuiz.quiz_id } })).quiz_modus === "VARIED", "Moduswechsel gespeichert");
+    await navigate(`/quiz?editQuizId=${modeQuiz.quiz_id}`);
+    await eventually(() => js(`document.querySelector('select[name="quizMode"]')?.value === 'VARIED'`), "Moduswechsel nach Reload");
+
     const quiz = await db.quiz.create({ data: { titel: "Excel Browser-Quiz", eventreihe_id: 10 } });
     const quizId = quiz.quiz_id;
     const block = await db.quiz_abschnitte.create({ data: { quiz_id: quizId, titel: "Testblock", sortierung: 1, abschnitt_typ: "fragenblock" } });

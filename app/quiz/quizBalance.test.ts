@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { isQuizMode, normalizeQuizMode } from "./quizMode";
 import test from "node:test";
 import { questionTemplateIds, resolveCanonicalQuestionTemplateId } from "@/app/fragen/editor/templates/questionTemplateRegistry";
 import { parseContentFilters, selectedContentTemplateIds, serializeContentFilters } from "@/app/components/content/contentLibrary";
@@ -84,4 +85,44 @@ test("closed recommendations exclude open standard and do not broaden into true/
   const filters = parseContentFilters(new URL(href, "https://quiz.invalid").searchParams, "QUESTION", Object.values(questionTemplateIds));
   assert.equal(filters.answerMode, "closed");
   assert.deepEqual(selectedContentTemplateIds(filters), ["standard", "multiple_choice"]);
+});
+
+test("quiz mode defaults to varied and rejects arbitrary submitted values", () => {
+  assert.equal(normalizeQuizMode(undefined), "VARIED");
+  assert.equal(normalizeQuizMode("invalid"), "VARIED");
+  assert.equal(isQuizMode("invalid"), false);
+  assert.equal(isQuizMode(null), false);
+  assert.equal(isQuizMode("THEMED"), true);
+});
+
+test("Film-only themed quiz keeps categories neutral without worsening green templates", () => {
+  const templates = ["standard", "standard", "standard", ...Array(6).fill("multiple_choice"),
+    ...Array(3).fill("musik"), "fakten_person", "fakten_jahr", "pixelbild", "anagramm", "reihenfolge", "paare_bilden", "wahr_falsch", "schaetzfrage"];
+  const input = { questions: templates.map(templateId => q({ templateId, categoryIds: [1] })),
+    sections: [{ id: 1, title: "Filmblock" }], categories: [{ id: 1, name: "Film" }, { id: 2, name: "Politik" }] };
+  const varied = getQuizBalance(input);
+  const themed = getQuizBalance({ ...input, mode: "THEMED" });
+  assert.equal(varied.blocks[0].categories[0].status, "RED");
+  assert.equal(varied.status, "RED");
+  assert.equal(themed.blocks[0].categories[0].count, 20);
+  assert.equal(themed.blocks[0].categories[0].status, "NONE");
+  assert.equal(themed.status, "GREEN");
+  assert.deepEqual(themed.blocks[0].recommendations, []);
+  assert.deepEqual(getQuizBalance({ ...input, mode: "VARIED" }), varied);
+});
+
+test("themed quiz preserves block template warnings and recommendations without category filters", () => {
+  const input = { mode: "THEMED" as const, questions: Array.from({ length: 10 }, () => q({ categoryIds: [1] })),
+    sections: [{ id: 1, title: "A" }, { id: 2, title: "B" }], categories: [{ id: 1, name: "Film" }, { id: 2, name: "Politik" }] };
+  const result = getQuizBalance(input);
+  assert.equal(result.status, "RED");
+  assert.equal(result.blocks[0].groups.find(g => g.id === "open")?.status, "RED");
+  assert.equal(result.blocks[1].total, 0);
+  assert.equal(result.blocks[1].status, "NONE");
+  assert.equal(result.audioRule?.status, "RED");
+  assert.ok(result.blocks[0].recommendations.some(r => r.label.startsWith("Audio")));
+  assert.ok(result.blocks.flatMap(b => b.recommendations).every(r => {
+    const params = new URL(r.href, "https://quiz.invalid").searchParams;
+    return params.has("template") && !params.has("categoryId");
+  }));
 });

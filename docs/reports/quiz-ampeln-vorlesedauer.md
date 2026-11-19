@@ -1,7 +1,7 @@
 # Gemeinsame Preview: Quiz-Ampeln und Vorlesedauer
 
 Basis: main `e456764a` nach PR #171 und #172. AP5 bleibt unverändert und wird
-nicht erneut implementiert. Keine neue Abhängigkeit, Migration oder Änderung
+nicht erneut implementiert. Keine neue Abhängigkeit oder Änderung
 von Spielbetrieb, Antworten oder Bewertung. **Kein Production-Backup und kein
 Production-Deployment in diesem Auftrag.** Ein gemeinsamer Release folgt erst
 nach gemeinsamer Preview-Abnahme und gesonderter Autorisierung.
@@ -135,3 +135,29 @@ kein Production-Deployment und kein Merge wurden ausgeführt.
 Der abschließende Dokumentationscommit ergänzt ausschließlich Bericht und Bildnachweise;
 Anwendung, Tests und Konfiguration bleiben gegenüber dem geprüften Preview-Quellstand
 identisch. Die finale PR-CI wird vor Übergabe ebenfalls abgewartet.
+
+## Ergänzung: persistierter Quizmodus
+
+Die Ergänzung zu PR #173 erweitert die oben dokumentierte ursprüngliche Abnahme.
+Neuanlage und Bearbeitung bieten „Abwechslungsreiches Quiz“ (Standard) und
+„Themenquiz“. Die additive Migration `20261119150000_add_quiz_mode` speichert den
+Modus als nicht-nullbares Quiz-Stammdatum mit Default `VARIED` und Werte-Constraint;
+Bestandsquiz erhalten den Standard. Kopien übernehmen den Modus, Updates ohne
+Modusparameter erhalten ihn. Die bestehenden Rechte und Revalidierung bleiben aktiv.
+
+Die reine Ampellogik setzt Kategoriebewertungen im Themenmodus auf neutral. Dadurch
+entstehen weder schlechtere Gesamtstatus noch Kategorie-Ausgleichsempfehlungen oder
+daraus abgeleitete Suchfilter. Kategorieanzahl und Blockanteile bleiben sichtbar;
+Template-Ampeln, Empfehlungen und Drei-Audio-Regel bleiben aktiv. Kompaktanzeige,
+Detailhinweis und Regeltabelle erklären den Modus.
+
+Bereits lokal erfolgreich: alle 14 Ampeltests einschließlich Film-only bei grünen
+Templates und unverändert roten unausgewogenen Templates; TypeScript, geändertes
+ESLint und die vollständige Analysis-/Client-Browserregression. PostgreSQL-CI prüft
+die echte Upgrade-Migration einschließlich Altbestand, Default, Wechsel, Erhalt bei
+anderen Updates und ungültigen/NULL-Werten. Die echte Next-/Chromium-Abnahme prüft
+Neuanlage mit Standardauswahl, Speichern als Themenquiz, Reload und Rückwechsel.
+
+Der aktualisierte gemeinsame Preview-Link und die gehosteten Ergebnisse dieser
+Ergänzung folgen nach erfolgreicher exakter CI. Die bisherige Preview oben belegt
+bis dahin ausschließlich den ursprünglichen Stand. Kein Production-Schritt.

@@ -1,4 +1,5 @@
 "use server";
+import { DEFAULT_QUIZ_MODE, isQuizMode, normalizeQuizMode, type QuizMode } from "./quizMode";
 
 import { newQuizIntroMedia, selectedQuizIntroMedia } from "./quizIntroMedia";
 
@@ -228,6 +229,7 @@ export async function getQuizFixedSlideVisibility(quizId: number) {
 }
 
 export type QuizResult = {
+  quiz_modus?: QuizMode;
   live_status?: "Vorbereitung"|"Läuft"|"Beendet";
   quiz_id: number;
   eventreihe_id: number;
@@ -403,6 +405,7 @@ export async function getQuizListe(options: { includePlanning?: boolean; eventSe
     eventreihe_name: quiz.eventreihe.name,
     eventreihe_archiviert: quiz.eventreihe.ist_archiviert,
     titel: quiz.titel,
+    quiz_modus: normalizeQuizMode(quiz.quiz_modus),
     aufloesungsstrategie: isQuizSolutionStrategy(quiz.aufloesungsstrategie)
       ? quiz.aufloesungsstrategie
       : "AFTER_EACH_QUESTION",
@@ -484,6 +487,7 @@ export async function getAktiveQuizListe(): Promise<QuizResult[]> {
 }
 
 export async function createQuiz(data: {
+  mode?: QuizMode;
   eventSeriesId: number;
   titel: string;
   quizDatum: string;
@@ -498,6 +502,7 @@ export async function createQuiz(data: {
   presentationTemplateId?: string | null;
   solutionStrategy?: QuizSolutionStrategy;
 }) {
+  if (data.mode !== undefined && !isQuizMode(data.mode)) return { success: false, message: "Der Quizmodus ist ungültig." };
   if (!isQuizSolutionStrategy(data.solutionStrategy ?? DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY)) {
     return { success: false, message: "Die AuflÃ¶sungsstrategie ist ungÃ¼ltig." };
   }
@@ -525,6 +530,7 @@ export async function createQuiz(data: {
     data: {
       eventreihe_id: validated.value.eventSeriesId,
       titel: validated.value.title,
+      quiz_modus: data.mode ?? DEFAULT_QUIZ_MODE,
       quiz_datum: validated.value.dateValue,
       veranstaltungszeit: validated.value.time,
       veranstaltungsname: validated.value.venueName,
@@ -556,6 +562,7 @@ export async function createQuiz(data: {
 }
 
 export async function updateQuiz(data: {
+  mode?: QuizMode;
   quizId: number;
   eventSeriesId: number;
   titel: string;
@@ -571,6 +578,7 @@ export async function updateQuiz(data: {
   presentationTemplateId?: string | null;
   solutionStrategy?: QuizSolutionStrategy;
 }) {
+  if (data.mode !== undefined && !isQuizMode(data.mode)) return { success: false, message: "Der Quizmodus ist ungültig." };
   if (!isQuizSolutionStrategy(data.solutionStrategy ?? DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY)) {
     return { success: false, message: "Die AuflÃ¶sungsstrategie ist ungÃ¼ltig." };
   }
@@ -640,6 +648,7 @@ export async function updateQuiz(data: {
       data: {
         eventreihe_id: validated.value.eventSeriesId,
         titel: validated.value.title,
+        quiz_modus: data.mode,
         quiz_datum: validated.value.dateValue,
         veranstaltungszeit: validated.value.time,
         veranstaltungsname: validated.value.venueName,
@@ -816,6 +825,7 @@ export async function copyQuiz(data: {
         shared_design_template_id:original.shared_design_template_id,
         answer_form_template_id: original.shared_design_template_id ? original.answer_form_template_id : validated.value.presentationTemplateId,
         aufloesungsstrategie: original.aufloesungsstrategie,
+        quiz_modus: original.quiz_modus,
 
         intro_logo_url: original.intro_logo_url,
         intro_musik_url: original.intro_musik_url,
@@ -1138,6 +1148,7 @@ export async function getQuizDetails(
     eventreihe_name: quiz.eventreihe.name,
     eventreihe_archiviert: quiz.eventreihe.ist_archiviert,
     titel: quiz.titel,
+    quiz_modus: normalizeQuizMode(quiz.quiz_modus),
     quiz_datum: quiz.quiz_datum
       ? quiz.quiz_datum.toISOString().split("T")[0]
       : null,
