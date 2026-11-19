@@ -18,6 +18,7 @@ import { buildPresentationQualityFixture } from "./presentationQualityFixtures";
 import { resolvePresentationLayout } from "./presentationLayoutResolver";
 import { isIntroMusicSlide } from "./presentationSlideMetadata";
 import ModerationToolbar from "../../quiz/[quizId]/moderation/components/ModerationToolbar";
+import PresentationPreview from "../../quiz/[quizId]/moderation/components/PresentationPreview";
 import {
   resolveIntermediateStandingsAudience,
 } from "./presentationRankingPolicy";
@@ -30,6 +31,27 @@ const rendererSource = readFileSync(
   new URL("./PresentationSlideRenderer.tsx", import.meta.url),
   "utf8",
 );
+
+test("LOVD November: every registered question template exposes the shared block number", () => {
+  for (const templateId of Object.values(questionTemplateIds)) {
+    const fixture = buildPresentationQualityFixture("short", "EDITORIAL");
+    assert.ok(fixture.slide.typ === "frage");
+    fixture.slide.frage.templateId = templateId;
+    fixture.slide.frageIndexImBlock = 17;
+    const html = renderToStaticMarkup(createElement(PresentationSlideRenderer, fixture));
+    assert.match(html, /aria-label="Frage 17, Folie 1 von 1"/, templateId);
+  }
+});
+
+test("LOVD November: next preview follows reordered flow with configured title and type fallback", () => {
+  const fixture = buildPresentationQualityFixture("qr", "EDITORIAL");
+  assert.ok(fixture.slide.typ === "ablauf");
+  const rules: Slide = { ...fixture.slide, element: { ...fixture.slide.element, type: "RULES", label: "", config: { version: 1, title: "Unsere Regeln" } } };
+  const ceremony: Slide = { ...fixture.slide, element: { ...fixture.slide.element, type: "WINNER", label: "", config: { version: 1 } } };
+  for (const [sequence, title] of [[[ceremony, rules], "Gewinner"], [[rules, ceremony], "Unsere Regeln"]] as const) {
+    assert.match(renderToStaticMarkup(createElement(PresentationPreview, { slide: sequence[0] })), new RegExp(title));
+  }
+});
 
 for (const style of ["EDITORIAL", "NEON", "KOMM_ONE", "BIRTHDAY", "CORPORATE"] as const) {
   test(`${style}: waiting preserves configured copy and paragraphs alongside video and start time`, () => {

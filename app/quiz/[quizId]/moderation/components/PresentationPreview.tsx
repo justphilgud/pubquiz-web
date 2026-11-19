@@ -1,9 +1,13 @@
 import type { Slide } from "../../praesentation/buildPraesentationSlides";
+import { getQuizFlowTypeLabel } from "@/app/quiz/flow/quizFlow";
 
 function getSlideTitel(slide: Slide | undefined) {
   if (!slide) return "Kein Slide";
 
-  if (slide.typ === "fixer-slide") return slide.slideTyp;
+  if (slide.typ === "ablauf") return slide.element.config.title?.trim() || slide.element.label?.trim() || getQuizFlowTypeLabel(slide.element.type);
+  if (slide.typ === "pixel-erklaerung") return "Pixelbild · Spielregeln";
+  if (slide.typ === "meme-erklaerung") return "Meme-Runde · Erklärung";
+  if (slide.typ === "fixer-slide") return ({ "vor-dem-start": "Vor dem Start", startsequenz: "Startsequenz", begruessung: "Begrüßung", preise: "Preise", regeln: "Regeln", qrcode: "QR-Code", bekanntmachungen: "Bekanntmachungen" })[slide.slideTyp];
   if (slide.typ === "block") return slide.abschnitt.titel;
   if (slide.typ === "frage") return slide.frage.frage ?? "Frage";
   if (slide.typ === "funny") return `Falsch aber lustig: ${slide.frage.frage ?? "Frage"}`;
@@ -18,6 +22,7 @@ function getSlideTitel(slide: Slide | undefined) {
 
 function getSlideTypLabel(slide: Slide | undefined) {
   if (!slide) return "—";
+  if (slide.typ === "ablauf") return getQuizFlowTypeLabel(slide.element.type);
 
   if (slide.typ === "frage") return "Frage";
   if (slide.typ === "funny") return "Funny";

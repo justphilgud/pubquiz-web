@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
 import ts from "typescript";
 import { buildPresentationQualityFixture } from "./presentationQualityFixtures";
-import { buildPraesentationSlides, getPresentationSlideKey } from "@/app/quiz/[quizId]/praesentation/buildPraesentationSlides";
+import { buildPraesentationSlides, getPresentationSlideKey, isPodiumRevealSlide } from "@/app/quiz/[quizId]/praesentation/buildPraesentationSlides";
 import { parsePresentationSlideKey, resolvePresentationAudienceState, resolvePresentationLiveState } from "./presentationLiveState";
 import { selectQuizAnswerAssignments } from "@/app/quiz/quizAnswerLiveState";
 import { assertLifecycleRevision } from "@/app/quiz/quizLifecycle";
@@ -70,7 +70,8 @@ function navigationHarness(previousKey: string, previousIndex: number, expired =
   const dependencies: Record<string, unknown> = {
     "@/app/lib/prisma": { prisma: { $transaction: (work: (db: unknown) => unknown) => work(tx) } },
     "../../actions": { getQuizPraesentation: async () => quiz },
-    "./buildPraesentationSlides": { buildPraesentationSlides, getPresentationSlideKey },
+    "./buildPraesentationSlides": { buildPraesentationSlides, getPresentationSlideKey, isPodiumRevealSlide },
+    "@/app/generated/prisma/client": { Prisma: { DbNull: null } },
     "../../quizAccess.server": { requireQuizLiveController: async () => {}, requireQuizQuestion: async () => ({ quiz_abschnitt_id: null }) },
     "../../quizLifecycle": { assertLifecycleRevision },
     "../../quizLifecycle.server": { requireQuizNotStopped: async () => state },

@@ -53,6 +53,13 @@ test("stored state restores slide, reveal, media and estimation after reload", (
   assert.deepEqual(state.estimation, { phase: "SOLUTION", questionId: 42 });
 });
 
+test("LOVD November: podium opening and reload preserve zero without changing other reveal defaults", () => {
+  for (const slide_key of ["default:AFTER_QUIZ:QUIZ:WINNER:WINNER", "flow:12:WINNER", "section:12:final"]) {
+    assert.equal(resolvePresentationLiveState({ slide_index: 12, slide_key, endstand_reveal_count: 0 }).revealCount, 0);
+  }
+  assert.equal(resolvePresentationLiveState({ slide_index: 0, slide_key: "question:12:question", endstand_reveal_count: 0 }).revealCount, 1);
+});
+
 test("question keys resolve assignment and question phase without copying question data into the status", () => {
   const questions = [
     { questionAssignmentId: 12, questionId: 101, sectionId: 16 },

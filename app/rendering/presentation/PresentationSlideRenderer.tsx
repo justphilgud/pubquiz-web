@@ -10,6 +10,7 @@ import { SynchronizedSpeech } from "./SynchronizedSpeech";
 import { mediaRemainingSeconds, formatMediaRemaining, introResumePosition } from "./mediaCountdown";
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import QRCode from "react-qr-code";
+import { PodiumCeremony } from "./PodiumCeremony";
 import { ClassicalChoiceSlide } from "./ClassicalChoiceSlide";
 import { OrderingSolutionLayout } from "./OrderingSolutionLayout";
 import { PairsSlide } from "./PairsSlide";
@@ -1372,181 +1373,12 @@ function renderZwischenstandSlide() {
 }
 
 function renderEndstandSlide() {
-  const topTeams = rankScores(punktestand);
-  const maxPunkte = Math.max(...topTeams.map((team) => team.punkte), 1);
-  const pferdeFarben = ["#22d3ee", "#fb7185", "#84cc16", "#60a5fa", "#f59e0b"];
-
-  const teamsMitPlatz = topTeams.map((team) => ({ ...team, platz: team.place }));
-  const finalReveal = resolvePodiumReveal(punktestand, endstandRevealCount);
-  const showFullTable = endstandRevealCount > finalReveal.revealStageCount;
-  const sichtbarePlaetze = finalReveal.visiblePodiumGroups.map((group) => group.place);
-  const sichtbareTeams = teamsMitPlatz.filter(
-    (team) => showFullTable || sichtbarePlaetze.includes(team.platz),
-  );
-
-  const renderIdentity = (team: ScoreEntry, className = "h-14 w-14") => (
-    <TeamIdentityVisual
-      name={team.teamname}
-      photoUrl={team.photoUrl}
-      avatarCode={team.avatarCode ?? resolveTeamAvatarCode(team.teamId ?? 0, null)}
-      className={className}
-    />
-  );
-
-  const podium = (
-    <div className="presentation-ranking-podium" aria-label="Podium Platz eins bis drei">
-      {teamsMitPlatz.filter((team) => team.platz <= 3 && sichtbarePlaetze.includes(team.platz)).sort((left, right) => left.platz - right.platz).map((team) => {
-        return <article key={`podium-${team.teamname}`} data-place={team.platz}>
-          {renderIdentity(team, team.platz === 1 ? "h-24 w-24" : "h-20 w-20")}
-          <strong>{team.teamname}</strong>
-          <span>{formatQuizPoints(team.punkte)} Punkte</span>
-          <b>#{team.platz}</b>
-        </article>;
-      })}
-    </div>
-  );
-
-  if (showFullTable) {
-    return (
-      <section className="presentation-flow-slide presentation-flow-ranking presentation-ranking-overview" data-flow-type="FINAL_STANDINGS">
-        <p className="presentation-flow-kicker">Endstand</p>
-        <h2>Finale Tabelle</h2>
-        {renderRankingTable(
-          teamsMitPlatz.map((team, index) => ({
-            key: `${team.teamId ?? team.teamname}-${index}`,
-            place: team.platz,
-            teamname: team.teamname,
-            punkte: team.punkte,
-          })),
-          true,
-        )}
-      </section>
-    );
-  }
-
-  if (theme.design.stylePreset === "EDITORIAL") {
-    return (
-      <section className="presentation-flow-slide presentation-flow-ranking" data-flow-type="WINNER">
-        <p className="presentation-flow-kicker">Ergebnisse</p>
-        <h2>Finale Tabelle</h2>
-        {podium}
-        {teamsMitPlatz.length === 0 ? (
-          <div className="presentation-flow-message">Noch liegen keine Teamwertungen vor.</div>
-        ) : (
-          <ol className="presentation-flow-ranking-list" data-many={sichtbareTeams.length > 6}>
-            {sichtbareTeams.map((team) => {
-              const istSichtbar = showFullTable || sichtbarePlaetze.includes(team.platz);
-              return (
-                <li key={team.teamname} className={istSichtbar ? "opacity-100" : "opacity-30"}>
-                  <span className="presentation-flow-rank">{team.platz}</span>
-                  <strong className="flex items-center gap-3">{istSichtbar && renderIdentity(team)}{istSichtbar ? team.teamname : "Noch geheim"}</strong>
-                  <span>{istSichtbar ? `${formatQuizPoints(team.punkte)} Punkte` : "–"}</span>
-                </li>
-              );
-            })}
-          </ol>
-        )}
-      </section>
-    );
-  }
-
-  return (
-    <div className="flex h-full min-h-0 flex-col rounded-[1.5rem] border-4 border-yellow-300 bg-[radial-gradient(circle_at_50%_0%,rgba(250,204,21,0.16),transparent_35%),linear-gradient(180deg,rgba(88,28,135,0.45),rgba(2,6,23,0.92))] p-8 shadow-[8px_8px_0_#ff00aa]">
-      <div className="presentation-legacy-kicker mb-4 inline-flex w-fit rotate-[-2deg] rounded-xl bg-pink-500 px-5 py-3 text-sm font-black uppercase tracking-[0.3em] text-yellow-200 shadow-[4px_4px_0_#00e5ff]">
-        Endstand
-      </div>
-
-      <h2 className="mb-5 text-center text-5xl font-black uppercase tracking-tight text-yellow-200 drop-shadow-[5px_5px_0_#ff00aa]">
-        Finale Tabelle
-      </h2>
-
-      <div className="min-h-0 flex-1 rounded-[1.5rem] border-4 border-cyan-300 bg-black/45 p-4 shadow-[6px_6px_0_#ff00aa]">
-        <div className="grid h-full gap-3">
-          {sichtbareTeams.map((team, index) => {
-            const prozent = Math.max(8, (team.punkte / maxPunkte) * 100);
-            const pferdLinks = `calc(${prozent}% - 5rem)`;
-            const istSichtbar = sichtbarePlaetze.includes(team.platz);
-            const platz = team.platz;
-
-            const istGewinner =
-              team.punkte === topTeams[0]?.punkte;
-
-            const istTot = !istGewinner;
-
-            return (
-              <div
-                key={team.teamname}
-                className={`grid grid-cols-[90px_1fr_150px] items-center gap-4 transition ${istSichtbar ? "opacity-100" : "opacity-30 blur-sm"
-                  }`}
-              >
-                <div className="flex h-full items-center justify-center rounded-2xl border-4 border-yellow-300 bg-slate-950/80 text-4xl font-black text-yellow-200 shadow-[4px_4px_0_#ff00aa]">
-                  #{platz}
-                </div>
-
-                <div className="relative h-full min-h-[68px] overflow-visible rounded-2xl border-4 border-cyan-300 bg-slate-950/70 shadow-[4px_4px_0_#ff00aa]">
-                  <div
-                    className={`absolute inset-y-0 left-0 rounded-r-xl bg-gradient-to-r ${index === 0
-                      ? "from-yellow-500/80 to-yellow-300/70"
-                      : index === 1
-                        ? "from-slate-400/80 to-slate-200/70"
-                        : index === 2
-                          ? "from-orange-700/80 to-orange-400/70"
-                          : "from-cyan-900/80 to-cyan-700/60"
-                      }`}
-                    style={{
-                      width: `${prozent}%`,
-                      animation: istSichtbar
-                        ? `bahnWachsen 1.2s ease-out ${index * 0.12}s both`
-                        : undefined,
-                    }}
-                  />
-
-                  <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,rgba(255,255,255,0.08)_0,rgba(255,255,255,0.08)_2px,transparent_2px,transparent_42px)]" />
-
-                  <div className="absolute left-5 top-1/2 z-20 max-w-[45%] -translate-y-1/2 truncate text-2xl font-black text-white drop-shadow-[3px_3px_0_#000]">
-                    <span className="flex items-center gap-3">{istSichtbar && renderIdentity(team, "h-12 w-12")}{istSichtbar ? team.teamname : "???"}</span>
-                  </div>
-
-                  {istSichtbar && (
-                    <div
-                      className={`absolute top-1/2 ${istTot
-                        ? "z-30 animate-[pferdEinreitenUndSterben_1.7s_ease-out_both]"
-                        : "z-30 animate-[pferdSieger_2.2s_ease-in-out_both]"
-                        }`}
-                      style={{
-                        left: pferdLinks,
-                        animationDelay: `${index * 0.12}s`,
-                      }}
-                    >
-
-                      {renderRennPferd({
-                        farbe: pferdeFarben[index % pferdeFarben.length],
-                        nummer: index + 1,
-                      })}
-                    </div>
-                  )}
-
-                  <div
-                    className="absolute right-3 top-1/2 z-10 h-[82%] w-6 -translate-y-1/2 rounded-sm border-2 border-white shadow-[0_0_18px_#facc15]"
-                    style={{
-                      backgroundImage:
-                        "conic-gradient(#fff 25%, #000 0 50%, #fff 0 75%, #000 0)",
-                      backgroundSize: "12px 12px",
-                    }}
-                  />
-                </div>
-
-                <div className="rounded-2xl border-4 border-yellow-300 bg-black/70 px-4 py-3 text-right text-4xl font-black text-yellow-200 shadow-[4px_4px_0_#ff00aa]">
-                  {istSichtbar ? formatQuizPoints(team.punkte) : "?"}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
+  return <section className="presentation-flow-slide presentation-flow-ranking presentation-ranking-ceremony" data-flow-type="WINNER">
+    <p className="presentation-flow-kicker">Siegerehrung</p><h2>Das Podium</h2>
+    <PodiumCeremony scores={punktestand} revealCount={endstandRevealCount} />
+  </section>;
 }
+
 
 function renderFunnySlide(slide: Extract<Slide, { typ: "funny" }>) {
   const page = getFunnyAnswerPage(funnyAnswers, templateRevealCount);
@@ -2456,8 +2288,6 @@ function renderFlowStandingsSlide(
     );
   }
 
-  const podiumGroups = podiumReveal.visiblePodiumGroups;
-
   return (
     <section
       className="presentation-flow-slide presentation-flow-ranking presentation-ranking-ceremony"
@@ -2467,31 +2297,7 @@ function renderFlowStandingsSlide(
       <h2>{config.title ?? "Das Podium"}</h2>
       {config.body && <p className="presentation-flow-lead">{config.body}</p>}
 
-    <div
-      className="presentation-ranking-podium"
-      data-group-count={podiumGroups.length}
-      aria-label="Podium Platz eins bis drei"
-    >
-      {podiumGroups.map((group) => (
-        <article key={`flow-podium-group-${group.place}`} data-place={group.place}>
-          <div className="presentation-ranking-podium-team-group">
-            {group.entries.map((team) => (
-              <div key={`flow-podium-${team.teamname}`} className="presentation-ranking-podium-team">
-                <TeamIdentityVisual
-                  name={team.teamname}
-                  photoUrl={team.photoUrl}
-                  avatarCode={team.avatarCode ?? resolveTeamAvatarCode(team.teamId ?? 0, null)}
-                  className={group.place === 1 ? "h-24 w-24" : "h-20 w-20"}
-                />
-                <strong>{team.teamname}</strong>
-              </div>
-            ))}
-          </div>
-          {showPoints && <span>{formatQuizPoints(group.entries[0]?.punkte ?? 0)} Punkte</span>}
-          <b>#{group.place}</b>
-        </article>
-      ))}
-    </div>
+      <PodiumCeremony scores={punktestand} revealCount={endstandRevealCount} showPoints={showPoints} />
 
       {podiumReveal.visiblePodiumGroups.length < podiumReveal.podiumGroups.length && (
         <p className="presentation-ranking-reveal-hint">
@@ -3049,7 +2855,7 @@ function renderAktuellenSlide() {
       {slideLabel !== "VOR DEM START" && (
         <PresentationDesignHeader
           theme={theme}
-          slideLabel={slideLabel}
+          slideLabel={slide?.typ === "frage" ? `Frage ${slide.frageIndexImBlock}` : slideLabel}
           slideNumber={slideIndex + 1}
           slideCount={slides.length}
           sponsor={slide?.typ === "frage" ? parseQuestionSponsor(slide.frage.templateConfig?.sponsor) ?? undefined : undefined}

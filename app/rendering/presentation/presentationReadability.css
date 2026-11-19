@@ -346,3 +346,55 @@
 .presentation-template.presentation-readable[data-design-style] .presentation-classical-choice[data-choice-fit][data-choice-media="true"] { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr); }
 
 .presentation-template[data-design-style="EDITORIAL"] .presentation-choice-lead { background: transparent; color: var(--brand-text); border-inline-start: 1px solid var(--lovd-rule); }
+
+/* Fit whole words. The existing bounded fitter selects space and type size. */
+.presentation-template .presentation-choice-answer,
+.presentation-template .presentation-choice-answer > span:last-child {
+  overflow-wrap: normal; word-break: normal; hyphens: none; min-width: 0;
+}
+
+.presentation-template.presentation-readable[data-design-style] .presentation-flow-slide[data-flow-type="CALENDAR_SUBSCRIPTION"] {
+  display: grid; grid-template-rows: auto auto auto minmax(0, 1fr); gap: .6rem;
+  height: 100%; min-height: 0;
+  padding: clamp(12px, 2cqw, 32px) !important;
+}
+.presentation-template.presentation-readable[data-design-style] [data-flow-type="CALENDAR_SUBSCRIPTION"] :is(h2,p) { margin: 0; }
+.presentation-template.presentation-readable[data-design-style] [data-flow-type="CALENDAR_SUBSCRIPTION"] h2 { font-size: clamp(28px, 3.5cqw, 60px) !important; line-height: 1.1 !important; max-width: none; }
+.presentation-template.presentation-readable[data-design-style] [data-flow-type="CALENDAR_SUBSCRIPTION"] .presentation-flow-lead { font-size: clamp(18px, 1.8cqw, 30px); }
+.presentation-template.presentation-readable[data-design-style] [data-flow-type="CALENDAR_SUBSCRIPTION"] .presentation-flow-qr-layout {
+  display: flex; align-items: center; justify-content: center; gap: 3cqw; min-height: 0; height: 100%;
+}
+.presentation-template.presentation-readable[data-design-style] [data-flow-type="CALENDAR_SUBSCRIPTION"] .presentation-flow-qr {
+  box-sizing: border-box; flex: none; height: 100%; max-height: 440px; aspect-ratio: 1; width: auto;
+  padding: 32px; background: white; border: 0; border-radius: 0; box-shadow: none;
+}
+.presentation-template [data-flow-type="CALENDAR_SUBSCRIPTION"] .presentation-flow-qr svg { display: block; width: 100%; height: 100%; }
+.presentation-template [data-flow-type="CALENDAR_SUBSCRIPTION"] .presentation-flow-qr-layout > div:last-child { max-width: 40%; }
+
+.presentation-template.presentation-readable[data-design-style]:has([data-podium-ceremony],[data-flow-type="CALENDAR_SUBSCRIPTION"]) :is(.presentation-editorial-header,.presentation-neon-header,.presentation-corporate-header) { height: clamp(48px, 9vh, 88px) !important; min-height: 0 !important; margin-bottom: 0; }
+.presentation-template.presentation-readable[data-design-style]:has([data-podium-ceremony],[data-flow-type="CALENDAR_SUBSCRIPTION"]) .presentation-editorial-logo { max-height: 100%; width: auto; }
+.presentation-template.presentation-readable[data-design-style]:has([data-podium-ceremony],[data-flow-type="CALENDAR_SUBSCRIPTION"]) .presentation-stage { padding-block: 8px !important; }
+.presentation-template.presentation-readable[data-design-style]:has([data-podium-ceremony],[data-flow-type="CALENDAR_SUBSCRIPTION"]) .presentation-editorial-footer { height: clamp(22px, 4vh, 40px) !important; min-height: 0 !important; }
+.presentation-template.presentation-readable[data-design-style] .presentation-ranking-ceremony:has([data-podium-ceremony]) { padding: 1.5cqw !important; gap: .5rem; }
+.presentation-template.presentation-readable[data-design-style] .presentation-ranking-ceremony:has([data-podium-ceremony]) h2 { font-size: clamp(28px, 3.4cqw, 56px) !important; line-height: 1.1; margin: 0; max-width: none; }
+.podium-ceremony { position: relative; flex: 1; width: 100%; min-height: 0; isolation: isolate; }
+.podium-step { position: absolute; bottom: 0; width: 31%; height: 25%; display: grid; place-items: end center; padding-bottom: 1rem; box-sizing: border-box; background: var(--quiz-surface); border: 2px solid var(--quiz-border); }
+.podium-step[data-place="2"] { left: 1%; height: 30%; }
+.podium-step[data-place="1"] { left: 34.5%; height: 40%; }
+.podium-step[data-place="3"] { left: 68%; }
+.podium-step b { font-size: clamp(22px, 3cqw, 48px); color: var(--quiz-text); }
+.podium-team { position: absolute; left: 1%; bottom: 30%; width: 31%; z-index: 2; color: var(--quiz-text); animation: podium-arrive 3.6s both; }
+.podium-team[data-place="1"] { left: 34.5%; bottom: 40%; }
+.podium-team[data-place="3"] { left: 68%; bottom: 25%; }
+.podium-team-content { display: flex; flex-direction: column; gap: .4rem; align-items: center; padding: .7rem; text-align: center; background: var(--quiz-background); }
+.podium-team strong { display: block; font-size: clamp(20px, 2.1cqw, 40px); line-height: 1.15; overflow-wrap: anywhere; animation: podium-name 3.6s both; }
+.podium-team b { font-size: clamp(18px, 1.8cqw, 32px); color: var(--quiz-text); }
+.podium-team span { font-size: clamp(16px, 1.3cqw, 24px); }
+@keyframes podium-arrive {
+  0%, 72% { left: 10%; bottom: 42%; width: 80%; z-index: 3; }
+  0%, 8% { opacity: 0; }
+  16%, 100% { opacity: 1; }
+  100% { z-index: 2; }
+}
+@keyframes podium-name { 0%, 72% { font-size: clamp(32px, 4.2cqw, 72px); } 100% { font-size: clamp(20px, 2.1cqw, 40px); } }
+@media (prefers-reduced-motion: reduce) { .podium-team, .podium-team strong { animation: none; } }
