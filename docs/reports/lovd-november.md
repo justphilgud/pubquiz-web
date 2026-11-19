@@ -148,6 +148,11 @@ enthüllt und die Navigation war wieder frei. Kein zusätzliches Reveal wurde ge
   71 Tests, 0 Fehler. Dieser zusätzliche Nullzustandtest ist Teil der normalen Suite.
 - TypeScript, Prisma-Schemavalidierung und Production-Build erfolgreich.
   ESLint aller geänderten Quelldateien ohne Befund.
+- Die historischen Eventarten-/Shared-Design-PostgreSQL-Fixtures wenden vor den
+  aktuellen Runtime-Actions zusätzlich die neue Snapshotmigration an. Die vorherigen
+  historischen Migrations-/Erhaltungsassertions bleiben unverändert. Beide Fixtures
+  lokal auf neu erzeugten Datenbanken geprüft: 3 echte PostgreSQL-Tests, 0 Fehler.
+  GitHub-CI für den jeweiligen PR-Kopf: [PR #171](https://github.com/justphilgud/pubquiz-web/pull/171).
 - Der zunächst fehlgeschlagene unveränderte Importplan-Hash war ein bestehendes
   Windows-CRLF-Checkoutproblem. Kanonische LF-Bytes liefern exakt den erwarteten Hash;
   weder die versionierte Datei noch der Test wurden dafür geändert.
