@@ -40,6 +40,21 @@ function quizFixture(): QuizPraesentationResult {
   };
 }
 
+test("LOVD November: pixel at block position 17 keeps its number across navigation and block boundaries", () => {
+  const quiz = quizFixture();
+  quiz.fragen = Array.from({ length: 18 }, (_, index) => ({ ...quiz.fragen[0],
+    quiz_fragen_id: index + 1, fragen_id: index + 1, sortierung: index + 1,
+    quiz_abschnitt_id: index < 17 ? 10 : 20,
+    templateId: index === 16 ? "pixelbild" : "standard",
+  }));
+  const questions = buildPraesentationSlides(quiz).filter(slide => slide.typ === "frage");
+  assert.equal(questions[16].frageIndexImBlock, 17);
+  assert.equal(questions[17].frageIndexImBlock, 1);
+  const rebuilt = buildPraesentationSlides(quiz).find(slide => getPresentationSlideKey(slide) === getPresentationSlideKey(questions[16]));
+  assert.ok(rebuilt?.typ === "frage");
+  assert.equal(rebuilt.frageIndexImBlock, 17);
+});
+
 test("unassigned editorial questions remain stored but are absent from the live deck", () => {
   const quiz = quizFixture();
   quiz.fragen.push({ ...quiz.fragen[0], quiz_fragen_id: 999, quiz_abschnitt_id: null });

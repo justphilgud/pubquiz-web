@@ -1,5 +1,44 @@
 # Living Specification: Presentation Rendering (AP5)
 
+## LOVD November 2026
+
+Alle Fragezweige verwenden im gemeinsamen Header `frageIndexImBlock`, einschließlich
+Pixel- und Spezialfragen. Nummern entstehen aus dem Deck, nicht aus Klick- oder
+Animationszustand. Der nächste Block beginnt wieder mit Frage 1. Bereits vorhandene
+Nummern innerhalb der Fragekomposition bleiben erhalten.
+
+Klassische Auswahlantworten brechen an Wortgrenzen um. Der vorhandene begrenzte
+DOM-Fitter nutzt Layoutalternativen und passt die Schrift am konkreten Inhalt an;
+er darf ein Wort wie „Marokko“ nicht durch beliebige Zeichenumbrüche passend machen.
+Die Kalenderfolie reserviert nach Titel/Text den verbleibenden Platz für den ganzen
+quadratischen QR-Code mit weißer Ruhezone. Das Feedziel bleibt unverändert.
+
+WINNER und der Legacy-Endstand öffnen mit Enthüllungszähler 0. Der Eintritt speichert
+die vollständige Rangliste einschließlich gültiger Stichentscheidplatzierungen in
+`quiz_praesentation_status.podium_snapshot`. Alle Fenster lesen diesen eingefrorenen
+Stand; Verlassen oder Durchlaufreset löscht ihn. Keine Punkte werden verändert.
+`PodiumCeremony` zeigt die drei leeren Stufen und enthüllt je vorhandener Ranggruppe
+3→2→1. Gleichstände bleiben gemeinsame Ranggruppen; fehlende Wettbewerbsränge
+werden nicht erfunden. Nur die neu gemountete Gruppe erscheint für eine Lesepause
+groß in der Mitte und wandert dann auf ihre Stufe. Frühere Gruppen bleiben stehen.
+Reduzierte Bewegung zeigt unmittelbar die Endposition. Die nächste reguläre Folie
+folgt nach allen vorhandenen Gruppen, ohne zusätzliche Tabellenphase auf derselben
+Folie. FINAL_STANDINGS bleibt eine separate reguläre Folie.
+
+Moderationsvorschau und öffentliche Präsentation teilen weiterhin den Renderer.
+Das Vorschaufeld verwendet konfigurierten Folientitel, danach Label/Typbezeichnung.
+Der manuelle Blockeingriff steht nach den häufigen Aktionen mit eigener Beschriftung
+und Abstand. Automatische Blockfreigaben und -schließungen bleiben unverändert.
+Meme-Review zeigt offene Entscheidungen und die Voraussetzung für Vorstellung und
+Abstimmung bereits vor der Aktion. Vorstellung, Übersicht und Abstimmung bleiben
+die bestehenden getrennten Phasen.
+Ein explizit abgeschlossener leerer Meme-Run überspringt nur seine eigene direkt
+folgende Auflösung; es wird kein fiktives Voting-Ergebnis erzeugt. Der zentrale
+Live-State-Adapter erhält für WINNER und Legacy-Endstand den gespeicherten Wert 0;
+die bisherigen Reveal-Mindestwerte anderer Folien bleiben erhalten.
+
+Nachweise und Grenzen: [LOVD-November-Abnahme](../reports/lovd-november.md).
+
 Stand: 7. September 2026.
 
 ## Zweck und Abhängigkeiten

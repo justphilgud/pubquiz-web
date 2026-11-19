@@ -7,6 +7,7 @@ import * as deck from "./[quizId]/praesentation/buildPraesentationSlides";
 import * as live from "../rendering/presentation/presentationLiveState";
 import * as slideMetadata from "../rendering/presentation/presentationSlideMetadata";
 import { mayApplyLiveSnapshot } from "./liveSnapshotRevision";
+import { NavigationTransition } from "./navigationTransition";
 
 const filename = "app/quiz/[quizId]/moderation/ModerationClient.tsx";
 const original = readFileSync(filename, "utf8");
@@ -62,7 +63,10 @@ function harness(source = original) {
   const schedule = (callback: () => void, delay: number, repeat?: number) => { const id = ++timerId; timers.set(id, { callback, due: time + delay, repeat }); return id; };
   const exported: { default?: (input: typeof props) => View } = {};
   runInNewContext(compiled, {
-    ...imports, ...deck, ...live, ...slideMetadata, mayApplyLiveSnapshot, exports: exported, AbortController, console,
+    ...imports, ...deck, ...live, ...slideMetadata, NavigationTransition,
+    usePresentationWindowReceipt: () => async () => {},
+    performance: { mark: () => {}, measure: () => {} },
+    mayApplyLiveSnapshot, exports: exported, AbortController, console,
     window: { setTimeout: (fn: () => void, delay: number) => schedule(fn, delay), clearTimeout: (id: number) => timers.delete(id), setInterval: (fn: () => void, delay: number) => schedule(fn, delay, delay), clearInterval: (id: number) => timers.delete(id) },
     document: { hidden: false },
     useMemo: memoSlot, useCallback: (fn: unknown, deps: unknown[]) => memoSlot(() => fn, deps),
@@ -83,7 +87,11 @@ function harness(source = original) {
       const snapshot = { presentationState: { ...state }, questionHidden: false, pixelState: null, serverNow: new Date().toISOString(), pollState: null, livePollState: null, liveResultState: null, teamJoinState: null, blockState: null };
       return { ok: true, json: async () => deferSnapshot ? new Promise(resolve => pendingSnapshots.push(() => resolve(snapshot))) : snapshot };
     },
-    setPraesentationSlideIndex: async (_quizId: number, index: number, key: string) => { state = { ...state, slideIndex: index, slideKey: key }; },
+    setPraesentationSlideIndex: async (_quizId: number, index: number, key: string) => {
+      state = { ...state, slideIndex: index, slideKey: key };
+      return { slide_index: index, slide_key: key, lifecycle_revision: state.lifecycleRevision,
+        quiz_started_at: new Date(1), endstand_reveal_count: 1 };
+    },
     getPresentationFunnyAnswers: async () => { counts.funny++; return deferFunny ? new Promise<unknown[]>(resolve => pendingFunny.push(resolve)) : [...answers]; },
     getAntwortStatus: async () => { counts.progress++; return { teamsAngemeldet: 1, antwortenEingegangen: 1, finaleAntworten: 0, prozent: 100, letzteAntwortAt: null }; },
   });

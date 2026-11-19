@@ -321,6 +321,9 @@ export function resolvePresentationLiveState(
     };
   }
 
+  const identity = parsePresentationSlideKey(status.slide_key ?? null);
+  const podium = identity?.kind === "NON_QUESTION" &&
+    (identity.slideType === "WINNER" || identity.slideType === "final");
   return {
     lifecycle: resolveQuizLifecycle(status),
     lifecycleRevision: status.lifecycle_revision ?? 0,
@@ -328,7 +331,7 @@ export function resolvePresentationLiveState(
     slideKey: status.slide_key ?? null,
     slideStartedAt: serializeDate(status.slide_started_at),
     quizStartedAt: serializeDate(status.quiz_started_at),
-    revealCount: Math.max(1, status.endstand_reveal_count ?? 1),
+    revealCount: Math.max(podium ? 0 : 1, status.endstand_reveal_count ?? 1),
     mediaOverlayActive: status.medium_overlay_aktiv ?? false,
     playbackCommand: normalizePlaybackCommand(status.audio_aktion),
     playbackCommandId: status.audio_aktion_id ?? 0,

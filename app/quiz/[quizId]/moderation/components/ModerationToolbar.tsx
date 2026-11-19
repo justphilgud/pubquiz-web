@@ -30,6 +30,7 @@ function formatSeconds(seconds: number | null | undefined) {
 }
 
 type Props = {
+  navigationPending?: boolean;
   nextLabel?: string;
   blockFreigegeben: boolean;
   mediumOverlayAktiv: boolean;
@@ -58,6 +59,7 @@ type Props = {
 };
 
 export default function ModerationToolbar({
+  navigationPending = false,
   nextLabel = "Weiter",
   blockFreigegeben,
   mediumOverlayAktiv,
@@ -89,25 +91,20 @@ export default function ModerationToolbar({
         <IconButton
           icon={BackwardIcon}
           label="Zur ersten Slide"
+          disabled={navigationPending}
           onClick={onZurErstenSlide}
         />
-        <IconButton icon={ChevronLeftIcon} label="Zurück" onClick={onZurueck} />
+        <IconButton icon={ChevronLeftIcon} label="Zurück" disabled={navigationPending} onClick={onZurueck} />
         <IconButton
           icon={ChevronRightIcon}
           label={nextLabel}
+          disabled={navigationPending}
           tone="primary"
           onClick={onWeiter}
         />
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <IconButton
-          icon={blockFreigegeben ? LockClosedIcon : LockOpenIcon}
-          label={blockFreigegeben ? "Block schließen" : "Block freigeben"}
-          tone={blockFreigegeben ? "warning" : "success"}
-          onClick={onBlockToggle}
-        />
-
         <IconButton
           icon={PhotoIcon}
           label={
@@ -226,6 +223,12 @@ export default function ModerationToolbar({
       </div>
 
 
+      <div className="ml-auto border-l border-zinc-700 pl-8" aria-label="Manueller Blockeingriff">
+        <p className="mb-2 text-xs text-zinc-400">Manueller Blockeingriff</p>
+        <IconButton icon={blockFreigegeben ? LockClosedIcon : LockOpenIcon}
+          label={blockFreigegeben ? "Block schließen" : "Block freigeben"}
+          tone={blockFreigegeben ? "warning" : "success"} disabled={navigationPending} onClick={onBlockToggle} />
+      </div>
     </div>
   );
 }

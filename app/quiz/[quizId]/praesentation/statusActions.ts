@@ -5,13 +5,14 @@ import { assertMemeArchiveResetSafe } from "../../memeArchive/archive.server";
 import { presentationCountdownDeadline } from "../../blockCountdown";
 import { mayLeaveMemeQuestion } from "../../memeNavigationPolicy";
 import { verifiedTiebreakPlaces } from "../../estimationTiebreak";
+import { readPodiumSnapshot } from "../../podiumSnapshot";
 import { getQuizAnswerProgress } from "../../interaction/answerProgress.server";
 import { prisma } from "@/app/lib/prisma";
 import { Prisma } from "@/app/generated/prisma/client";
 import { assertLifecycleRevision, resolveQuizLifecycle } from "../../quizLifecycle";
 import { lockQuizLifecycle, lockQuizProductGate, RESET_PRESENTATION_DATA } from "../../quizLifecycle.server";
 import { getQuizPraesentation } from "../../actions";
-import { buildPraesentationSlides, getPresentationSlideKey } from "./buildPraesentationSlides";
+import { buildPraesentationSlides, getPresentationSlideKey, isPodiumRevealSlide } from "./buildPraesentationSlides";
 import {
   requireQuizLiveController,
   requireQuizQuestion,
@@ -60,6 +61,13 @@ export async function getPraesentationPunktestand(quizId: number) {
   await requireQuizViewer(quizId);
   await ensureQuizBlockDeadlines(quizId);
   return prisma.$transaction(async (tx) => {
+    const status = await tx.quiz_praesentation_status.findUnique({ where: { quiz_id: quizId }, select: { podium_snapshot: true } });
+    const snapshot = readPodiumSnapshot(status?.podium_snapshot);
+    return snapshot ?? loadPresentationScores(tx, quizId);
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead });
+}
+
+async function loadPresentationScores(tx: Prisma.TransactionClient, quizId: number) {
   const [sessions, totals] = await Promise.all([
     tx.quiz_team_sessions.findMany({
       where: { quiz_id: quizId },
@@ -104,7 +112,6 @@ export async function getPraesentationPunktestand(quizId: number) {
       photoUrl: entry.photoUrl,
       punkte: Number(entry.punkte),
     }));
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead });
 }
 
 export async function getPraesentationAudienceZwischenstand(quizId: number) {
@@ -147,6 +154,7 @@ export async function setPraesentationSlideIndex(
   slideIndex: number,
   slideKey: string,
   expectedLifecycleRevision?: number,
+  expectedSlideKey?: string | null,
 ) {
   const navigationRequestedAt = new Date();
   const requestStartedAt = performance.now();
@@ -180,6 +188,9 @@ export async function setPraesentationSlideIndex(
       assertLifecycleRevision(previousStatus.lifecycle_revision, expectedLifecycleRevision);
     }
     if (previousStatus.slide_key === slideKey) return previousStatus;
+    if (expectedSlideKey !== undefined && previousStatus.slide_key !== expectedSlideKey) {
+      throw new Error("Die Folie wurde inzwischen in einer anderen Moderation gewechselt. Aktuellen Stand laden und erneut prüfen.");
+    }
     // Validated against the server-built deck above. A sponsor changes ONLY
     // presentation position, never runs, deadlines, countdowns or block releases.
     if (identity?.kind === "NON_QUESTION" && identity.slideType === "SPONSOR") {
@@ -234,13 +245,17 @@ export async function setPraesentationSlideIndex(
         data: { is_hidden: true, revision: { increment: 1 } },
       });
     }
+    const podiumSnapshot = isPodiumRevealSlide(slides[slideIndex])
+      ? JSON.parse(JSON.stringify(await loadPresentationScores(tx, quizId))) as Prisma.InputJsonValue
+      : Prisma.DbNull;
     const status = await tx.quiz_praesentation_status.upsert({
       where: { quiz_id: quizId },
       update: {
+        podium_snapshot: podiumSnapshot,
         slide_index: slideIndex,
         slide_key: slideKey,
         slide_started_at: new Date(),
-        endstand_reveal_count: 1,
+        endstand_reveal_count: isPodiumRevealSlide(slides[slideIndex]) ? 0 : 1,
         medium_overlay_aktiv: false,
         audio_aktion: "stop",
         audio_aktion_id: { increment: 1 },
@@ -250,11 +265,12 @@ export async function setPraesentationSlideIndex(
         countdown_status: "idle",
       },
       create: {
+        podium_snapshot: podiumSnapshot,
         quiz_id: quizId,
         slide_index: slideIndex,
         slide_key: slideKey,
         slide_started_at: new Date(),
-        endstand_reveal_count: 1,
+        endstand_reveal_count: isPodiumRevealSlide(slides[slideIndex]) ? 0 : 1,
         medium_overlay_aktiv: false,
         audio_aktion: "stop",
         audio_aktion_id: 1,

@@ -167,7 +167,9 @@ const MemeModerationReview = forwardRef<MemeModerationReviewHandle, Props>(funct
       <section className="rounded-2xl border border-fuchsia-500/50 bg-fuchsia-950/30 p-4">
         <h2 className="font-bold">Meme-Auswahl</h2>
         <p className="mt-2 text-sm text-zinc-300">
-          Die Vorabmoderation erscheint, sobald das erste Team sein Meme final abgegeben hat.
+          {view.interactionState === "LOCKED"
+            ? "Die Meme-Runde ist noch nicht geöffnet."
+            : "Noch keine finalen Einreichungen. Nächste Aktion: Antwortphase schließen. Danach kannst du ohne Meme fortfahren."}
         </p>
       </section>
     );
@@ -186,6 +188,15 @@ const MemeModerationReview = forwardRef<MemeModerationReviewHandle, Props>(funct
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="font-bold">Meme-Auswahl &amp; Review</h2>
+          <p role="status" className="mt-2 font-semibold text-fuchsia-100">
+            {view.selectionState === "COMPLETED" ? "Auswahl abgeschlossen. Die Foliensteuerung führt durch Vorstellung, Abstimmung und Ergebnis."
+              : view.selectionState === "SKIPPED" ? "Keine gültigen Beiträge. Mit Weiter ohne Meme fortfahren."
+              : view.answerPhaseOpen ? "Nächster Schritt: Antwortphase schließen. Bereits eingereichte Beiträge können jetzt geprüft werden."
+              : view.pendingCount > 0 ? `Noch ${view.pendingCount} ${view.pendingCount === 1 ? "Beitrag" : "Beiträge"} prüfen – jeden Beitrag freigeben oder ausschließen.`
+              : allRejected ? "Mindestens einen Beitrag freigeben, um die Vorstellung und Abstimmung zu starten."
+              : view.selectedCount === 0 ? "Keine Einreichungen: Ohne Meme fortfahren."
+              : "Alle Beiträge geprüft. Mit Weiter die Memes vorstellen, anschließend Abstimmung starten."}
+          </p>
           <p className="mt-1 text-sm text-zinc-300">
             {view.selectedCount} eingereicht · {view.approvedCount} freigegeben ·{" "}
             {view.rejectedCount} ausgeschlossen · {view.pendingCount} offen

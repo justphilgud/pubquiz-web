@@ -1,6 +1,7 @@
 "use client";
 
 import { pollEvaluation } from "../../evaluation/pollEvaluation";
+import { usePresentationRenderReceipt } from "../../presentationWindowSync";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
@@ -23,6 +24,7 @@ import {
   getPresentationSlideKey,
   isIntermediateStandingsSlide,
   isStandingsSlide,
+  isPodiumRevealSlide,
 } from "./buildPraesentationSlides";
 import PresentationSlideRenderer from "@/app/rendering/presentation/PresentationSlideRenderer";
 import {
@@ -72,6 +74,7 @@ export default function QuizPraesentationPlayer({
   const [scores, setScores] = useState<
     { teamId: number; teamname: string; punkte: number; avatarCode: TeamAvatarCode; photoUrl: string | null }[]
   >([]);
+  const [scoresSlideKey, setScoresSlideKey] = useState<string | null>(null);
   const [audienceInterimStandings, setAudienceInterimStandings] = useState<
     IntermediateStandingsAudienceEntry[]
   >([]);
@@ -119,6 +122,8 @@ export default function QuizPraesentationPlayer({
     slides.map(getPresentationSlideKey),
   ).index;
   const slide = slides[slideIndex];
+  usePresentationRenderReceipt(quizId, slide ? getPresentationSlideKey(slide) : "", liveState.revealCount,
+    !isPodiumRevealSlide(slide) || scoresSlideKey === (slide ? getPresentationSlideKey(slide) : ""));
   const showTeamJoinState =
     (slide?.typ === "ablauf" && slide.element.type === "QR_CODE") ||
     (slide?.typ === "fixer-slide" && slide.slideTyp === "qrcode") ||
@@ -233,7 +238,7 @@ export default function QuizPraesentationPlayer({
     }
     return pollEvaluation(
       () => Promise.all([getPraesentationPunktestand(quizId), getPraesentationJahreswertung(quizId)]),
-      ([scores, yearly]) => { setScores(scores); setYearlyStandings(yearly); },
+      ([scores, yearly]) => { setScores(scores); setYearlyStandings(yearly); setScoresSlideKey(slide ? getPresentationSlideKey(slide) : null); },
     );
   }, [quizId, slide, liveState.updatedAt]);
 

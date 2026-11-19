@@ -21,6 +21,7 @@ export async function requireQuizNotStopped(tx: Prisma.TransactionClient, quizId
 
 export const RESET_PRESENTATION_DATA = {
   stichentscheid_json: PrismaValue.DbNull,
+  podium_snapshot: PrismaValue.DbNull,
   slide_index: 0,
   slide_key: null,
   quiz_started_at: null,

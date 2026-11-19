@@ -92,6 +92,7 @@ export type Quiz_praesentation_statusMaxAggregateOutputType = {
 
 export type Quiz_praesentation_statusCountAggregateOutputType = {
   stichentscheid_json: number
+  podium_snapshot: number
   quiz_id: number
   slide_index: number
   slide_key: number
@@ -181,6 +182,7 @@ export type Quiz_praesentation_statusMaxAggregateInputType = {
 
 export type Quiz_praesentation_statusCountAggregateInputType = {
   stichentscheid_json?: true
+  podium_snapshot?: true
   quiz_id?: true
   slide_index?: true
   slide_key?: true
@@ -291,6 +293,7 @@ export type quiz_praesentation_statusGroupByArgs<ExtArgs extends runtime.Types.E
 
 export type Quiz_praesentation_statusGroupByOutputType = {
   stichentscheid_json: runtime.JsonValue | null
+  podium_snapshot: runtime.JsonValue | null
   quiz_id: number
   slide_index: number
   slide_key: string | null
@@ -337,6 +340,7 @@ export type quiz_praesentation_statusWhereInput = {
   OR?: Prisma.quiz_praesentation_statusWhereInput[]
   NOT?: Prisma.quiz_praesentation_statusWhereInput | Prisma.quiz_praesentation_statusWhereInput[]
   stichentscheid_json?: Prisma.JsonNullableFilter<"quiz_praesentation_status">
+  podium_snapshot?: Prisma.JsonNullableFilter<"quiz_praesentation_status">
   quiz_id?: Prisma.IntFilter<"quiz_praesentation_status"> | number
   slide_index?: Prisma.IntFilter<"quiz_praesentation_status"> | number
   slide_key?: Prisma.StringNullableFilter<"quiz_praesentation_status"> | string | null
@@ -361,6 +365,7 @@ export type quiz_praesentation_statusWhereInput = {
 
 export type quiz_praesentation_statusOrderByWithRelationInput = {
   stichentscheid_json?: Prisma.SortOrderInput | Prisma.SortOrder
+  podium_snapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   slide_index?: Prisma.SortOrder
   slide_key?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -389,6 +394,7 @@ export type quiz_praesentation_statusWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.quiz_praesentation_statusWhereInput[]
   NOT?: Prisma.quiz_praesentation_statusWhereInput | Prisma.quiz_praesentation_statusWhereInput[]
   stichentscheid_json?: Prisma.JsonNullableFilter<"quiz_praesentation_status">
+  podium_snapshot?: Prisma.JsonNullableFilter<"quiz_praesentation_status">
   slide_index?: Prisma.IntFilter<"quiz_praesentation_status"> | number
   slide_key?: Prisma.StringNullableFilter<"quiz_praesentation_status"> | string | null
   slide_started_at?: Prisma.DateTimeFilter<"quiz_praesentation_status"> | Date | string
@@ -412,6 +418,7 @@ export type quiz_praesentation_statusWhereUniqueInput = Prisma.AtLeast<{
 
 export type quiz_praesentation_statusOrderByWithAggregationInput = {
   stichentscheid_json?: Prisma.SortOrderInput | Prisma.SortOrder
+  podium_snapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   slide_index?: Prisma.SortOrder
   slide_key?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -443,6 +450,7 @@ export type quiz_praesentation_statusScalarWhereWithAggregatesInput = {
   OR?: Prisma.quiz_praesentation_statusScalarWhereWithAggregatesInput[]
   NOT?: Prisma.quiz_praesentation_statusScalarWhereWithAggregatesInput | Prisma.quiz_praesentation_statusScalarWhereWithAggregatesInput[]
   stichentscheid_json?: Prisma.JsonNullableWithAggregatesFilter<"quiz_praesentation_status">
+  podium_snapshot?: Prisma.JsonNullableWithAggregatesFilter<"quiz_praesentation_status">
   quiz_id?: Prisma.IntWithAggregatesFilter<"quiz_praesentation_status"> | number
   slide_index?: Prisma.IntWithAggregatesFilter<"quiz_praesentation_status"> | number
   slide_key?: Prisma.StringNullableWithAggregatesFilter<"quiz_praesentation_status"> | string | null
@@ -466,6 +474,7 @@ export type quiz_praesentation_statusScalarWhereWithAggregatesInput = {
 
 export type quiz_praesentation_statusCreateInput = {
   stichentscheid_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  podium_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   slide_index?: number
   slide_key?: string | null
   slide_started_at?: Date | string
@@ -489,6 +498,7 @@ export type quiz_praesentation_statusCreateInput = {
 
 export type quiz_praesentation_statusUncheckedCreateInput = {
   stichentscheid_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  podium_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   quiz_id: number
   slide_index?: number
   slide_key?: string | null
@@ -512,6 +522,7 @@ export type quiz_praesentation_statusUncheckedCreateInput = {
 
 export type quiz_praesentation_statusUpdateInput = {
   stichentscheid_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  podium_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   slide_index?: Prisma.IntFieldUpdateOperationsInput | number
   slide_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slide_started_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -535,6 +546,7 @@ export type quiz_praesentation_statusUpdateInput = {
 
 export type quiz_praesentation_statusUncheckedUpdateInput = {
   stichentscheid_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  podium_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   slide_index?: Prisma.IntFieldUpdateOperationsInput | number
   slide_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -558,6 +570,7 @@ export type quiz_praesentation_statusUncheckedUpdateInput = {
 
 export type quiz_praesentation_statusCreateManyInput = {
   stichentscheid_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  podium_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   quiz_id: number
   slide_index?: number
   slide_key?: string | null
@@ -581,6 +594,7 @@ export type quiz_praesentation_statusCreateManyInput = {
 
 export type quiz_praesentation_statusUpdateManyMutationInput = {
   stichentscheid_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  podium_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   slide_index?: Prisma.IntFieldUpdateOperationsInput | number
   slide_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slide_started_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -603,6 +617,7 @@ export type quiz_praesentation_statusUpdateManyMutationInput = {
 
 export type quiz_praesentation_statusUncheckedUpdateManyInput = {
   stichentscheid_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  podium_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   quiz_id?: Prisma.IntFieldUpdateOperationsInput | number
   slide_index?: Prisma.IntFieldUpdateOperationsInput | number
   slide_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -631,6 +646,7 @@ export type Quiz_praesentation_statusNullableScalarRelationFilter = {
 
 export type quiz_praesentation_statusCountOrderByAggregateInput = {
   stichentscheid_json?: Prisma.SortOrder
+  podium_snapshot?: Prisma.SortOrder
   quiz_id?: Prisma.SortOrder
   slide_index?: Prisma.SortOrder
   slide_key?: Prisma.SortOrder
@@ -750,6 +766,7 @@ export type quiz_praesentation_statusUncheckedUpdateOneWithoutQuizNestedInput = 
 
 export type quiz_praesentation_statusCreateWithoutQuizInput = {
   stichentscheid_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  podium_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   slide_index?: number
   slide_key?: string | null
   slide_started_at?: Date | string
@@ -772,6 +789,7 @@ export type quiz_praesentation_statusCreateWithoutQuizInput = {
 
 export type quiz_praesentation_statusUncheckedCreateWithoutQuizInput = {
   stichentscheid_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  podium_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   slide_index?: number
   slide_key?: string | null
   slide_started_at?: Date | string
@@ -810,6 +828,7 @@ export type quiz_praesentation_statusUpdateToOneWithWhereWithoutQuizInput = {
 
 export type quiz_praesentation_statusUpdateWithoutQuizInput = {
   stichentscheid_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  podium_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   slide_index?: Prisma.IntFieldUpdateOperationsInput | number
   slide_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slide_started_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -832,6 +851,7 @@ export type quiz_praesentation_statusUpdateWithoutQuizInput = {
 
 export type quiz_praesentation_statusUncheckedUpdateWithoutQuizInput = {
   stichentscheid_json?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  podium_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   slide_index?: Prisma.IntFieldUpdateOperationsInput | number
   slide_key?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   slide_started_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -856,6 +876,7 @@ export type quiz_praesentation_statusUncheckedUpdateWithoutQuizInput = {
 
 export type quiz_praesentation_statusSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   stichentscheid_json?: boolean
+  podium_snapshot?: boolean
   quiz_id?: boolean
   slide_index?: boolean
   slide_key?: boolean
@@ -880,6 +901,7 @@ export type quiz_praesentation_statusSelect<ExtArgs extends runtime.Types.Extens
 
 export type quiz_praesentation_statusSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   stichentscheid_json?: boolean
+  podium_snapshot?: boolean
   quiz_id?: boolean
   slide_index?: boolean
   slide_key?: boolean
@@ -904,6 +926,7 @@ export type quiz_praesentation_statusSelectCreateManyAndReturn<ExtArgs extends r
 
 export type quiz_praesentation_statusSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   stichentscheid_json?: boolean
+  podium_snapshot?: boolean
   quiz_id?: boolean
   slide_index?: boolean
   slide_key?: boolean
@@ -928,6 +951,7 @@ export type quiz_praesentation_statusSelectUpdateManyAndReturn<ExtArgs extends r
 
 export type quiz_praesentation_statusSelectScalar = {
   stichentscheid_json?: boolean
+  podium_snapshot?: boolean
   quiz_id?: boolean
   slide_index?: boolean
   slide_key?: boolean
@@ -949,7 +973,7 @@ export type quiz_praesentation_statusSelectScalar = {
   schaetzfrage_id?: boolean
 }
 
-export type quiz_praesentation_statusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"stichentscheid_json" | "quiz_id" | "slide_index" | "slide_key" | "slide_started_at" | "quiz_started_at" | "quiz_stopped_at" | "lifecycle_revision" | "updated_at" | "audio_aktion" | "audio_aktion_id" | "countdown_dauer_sekunden" | "countdown_ended_at" | "countdown_started_at" | "countdown_status" | "medium_overlay_aktiv" | "endstand_reveal_count" | "show_schaetzfrage" | "zeige_schaetzantwort" | "schaetzfrage_id", ExtArgs["result"]["quiz_praesentation_status"]>
+export type quiz_praesentation_statusOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"stichentscheid_json" | "podium_snapshot" | "quiz_id" | "slide_index" | "slide_key" | "slide_started_at" | "quiz_started_at" | "quiz_stopped_at" | "lifecycle_revision" | "updated_at" | "audio_aktion" | "audio_aktion_id" | "countdown_dauer_sekunden" | "countdown_ended_at" | "countdown_started_at" | "countdown_status" | "medium_overlay_aktiv" | "endstand_reveal_count" | "show_schaetzfrage" | "zeige_schaetzantwort" | "schaetzfrage_id", ExtArgs["result"]["quiz_praesentation_status"]>
 export type quiz_praesentation_statusInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   quiz?: boolean | Prisma.quizDefaultArgs<ExtArgs>
 }
@@ -967,6 +991,7 @@ export type $quiz_praesentation_statusPayload<ExtArgs extends runtime.Types.Exte
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     stichentscheid_json: runtime.JsonValue | null
+    podium_snapshot: runtime.JsonValue | null
     quiz_id: number
     slide_index: number
     slide_key: string | null
@@ -1411,6 +1436,7 @@ export interface Prisma__quiz_praesentation_statusClient<T, Null = never, ExtArg
  */
 export interface quiz_praesentation_statusFieldRefs {
   readonly stichentscheid_json: Prisma.FieldRef<"quiz_praesentation_status", 'Json'>
+  readonly podium_snapshot: Prisma.FieldRef<"quiz_praesentation_status", 'Json'>
   readonly quiz_id: Prisma.FieldRef<"quiz_praesentation_status", 'Int'>
   readonly slide_index: Prisma.FieldRef<"quiz_praesentation_status", 'Int'>
   readonly slide_key: Prisma.FieldRef<"quiz_praesentation_status", 'String'>

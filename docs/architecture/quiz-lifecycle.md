@@ -1,5 +1,31 @@
 # Living Specification: Quiz-Lifecycle (AP1)
 
+## LOVD November 2026: bestätigte Navigation
+
+Ein synchroner `NavigationTransition` serialisiert Weiter, Zurück, Anfang und
+Enthüllungen. Wiederholte Eingaben während desselben Befehls werden verworfen,
+nicht für später vorgemerkt. Die Moderation zeigt den Wartezustand sofort und
+übernimmt eine neue Position erst nach der Serverbestätigung. Die Serveraktion
+prüft optional den erwarteten Ausgangsschlüssel unter dem bestehenden Quiz-Lock;
+ein bereits erreichtes Ziel bleibt idempotent. Veraltete Fenster überschreiben
+keine inzwischen geänderte Position.
+
+`presentationWindowSync` bestätigt über BroadcastChannel den gerenderten Stand
+der verbundenen Präsentationsfenster desselben Browserprofils und Ursprungs.
+Zwei Renderframes und endliche Podiumsanimationen gehen der Bestätigung voraus.
+Diese Quittung ist keine zweite fachliche Zustandsquelle und schreibt keine DB.
+Ein Timeout lässt nur die erneute Anzeigeprüfung zu; es führt nicht zum nächsten
+Wechsel. Ohne verbundenes lokales Fenster endet die Sperre nach Serverbestätigung.
+Andere Geräte/Browserprofile liefern keine solche Quittung. Die bestehenden
+Server-Snapshots bleiben dort maßgeblich; eine geräteübergreifende sichtbare
+Renderbestätigung ist damit nicht nachgewiesen.
+
+Browser-Performanceeinträge `pubquiz-navigation-server` und
+`pubquiz-presentation-visible` trennen Eingabe→Serverbestätigung und die weitere
+Wartezeit auf Sichtbarkeit. Die vorhandenen serverseitigen Phasenmessungen bleiben.
+Tests: `navigationTransition.test.ts`, `sponsorNavigation.test.ts` und der
+[Abnahmebericht](../reports/lovd-november.md).
+
 ## Ergänzung 16. Oktober 2026: dauerhaftes Meme-Archiv
 
 Reset löscht weiterhin Sessions, Antworten, Runs und Votingdaten, aber keine

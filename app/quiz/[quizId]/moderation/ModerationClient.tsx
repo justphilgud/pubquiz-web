@@ -1,6 +1,9 @@
 "use client";
 
 import { getMemeAdvanceLabel } from "@/app/quiz/memeVoting";
+import { nextIndexAfterSkippedMeme } from "@/app/quiz/memeNavigationPolicy";
+import { NavigationTransition } from "@/app/quiz/navigationTransition";
+import { usePresentationWindowReceipt } from "@/app/quiz/presentationWindowSync";
 import { getQuizIntroAudioUrl } from "@/app/quiz/quizIntroMedia";
 
 import { getPresentationSlideMedia, getSlideSpeech, isIntroMusicSlide } from "@/app/rendering/presentation/presentationSlideMetadata";
@@ -18,7 +21,6 @@ import {
   freigabeQuizBlock,
   schliesseQuizBlock,
   QuizPraesentationResult,
-  getQuizPunktestand,
   getPresentationFunnyAnswers,
   getSchaetzfrageById,
   getZufaelligeSchaetzfrage,
@@ -43,11 +45,12 @@ import {
   setAudioAktion,
   starteCountdown,
   resetCountdown,
-  setEndstandRevealCount,
+  setEndstandRevealCount as persistRevealCount,
   setSchaetzfrageStatus,
   getAntwortStatus,
   getPraesentationAudienceZwischenstand,
   getPraesentationJahreswertung,
+  getPraesentationPunktestand,
   stoppeQuiz,
   setQuizQuestionHidden,
 } from "../praesentation/statusActions";
@@ -151,6 +154,36 @@ export default function ModerationClient({
   backToQuizLabel,
   theme,
 }: Props) {
+  const transition = useRef(new NavigationTransition());
+  const [transitionPending, setTransitionPending] = useState(false);
+  const [unconfirmedPosition, setUnconfirmedPosition] = useState<{ key: string; reveal: number } | null>(null);
+  const waitForPresentation = usePresentationWindowReceipt(quizId);
+
+  async function confirmPresentation(position: { key: string; reveal: number }) {
+    setUnconfirmedPosition(position);
+    await waitForPresentation(position);
+    setUnconfirmedPosition(null);
+  }
+
+  async function runNavigation(action: () => Promise<void>) {
+    await transition.current.run(async () => {
+      performance.mark("pubquiz-navigation-input");
+      setTransitionPending(true);
+      try {
+        setActionError(null);
+        if (unconfirmedPosition) await confirmPresentation(unconfirmedPosition);
+        else await action();
+      } catch (cause) {
+        setActionError(`${cause instanceof Error ? cause.message : "Wechsel fehlgeschlagen."} Bitte Verbindung prüfen und erneut versuchen.`);
+      } finally { setTransitionPending(false); }
+    });
+  }
+
+  async function setEndstandRevealCount(data: { quizId: number; revealCount: number }) {
+    await persistRevealCount({ ...data, lifecycleRevision: lifecycleState.lifecycleRevision });
+    setEndstandRevealCountLokal(data.revealCount);
+    if (aktuellerSlide) await confirmPresentation({ key: getPresentationSlideKey(aktuellerSlide), reveal: data.revealCount });
+  }
   const [activeBlockId, setActiveBlockId] = useState<number | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [initialClockOffset] = useState(() => (initialLiveState.serverNow ?? Date.now()) - Date.now());
@@ -386,7 +419,7 @@ export default function ModerationClient({
         presentationQuestionAssignmentId,
         controller.signal,
       );
-      if (mayApplyLiveSnapshot(requestedNavigationRevision, navigationRevision.current, active, navigationPending.current)) {
+      if (mayApplyLiveSnapshot(requestedNavigationRevision, navigationRevision.current, active, navigationPending.current || transition.current.busy)) {
         applyLiveState(snapshot.presentationState);
         setQuestionHidden(snapshot.questionHidden);
         setPixelState(snapshot.pixelState);
@@ -471,7 +504,7 @@ export default function ModerationClient({
   }, [aktuellerSlide, activeBlockId, quizId, lifecycleState.lifecycleRevision]);
 
   function vorherigerSlide() {
-    void goToSlide(slideIndex - 1);
+    void runNavigation(() => goToSlide(slideIndex - 1));
   }
 
   async function naechsterSlideAction() {
@@ -512,6 +545,8 @@ export default function ModerationClient({
           setActionError("Prüfe die final eingereichten Memes und schließe den Review ab.");
           return;
         }
+        await goToSlide(nextIndexAfterSkippedMeme(slides, slideIndex));
+        return;
       }
       if (await memePresentationControlsRef.current?.advance()) return;
     }
@@ -522,7 +557,6 @@ export default function ModerationClient({
       endstandRevealCount < memePresentationState.result.pageCount
     ) {
       const nextPage = endstandRevealCount + 1;
-      setEndstandRevealCountLokal(nextPage);
       await setEndstandRevealCount({ quizId, revealCount: nextPage });
       return;
     }
@@ -530,13 +564,12 @@ export default function ModerationClient({
       const pageCount = getFunnyAnswerPageCount(funnyAnswers.length);
       if (endstandRevealCount < pageCount) {
         const nextPage = endstandRevealCount + 1;
-        setEndstandRevealCountLokal(nextPage);
         await setEndstandRevealCount({ quizId, revealCount: nextPage });
         return;
       }
     }
     if (aktuellerSlide?.typ === "frage" && naechsterSlide?.typ === "funny" && funnyAnswers.length === 0) {
-      void goToSlide(slideIndex + 2);
+      await goToSlide(slideIndex + 2);
       return;
     }
     const templateData =
@@ -552,7 +585,6 @@ export default function ModerationClient({
         endstandRevealCount + 1,
         templateData.reviews.length,
       );
-      setEndstandRevealCountLokal(nextRevealCount);
       await setEndstandRevealCount({
         quizId,
         revealCount: nextRevealCount,
@@ -561,22 +593,18 @@ export default function ModerationClient({
     }
 
     if (isPodiumRevealSlide(aktuellerSlide)) {
-      const punktestand = await getQuizPunktestand(quizId);
+      const punktestand = await getPraesentationPunktestand(quizId);
       const reveal = resolvePodiumReveal(
         punktestand,
         endstandRevealCount,
       );
-      const revealStageCount = aktuellerSlide?.typ === "endstand"
-        ? reveal.revealStageCount + 1
-        : reveal.revealStageCount;
+      const revealStageCount = reveal.revealStageCount;
 
       if (endstandRevealCount < revealStageCount) {
         const neuerRevealCount = Math.min(
           revealStageCount,
           endstandRevealCount + 1,
         );
-
-        setEndstandRevealCountLokal(neuerRevealCount);
 
         await setEndstandRevealCount({
           quizId,
@@ -587,15 +615,15 @@ export default function ModerationClient({
       }
     }
 
-    void goToSlide(slideIndex + 1);
+    await goToSlide(slideIndex + 1);
   }
 
   function showFunnyAnswers() {
-    void goToSlide(slideIndex + 1);
+    void runNavigation(() => goToSlide(slideIndex + 1));
   }
 
   function skipFunnyAnswers() {
-    void goToSlide(slideIndex + 2);
+    void runNavigation(() => goToSlide(slideIndex + 2));
   }
 
   const handleMediumToggle = useCallback(async () => {
@@ -653,12 +681,11 @@ export default function ModerationClient({
     const nextSlideKey = getPresentationSlideKey(nextSlide);
     const sponsorMoment = nextSlide.typ === "ablauf" && nextSlide.presentationRole?.kind === "SPONSOR";
     const newStartedAt = new Date().toISOString();
-    setSlideIndex(safeIndex);
-    setSlideStartedAt(newStartedAt);
+    // Keep the confirmed position until the server has committed the transition.
     if (!sponsorMoment) {
       setShowAuswertungDialog(false);
       setAuswertungDialogBereitsGezeigt(false);
-      setEndstandRevealCountLokal(1);
+      setEndstandRevealCountLokal(isPodiumRevealSlide(nextSlide) ? 0 : 1);
       setMediumOverlayAktivLokal(false);
       setAudioLaeuft(false);
       setPlaybackCommand("stop");
@@ -671,12 +698,19 @@ export default function ModerationClient({
         Math.max(1, Math.round(getPauseDurationSeconds(nextSlide) / 60)),
       );
     }
+    let committed = false;
     try {
-      await setPraesentationSlideIndex(quizId, safeIndex, nextSlideKey, lifecycleState.lifecycleRevision);
+      const status = await setPraesentationSlideIndex(quizId, safeIndex, nextSlideKey, lifecycleState.lifecycleRevision, lifecycleState.slideKey);
+      committed = true;
+      performance.measure("pubquiz-navigation-server", "pubquiz-navigation-input");
+      setSlideIndex(safeIndex);
+      setSlideStartedAt(newStartedAt);
+      applyLiveState(resolvePresentationLiveState(status));
+      await confirmPresentation({ key: nextSlideKey, reveal: status.endstand_reveal_count });
       setActionError(null);
     } catch (cause) {
-      applyLiveState(lifecycleState);
-      setActionError(cause instanceof Error ? cause.message : "Navigation fehlgeschlagen.");
+      if (!committed) applyLiveState(lifecycleState);
+      throw cause;
     } finally {
       navigationPending.current = false;
     }
@@ -700,7 +734,7 @@ export default function ModerationClient({
   }
 
   function zurErstenSlide() {
-    void goToSlide(0);
+    void runNavigation(() => goToSlide(0));
   }
 
   async function handleQuizBeenden() {
@@ -812,7 +846,7 @@ export default function ModerationClient({
       return pollEvaluation(() => getPraesentationAudienceZwischenstand(quizId), setAudienceInterimStandings);
     }
     return pollEvaluation(
-      () => Promise.all([getQuizPunktestand(quizId), getPraesentationJahreswertung(quizId)]),
+      () => Promise.all([getPraesentationPunktestand(quizId), getPraesentationJahreswertung(quizId)]),
       ([scores, yearly]) => { setPunktestand(scores); setYearlyStandings(yearly); },
     );
   }, [aktuellerSlide, quizId, lifecycleState.lifecycleRevision]);
@@ -949,7 +983,7 @@ export default function ModerationClient({
     hatMedien,
     hatAudio,
     onWeiter: () => {
-      void naechsterSlideAction();
+      void runNavigation(naechsterSlideAction);
     },
     onZurueck: vorherigerSlide,
     onBlockFreigeben: () => {
@@ -1006,6 +1040,8 @@ export default function ModerationClient({
             } catch (cause) { setActionError(cause instanceof Error ? cause.message : "Aktion fehlgeschlagen."); }
           }}>{questionHidden ? "Frage wieder einblenden" : "Frage schließen / ausblenden"}</button>}
           {actionError && <p role="alert">{actionError}</p>}
+          {transitionPending && <p role="status">Folienwechsel läuft … Bitte warten.</p>}
+          {unconfirmedPosition && !transitionPending && <button type="button" onClick={() => void runNavigation(async () => {})}>Anzeige erneut prüfen</button>}
           <Link href={`/quiz/${quizId}`} className="ml-auto inline-flex min-h-9 items-center rounded-lg px-2 py-1 text-sm font-medium text-zinc-300 underline-offset-4 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300">
             {backToQuizLabel}
           </Link>
@@ -1041,7 +1077,14 @@ export default function ModerationClient({
 
             <div className="sticky top-0 z-20 rounded-xl border border-zinc-800 bg-zinc-950/95 p-2 shadow-lg backdrop-blur">
               <ModerationToolbar
-                nextLabel={aktuellerSlide?.typ === "frage" && aktuellerSlide.frage.templateId === "meme_beschriften" && memePresentationState ? getMemeAdvanceLabel({ ...memePresentationState, hasResult: Boolean(memePresentationState.result) }) : "Weiter"}
+                navigationPending={transitionPending || unconfirmedPosition !== null}
+                nextLabel={aktuellerSlide?.typ === "frage" && aktuellerSlide.frage.templateId === "meme_beschriften"
+                  ? memePresentationState
+                    ? getMemeAdvanceLabel({ ...memePresentationState, hasResult: Boolean(memePresentationState.result) })
+                    : memeState?.state === "OPEN" || memeState?.state === "COUNTDOWN"
+                      ? "Antwortphase schließen"
+                      : "Memes prüfen / vorstellen"
+                  : "Weiter"}
                 blockFreigegeben={blockFreigegeben}
                 mediumOverlayAktiv={mediumOverlayAktiv}
                 audioLaeuft={audioLaeuft}
@@ -1054,7 +1097,7 @@ export default function ModerationClient({
                 showSchaetzfrageControls={false}
                 onZurErstenSlide={zurErstenSlide}
                 onZurueck={vorherigerSlide}
-                onWeiter={naechsterSlideAction}
+                onWeiter={() => void runNavigation(naechsterSlideAction)}
                 onBlockToggle={handleBlockToggle}
                 onMediumToggle={handleMediumToggle}
                 onAudioToggle={handleAudioPlay}
