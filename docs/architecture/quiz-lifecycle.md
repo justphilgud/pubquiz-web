@@ -14,6 +14,9 @@ keine inzwischen geänderte Position.
 der verbundenen Präsentationsfenster desselben Browserprofils und Ursprungs.
 Zwei Renderframes und endliche Podiumsanimationen gehen der Bestätigung voraus.
 Diese Quittung ist keine zweite fachliche Zustandsquelle und schreibt keine DB.
+Öffentliche Fenster beantworten nur ausdrückliche Probes, niemals die Quittungen
+anderer Fenster. Der Protokolltest schützt dadurch vor Echo-Rückkopplungen bei
+mehreren gleichzeitig geöffneten Präsentationen.
 Ein Timeout lässt nur die erneute Anzeigeprüfung zu; es führt nicht zum nächsten
 Wechsel. Ohne verbundenes lokales Fenster endet die Sperre nach Serverbestätigung.
 Andere Geräte/Browserprofile liefern keine solche Quittung. Die bestehenden

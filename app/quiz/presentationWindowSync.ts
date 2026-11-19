@@ -6,6 +6,10 @@ type Position = { key: string; reveal: number };
 type Message = { kind: "probe" } | ({ kind: "rendered"; id: string } & Position);
 const channelName = (quizId: number) => `pubquiz-presentation-${quizId}`;
 
+export function respondToPresentationProbe(data: unknown, publish: () => void) {
+  if (data && typeof data === "object" && "kind" in data && data.kind === "probe") publish();
+}
+
 /** Render receipt only; navigation and persisted state remain server-authoritative. */
 export function usePresentationWindowReceipt(quizId: number) {
   const channel = useRef<BroadcastChannel | null>(null);
@@ -54,7 +58,7 @@ export function usePresentationRenderReceipt(quizId: number, key: string, reveal
       if (rendered.current) channel.postMessage({ kind: "rendered", id, ...rendered.current });
     };
     publishReceipt.current = publish;
-    channel.onmessage = publish;
+    channel.onmessage = ({ data }) => respondToPresentationProbe(data, publish);
     const timer = setInterval(publish, 1_000);
     return () => { clearInterval(timer); channel.close(); connection.current = null; publishReceipt.current = () => {}; };
   }, [quizId]);

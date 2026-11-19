@@ -146,6 +146,9 @@ enthüllt und die Navigation war wieder frei. Kein zusätzliches Reveal wurde ge
 - Vollständiges `npm test`: 1.901 Tests, 0 Fehler. Anschließend gezielte Regressionen
   für den korrigierten Podium-Nullzustand einschließlich Moderation/Renderer:
   71 Tests, 0 Fehler. Dieser zusätzliche Nullzustandtest ist Teil der normalen Suite.
+- Abschließender Mehrfenster-Protokolltest schützt zwei öffentliche Fenster vor
+  gegenseitigem Quittungsecho und ignoriert fremde/unvollständige Nachrichten;
+  `test:lovd-november` besteht mit 5 Tests ohne Fehler.
 - TypeScript, Prisma-Schemavalidierung und Production-Build erfolgreich.
   ESLint aller geänderten Quelldateien ohne Befund.
 - Die historischen Eventarten-/Shared-Design-PostgreSQL-Fixtures wenden vor den
