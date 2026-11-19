@@ -1,5 +1,41 @@
 # Bewertungs- und Ergebnisworkflow (AP4)
 
+## LOVD November AP5 · historische manuelle Auswertung
+
+Der [Analysebericht](../reports/lovd-november-ap5.md) untersucht Quiz 37 mit zwölf
+Teams anhand eines festen Aggregatstands vom 19.11.2026. Er verändert keine
+Bewertungs-, Filter-, Submission- oder Lifecycle-Regel. `manualReviewAnalysis.ts`
+ist reine Auswertung anonymisierter Summen. Answer-Mode-Resolver und bestehende
+Filter bleiben die Definition der Sichtbarkeit. `REVIEW_REQUIRED` ohne manuelle
+Quelle, bereits manuell entschiedene Fälle und unvollständige Bewertung sind getrennt.
+Sichtbarkeit im Filter „nur falsche Antworten“ bedeutet nicht manuellen Restbedarf.
+
+Die SQL-Analyse liest pro Antwort ausschließlich die höchste Submission desselben
+Runs und bei fehlendem Run den bestehenden Legacy-Inhalt. Neuere Drafts ersetzen
+keinen finalen Snapshot. Die Abfrage gibt nur Frageaggregate und Gruppengrößen aus;
+Antworttexte, Teamdaten, individuelle Scores und Equality-Schlüssel bleiben in SQL.
+Ein SELECT verwendet einen konsistenten Statement-Snapshot. Keine Deadline-
+Finalisierung, Rekalkulation oder Backfillaktion darf für diese Analyse aufgerufen werden.
+
+Identität meint ganze TEXT-/STRUCTURED_TEXT-Inhalte je konkreter Zuweisung, ohne
+Schreibweisenormalisierung. Strukturierte Feld-IDs gehören zum Schlüssel. Gruppen
+mit widersprüchlichen gespeicherten Entscheidungen erzeugen keine Einsparung.
+Pixel-, Risiko-, Zahlen- und Länderfälle sind kein allgemeines Freitextpotenzial.
+Eine Ersparnis ist `max(0, Gruppengröße − 1)`, getrennt für sichtbare, belegte
+manuelle und heute noch offene Fälle. Historische Klickzahlen sind nicht gespeichert.
+
+Der feste Bericht `/berichte/lovd-november-ap5` nutzt `requireAdmin`, die gespeicherte
+Aggregatdatei und den reinen Analysator. Er lädt keine Produktionsdaten nach und
+bietet keine Bewertungsaktion. Normale Auswertung bleibt unverändert zuständig für
+alle Schreibaktionen. Empfehlungen sind geplant, insbesondere kein implementierter
+Sammelbewertungs- oder neuer Filtervertrag.
+
+Regressionen: `manualReviewAnalysis.test.ts`, bestehende Filter-/Readmodel-/Submission-
+Tests und `scripts/analysis/lovd-manual-review.integration.test.ts`. Letzterer läuft
+auf einer isolierten synthetischen PostgreSQL-Fixture mit vollständigem Rollback
+und ist im CI-PostgreSQL-Job verdrahtet. Aggregatmetadaten und Browserabnahme stehen
+im Bericht. Keine Migration oder zusätzliche Projektabhängigkeit.
+
 ## Zweck und Zuständigkeit
 
 Eine wirksame finale Antwort wird bewertet, die Bewertung atomar gespeichert und
