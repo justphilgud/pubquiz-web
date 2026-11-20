@@ -12,7 +12,7 @@ export type ReviewHintEntry = {
   reviewFields?: readonly ReviewField[]; reviewSolutions?: readonly string[];
   pixelStage?: number | null;
 };
-export type ReviewHint = { kind: "SAME" | "SIMILAR" | "SOLUTION" | "FACE_SWAP"; text: string };
+export type ReviewHint = { kind: "SAME" | "SIMILAR" | "SOLUTION" | "FACE_SWAP"; text: string; count?: number };
 
 export function isOrdinaryReviewTemplate(entry: Pick<ReviewHintEntry, "templateId">) {
   const id = resolveCanonicalQuestionTemplateId(entry.templateId);
@@ -89,7 +89,7 @@ export function buildManualReviewHints(entries: readonly ReviewHintEntry[]) {
   for (const bucket of buckets.values()) {
     const groups = [...bucket.values()];
     for (const group of groups) {
-      if (group.ids.size > 1) for (const id of group.ids) add(id, { kind: "SAME",
+      if (group.ids.size > 1) for (const id of group.ids) add(id, { kind: "SAME", count: group.ids.size,
         text: `Gleicher Feldtext bei ${group.ids.size} sichtbaren Teamantworten (Groß-/Kleinschreibung unerheblich): „${short(group.text)}“.` });
     }
     let comparisons = 0;

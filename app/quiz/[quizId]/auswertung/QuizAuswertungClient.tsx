@@ -561,12 +561,12 @@ export default function QuizAuswertungClient({
                 </button>
               </label>
 
-              <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                <input type="checkbox" checked={pendingOnly} onChange={e => setPendingOnly(e.target.checked)} />
+              <label className="flex min-h-11 items-center gap-2 text-sm font-semibold text-slate-700">
+                <input className="size-4" type="checkbox" checked={pendingOnly} onChange={e => setPendingOnly(e.target.checked)} />
                 Noch zu prüfen (ohne manuell entschiedene Fälle)
               </label>
-              <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                <input type="checkbox" checked={hideClearClosedWrong} onChange={e => setHideClearClosedWrong(e.target.checked)} />
+              <label className="flex min-h-11 items-center gap-2 text-sm font-semibold text-slate-700">
+                <input className="size-4" type="checkbox" checked={hideClearClosedWrong} onChange={e => setHideClearClosedWrong(e.target.checked)} />
                 Eindeutig falsche geschlossene Antworten ausblenden
               </label>
               <p className="text-xs text-slate-600">Meme- und Reihenfolgefragen bleiben in ihren eigenen Wertungen und der Matrix. Prüfhinweise vergleichen ohne Groß-/Kleinschreibung; sie ändern keine Punkte.</p>
@@ -576,7 +576,7 @@ export default function QuizAuswertungClient({
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
+          <div role="region" aria-label="Antwortprüfung – horizontal scrollbar" tabIndex={0} className="overflow-x-auto rounded-2xl bg-white shadow-sm">
             <table className="w-full border-collapse text-sm">
               <thead className="bg-slate-100 text-left text-xs font-bold uppercase tracking-wide text-slate-500">
                 <tr>
