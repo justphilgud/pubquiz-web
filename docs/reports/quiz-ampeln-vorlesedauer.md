@@ -4,8 +4,8 @@
 [Quizliste](https://pubquiz-6q4742xa6-just-phil-gud.vercel.app/quiz).
 Die abschließende technische Abnahme der Ergänzung steht am Ende dieses Berichts.
 
-Basis: main `e456764a` nach PR #171 und #172. AP5 bleibt unverändert und wird
-nicht erneut implementiert. Keine neue Abhängigkeit oder Änderung
+Basis: main `e456764a` nach PR #171 und #172. Die historische AP5-Analyse bleibt
+unverändert; neue Anwendungshilfen sind am Ende getrennt verlinkt. Keine neue Abhängigkeit oder Änderung
 von Spielbetrieb, Antworten oder Bewertung. **Kein Production-Backup und kein
 Production-Deployment in diesem Auftrag.** Ein gemeinsamer Release folgt erst
 nach gemeinsamer Preview-Abnahme und gesonderter Autorisierung.
@@ -260,3 +260,30 @@ wurde nur für diese Preview eingesetzt; Schutz bleibt aktiv. Browser geschlosse
 temporäre lokale Bypass-Kopie entfernt. Der finale Dokumentationscommit ergänzt
 nur Bericht und Bilder; Anwendung und Tests sind identisch zum geprüften Deployment.
 Kein Merge, Production-Backup oder Production-Deployment. AP5 bleibt unberührt.
+
+## Abschließender Auftrag: Templategrenzen, Fragetextdauer und getrennte AP5-Hilfen
+
+Bestand geprüft: main enthält PR #171/#172; PR #173 ist offen und wird auf demselben
+Branch `codex/quiz-ampeln-vorlesedauer` erweitert, ohne doppelte PR. Die zuvor
+abgenommenen Kategoriegrenzen 20/30 % und der Themenquiz-Modus bleiben erhalten.
+
+Endgültige Templatekorrektur: Offene Fragen sind bei **10–20 %** grün; 5–<10 % und
+>20–25 % gelb; <5 % oder >25 % rot. Geschlossene Fragen: **10–50 %** grün,
+>50–60 % gelb, <10 % oder >60 % rot. Der Auftraggeber hat ausdrücklich bestätigt,
+dass Audio ab **einer Frage pro Block** grün ist; frühere Audio-Prozentgrenzen und
+Drei-Audio-Zusatzregel entfallen. Übrige Präsenzgruppen bleiben ab einem Vertreter
+grün, ohne Forderung nach jedem Einzeltemplate. Schätzfragen/Umfragen ohne Ampel.
+Die verbindliche Tabelle und Empfehlungen verwenden dieselben neuen Grenzen.
+
+Der allgemeine Fragetext zeigt beim Erstellen/Bearbeiten seine geschätzte
+Vorlesedauer, zusätzlich zur bestehenden Übersetzungsdauer. Beide verwenden den
+reinen Helfer; keine automatische Kürzung oder Veränderung.
+
+Das zweite Arbeitspaket verbessert ausschließlich die manuelle Antwortprüfung.
+Umfang, Sicherheit, Prüfungen und bekannte Grenzen sind im separaten
+[AP5-Anwendungsbericht](ap5-review-improvements.md) beschrieben; keine Ampel-Logik
+oder Ampeloberfläche in der Auswertung, keine automatische Punkteänderung.
+
+Gezielte Tests und Browserregression erfolgreich; vollständige CI, aktualisierte
+gemeinsame Preview und abschließende gehostete Bildnachweise folgen vor Übergabe.
+Historische AP5-Aggregate werden nicht erneut ermittelt. Kein Production-Schritt.

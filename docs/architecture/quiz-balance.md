@@ -26,7 +26,7 @@ Im abwechslungsreichen Quiz gelten die unten verbindlich dokumentierten Grenzen.
 Themenquiz bleiben Sachkategorien mit Anzahl und Blockanteil sichtbar, aber neutral:
 keine grüne/gelbe/rote Kategorieampel, kein Einfluss auf Block-/Gesamtstatus und
 keine Kategorie-Ausgleichsempfehlung oder daraus abgeleiteter Kategorie-Suchfilter.
-Template-Ampeln, Template-Empfehlungen und die Drei-Audio-Regel bleiben aktiv.
+Template-Ampeln und Template-Empfehlungen bleiben aktiv.
 Der kompakte Einstieg nennt den Modus; Detailansicht und Regeltabelle erklären ihn.
 
 Der Auftraggeber hat überschneidungsfreie Templategruppen bestätigt: Standardfragen
@@ -49,9 +49,9 @@ zur Fragenzahl, erhalten selbst aber keine Ampel.
 
 | Gruppe | Vollständige Registry-Zuordnung | Rot | Gelb | Grün |
 |---|---|---|---|---|
-| Offene Fragen | Standard, effektiv offen | <5 % oder >25 % | 5–10 % oder >20–25 % | >10–20 % |
-| Geschlossene Fragen | Standard, effektiv geschlossen; Multiple Choice | <10 % oder >60 % | 10–<15 % oder >50–60 % | 15–50 % |
-| Audio-Fragen | Musik rückwärts, normale Musik, 8-Bit-Musik, Übersetzt-vorgelesen | <10 % oder >30 % | 10–<15 % oder >25–30 % | 15–25 % |
+| Offene Fragen | Standard, effektiv offen | <5 % oder >25 % | 5–<10 % oder >20–25 % | 10–20 % |
+| Geschlossene Fragen | Standard, effektiv geschlossen; Multiple Choice | <10 % oder >60 % | >50–60 % | 10–50 % |
+| Audio-Fragen | Musik rückwärts, normale Musik, 8-Bit-Musik, Übersetzt-vorgelesen | 0 Fragen | — | ≥1 Frage |
 | Sachkategorien, abwechslungsreiches Quiz | Bestehende zugeordnete Kategorien, z. B. Politik, Wirtschaft, Kultur, Film, Geografie | >30 % | >20–30 % | ≤20 % |
 | Sachkategorien, Themenquiz | Dieselben Kategorien und Anteile; neutrale Anzeige ohne Ausgleichsempfehlung | — | — | — |
 | Fakten | Person, Jahr, Land, Freitext | 0 Fragen | — | ≥1 Frage |
@@ -76,9 +76,11 @@ keine Ampelzeilen. Fehlende oder archivierte Kategorien werden nicht erfunden;
 vorhandene zugeordnete archivierte Kategorien bleiben für korrekte Anteile sichtbar,
 aber werden nicht als aktive Suchalternative empfohlen.
 
-Bei genau zwei Fragenblöcken gilt zusätzlich: Mindestens einer enthält mindestens
-drei Audio-Fragen. Die gemeinsame Zusatzanzeige ist rot, wenn beide darunter liegen,
-und grün, sobald einer die drei erreicht. Sie verlangt nicht drei in beiden Blöcken.
+Mit dem abschließenden Auftrag vom 20.11.2026 ist 10 % bei offenen und geschlossenen
+Fragen ausdrücklich inklusive grün. Die oberen Grenzen bleiben unverändert.
+Der Auftraggeber hat außerdem ausdrücklich bestätigt: Audio ist bereits ab einer
+Frage je Block grün. Die früheren Audio-Prozentgrenzen und die Drei-Audio-Zusatzregel
+entfallen vollständig; das interne Modell und die Oberfläche führen sie nicht weiter.
 Fakten, Bild, Kreativität, Reihenfolge, Paare und Wahr/Falsch haben kein Gelb.
 Es genügt ein Vertreter der jeweiligen Gruppe; nicht jedes der 23 Templates muss
 vorkommen. Schätzfragen und Umfragen zeigen ausschließlich „Keine Ampel“.
@@ -132,6 +134,11 @@ diesen verlangten Suchvertrag aktualisiert; keine Scoring-/Runtime-Regel ändert
 
 ## Vorlesedauer
 
+`QuestionSection` zeigt zusätzlich die geschätzte Vorlesedauer des allgemeinen
+Fragetextes bei Neuanlage und Bearbeiten. Dieselbe reine Berechnung nutzt den
+aktuellen Text bei 1×; keine Änderung, Kürzung, Speicherung oder Generatoraktion.
+Die folgende Übersetzungsanzeige bleibt separat erhalten.
+
 Im gemeinsamen Übersetzungseditor erscheint beim Erstellen und Bearbeiten eine
 aus `translation` und `speed` abgeleitete Dauer. Annahme: 150 durch Leerraum
 getrennte Wörter pro Minute bei 1×. Sekunden = aufgerundet Wörter × 60 / (150 ×
@@ -149,7 +156,7 @@ Kürzung und Umformulierung bleiben vollständig beim Nutzer.
 
 - `quizBalance.test.ts`: alle Grenzen und Nachbarbereiche, ungerundete Berechnung,
   Blocknenner, Kategorien, vollständige Registry, Aliase, Präsenzgruppen, Audio-
-  Zusatzregel, fehlende Blöcke und kombinierte Suchlinks.
+  Präsenz statt alter Audio-Zusatzregel, fehlende Blöcke und kombinierte Suchlinks.
   Quizmodus: Film-only grün bei ausgeglichenen Templates, neutrale Kategorien,
   weiterhin rote Templatewarnungen, keine Kategorie-Ausgleichsfilter, Rückwechsel.
   Kategoriegrenzen: genau 20/30 %, knapp darüber, 5/6/7/8 von 25, konsistente
@@ -169,6 +176,11 @@ Kürzung und Umformulierung bleiben vollständig beim Nutzer.
   synthetischen Daten; echte Suchtreffer, neuer Tab, bestehender Quiztab sowie
   Erstellen/Bearbeiten und Desktop-/Mobilgrößen zusätzlich prüfen.
 
-AP5 der LOVD-November-Auswertung bleibt abgeschlossen und unverändert. Dieser
+Die historische AP5-Analyse bleibt abgeschlossen und unverändert. Dieser
 Auftrag enthält weder Production-Backup noch Production-Deployment; beide folgen
 erst nach gemeinsamer Preview-Abnahme in einem separaten autorisierten Schritt.
+
+Die neue AP5-Anwendungsverbesserung ist getrennt in
+[Bewertungsworkflow](evaluation-workflow.md#ap5-anwendungsergänzung-20112026) beschrieben.
+Sie teilt weder Ampelmodell noch Ampeloberfläche und verändert nicht die historische
+AP5-Aggregation. Gemeinsamer Browsernachweis prüft nur beide getrennten Oberflächen.

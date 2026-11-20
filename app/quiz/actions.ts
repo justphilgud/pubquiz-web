@@ -4813,6 +4813,12 @@ async function loadQuizAuswertungAlleAntworten(quizId: number, db: Prisma.Transa
         maximumPointsLabel,
         templateId: quizFrage.fragen.vorlage?.code ?? null,
         richtigeAntwort: richtigeAntworten || offeneMusterloesung || "-",
+        reviewSolutions: quizFrage.fragen.antworten.filter(a => a.ist_richtig).map(a => a.antwort),
+        reviewFields: quizFrage.fragen.antwortfelder.map(field => ({
+          id: field.antwortfeld_id, label: field.label,
+          answer: effectiveSubmission?.structuredAnswers.get(field.antwortfeld_id) ?? null,
+          solutions: field.loesungen.filter(solution => solution.ist_akzeptiert).map(solution => solution.loesung_text),
+        })),
 
         team_antwort_id: antwort?.team_antwort_id ?? null,
         evaluationRevision: antwort ? evaluationRevision(antwort) : null,

@@ -10,6 +10,8 @@ import {
   updateTeamAntwortBewertung,
 } from "../../actions";
 import { pollEvaluation } from "../../evaluation/pollEvaluation";
+import { buildManualReviewHints, filterManualReview, type ReviewField } from "../../evaluation/manualReviewHints";
+import { ManualReviewHints } from "../../evaluation/ManualReviewHintList";
 import { formatQuizPoints } from "../../formatQuizPoints";
 import { rankScores } from "@/app/rendering/presentation/presentationRankingPolicy";
 import TeamQuestionEvaluationMatrix from "../../evaluation/TeamQuestionEvaluationMatrix";
@@ -24,6 +26,8 @@ import {
 } from "../../evaluation/evaluationAnswerFilter";
 
 type AuswertungsAntwort = {
+  reviewFields?: readonly ReviewField[];
+  reviewSolutions?: readonly string[];
   quiz_fragen_id: number;
   abschnittId: number | null;
   istGespielt: boolean;
@@ -123,6 +127,8 @@ export default function QuizAuswertungClient({
     DEFAULT_EVALUATION_ANSWER_FILTERS.includeUnanswered,
   );
   const [ausgewaehltesTeam, setAusgewaehltesTeam] = useState<string | null>(null);
+  const [pendingOnly, setPendingOnly] = useState(false);
+  const [hideClearClosedWrong, setHideClearClosedWrong] = useState(false);
   const [punkteOverrides, setPunkteOverrides] = useState<Record<number, string>>({});
   const [rekalkulationLaeuft, setRekalkulationLaeuft] = useState(false);
   const [rekalkulationsmeldung, setRekalkulationsmeldung] = useState<string | null>(
@@ -160,13 +166,14 @@ export default function QuizAuswertungClient({
 
 
 
-  const sichtbareAntworten = filterEvaluationAnswers(antworten, {
+  const sichtbareAntworten = filterManualReview(filterEvaluationAnswers(antworten, {
     scope: fragenScope,
     selectedTeam: ausgewaehltesTeam,
     openQuestionsOnly: nurOffeneFragen,
     incorrectAnswersOnly: nurFalscheAntworten,
     includeUnanswered: zeigeUnbeantwortete,
-  });
+  }), { pendingOnly, hideClearClosedWrong });
+  const reviewHints = buildManualReviewHints(sichtbareAntworten);
   const sichtbareMatrix = useMemo(
     () => filterEvaluationMatrixByScope(matrix, fragenScope),
     [fragenScope, matrix],
@@ -554,6 +561,15 @@ export default function QuizAuswertungClient({
                 </button>
               </label>
 
+              <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                <input type="checkbox" checked={pendingOnly} onChange={e => setPendingOnly(e.target.checked)} />
+                Noch zu prüfen (ohne manuell entschiedene Fälle)
+              </label>
+              <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                <input type="checkbox" checked={hideClearClosedWrong} onChange={e => setHideClearClosedWrong(e.target.checked)} />
+                Eindeutig falsche geschlossene Antworten ausblenden
+              </label>
+              <p className="text-xs text-slate-600">Meme- und Reihenfolgefragen bleiben in ihren eigenen Wertungen und der Matrix. Prüfhinweise vergleichen ohne Groß-/Kleinschreibung; sie ändern keine Punkte.</p>
               <div className="ml-auto text-sm font-semibold text-slate-500">
                 {sichtbareAntworten.length} Treffer
               </div>
@@ -668,6 +684,7 @@ export default function QuizAuswertungClient({
                           : antwort.templateId === "fakten_land"
                             ? countryName(antwort.antwortText ?? antwort.ausgewaehlteAntwort ?? "-")
                             : antwort.antwortText ?? antwort.ausgewaehlteAntwort ?? "-"}
+                        <ManualReviewHints hints={antwort.team_antwort_id === null ? [] : reviewHints.get(antwort.team_antwort_id) ?? []} />
                         {!antwort.istNichtGespielt && !antwort.istUnbeantwortet && (
                           <div className="mt-1 text-xs font-normal text-slate-500">
                             {antwort.antwortQuelle === "LEGACY"

@@ -22,9 +22,9 @@ export const BALANCE_TEMPLATE_GROUPS = {
 } satisfies Record<RegistryId, BalanceGroup>;
 
 export const BALANCE_RULES: { id: BalanceGroup; label: string; red: string; yellow: string; green: string }[] = [
-  { id: "open", label: "Offene Fragen", red: "<5 % oder >25 %", yellow: "5–10 % oder >20–25 %", green: ">10–20 %" },
-  { id: "closed", label: "Geschlossene Fragen", red: "<10 % oder >60 %", yellow: "10–<15 % oder >50–60 %", green: "15–50 %" },
-  { id: "audio", label: "Audio-Fragen", red: "<10 % oder >30 %", yellow: "10–<15 % oder >25–30 %", green: "15–25 %" },
+  { id: "open", label: "Offene Fragen", red: "<5 % oder >25 %", yellow: "5–<10 % oder >20–25 %", green: "10–20 %" },
+  { id: "closed", label: "Geschlossene Fragen", red: "<10 % oder >60 %", yellow: ">50–60 %", green: "10–50 %" },
+  { id: "audio", label: "Audio-Fragen", red: "0 Fragen", yellow: "—", green: "≥1 Frage" },
   ...([ ["facts", "Fakten"], ["image", "Bild"], ["creative", "Kreativität"], ["ordering", "Reihenfolge"], ["pairs", "Paare"], ["trueFalse", "Wahr oder Falsch"] ] as const)
     .map(([id, label]) => ({ id, label, red: "0 Fragen", yellow: "—", green: "≥1 Frage" })),
   { id: "estimate", label: "Schätzfrage", red: "—", yellow: "—", green: "—" },
@@ -50,9 +50,8 @@ export function balanceStatus(group: BalanceGroup | "category", count: number, t
   if (!total || group === "estimate" || group === "poll" || (group === "category" && !count)) return "NONE";
   const p = count * 100;
   if (group === "category") return p > CATEGORY_BALANCE_LIMITS.yellowMax * total ? "RED" : p > CATEGORY_BALANCE_LIMITS.greenMax * total ? "YELLOW" : "GREEN";
-  if (group === "open") return p < 5 * total || p > 25 * total ? "RED" : p <= 10 * total || p > 20 * total ? "YELLOW" : "GREEN";
-  if (group === "closed") return p < 10 * total || p > 60 * total ? "RED" : p < 15 * total || p > 50 * total ? "YELLOW" : "GREEN";
-  if (group === "audio") return p < 10 * total || p > 30 * total ? "RED" : p < 15 * total || p > 25 * total ? "YELLOW" : "GREEN";
+  if (group === "open") return p < 5 * total || p > 25 * total ? "RED" : p < 10 * total || p > 20 * total ? "YELLOW" : "GREEN";
+  if (group === "closed") return p < 10 * total || p > 60 * total ? "RED" : p > 50 * total ? "YELLOW" : "GREEN";
   return count ? "GREEN" : "RED";
 }
 
@@ -81,7 +80,7 @@ export function getQuizBalance(input: { questions: readonly BalanceQuestion[]; s
     const questions = input.questions.filter(q => q.sectionId === section.id);
     const groups = BALANCE_RULES.map(rule => {
       const count = questions.filter(q => questionBalanceGroup(q) === rule.id).length;
-      const upperGreen = rule.id === "open" ? 20 : rule.id === "closed" ? 50 : rule.id === "audio" ? 25 : null;
+      const upperGreen = rule.id === "open" ? 20 : rule.id === "closed" ? 50 : null;
       return { ...rule, count, status: balanceStatus(rule.id, count, questions.length), overrepresented: upperGreen !== null && count * 100 > upperGreen * questions.length };
     });
     const categories = input.categories.map(category => {
@@ -94,7 +93,7 @@ export function getQuizBalance(input: { questions: readonly BalanceQuestion[]; s
     const recommendations: { label: string; href: string }[] = [];
     for (const group of groups) {
       if (!questions.length || group.status === "NONE" || group.status === "GREEN") continue;
-      const lower = group.id === "open" ? group.count * 100 <= 10 * questions.length : group.id === "closed" || group.id === "audio" ? group.count * 100 < 15 * questions.length : group.count === 0;
+      const lower = group.id === "open" ? group.count * 100 < 10 * questions.length : group.id === "closed" ? group.count * 100 < 10 * questions.length : group.count === 0;
       if (lower) recommendations.push({
         label: `${group.label} ergänzen${alternative ? ` · ${alternative.name}` : ""}`,
         href: balanceSearchHref({ templateIds: templatesForGroup(group.id), categoryId: alternative?.id, answerMode: group.id === "open" ? "open" : group.id === "closed" ? "closed" : undefined }),
@@ -106,13 +105,8 @@ export function getQuizBalance(input: { questions: readonly BalanceQuestion[]; s
       status: worstBalanceStatus([...groups.map(g => g.status), ...displayedCategories.map(c => c.status)]),
     };
   });
-  const audioRule = blocks.length === 2 ? {
-    status: (blocks.every(b => !b.total) ? "NONE" : blocks.some(b => b.groups.find(g => g.id === "audio")!.count >= 3) ? "GREEN" : "RED") as BalanceStatus,
-    label: "Mindestens ein Block enthält mindestens drei Audio-Fragen.",
-    recommendations: blocks.filter(b => b.groups.find(g => g.id === "audio")!.count < 3).map(b => ({ label: `${b.title}: Audio-Fragen suchen`, href: balanceSearchHref({ templateIds: templatesForGroup("audio") }) })),
-  } : null;
-  return { mode, blocks, audioRule, unassigned: input.questions.filter(q => !input.sections.some(s => s.id === q.sectionId)).length,
-    status: worstBalanceStatus([...blocks.map(b => b.status), ...(audioRule ? [audioRule.status] : [])]),
+  return { mode, blocks, unassigned: input.questions.filter(q => !input.sections.some(s => s.id === q.sectionId)).length,
+    status: worstBalanceStatus(blocks.map(b => b.status)),
   };
 }
 

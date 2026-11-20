@@ -15,9 +15,9 @@ const balanced25 = () => [
 ].map(templateId => q({ templateId }));
 
 for (const [group, boundaries] of Object.entries({
-  open: [[49,"RED"],[50,"YELLOW"],[100,"YELLOW"],[101,"GREEN"],[200,"GREEN"],[201,"YELLOW"],[250,"YELLOW"],[251,"RED"]],
-  closed: [[99,"RED"],[100,"YELLOW"],[149,"YELLOW"],[150,"GREEN"],[500,"GREEN"],[501,"YELLOW"],[600,"YELLOW"],[601,"RED"]],
-  audio: [[99,"RED"],[100,"YELLOW"],[149,"YELLOW"],[150,"GREEN"],[250,"GREEN"],[251,"YELLOW"],[300,"YELLOW"],[301,"RED"]],
+  open: [[49,"RED"],[50,"YELLOW"],[99,"YELLOW"],[100,"GREEN"],[101,"GREEN"],[200,"GREEN"],[201,"YELLOW"],[250,"YELLOW"],[251,"RED"]],
+  closed: [[99,"RED"],[100,"GREEN"],[149,"GREEN"],[150,"GREEN"],[500,"GREEN"],[501,"YELLOW"],[600,"YELLOW"],[601,"RED"]],
+  audio: [[0,"RED"],[1,"GREEN"],[99,"GREEN"],[100,"GREEN"],[1000,"GREEN"]],
   category: [[0,"NONE"],[1,"GREEN"],[199,"GREEN"],[200,"GREEN"],[201,"YELLOW"],[299,"YELLOW"],[300,"YELLOW"],[301,"RED"]],
 })) test(`${group}: every exact user boundary and both adjacent ranges`, () => {
   for (const [count, status] of boundaries) assert.equal(balanceStatus(group as BalanceGroup | "category", Number(count), 1000), status as BalanceStatus, `${group} ${count}/1000`);
@@ -59,13 +59,11 @@ test("each block owns its denominator, duplicate categories count once, zero cat
   assert.equal(result.unassigned, 1);
 });
 
-test("two blocks need three audio questions in at least one block, not both", () => {
-  const sections = [{ id: 1, title: "A" }, { id: 2, title: "B" }];
-  const input = { sections, categories: [], questions: [q({ templateId: "musik" }),q({ templateId: "musik" }),q({ templateId: "musik", sectionId: 2 }),q({ templateId: "musik", sectionId: 2 })] };
-  assert.equal(getQuizBalance(input).audioRule?.status, "RED");
-  assert.equal(getQuizBalance({ ...input, questions: [...input.questions,q({ templateId: "musik" })] }).audioRule?.status, "GREEN");
-  assert.equal(getQuizBalance({ ...input, sections: sections.slice(0,1) }).audioRule, null);
-  assert.equal(getQuizBalance({ ...input, questions: [] }).audioRule?.status, "NONE");
+test("audio presence is blockwise and has no percentage or three-audio rule", () => {
+  const result = getQuizBalance({ questions: [q({ templateId: "musik" }), ...Array.from({length:99},()=>q())], sections:[{id:1,title:"A"},{id:2,title:"B"}], categories:[] });
+  assert.equal(result.blocks[0].groups.find(g=>g.id==="audio")?.status,"GREEN");
+  assert.equal(result.blocks[1].status,"NONE");
+  assert.ok(!("audioRule" in result));
 });
 
 test("recommendations combine real category and all audio filters, round-trip to actual active search", () => {
@@ -127,7 +125,6 @@ test("themed quiz preserves block template warnings and recommendations without 
   assert.equal(result.blocks[0].groups.find(g => g.id === "open")?.status, "RED");
   assert.equal(result.blocks[1].total, 0);
   assert.equal(result.blocks[1].status, "NONE");
-  assert.equal(result.audioRule?.status, "RED");
   assert.ok(result.blocks[0].recommendations.some(r => r.label.startsWith("Audio")));
   assert.ok(result.blocks.flatMap(b => b.recommendations).every(r => {
     const params = new URL(r.href, "https://quiz.invalid").searchParams;

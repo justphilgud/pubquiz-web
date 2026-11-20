@@ -2,6 +2,7 @@ import type { ReactNode, Ref } from "react";
 import { CharacterCount } from "./CharacterCount";
 import { PresentationContentWarning } from "@/app/rendering/presentation/PresentationContentWarning";
 import { useQuestionEditorMessages } from "./QuestionEditorMessagesProvider";
+import { estimateReadingDuration, formatReadingDuration } from "../readingDuration";
 
 type QuestionSectionProps = {
   questionText: string;
@@ -54,6 +55,10 @@ export function QuestionSection({
         maximum={300}
         warningAt={220}
       />
+      <p role="status" aria-live="polite" className="mt-2 text-xs text-slate-600">
+        Geschätzte Vorlesedauer des Fragetextes: {formatReadingDuration(estimateReadingDuration(questionText).seconds)}
+        {" · ca. 150 Wörter/Minute; Stimme und Pausen können abweichen. Der Text bleibt unverändert."}
+      </p>
       {rewriteContent}
       {mediaContent}
       <PresentationContentWarning text={questionText} role="question" />

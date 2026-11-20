@@ -1,5 +1,11 @@
 # LOVD November · AP 5: Analyse der manuellen Auswertung
 
+Historischer Aggregatstand vom 19.11.2026, unverändert. Die am 20.11.2026 zusätzlich
+beauftragten **Anwendungsverbesserungen** (Filter und ausschließlich manuelle
+Prüfhinweise) sind getrennt im [AP5-Anwendungsbericht](ap5-review-improvements.md)
+dokumentiert. Die historischen Einsparungszahlen unten wurden dafür nicht neu
+berechnet und sind keine Messung der neuen Oberfläche.
+
 ## Ergebnis
 
 Quiz **37 · Knowvember · 18.11.2026 · zwölf Teams**, Production-Branch
