@@ -1,7 +1,7 @@
 # Gemeinsame Preview: Quiz-Ampeln und Vorlesedauer
 
-**Aktuelle gemeinsame Preview einschließlich Quizmodus:**
-[Quizliste](https://pubquiz-e4r3wo9dt-just-phil-gud.vercel.app/quiz).
+**Aktuelle gemeinsame Preview einschließlich Quizmodus und Kategoriegrenzen 20/30 %:**
+[Quizliste](https://pubquiz-6q4742xa6-just-phil-gud.vercel.app/quiz).
 Die abschließende technische Abnahme der Ergänzung steht am Ende dieses Berichts.
 
 Basis: main `e456764a` nach PR #171 und #172. AP5 bleibt unverändert und wird
@@ -219,5 +219,44 @@ Lokale Tests erfolgreich: alle 18 Ampeltests, einschließlich exakt 20/30 % und
 knapp darüber ohne Rundung, 5/6/7/8 von 25 mit konsistenten Gesamtstatus und
 Empfehlungen, Themenquiz, unveränderten Templatewerten sowie Mehrfachkategorien
 mit zusammen 120 %. Typecheck, geändertes ESLint und Analysis-/Client-Browsertests
-erfolgreich. Neue gemeinsame Preview und gehostete Nachweise werden vor Übergabe
-ergänzt. Keine Migration oder neue Abhängigkeit für diese Grenzwertänderung.
+erfolgreich. Keine Migration oder neue Abhängigkeit für diese Grenzwertänderung.
+
+### Gemeinsame Preview und technische Abnahme der Kategoriegrenzen
+
+- [Aktuelle gemeinsame Preview](https://pubquiz-6q4742xa6-just-phil-gud.vercel.app/quiz),
+  Quellstand `e34ecf1993e52bc5720c82300243a8f8abb2df95`, Deployment
+  `dpl_DyX3WMTBBVJ5V8JDN1phouhgvdAK`, Environment `preview`, 20.11.2026.
+- Vollständig erfolgreiche exakte [Push-CI](https://github.com/justphilgud/pubquiz-web/actions/runs/44680197948)
+  und [PR-CI](https://github.com/justphilgud/pubquiz-web/actions/runs/44680202378):
+  TypeScript, Gesamttests, Changed-file-ESLint, Build, HTTP-Prüfung und
+  PostgreSQL-/Chromium-Regressionssuite einschließlich bestehender Formularabläufe.
+- Getrennte neue synthetische Fixtures; bisherige Quiz und AP5 bleiben unverändert.
+  Neue Datenbankstruktur oder Migration war nicht erforderlich.
+
+| Gehostete Prüfung | Ergebnis |
+|---|---|
+| [Quiz #8, 25 Fragen](https://pubquiz-6q4742xa6-just-phil-gud.vercel.app/quiz/8) | 5/25 = 20 % grün, 6/25 = 24 % gelb, 7/25 = 28 % gelb, 8/25 = 32 % rot. Alle bewerteten Templategruppen grün; Block-/Gesamtstatus wegen der roten Kategorie rot. |
+| Mehrfachkategorien | Die vier Anteile ergeben zusammen 104 %. Alle Zähler bleiben erhalten; keine Normalisierung auf 100 %. |
+| [Quiz #9, exakt 30 %](https://pubquiz-6q4742xa6-just-phil-gud.vercel.app/quiz/9) | 4/20 = 20 % grün, 6/20 = 30 % gelb. Bei grünen Templategruppen ist der Blockstatus gelb; Kategorie-Ausgleich aktiv. |
+| Regelansicht und Erläuterung | Kategoriezeile zeigt >30 % rot, >20–30 % gelb, ≤20 % grün; roter Ausgleichshinweis nennt jetzt >30 %. |
+| Empfehlung | Echter Klick öffnet neuen Tab mit Kategorie 9 und vier passenden Suchtreffern. Quiz-URL `/quiz/8` und Dialog bleiben erhalten; Escape schließt und gibt den Fokus zurück. |
+| [Themenquiz #5](https://pubquiz-6q4742xa6-just-phil-gud.vercel.app/quiz/5) | Film 20/20 = 100 % weiterhin „Nicht bewertet“, neutraler Modushinweis, keine Kategorieempfehlung. Gesamtstatus bei grünen Templates weiterhin grün. |
+| Mobil / Sichtprüfung | 390×844 ohne Seitenüberlauf; Dialog von x=16 bis x=374. Kategorien, Warntext und Empfehlung lesbar. Desktop 1366×768 ebenfalls geprüft. |
+
+Die Unit-Tests prüfen zusätzlich die nicht ganzzahlig darstellbaren Grenzfälle
+knapp über 20/30 %, den grünen Gesamtstatus bei 5/25, 6–7/25 gelb, 8/25 rot,
+blockeigene Nenner und grüne Ausgleichsalternativen bis einschließlich 20 %.
+Die gehostete Prüfung ergänzt echte Serverdaten, Darstellung und Suche.
+
+Bildnachweise: [25er-Block Desktop](assets/quiz-ampeln-vorlesedauer/category-preview-25-1366.png),
+[25er-Block Mobil](assets/quiz-ampeln-vorlesedauer/category-preview-25-390.png),
+[exakt 30 %](assets/quiz-ampeln-vorlesedauer/category-preview-30-1366.png),
+[aktualisierte Regeltabelle](assets/quiz-ampeln-vorlesedauer/category-preview-rules-1366.png),
+[echte vorgefilterte Suche](assets/quiz-ampeln-vorlesedauer/category-preview-search-1366.png).
+
+Technische Abnahme erfolgreich, keine offenen technischen Fehler. Fachliche
+Preview-Abnahme bleibt beim Auftraggeber. Der vorhandene freigegebene Header-Bypass
+wurde nur für diese Preview eingesetzt; Schutz bleibt aktiv. Browser geschlossen,
+temporäre lokale Bypass-Kopie entfernt. Der finale Dokumentationscommit ergänzt
+nur Bericht und Bilder; Anwendung und Tests sind identisch zum geprüften Deployment.
+Kein Merge, Production-Backup oder Production-Deployment. AP5 bleibt unberührt.
