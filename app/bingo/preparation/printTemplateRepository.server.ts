@@ -16,7 +16,7 @@ export async function resolveSelectedPrint(tx:Prisma.TransactionClient,design:Sh
   if(!row||row.status!=='ACTIVE'||!config||config.purpose!=='BINGO_PRINT'||config.bingoPrint?.layout?.version!==4)throw new BingoPreparationError('Die gewählte Druckvorlage ist nicht mehr aktiv. Bitte eine verfügbare Druckvorlage wählen. Bestehende Druckstände bleiben unverändert.');
   template={...systemPrintTemplates()[0],id:row.presentation_template_id,name:row.name,config};
  }
- const settings=structuredClone(template.config.bingoPrint!);settings.layout={version:4,format:selection.format,textFont:settings.layout!.textFont};return settings;
+ const settings=structuredClone(template.config.bingoPrint!);settings.layout={version:4,format:selection.format,...(selection.cardProfile?{cardProfile:selection.cardProfile}:{}),textFont:settings.layout!.textFont};return settings;
 }
 export async function availablePrintTemplates(tx:Prisma.TransactionClient){
  const rows=await tx.presentation_templates.findMany({where:{status:'ACTIVE'},select:{presentation_template_id:true,name:true,theme_config_json:true}});

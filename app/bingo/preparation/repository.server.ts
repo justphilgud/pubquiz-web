@@ -79,7 +79,9 @@ export async function writePreparation(userId: number, input: unknown) {
       case "generate": {
         if (round!.strategy !== "NEW") throw new BingoPreparationError("Diese Runde verwendet vorhandene Karten. Bitte eine Serie ausdrücklich zuordnen.");
         const design = (await resolveSharedDesign(tx, game.shared_design_template_id, series)).design;
-        let snapshot = await captureNewPrintSnapshot(design, game.titel, round!.label,await resolveSelectedPrint(tx,design,series.bingo_print_config,game.bingo_print_config),await selectedPrintSource(tx,game.bingo_print_config??series.bingo_print_config));
+        const settings=await resolveSelectedPrint(tx,design,series.bingo_print_config,game.bingo_print_config);
+        if(command.printLayout)settings.layout={version:settings.layout?.version??3,textFont:settings.layout?.textFont??'ARIMO',...command.printLayout};
+        let snapshot = await captureNewPrintSnapshot(design, game.titel, round!.label,settings,await selectedPrintSource(tx,game.bingo_print_config??series.bingo_print_config));
         if(round!.term_snapshot!==null){if(snapshot.version!==3&&snapshot.version!==4)throw new BingoPreparationError('Für Textkarten bitte ein neues V3-Druckformat auswählen.');snapshot=parsePrintSnapshot({...snapshot,terms:parseTermSet(round!.term_snapshot)});}
         validateModernTerms(snapshot);validateReferenceTerms(snapshot);
         // Game lock serializes generation. Include existing game layouts, not just this request.

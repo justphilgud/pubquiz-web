@@ -4,7 +4,7 @@ import { PDFDocument, rgb, pushGraphicsState, popGraphicsState, concatTransforma
 import { randomBytes } from 'node:crypto';
 import { parsePrintSnapshot, type EmbeddedAsset, type PrintSnapshot } from './printSnapshot';
 import { regularFace, glyphGeometry, type PrintMode } from './pdfSquare.server';
-import { geometry, position } from './printFormats';
+import { geometry, position, cardProfile } from './printFormats';
 import { decodeCard, MAX_EXPORT, BingoPreparationError, type StoredCard } from './policy';
 import { termFor, usesCardText } from './termSet';
 type Face=ReturnType<typeof fontkit.create>;
@@ -48,15 +48,15 @@ export function draw(page:PDFPage,value:string,f:Font,size:number,x:number,y:num
 export function logo(page:PDFPage,image:PDFImage,cx:number,cy:number,width:number,height:number){const scale=Math.min(width/image.width,height/image.height);page.drawImage(image,{x:cx-image.width*scale/2,y:cy-image.height*scale/2,width:image.width*scale,height:image.height*scale});}
 export function validateModernTerms(input:PrintSnapshot){
  const snap=parsePrintSnapshot(input);if(snap.version!==3||!snap.settings.layout||!snap.terms)return;
- const g=geometry(snap.settings.layout.format),face=regularFace(Buffer.from(snap.text.bytes,'base64')),cell=(g.side-36)/5;
- const limit=snap.settings.layout.format==='A4_SIX'?36:40;
+ const g=geometry(snap.settings.layout.format,snap.settings.layout.cardProfile),face=regularFace(Buffer.from(snap.text.bytes,'base64')),cell=(g.side-36)/5;
+ const limit=cardProfile(snap.settings.layout.format,snap.settings.layout.cardProfile)==='A4_SIX'?36:40;
  for(const entry of snap.terms.entries.filter(e=>e.number<=75)){if(!usesCardText(snap.terms,entry.number))continue;const text=termFor(snap.terms,entry.number);if([...text].length>limit)throw new BingoPreparationError(`Kugel ${entry.number}: höchstens ${limit} Zeichen für ${snap.settings.layout.format}. Bitte Begriff kürzen oder Format ändern.`);fitTerm(text,face,cell-6,cell-6);}
 }
 export async function createModernCardsPdf(input:PrintSnapshot,cards:readonly StoredCard[],mode:PrintMode='front',singleCard=false){
   const snap=parsePrintSnapshot(input);if(snap.version!==3||!snap.settings.layout)throw new BingoPreparationError('Ungültiger V3-Druckstand.');
   if(!cards.length||cards.length>MAX_EXPORT||new Set(cards.map(c=>c.id)).size!==cards.length)throw new BingoPreparationError('Ungültige Kartenmenge für den PDF-Export.');
   for(const card of cards){decodeCard(card.cells);if(!card.shortCode)throw new BingoPreparationError('Die dauerhafte Kartenkennung fehlt.');}
-  const g=geometry(snap.settings.layout.format),capacity=singleCard?1:g.capacity,pdf=await PDFDocument.create();
+  const g=geometry(snap.settings.layout.format,snap.settings.layout.cardProfile),capacity=singleCard?1:g.capacity,pdf=await PDFDocument.create();
   pdf.setTitle('Bingo-Druckkarten');pdf.setSubject(`${snap.settings.layout.format} · tatsächliche Größe 100 % · Duplex an langer Kante`);
   async function font(asset:EmbeddedAsset):Promise<Font>{const bytes=Buffer.from(asset.bytes,'base64'),face=regularFace(bytes);pdf.registerFontkit({create:()=>face});return {face,font:await pdf.embedFont(bytes,{subset:true,customName:`${randomBytes(6).toString('hex')}Bingo`})};}
   const heading=await font(snap.display),numbers=await font(snap.body),words=await font(snap.text),front=await pdf.embedPng(Buffer.from(snap.logo.bytes,'base64')),backs=await Promise.all(snap.backLogos.map(a=>pdf.embedPng(Buffer.from(a.bytes,'base64')))),colors=snap.settings.colors;
@@ -66,7 +66,7 @@ export async function createModernCardsPdf(input:PrintSnapshot,cards:readonly St
   for(let offset=0;offset<cards.length;offset+=capacity)for(const back of mode==='duplex'?[false,true]:[mode==='back']){
     const page=pdf.addPage(singleCard?[g.side,g.side]:[g.width,g.height]);
     for(let slot=0;slot<capacity&&offset+slot<cards.length;slot++){
-      const card=cards[offset+slot],{x,y,side}=singleCard?{x:0,y:0,side:g.side}:position(snap.settings.layout.format,slot,back);
+      const card=cards[offset+slot],{x,y,side}=singleCard?{x:0,y:0,side:g.side}:position(snap.settings.layout.format,slot,back,snap.settings.layout.cardProfile);
       page.drawRectangle({x,y,width:side,height:side,color:ink(back?colors.back:colors.background)});
       if(back){
         backs.forEach((image,i)=>logo(page,image,x+side/2,y+side/2+(backs.length===2?(i===0?side*.19:-side*.19):0),side-40,backs.length===2?side*.28:side-55));

@@ -10,14 +10,14 @@ export const printFonts = [
   { id: "ARIMO", name: "Arimo Regular (Arial-kompatibel)", family: "Arial, Helvetica, sans-serif" },
 ] as const;
 export type PrintFont = typeof printFonts[number]["id"];
-import { printFormat, type PrintFormat } from "./printFormats";
+import { parsePrintLayout, type PrintLayout } from "./printFormats";
 export type BingoPrint = {
   version: 1;
   frontLogo: string;
   backLogos: string[];
   headerFont: PrintFont;
   numberFont: PrintFont;
-  layout?: { version: 3 | 4; format: PrintFormat; textFont: PrintFont };
+  layout?: PrintLayout & { version: 3 | 4; textFont: PrintFont };
   colors: { background: string; header: string; grid: string; heading: string; numbers: string; back: string };
 };
 const object = (v:unknown):v is Record<string,unknown> => !!v && typeof v==='object' && !Array.isArray(v);
@@ -26,8 +26,8 @@ export function parseBingoPrint(value:unknown):BingoPrint|null {
   if(!object(value)||!exact(value, Object.hasOwn(value,'layout')?'version,frontLogo,backLogos,headerFont,numberFont,colors,layout':'version,frontLogo,backLogos,headerFont,numberFont,colors')||value.version!==1||typeof value.frontLogo!=='string'||!isSafeTemplateAssetReference(value.frontLogo)||!Array.isArray(value.backLogos)||value.backLogos.length<1||value.backLogos.length>2||!value.backLogos.every(x=>typeof x==='string'&&isSafeTemplateAssetReference(x))||new Set(value.backLogos).size!==value.backLogos.length||!printFonts.some(f=>f.id===value.headerFont)||!(value.layout?printFonts.map(f=>f.id):['ARIMO','MONTSERRAT']).includes(String(value.numberFont))||!object(value.colors)||!exact(value.colors,'background,header,grid,heading,numbers,back')||!Object.values(value.colors).every(c=>typeof c==='string'&&/^#[0-9a-fA-F]{6}$/.test(c)))return null;
   if (value.layout !== undefined) {
     const layout=value.layout;
-    if (!object(layout) || !exact(layout,'version,format,textFont') || ![3,4].includes(Number(layout.version)) || !printFonts.some(f=>f.id===layout.textFont)) return null;
-    try { printFormat(layout.format); } catch { return null; }
+    if (!object(layout) || !exact(layout,layout.format==='SRA3_TWELVE'?'version,format,cardProfile,textFont':'version,format,textFont') || ![3,4].includes(Number(layout.version)) || !printFonts.some(f=>f.id===layout.textFont)) return null;
+    try { parsePrintLayout({format:layout.format,...(layout.cardProfile!==undefined?{cardProfile:layout.cardProfile}:{})}); } catch { return null; }
   }
   return structuredClone(value) as BingoPrint;
 }

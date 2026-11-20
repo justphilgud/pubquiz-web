@@ -158,3 +158,7 @@ Aktuelle Browser-/CI-Ergebnisse und verbleibende Grenzen stehen im Prüfbericht.
 Kein physischer Druck- oder Duplexregistrierungsnachweis wird behauptet.
 
 Lokale Abnahme, Bilder und konkreter Hostingblocker: [Prüfbericht](../acceptance/bingo-print-templates-v4-2026-11-06.md). Der neue `scripts/testing/bingo-print-templates.browser.mjs` prüft tatsächlich den nativen Abbruchdialog, Schrift-/Farbpersistenz, PDF-Canvas und drei gemessene Viewports.
+
+## SRA3-Ergänzung (20.11.2026)
+
+Die zusätzliche Papier-/Profiltrennung, unveränderte Kartenzeichnung und vollständige Duplexbelegung regelt [Bingo auf SRA3](bingo-sra3.md). Bestehende Druckversionen werden nicht umgestellt.
