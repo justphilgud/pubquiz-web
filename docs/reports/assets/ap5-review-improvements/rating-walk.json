@@ -1,0 +1,62 @@
+[
+  {
+    "step": 1,
+    "decision": "Richtig",
+    "points": 1,
+    "path": "/quiz/10/auswertung"
+  },
+  {
+    "step": 2,
+    "decision": "Falsch",
+    "points": 0,
+    "path": "/quiz/10/auswertung"
+  },
+  {
+    "step": 3,
+    "decision": "Richtig",
+    "points": 1,
+    "path": "/quiz/10/auswertung"
+  },
+  {
+    "step": 4,
+    "decision": "Falsch",
+    "points": 0,
+    "path": "/quiz/10/auswertung"
+  },
+  {
+    "step": 5,
+    "decision": "Richtig",
+    "points": 1,
+    "path": "/quiz/10/auswertung"
+  },
+  {
+    "step": 6,
+    "decision": "Falsch",
+    "points": 0,
+    "path": "/quiz/10/auswertung"
+  },
+  {
+    "step": 7,
+    "decision": "Richtig",
+    "points": 1,
+    "path": "/quiz/10/auswertung"
+  },
+  {
+    "step": 8,
+    "decision": "Falsch",
+    "points": 0,
+    "path": "/quiz/10/auswertung"
+  },
+  {
+    "step": 9,
+    "decision": "Richtig",
+    "points": 1,
+    "path": "/quiz/10/auswertung"
+  },
+  {
+    "step": 10,
+    "decision": "Falsch",
+    "points": 0,
+    "path": "/quiz/10/auswertung"
+  }
+]

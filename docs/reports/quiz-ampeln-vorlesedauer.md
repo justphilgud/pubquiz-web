@@ -1,7 +1,8 @@
 # Gemeinsame Preview: Quiz-Ampeln und Vorlesedauer
 
-**Aktuelle gemeinsame Preview einschließlich Quizmodus und Kategoriegrenzen 20/30 %:**
-[Quizliste](https://pubquiz-6q4742xa6-just-phil-gud.vercel.app/quiz).
+**Aktuelle gemeinsame Preview mit endgültigen Ampelregeln, Vorlesedauer und separater AP5-Prüfhilfe:**
+[Quizliste](https://pubquiz-listjyww8-just-phil-gud.vercel.app/quiz) ·
+[manuelle Antwortprüfung](https://pubquiz-listjyww8-just-phil-gud.vercel.app/quiz/10/auswertung).
 Die abschließende technische Abnahme der Ergänzung steht am Ende dieses Berichts.
 
 Basis: main `e456764a` nach PR #171 und #172. Die historische AP5-Analyse bleibt
@@ -284,6 +285,36 @@ Umfang, Sicherheit, Prüfungen und bekannte Grenzen sind im separaten
 [AP5-Anwendungsbericht](ap5-review-improvements.md) beschrieben; keine Ampel-Logik
 oder Ampeloberfläche in der Auswertung, keine automatische Punkteänderung.
 
-Gezielte Tests und Browserregression erfolgreich; vollständige CI, aktualisierte
-gemeinsame Preview und abschließende gehostete Bildnachweise folgen vor Übergabe.
-Historische AP5-Aggregate werden nicht erneut ermittelt. Kein Production-Schritt.
+### Abschließende gemeinsame Preview-Abnahme
+
+[Gemeinsame Preview](https://pubquiz-listjyww8-just-phil-gud.vercel.app/quiz),
+Quellstand `da2b9dd1b3c26f2c79093947340e5d87903e6106`, Deployment
+`dpl_3L8XheZ3Pb33A9qhZibKa4fJMfHx`, Environment `preview`, 20.11.2026.
+Vollständig grüne exakte [Push-CI](https://github.com/justphilgud/pubquiz-web/actions/runs/44706585403)
+und [PR-CI](https://github.com/justphilgud/pubquiz-web/actions/runs/44706591786):
+Typecheck, Gesamttests, Changed-file-ESLint, Build, HTTP- und PostgreSQL-/Browsertests.
+Vorab 76 gezielte Regressionen erfolgreich; neue Hinweis-/Filter-/Fragetexttests
+sind im CI-Testpaket verdrahtet. Beide Arbeitspakete bleiben in Logik und UI getrennt.
+
+| Gehostete Prüfung | Ergebnis |
+|---|---|
+| [Quiz #12, endgültige Templategrenzen](https://pubquiz-listjyww8-just-phil-gud.vercel.app/quiz/12) | Zwei Blöcke à zehn Fragen: jeweils eine offene, eine geschlossene und eine Audio-Frage grün. Auch die übrigen Präsenzgruppen grün. Beide Blockstatus grün, keine erzwungenen Einzeltemplates und keine alte Drei-Audio-Anzeige. |
+| Regeltabelle | Offen 10–20 %, geschlossen 10–50 % inklusiv grün; obere Grenzen erhalten. Audio ≥1, ohne Gelb; Kategorien unverändert 20/30 %, Themenquiz neutral. |
+| Allgemeiner Fragetext | Neuanlage: 50 Wörter/249 Zeichen → 0:20. Bearbeiten: 25 Wörter/124 Zeichen → 0:10. Gesamter Text erhalten, nicht gespeichert und nicht automatisch gekürzt. |
+| Übersetzung | Bestehende Frage #33 zeigt weiterhin die separate Schätzung 1:00 bei 150 Wörtern; allgemeine Fragetextdauer zusätzlich sichtbar. |
+| Empfehlungen / Suche | Bestehende neue Tabs und kombinierte Kategorie-/Mehrfach-Templatefilter bleiben im Browserpaket geprüft. Neue Untergrenzen lösen bei genau 10 % keinen Ergänzungsbedarf aus; Audio ab einer Frage ebenfalls ohne Defizit. |
+| Getrennte AP5-Prüfhilfe | Eigenes Testquiz #10, Case-/Ähnlichkeits-/FaceMorph-Hinweise, Filter, keine Schreibwirkung durch Anzeigen/Filter; zehn bewusste Einzelentscheidungen gespeichert. Vollständige Nachweise und Grenzen im [AP5-Bericht](ap5-review-improvements.md). |
+
+Bildnachweise: [endgültige Regeltabelle](assets/quiz-ampeln-vorlesedauer/final-rules-1366.png),
+[allgemeine Fragetextdauer](assets/quiz-ampeln-vorlesedauer/final-reading-create-1366.png).
+Die Regeltabelle ist die aktuelle Wahrheit; ältere Abnahmeschritte oben dokumentieren
+ausdrücklich frühere Regeln. Die bestätigte Audio-Korrektur ersetzt deren Prozent-/
+Zusatzregeln, die früheren offenen/geschlossenen Untergrenzen sind ebenfalls überholt.
+
+Technische Abnahme erfolgreich, keine offenen technischen Fehler. Gemeinsame
+fachliche Preview-Abnahme bleibt beim Auftraggeber. Historische AP5-Aggregate
+wurden nicht neu ermittelt. Geschützter Zugriff und Header-Bypass wie freigegeben;
+Browser und temporäre lokale Bypass-Kopie nach Prüfung entfernt. Der abschließende
+Dokumentationscommit ergänzt nur Spezifikation, Bericht und Bildnachweise; Anwendung
+und Tests entsprechen exakt der geprüften Preview. Kein Merge, Production-Backup
+oder Production-Deployment.

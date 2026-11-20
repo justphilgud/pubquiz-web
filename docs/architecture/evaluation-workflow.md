@@ -34,6 +34,12 @@ Quiz-Ampeln und deren Modus. Keine neue Persistenz, Migration oder Abhängigkeit
   akzeptierte Lösungen. Die bestehenden Einzelaktionen samt Revision/Quiz-Lock und
   zentraler Punkteprojektion bleiben die einzige bewusste Bewertungsmöglichkeit.
 
+Die Darstellung bleibt kompakt: Aufklappbare Hinweise zeigen in der Zusammenfassung
+die Hinweisarten und die Zahl gleicher sichtbarer Feldtexte. Die Tabelle scrollt
+auf schmalen Geräten intern horizontal und ist als fokussierbare Region erreichbar.
+Dadurch werden Bewertungsaktionen nicht mehr durch den bisherigen Overflow-Container
+abgeschnitten; kein Wechsel zu einem separaten Bewertungsworkflow.
+
 Grenzen: Ähnlichkeit ist ein Prüfhinweis, kein Beweis. Numerische/Länder-, Pixel-,
 Paare-, Meme-, Ordering- und Umfragefälle bekommen keine unscharfen Freitexthinweise.
 Verglichen werden Texte mit Buchstaben von 3 bis 512 Unicodezeichen. Maximal 5000
