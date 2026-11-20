@@ -45,5 +45,3 @@ test('new V3 LOVD keeps the old front typography on every profile, freezes code 
   assert.equal(JSON.stringify(old),frozen);assert.equal(old.settings.partnerBack,undefined);
  }
 });
-
-

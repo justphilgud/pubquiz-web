@@ -16,4 +16,3 @@ export function drawPartnerBack(page:PDFPage,{x,y,side}:{x:number;y:number;side:
  }
  draw(page,shortCode,code,6.5,x+14,y+14,side-28,codeInk,true);
 }
-
