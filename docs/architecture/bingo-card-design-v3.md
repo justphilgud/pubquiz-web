@@ -181,3 +181,5 @@ Die neue gezielte Erweiterung ist in [bingo-matching.md](./bingo-matching.md) be
 ## SRA3-Ergänzung (20.11.2026)
 
 [SRA3](bingo-sra3.md) verwendet die bisherigen Kartenkanten und V3-Textregeln unverändert auf einem zusätzlichen 3×4-Bogen. Das 89-mm-Profil behält insbesondere seine 36-Zeichen-Vorgrenze.
+
+Für neue LOVD-Druckstände ergänzt [die gespeicherte Partnergestaltung aus PR174](bingo-sra3.md#lovd-partnerkorrektur-in-pr174-20112026) die Rückseite und offiziellen Markenflächen. V3-Fronttypografie und Textregeln bleiben erhalten; alte Druckstände ohne Marker behalten ihre bisherige Ausführung.

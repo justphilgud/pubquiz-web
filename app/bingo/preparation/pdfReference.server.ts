@@ -3,7 +3,8 @@ import {randomBytes} from 'node:crypto';
 import {PDFDocument,rgb,type PDFFont} from 'pdf-lib';
 import {parsePrintSnapshot,type EmbeddedAsset,type PrintSnapshot} from './printSnapshot';
 import {regularFace,glyphGeometry,type PrintMode} from './pdfSquare.server';
-import {draw,logo} from './pdfModern.server';
+import {draw,logo} from './pdfDrawing.server';
+import {drawPartnerBack} from './pdfPartner.server';
 import {geometry,position,cardProfile} from './printFormats';
 import {BingoPreparationError,decodeCard,MAX_EXPORT,type StoredCard} from './policy';
 import {termFor,usesCardText} from './termSet';
@@ -44,25 +45,13 @@ export async function createReferenceCardsPdf(input:PrintSnapshot,cards:readonly
  pdf.setTitle('Bingo-Druckkarten');pdf.setSubject(`${snap.settings.layout.format} · V4 · tatsächliche Größe 100 % · Duplex an langer Kante`);
  async function font(asset:EmbeddedAsset):Promise<{face:Face;font:PDFFont}>{const bytes=Buffer.from(asset.bytes,'base64'),face=regularFace(bytes);pdf.registerFontkit({create:()=>face});return {face,font:await pdf.embedFont(bytes,{subset:true,customName:`${randomBytes(6).toString('hex')}Bingo`})};}
  const heading=await font(snap.display),numbers=await font(snap.body),words=await font(snap.text),code=await font(snap.codeFont),front=await pdf.embedPng(Buffer.from(snap.logo.bytes,'base64')),backs=await Promise.all(snap.backLogos.map(a=>pdf.embedPng(Buffer.from(a.bytes,'base64')))),c=snap.settings.colors;
- // A contrasting neutral, drawn over an explicitly logo-free bottom margin, no label bar.
- const l=[1,3,5].map(i=>parseInt(c.back.slice(i,i+2),16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((a,v,i)=>a+v*[.2126,.7152,.0722][i],0);
- const soft=.406,lightRatio=(soft+.05)/(l+.05),darkRatio=(l+.05)/(.0176+.05);
- const codeInk=lightRatio>=4.5?rgb(.67,.67,.67):darkRatio>=4.5?rgb(.14,.14,.14):l<.179?rgb(1,1,1):rgb(0,0,0);
  for(let offset=0;offset<cards.length;offset+=capacity)for(const back of mode==='duplex'?[false,true]:[mode==='back']){
   const page=pdf.addPage(singleCard?[g.side,g.side]:[g.width,g.height]);
   for(let slot=0;slot<capacity&&offset+slot<cards.length;slot++){
    const card=cards[offset+slot],{x,y,side}=singleCard?{x:0,y:0,side:g.side}:position(snap.settings.layout.format,slot,back,snap.settings.layout.cardProfile);
    page.drawRectangle({x,y,width:side,height:side,color:ink(back?c.back:c.background)});
    if(back){
-    page.drawRectangle({x:x+9,y:y+9,width:side-18,height:side-18,borderColor:codeInk,borderWidth:.25,opacity:.25,borderOpacity:.4});
-    if(backs.length===1)logo(page,backs[0],x+side/2,y+side/2+3,side*.68,side*.72);
-    else{
-     logo(page,backs[0],x+side/2,y+side*.75,side*.62,side*.25);
-     logo(page,backs[1],x+side/2,y+side*.31,side*.36,side*.37);
-     const cx=x+side/2,cy=y+side*.565,r=6;
-     for(const direction of [-1,1])page.drawLine({start:{x:cx-r,y:cy-direction*r},end:{x:cx+r,y:cy+direction*r},thickness:.35,color:codeInk});
-    }
-    draw(page,card.shortCode!,code,6.5,x+14,y+14,side-28,codeInk,true);
+    drawPartnerBack(page,{x,y,side},backs,code,card.shortCode!,c.back,snap.settings.partnerBack===1);
    }else{
     const gx=x+14,gy=y+14,w=(side-28)/5,h=(side-70)/5,hy=gy+5*h+8,hh=34;
     page.drawRectangle({x:gx,y:hy,width:5*w,height:hh,color:ink(c.header)});
@@ -71,7 +60,7 @@ export async function createReferenceCardsPdf(input:PrintSnapshot,cards:readonly
     for(let row=0;row<5;row++)for(let col=0;col<5;col++){
      const cx=gx+col*w,cy=gy+(4-row)*h,free=row===2&&col===2;
      page.drawRectangle({x:cx,y:cy,width:w,height:h,color:ink(free?c.header:c.background),borderColor:ink(c.grid),borderWidth:.4});
-     if(free)logo(page,front,cx+w/2,cy+h/2,w-5,h-4);
+     if(free)logo(page,front,cx+w/2,cy+h/2,snap.settings.partnerBack?w*.64:w-5,snap.settings.partnerBack?h*.64:h-4);
      else if(snap.terms&&usesCardText(snap.terms,card.cells[row][col]!)){const fit=fitReferenceTerm(termFor(snap.terms,card.cells[row][col]!),words.face,w-4,h-4),baseline=cy+(h+fit.inkHeight+(fit.lines.length-1)*fit.lineHeight)/2-fit.ascent;fit.lines.forEach((line,i)=>draw(page,line,words,fit.size,cx+2,baseline-i*fit.lineHeight,w-4,ink(c.numbers)));}
      else{let size=cardProfile(snap.settings.layout.format,snap.settings.layout.cardProfile)==='A4_SIX'?24:26;while(glyphGeometry(numbers.face,String(card.cells[row][col]),size).width>w-4&&size>10)size-=.25;const run=numbers.face.layout(String(card.cells[row][col])),ascent=Math.max(...run.glyphs.map(g=>g.bbox.maxY))*size/numbers.face.unitsPerEm,descent=Math.min(...run.glyphs.map(g=>g.bbox.minY))*size/numbers.face.unitsPerEm;draw(page,String(card.cells[row][col]),numbers,size,cx+2,cy+(h-ascent-descent)/2,w-4,ink(c.numbers));}
     }

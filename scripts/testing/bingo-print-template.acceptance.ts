@@ -72,6 +72,17 @@ export async function exercisePrintTemplates(db:Client,api:Api){
  assert.deepEqual(added.cards,originalCards);assert.equal(added.snapshot.version===4&&added.snapshot.settings.layout?.cardProfile,'A4_SIX');
  assert.deepEqual((await api.readExport(1,game.id,sid,1,7,1)).snapshot,original.snapshot);
  await db.query('UPDATE pubquiz.eventreihen SET bingo_print_config=$1 WHERE eventreihe_id=10',[inheritedBefore]);
+ // New LOVD defaults are resolved through real series inheritance without promoting V3 typography.
+ const lovdSeriesBefore=(await db.query('SELECT shared_design_template_id,bingo_print_config FROM pubquiz.eventreihen WHERE eventreihe_id=10')).rows[0];
+ await db.query("UPDATE pubquiz.eventreihen SET shared_design_template_id='lovd-ungegoogelt',bingo_print_config=NULL WHERE eventreihe_id=10");
+ const lovdGame=await api.creation.createBingoEvent(1,{seriesId:10,title:'LOVD inherited partner correction',date:'',time:'',roundCount:1,requestId:randomUUID()});
+ const lovdPrep=await api.readPreparation(1,lovdGame.id);
+ const lovdGenerated=await api.writePreparation(1,{gameId:lovdGame.id,expectedSeriesId:10,revision:lovdPrep.revision,operation:'generate',roundId:lovdPrep.rounds[0].id,count:13,requestId:randomUUID(),printLayout:{format:'SRA3_TWELVE',cardProfile:'A4_FOUR'}});
+ const lovdExport=await api.readExport(1,lovdGame.id,lovdGenerated.seriesId!,1,13);
+ assert.equal(lovdExport.snapshot.version,3);if(lovdExport.snapshot.version!==3)throw Error('V3 retained');assert.equal(lovdExport.snapshot.settings.partnerBack,1);assert.equal(lovdExport.snapshot.settings.colors.header,'#6A241C');assert.ok(lovdExport.snapshot.codeFont);
+ for(const row of (await db.query('SELECT to_jsonb(s) data FROM pubquiz.bingo_card_series s WHERE id=$1',[lovdGenerated.seriesId])).rows)assert.doesNotThrow(()=>inspectRow(row.data,new Set(),'pubquiz','bingo_card_series'));
+ await db.query('UPDATE pubquiz.eventreihen SET shared_design_template_id=$1,bingo_print_config=$2 WHERE eventreihe_id=10',[lovdSeriesBefore.shared_design_template_id,lovdSeriesBefore.bingo_print_config]);
+ console.info('LOVD real inherited V3 generation, corrected RGB, frozen regular code face and backup integrity PASS');
  console.info('SRA3 inherited profile, explicit generation, idempotence/reload, immutable historical and additional print versions: PASS');
  console.info('V4 populated additive migration, strict template selection, role/product gates, immutable redesign, historical export and frozen integrity: PASS');
 }

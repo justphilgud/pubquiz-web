@@ -6,7 +6,7 @@ import "server-only";
 import { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
 import { sharedDesignContext, resolveSharedDesign, validateTarget } from "@/app/rendering/sharedDesign/sharedDesignRepository.server";
-import { parseBingoPrint, printContrastIssues, shortCardCode, PHIL_LOGO, LOVD_LOGO, PHIL_PRINT_LOGO, LOVD_PRINT_LOGO, type BingoPrint } from "@/app/bingo/preparation/bingoPrint";
+import { parseBingoPrint, printContrastIssues, shortCardCode, PHIL_LOGO, LOVD_LOGO, PHIL_PRINT_LOGO, LOVD_PRINT_LOGO, LOVD_LIGHT_LOGO, LOVD_SMALL_LOGO, type BingoPrint } from "@/app/bingo/preparation/bingoPrint";
 import { preparationContext } from "./access.server";
 import { resolveSelectedPrint } from "./printTemplateRepository.server";
 import { capturePrintSnapshot,captureNewPrintSnapshot } from "./printAssets.server";
@@ -45,7 +45,7 @@ export async function readPrintDesign(userId:number,target:unknown){
 }
 
 function existingLogosOnly(config:BingoPrint,c:Awaited<ReturnType<typeof designContext>>){
-  const allowed=new Set([PHIL_LOGO,LOVD_LOGO,PHIL_PRINT_LOGO,LOVD_PRINT_LOGO,c.design.config.tokens.assets.logo,c.settings.frontLogo,...c.settings.backLogos,c.inherited.frontLogo,...c.inherited.backLogos]);
+  const allowed=new Set([PHIL_LOGO,LOVD_LOGO,PHIL_PRINT_LOGO,LOVD_PRINT_LOGO,LOVD_LIGHT_LOGO,LOVD_SMALL_LOGO,c.design.config.tokens.assets.logo,c.settings.frontLogo,...c.settings.backLogos,c.inherited.frontLogo,...c.inherited.backLogos]);
   if([config.frontLogo,...config.backLogos].some(ref=>!allowed.has(ref)))throw new BingoPreparationError('Bitte ein vorhandenes Druck-, Reihen- oder Vorlagenlogo auswählen.');
 }
 export async function savePrintDesign(userId:number,input:unknown){

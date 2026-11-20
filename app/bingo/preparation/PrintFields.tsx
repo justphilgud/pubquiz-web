@@ -1,6 +1,6 @@
 "use client";
 import localFont from "next/font/local";
-import { PHIL_LOGO, LOVD_LOGO, PHIL_PRINT_LOGO, LOVD_PRINT_LOGO, printFonts, printContrastIssues, parseBingoPrint, type BingoPrint } from "@/app/bingo/preparation/bingoPrint";
+import { PHIL_LOGO, LOVD_LOGO, PHIL_PRINT_LOGO, LOVD_PRINT_LOGO, LOVD_LIGHT_LOGO, LOVD_SMALL_LOGO, printFonts, printContrastIssues, parseBingoPrint, type BingoPrint } from "@/app/bingo/preparation/bingoPrint";
 import PrintFormatFields from "./PrintFormatFields";
 const phil=localFont({src:'../../../public/branding/phil-gud/phil-gud.woff',weight:'400'});
 const montserrat=localFont({src:'../../../assets/fonts/bingo/montserrat.ttf',weight:'400'});
@@ -8,8 +8,8 @@ const arimo=localFont({src:'../../../assets/fonts/arimo/Arimo.ttf',weight:'400'}
 const faces={PHIL_GUD:phil.className,MONTSERRAT:montserrat.className,ARIMO:arimo.className};
 const labels={background:'Kartenhintergrund',header:'BINGO-Kopfbereich',grid:'Rasterlinien',heading:'BINGO-Schriftfarbe',numbers:'Zahlenfarbe',back:'Rückseitenhintergrund'};
 export default function PrintFields({value,onChange,disabled=false,templateLogo,showFormat=true}:{value:BingoPrint;onChange:(v:BingoPrint)=>void;disabled?:boolean;templateLogo?:string|null;showFormat?:boolean}){
-  const modern=value.layout?.version===4;
-  const logos=modern?[{value:PHIL_PRINT_LOGO,label:'Phil Gud · transparentes Original'},{value:LOVD_PRINT_LOGO,label:'LOVD · transparentes Original'}]:[{value:PHIL_LOGO,label:'Phil Gud · Original'},{value:LOVD_LOGO,label:'LOVD · Original'}];
+  const modern=value.layout?.version===4||value.partnerBack===1;
+  const logos=modern?[{value:PHIL_PRINT_LOGO,label:'Phil Gud · transparentes Original'},{value:LOVD_SMALL_LOGO,label:'LOVD · Kleinformat, transparentes Original'},{value:LOVD_LIGHT_LOGO,label:'LOVD STELP · transparentes Original'}]:[{value:PHIL_LOGO,label:'Phil Gud · Original'},{value:LOVD_LOGO,label:'LOVD · Original'}];
   for(const ref of [templateLogo,value.frontLogo,...value.backLogos])if(ref&&!logos.some(l=>l.value===ref))logos.push({value:ref,label:ref===templateLogo?'Aktuelles Reihen-/Vorlagenlogo':`Gespeichertes Drucklogo ${logos.length-1}`});
   const selectLogo=(label:string,current:string,change:(v:string)=>void)=><label className="block text-sm">{label}<select aria-label={label} className="mt-1 min-h-11 w-full rounded-lg border bg-white px-3" value={current} onChange={e=>change(e.target.value)}>{logos.map(l=><option key={l.value} value={l.value}>{l.label}</option>)}</select></label>;
   return <fieldset disabled={disabled} className="min-w-0 space-y-4"><legend className="sr-only">Bingo-Druckgestaltung</legend><div className="grid gap-3 sm:grid-cols-2">

@@ -84,7 +84,7 @@ Vorhandene Schriftwahl, Farbwahl sowie ein vorderes/ein oder zwei hintere Logos
 bleiben anpassbar. Bei einem Rückseitenlogo entfällt das gezeichnete feine ×.
 
 Phil Gud: Weiß, Schwarz, Gelb #F0FC16, Pink #F6C4DC. LOVD: Creme #FFF8E9,
-Burgund #733B40, Schwarz. Zahlen #171717, Raster #888888. Schwarze Rückseite,
+Kopf/Freifeld LOVD Red #6A241C, BINGO Creme Catalana #FFF9E9, Schwarz. Zahlen #171717, Raster #888888. Schwarze Rückseite,
 Kennung neutral grau unten rechts ohne Beschriftungsbalken. Der Renderer wählt
 auch für individuell geänderte Rückseiten einen mindestens 4,5:1 kontrastierenden
 neutralen Kennungston. Logos werden proportional platziert.
@@ -162,3 +162,5 @@ Lokale Abnahme, Bilder und konkreter Hostingblocker: [Prüfbericht](../acceptanc
 ## SRA3-Ergänzung (20.11.2026)
 
 Die zusätzliche Papier-/Profiltrennung, unveränderte Kartenzeichnung und vollständige Duplexbelegung regelt [Bingo auf SRA3](bingo-sra3.md). Bestehende Druckversionen werden nicht umgestellt.
+
+Die LOVD-Korrektur neuer Druckstände und der ausdrücklich unveränderte V3-Frontpfad sind im [PR174-Nachtrag](../acceptance/bingo-lovd-pr174-2026-11-20.md) mit Originalquellen, Variantenmarker und historischen Exportprüfungen dokumentiert.

@@ -1,0 +1,171 @@
+{
+  "RGB": [
+    106,
+    36,
+    28
+  ],
+  "profilesMm": [
+    89,
+    92.5,
+    93
+  ],
+  "frontTypographyUnchanged": true,
+  "regularCodePt": 6.5,
+  "regularCodeFonts": [
+    {
+      "family": "Arimo",
+      "weight": 400,
+      "glyphOutlinesMatched": 12
+    },
+    {
+      "family": "Arimo",
+      "weight": 400,
+      "glyphOutlinesMatched": 12
+    },
+    {
+      "family": "Arimo",
+      "weight": 400,
+      "glyphOutlinesMatched": 12
+    },
+    {
+      "family": "Arimo",
+      "weight": 400,
+      "glyphOutlinesMatched": 12
+    },
+    {
+      "family": "Arimo",
+      "weight": 400,
+      "glyphOutlinesMatched": 12
+    },
+    {
+      "family": "Arimo",
+      "weight": 400,
+      "glyphOutlinesMatched": 12
+    },
+    {
+      "family": "Arimo",
+      "weight": 400,
+      "glyphOutlinesMatched": 12
+    },
+    {
+      "family": "Arimo",
+      "weight": 400,
+      "glyphOutlinesMatched": 12
+    },
+    {
+      "family": "Arimo",
+      "weight": 400,
+      "glyphOutlinesMatched": 12
+    },
+    {
+      "family": "Arimo",
+      "weight": 400,
+      "glyphOutlinesMatched": 12
+    },
+    {
+      "family": "Arimo",
+      "weight": 400,
+      "glyphOutlinesMatched": 12
+    },
+    {
+      "family": "Arimo",
+      "weight": 400,
+      "glyphOutlinesMatched": 12
+    },
+    {
+      "family": "Arimo",
+      "weight": 400,
+      "glyphOutlinesMatched": 12
+    }
+  ],
+  "transparentOriginalsWithSoftMasks": true,
+  "crossPerBack": true,
+  "LProtectionMeasured": true,
+  "historicalV3Still8ptAndOriginalColors": true,
+  "comparisons": [
+    {
+      "profile": "A4_FOUR",
+      "kind": "numbers",
+      "side": 0,
+      "edgeMm": 92.5,
+      "meanPixelDifference": 7.739984882842025e-05
+    },
+    {
+      "profile": "A4_FOUR",
+      "kind": "numbers",
+      "side": 1,
+      "edgeMm": 92.49999999999997,
+      "meanPixelDifference": 0.0
+    },
+    {
+      "profile": "A4_FOUR",
+      "kind": "terms",
+      "side": 0,
+      "edgeMm": 92.5,
+      "meanPixelDifference": 3.5071806500377925e-05
+    },
+    {
+      "profile": "A4_FOUR",
+      "kind": "terms",
+      "side": 1,
+      "edgeMm": 92.49999999999997,
+      "meanPixelDifference": 0.0
+    },
+    {
+      "profile": "A4_SIX",
+      "kind": "numbers",
+      "side": 0,
+      "edgeMm": 89.00000000000001,
+      "meanPixelDifference": 0.05978106721563246
+    },
+    {
+      "profile": "A4_SIX",
+      "kind": "numbers",
+      "side": 1,
+      "edgeMm": 89.00000000000001,
+      "meanPixelDifference": 0.0
+    },
+    {
+      "profile": "A4_SIX",
+      "kind": "terms",
+      "side": 0,
+      "edgeMm": 89.00000000000001,
+      "meanPixelDifference": 0.059914387478351795
+    },
+    {
+      "profile": "A4_SIX",
+      "kind": "terms",
+      "side": 1,
+      "edgeMm": 89.00000000000001,
+      "meanPixelDifference": 0.0
+    },
+    {
+      "profile": "A6_ONE",
+      "kind": "numbers",
+      "side": 0,
+      "edgeMm": 93.0,
+      "meanPixelDifference": 1.0179685108662382
+    },
+    {
+      "profile": "A6_ONE",
+      "kind": "numbers",
+      "side": 1,
+      "edgeMm": 93.00000000000001,
+      "meanPixelDifference": 0.0
+    },
+    {
+      "profile": "A6_ONE",
+      "kind": "terms",
+      "side": 0,
+      "edgeMm": 93.0,
+      "meanPixelDifference": 1.0179697065350475
+    },
+    {
+      "profile": "A6_ONE",
+      "kind": "terms",
+      "side": 1,
+      "edgeMm": 93.00000000000001,
+      "meanPixelDifference": 0.0
+    }
+  ]
+}
