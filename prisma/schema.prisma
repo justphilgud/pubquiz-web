@@ -328,6 +328,7 @@ model quiz {
   eventreihe_id            Int
   quiz_datum               DateTime?                  @db.Date
   titel                    String?
+  quiz_modus               String                     @default("VARIED") @db.VarChar(16)
   veranstaltungszeit       String?                    @db.VarChar(5)
   veranstaltungsname       String?                    @db.VarChar(200)
   karten_url               String?                    @db.VarChar(2048)

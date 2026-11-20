@@ -1,5 +1,59 @@
 # Bewertungs- und Ergebnisworkflow (AP4)
 
+## AP5-Anwendungsergänzung 20.11.2026
+
+Die historische Analyse unten bleibt als fester Befund erhalten. Die nun beauftragte
+Anwendungsverbesserung liegt ausschließlich in der Antwortprüfung, getrennt von
+Quiz-Ampeln und deren Modus. Keine neue Persistenz, Migration oder Abhängigkeit.
+
+- Bestehende Bereichs-, Team-, Offen-/Falsch- und Unbeantwortet-Filter bleiben erhalten.
+  Zusätzlich wählbar: „Noch zu prüfen“ (gespielt, wirksame Antwort, REVIEW_REQUIRED,
+  nicht MANUAL, nicht ausstehende Berechnung) und das Ausblenden automatisch eindeutig
+  falscher geschlossener Antworten. Bereits manuelle Entscheidungen werden dadurch
+  nicht als eindeutiger automatischer Fall versteckt.
+- Meme-/Ordering-Zuweisungen sind unabhängig von Aliasnamen keine normalen Fälle
+  dieser Prüfliste. Matrix, Punkte, Voting und Ordering-Auswertung bleiben unverändert.
+- `manualReviewHints.ts` ist eine reine, schreibfreie Hinweislogik. Sie verarbeitet
+  nur den bereits autorisierten Readmodel-Stand, nie neue Drafts anstelle finaler
+  Submission-Snapshots. Der Leser ergänzt rohe strukturierte Feldtexte und ihre
+  bereits freigegebenen kanonischen Lösungen aus den schon geladenen Daten.
+- Gleiche Feldtexte werden innerhalb derselben Zuweisung und derselben Feld-ID
+  markiert; Unicode-Normalisierung, Leerraum und Groß-/Kleinschreibung einschließlich
+  deutschem ß/SS sind für diesen Vergleich unerheblich. Originaltexte bleiben erhalten.
+  Zähler und Vergleichsgruppen beziehen sich auf den aktuellen Filter, nicht auf
+  unsichtbare Teamantworten. Keine Gleichsetzung unterschiedlicher Fragekontexte.
+- Sehr ähnliche Texte bedeuten genau eine Zeichenersetzung, -einfügung oder -löschung
+  nach Normalisierung, z. B. ein doppelter Buchstabe. Hinweise vergleichen sowohl
+  Teamtexte untereinander als auch akzeptierte Lösungen. Keine automatische Annahme
+  weiterer Schreibvarianten in der Bewertungsengine.
+- FaceMorph mit genau zwei strukturierten Feldern erhält einen Hinweis, wenn ein
+  Feld zur Lösung der anderen Person passt und nicht zur eigenen. Zwei Gegenmatches
+  markieren eine mögliche Vertauschung. Mehrdeutige eigene/andere Lösungen werden
+  nicht als Vertauschung behauptet; flache Legacytexte werden nicht in A/B geraten.
+- Hinweise schreiben weder Bewertung noch Punkte, Antworttexte, Submissions oder
+  akzeptierte Lösungen. Die bestehenden Einzelaktionen samt Revision/Quiz-Lock und
+  zentraler Punkteprojektion bleiben die einzige bewusste Bewertungsmöglichkeit.
+
+Die Darstellung bleibt kompakt: Aufklappbare Hinweise zeigen in der Zusammenfassung
+die Hinweisarten und die Zahl gleicher sichtbarer Feldtexte. Die Tabelle scrollt
+auf schmalen Geräten intern horizontal und ist als fokussierbare Region erreichbar.
+Dadurch werden Bewertungsaktionen nicht mehr durch den bisherigen Overflow-Container
+abgeschnitten; kein Wechsel zu einem separaten Bewertungsworkflow.
+
+Grenzen: Ähnlichkeit ist ein Prüfhinweis, kein Beweis. Numerische/Länder-, Pixel-,
+Paare-, Meme-, Ordering- und Umfragefälle bekommen keine unscharfen Freitexthinweise.
+Verglichen werden Texte mit Buchstaben von 3 bis 512 Unicodezeichen. Maximal 5000
+Paarvergleiche je Frage/Feld und vier Hinweise pro Zeile begrenzen die Darstellung;
+fehlende Hinweise bedeuten keine bestätigte Richtigkeit. Keine Sammelbewertung und
+keine garantierte historische Zeit-/Klickersparnis. Die bisherigen Scorer und ihre
+Schreibweisenormalisierung werden durch die Ergänzung nicht verändert.
+
+Tests: `manualReviewHints.test.ts`, bestehende Filter-/Workflow-/Scorer-/Submission-
+Regressionen und `quizPlanning.browser.test.ts` mit echter Antwortprüfungs-Komponente,
+Filterwechsel, FaceMorph-/Ähnlichkeitshinweisen und null ausgelösten Schreibaktionen.
+Neuanlage/Bearbeiten des Fragetextes mit reiner Vorlesedauer wird separat geprüft.
+Gehostete Abnahme und bekannte Grenzen: [AP5-Anwendungsbericht](../reports/ap5-review-improvements.md).
+
 ## LOVD November AP5 · historische manuelle Auswertung
 
 Der [Analysebericht](../reports/lovd-november-ap5.md) untersucht Quiz 37 mit zwölf

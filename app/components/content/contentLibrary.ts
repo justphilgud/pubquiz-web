@@ -18,6 +18,9 @@ export type ContentFiltersState = {
   query: string;
   contentType: ContentTypeFilter;
   templateId: string | null;
+  /** Repeated template URL values; the legacy single value remains compatible. */
+  templateIds?: string[];
+  answerMode?: "open" | "closed" | null;
   categoryIds: number[];
   storyType: string;
   status: ContentStatusFilter;
@@ -119,7 +122,9 @@ export function parseContentFilters(
   const requestedMedia = params.get("media");
   const requestedUsage = params.get("usage");
   const requestedQuestionLifecycle = params.get("questionLifecycle");
-  const requestedTemplateId = params.get("template");
+  const requestedTemplateIds = [...new Set(params.getAll("template").flatMap(value => value.split(","))
+    .filter(id => id && (!allowedTemplateIds || allowedTemplateIds.includes(id))))];
+  const requestedTemplateId = requestedTemplateIds[0];
   const templateId = requestedTemplateId &&
       (!allowedTemplateIds || allowedTemplateIds.includes(requestedTemplateId))
     ? requestedTemplateId
@@ -130,6 +135,8 @@ export function parseContentFilters(
       ? requestedType as ContentTypeFilter
       : initialType ?? "ALL",
     templateId,
+    ...(requestedTemplateIds.length > 1 ? { templateIds: requestedTemplateIds } : {}),
+    ...(params.get("answerMode") === "open" || params.get("answerMode") === "closed" ? { answerMode: params.get("answerMode") as "open" | "closed" } : {}),
     categoryIds: [...new Set(params.getAll("categoryId")
       .map((value) => parsePositiveId(value))
       .filter((value): value is number => value !== null))],
@@ -156,6 +163,9 @@ function parsePositiveId(value: string | null) {
 }
 
 export function normalizeContentFiltersForType(filters: ContentFiltersState) {
+  if (filters.contentType === "STORY_ELEMENT" || filters.contentType === "POLL") {
+    filters = { ...filters, ...(filters.templateIds ? { templateIds: [] } : {}), ...(filters.answerMode ? { answerMode: null } : {}) };
+  }
   if (filters.contentType === "QUESTION") return { ...filters, storyType: "ALL" };
   if (filters.contentType === "STORY_ELEMENT") return { ...filters, templateId: null, categoryIds: [], questionLifecycle: "ALL" as const };
   if (filters.contentType === "POLL") {
@@ -192,7 +202,8 @@ export function serializeContentFilters(filters: ContentFiltersState) {
   if (filters.query.trim()) params.set("q", filters.query.trim());
   if (filters.contentType !== "ALL") params.set("contentType", filters.contentType);
   if (filters.contentType === "QUESTION" || filters.contentType === "ALL") {
-    if (filters.templateId) params.set("template", filters.templateId);
+    for (const id of selectedContentTemplateIds(filters)) params.append("template", id);
+    if (filters.answerMode) params.set("answerMode", filters.answerMode);
     for (const categoryId of filters.categoryIds) params.append("categoryId", String(categoryId));
   }
   if (filters.storyType !== "ALL") params.set("storyType", filters.storyType);
@@ -202,6 +213,10 @@ export function serializeContentFilters(filters: ContentFiltersState) {
   if (filters.usage !== "ALL") params.set("usage", filters.usage);
   if (filters.eventSeriesId !== null) params.set("eventSeriesId", String(filters.eventSeriesId));
   return params;
+}
+
+export function selectedContentTemplateIds(filters: Pick<ContentFiltersState, "templateId" | "templateIds">) {
+  return [...new Set(filters.templateIds ?? (filters.templateId ? [filters.templateId] : []))];
 }
 
 /** A completed page belongs to exactly one applied URL/refresh context. */

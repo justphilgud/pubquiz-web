@@ -6624,6 +6624,7 @@ export const QuizScalarFieldEnum = {
   eventreihe_id: 'eventreihe_id',
   quiz_datum: 'quiz_datum',
   titel: 'titel',
+  quiz_modus: 'quiz_modus',
   veranstaltungszeit: 'veranstaltungszeit',
   veranstaltungsname: 'veranstaltungsname',
   karten_url: 'karten_url',

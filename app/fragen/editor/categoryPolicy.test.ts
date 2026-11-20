@@ -353,7 +353,7 @@ test("template filtering is case-insensitive and keeps multiple selections", () 
   assert.match(templateFilter, /border-slate-700 bg-slate-50 font-medium/);
 });
 
-test("only productive standalone templates are available for filtering", () => {
+test("productive template search includes legacy MC and 8-bit while their editor selection stays unchanged", () => {
   const filterableIds = questionTemplateDefinitions
     .filter((template) => template.availableForFiltering)
     .map((template) => template.id);
@@ -368,8 +368,11 @@ test("only productive standalone templates are available for filtering", () => {
   assert.ok(filterableIds.includes(questionTemplateIds.translationReadAloud));
   assert.ok(filterableIds.includes(questionTemplateIds.anagram));
   assert.ok(filterableIds.includes(questionTemplateIds.googleReviews));
-  assert.ok(!filterableIds.includes(questionTemplateIds.multipleChoice));
-  assert.ok(!filterableIds.includes(questionTemplateIds.musicEightBit));
+  assert.ok(filterableIds.includes(questionTemplateIds.multipleChoice));
+  assert.ok(filterableIds.includes(questionTemplateIds.musicEightBit));
+  for (const id of [questionTemplateIds.multipleChoice, questionTemplateIds.musicEightBit]) {
+    assert.equal(questionTemplateDefinitions.find(template => template.id === id)?.selectable, false);
+  }
 });
 
 test("answer mode is derived from central template semantics, not answer count", () => {
@@ -462,10 +465,9 @@ test("media and answer-mode filters cover relations and combine with templates",
     questionSearchActions,
     /getQuestionAnswerModeWhereInput\("CLOSED"\)/,
   );
-  assert.match(
-    questionSearchActions,
-    /templateId === "standard"[\s\S]*getClosedQuestionTemplatePersistenceIds/,
-  );
+  // Quiz balance recommendations require disjoint, exact template filters.
+  assert.match(questionSearchActions, /templateId === "standard"[\s\S]*vorlage_id: null/);
+  assert.doesNotMatch(questionSearchActions, /getClosedQuestionTemplatePersistenceIds/);
   assert.doesNotMatch(overviewControls, /Nur ohne Antworten/);
   assert.doesNotMatch(overviewControls, /Nur ohne Medien/);
 });

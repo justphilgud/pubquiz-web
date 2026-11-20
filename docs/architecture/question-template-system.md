@@ -47,6 +47,10 @@ Spezialvorlagentexte. Regressionen prüfen `questionSimilarity.test.ts`,
 
 ## Übersetzung und Browserstimmen
 
+Der Editor zeigt zusätzlich eine rein abgeleitete Vorlesedauer aus Übersetzung und
+Geschwindigkeit, ohne Textänderung oder Generatoraufruf. Annahme, Leerzustand und
+Regressionen stehen in [Quiz-Ampeln und Vorlesedauer](quiz-balance.md#vorlesedauer).
+
 Original und Übersetzung werden getrennt gespeichert und sind auf je 2.000
 Zeichen begrenzt. Der Originaltext bleibt im Editor, Export und Klon erhalten,
 wird aber weder im Teamformular noch in der normalen Präsentation ausgegeben.

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import { confirmImport, previewImport } from "@/app/fragen/import/excel/importService";
 import type { ImportTarget } from "@/app/fragen/import/excel/format";
@@ -8,6 +9,29 @@ import { evaluateBaseAnswer } from "@/app/quiz/evaluation/evaluateBaseAnswer";
 import { resolveQuizAnswerInteraction } from "@/app/quiz/answerInteraction";
 import { pairColumns } from "@/app/fragen/editor/templates/pairsTemplate";
 import { fixtureSecret, fixtureWorkbook, openExcelFixture, seriesTarget, testDatabase } from "./excelImportFixture";
+
+test("PostgreSQL quiz mode upgrade backfills existing quizzes, persists switches and rejects invalid modes", {
+  skip: !testDatabase, timeout: 120_000,
+}, async () => {
+  const { db, sql, close } = await openExcelFixture();
+  try {
+    await sql.query('ALTER TABLE pubquiz.quiz DROP COLUMN quiz_modus');
+    const legacy = await sql.query<{ quiz_id: number }>("INSERT INTO pubquiz.quiz(eventreihe_id,titel) VALUES (10,'Legacy quiz') RETURNING quiz_id");
+    await sql.query(readFileSync("prisma/migrations/20261119150000_add_quiz_mode/migration.sql", "utf8"));
+    const id = legacy.rows[0].quiz_id;
+    assert.equal((await db.quiz.findUniqueOrThrow({ where: { quiz_id: id } })).quiz_modus, "VARIED");
+    const created = await db.quiz.create({ data: { eventreihe_id: 10, titel: "Default quiz" } });
+    assert.equal(created.quiz_modus, "VARIED");
+    await db.quiz.update({ where: { quiz_id: id }, data: { quiz_modus: "THEMED" } });
+    assert.equal((await db.quiz.findUniqueOrThrow({ where: { quiz_id: id } })).quiz_modus, "THEMED");
+    await db.quiz.update({ where: { quiz_id: id }, data: { titel: "Unrelated edit" } });
+    assert.equal((await db.quiz.findUniqueOrThrow({ where: { quiz_id: id } })).quiz_modus, "THEMED");
+    await assert.rejects(sql.query("UPDATE pubquiz.quiz SET quiz_modus='INVALID' WHERE quiz_id=$1", [id]), /quiz_modus_valid/);
+    await assert.rejects(sql.query("UPDATE pubquiz.quiz SET quiz_modus=NULL WHERE quiz_id=$1", [id]), /not-null constraint/);
+    await db.quiz.update({ where: { quiz_id: id }, data: { quiz_modus: "VARIED" } });
+    assert.equal((await db.quiz.findUniqueOrThrow({ where: { quiz_id: id } })).quiz_modus, "VARIED");
+  } finally { await close(); }
+});
 
 test("PostgreSQL import: preview, active categories, authorization, full rollback, concurrent retries and 100 pair questions", {
   skip: !testDatabase, timeout: 120_000,

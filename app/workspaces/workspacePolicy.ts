@@ -88,7 +88,7 @@ export function quizCollectionReturnHref(value: string | null | undefined, serie
 
 /** Only collection filters can cross contexts; discard object/draft/return identifiers. */
 export function workspaceCollectionHref(seriesId: number | null, type: "quiz" | "bingo" | "karaoke", area: string | undefined, search: string) {
-  const allowed = type !== "quiz" ? [] : area === "events" ? ["status", "tab"] : area === "teams" ? ["q", "status"] : ["q", "contentType", "template", "categoryId", "storyType", "status", "questionLifecycle", "media", "usage"];
+  const allowed = type !== "quiz" ? [] : area === "events" ? ["status", "tab"] : area === "teams" ? ["q", "status"] : ["q", "contentType", "template", "answerMode", "categoryId", "storyType", "status", "questionLifecycle", "media", "usage"];
   const query = new URLSearchParams();
   for (const [key, value] of new URLSearchParams(search)) if (allowed.includes(key)) query.append(key, value);
   const path = seriesId === null ? type !== "quiz" ? `/${type}` : area === "events" ? "/quiz" : area === "teams" ? "/admin/teams" : "/content" : `/workspaces/${seriesId}/${type}${area ? `/${area}` : ""}`;

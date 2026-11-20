@@ -1,4 +1,6 @@
 "use client";
+import { TemplateFilterCombobox } from "@/app/fragen/components/TemplateFilterCombobox";
+import { selectedContentTemplateIds } from "./contentLibrary";
 import EventSeriesPicker from "@/app/workspaces/EventSeriesPicker";
 
 import { useMemo, useState } from "react";
@@ -19,11 +21,11 @@ export default function ContentFilters({ filters, categories, eventSeries, templ
   loading: boolean;
   hideContentType?: boolean;
   onChange: (filters: ContentFiltersState) => void;
-  onTemplateChange: (templateId: string | null) => void;
+  onTemplateChange: (templateIds: string[]) => void;
   onApply: () => void;
   onReset: () => void;
 }) {
-  const filterCount = [!hideContentType && filters.contentType !== "ALL", filters.templateId !== null, filters.categoryIds.length > 0, filters.storyType !== "ALL", filters.status !== "ALL", filters.questionLifecycle !== "ALL", filters.media !== "ALL", filters.usage !== "ALL", filters.eventSeriesId !== null].filter(Boolean).length;
+  const filterCount = [!hideContentType && filters.contentType !== "ALL", selectedContentTemplateIds(filters).length > 0, Boolean(filters.answerMode), filters.categoryIds.length > 0, filters.storyType !== "ALL", filters.status !== "ALL", filters.questionLifecycle !== "ALL", filters.media !== "ALL", filters.usage !== "ALL", filters.eventSeriesId !== null].filter(Boolean).length;
   const [open, setOpen] = useState(filterCount > 0);
   const [categoryQuery, setCategoryQuery] = useState("");
   const visibleCategories = useMemo(() => {
@@ -43,7 +45,8 @@ export default function ContentFilters({ filters, categories, eventSeries, templ
         <div className="mt-3 grid gap-3 rounded-2xl bg-slate-50 p-3 sm:grid-cols-2 xl:grid-cols-5">
           {!hideContentType && <label><span className="mb-1 block text-xs font-bold text-slate-600">Inhaltstyp</span><select value={filters.contentType} onChange={(event) => onChange(normalizeContentFiltersForType({ ...filters, contentType: event.target.value as ContentFiltersState["contentType"] }))} className={inputClass}><option value="ALL">Alle Inhalte</option><option value="QUESTION">Fragen</option><option value="STORY_ELEMENT">Story-Elemente</option><option value="POLL">Umfragen</option></select></label>}
           <label><span className="mb-1 block text-xs font-bold text-slate-600">Status</span><select value={filters.status} onChange={(event) => onChange({ ...filters, status: event.target.value as ContentFiltersState["status"] })} className={inputClass}><option value="ALL">Alle Status</option><option value="DRAFT">Meine Entwürfe</option><option value="NOT_APPROVED">Nicht freigegeben</option><option value="ACTIVE">Aktiv / freigegeben</option><option value="ARCHIVED">Archiviert</option></select></label>
-          {(filters.contentType === "QUESTION" || filters.contentType === "ALL") && <label><span className="mb-1 block text-xs font-bold text-slate-600">Template</span><select aria-label="Template" value={filters.templateId ?? ""} onChange={(event) => onTemplateChange(event.target.value || null)} className={inputClass}><option value="">Alle Templates</option>{templates.filter((template) => template.availableForFiltering).map((template) => <option key={template.id} value={template.id}>{template.name}</option>)}</select></label>}
+          {(filters.contentType === "QUESTION" || filters.contentType === "ALL") && <TemplateFilterCombobox templates={templates.filter(template => template.availableForFiltering)} value={selectedContentTemplateIds(filters)} onChange={onTemplateChange} />}
+          {(filters.contentType === "QUESTION" || filters.contentType === "ALL") && <label><span className="mb-1 block text-xs font-bold text-slate-600">Antwortmodus</span><select aria-label="Antwortmodus" value={filters.answerMode ?? ""} onChange={event => onChange({ ...filters, answerMode: event.target.value === "open" || event.target.value === "closed" ? event.target.value : null })} className={inputClass}><option value="">Alle</option><option value="open">Offen</option><option value="closed">Geschlossen</option></select></label>}
           {(filters.contentType === "QUESTION" || filters.contentType === "ALL") && <label><span className="mb-1 block text-xs font-bold text-slate-600">Aktualität</span><select value={filters.questionLifecycle} onChange={(event) => onChange({ ...filters, questionLifecycle: event.target.value as ContentFiltersState["questionLifecycle"] })} className={inputClass}><option value="ALL">Alle</option><option value="CURRENT">Aktuell</option><option value="OUTDATED_SOON">Bald veraltet</option><option value="OUTDATED">Veraltet</option><option value="REVIEW_SOON">Prüfung demnächst</option><option value="REVIEW_DUE">Prüfung fällig</option></select></label>}
           {(filters.contentType === "QUESTION" || filters.contentType === "ALL") && <details className="relative self-end rounded-xl border border-slate-300 bg-white">
             <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-2 px-3 text-sm font-semibold text-slate-800">

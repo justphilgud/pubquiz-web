@@ -1,4 +1,5 @@
 "use server";
+import { DEFAULT_QUIZ_MODE, isQuizMode, normalizeQuizMode, type QuizMode } from "./quizMode";
 
 import { newQuizIntroMedia, selectedQuizIntroMedia } from "./quizIntroMedia";
 
@@ -186,6 +187,8 @@ import {
   type MemeQuestionConfig,
 } from "@/app/quiz/memeCaption";
 import { loadQuizPlanningDurations } from "./quizPlanning.server";
+import { loadQuizBalances } from "./quizBalance.server";
+import type { QuizBalance } from "./quizBalance";
 import { supportsSponsorMoments } from "./presentationTiming";
 import { revalidateQuizPlanning } from "./revalidateQuizPlanning.server";
 
@@ -226,6 +229,7 @@ export async function getQuizFixedSlideVisibility(quizId: number) {
 }
 
 export type QuizResult = {
+  quiz_modus?: QuizMode;
   live_status?: "Vorbereitung"|"Läuft"|"Beendet";
   quiz_id: number;
   eventreihe_id: number;
@@ -250,6 +254,7 @@ export type QuizResult = {
   archivierungsgrund: string | null;
   fragen_anzahl: number;
   plannedDurationSeconds?: number;
+  balance?: QuizBalance;
   presentation_template_id: string | null;
   answer_form_template_id: string | null;
 };
@@ -390,9 +395,9 @@ export async function getQuizListe(options: { includePlanning?: boolean; eventSe
     },
   });
 
-  const durations = options.includePlanning
-    ? await loadQuizPlanningDurations(quizze.map(quiz => quiz.quiz_id))
-    : undefined;
+  const [durations, balances] = options.includePlanning
+    ? await Promise.all([loadQuizPlanningDurations(quizze.map(quiz => quiz.quiz_id)), loadQuizBalances(quizze.map(quiz => quiz.quiz_id))])
+    : [undefined, undefined];
   return sortQuizResults(quizze.map((quiz) => ({
     live_status:quiz.praesentation_status?.quiz_stopped_at?"Beendet" as const:quiz.praesentation_status?.quiz_started_at?"Läuft" as const:"Vorbereitung" as const,
     quiz_id: quiz.quiz_id,
@@ -400,6 +405,7 @@ export async function getQuizListe(options: { includePlanning?: boolean; eventSe
     eventreihe_name: quiz.eventreihe.name,
     eventreihe_archiviert: quiz.eventreihe.ist_archiviert,
     titel: quiz.titel,
+    quiz_modus: normalizeQuizMode(quiz.quiz_modus),
     aufloesungsstrategie: isQuizSolutionStrategy(quiz.aufloesungsstrategie)
       ? quiz.aufloesungsstrategie
       : "AFTER_EACH_QUESTION",
@@ -422,6 +428,7 @@ export async function getQuizListe(options: { includePlanning?: boolean; eventSe
     archivierungsgrund: quiz.archivierungsgrund,
     fragen_anzahl: quiz._count.quiz_fragen,
     plannedDurationSeconds: durations?.get(quiz.quiz_id),
+    balance: balances?.get(quiz.quiz_id),
     presentation_template_id: quiz.presentation_template_id,
     answer_form_template_id: quiz.answer_form_template_id,
   })));
@@ -480,6 +487,7 @@ export async function getAktiveQuizListe(): Promise<QuizResult[]> {
 }
 
 export async function createQuiz(data: {
+  mode?: QuizMode;
   eventSeriesId: number;
   titel: string;
   quizDatum: string;
@@ -494,6 +502,7 @@ export async function createQuiz(data: {
   presentationTemplateId?: string | null;
   solutionStrategy?: QuizSolutionStrategy;
 }) {
+  if (data.mode !== undefined && !isQuizMode(data.mode)) return { success: false, message: "Der Quizmodus ist ungültig." };
   if (!isQuizSolutionStrategy(data.solutionStrategy ?? DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY)) {
     return { success: false, message: "Die AuflÃ¶sungsstrategie ist ungÃ¼ltig." };
   }
@@ -521,6 +530,7 @@ export async function createQuiz(data: {
     data: {
       eventreihe_id: validated.value.eventSeriesId,
       titel: validated.value.title,
+      quiz_modus: data.mode ?? DEFAULT_QUIZ_MODE,
       quiz_datum: validated.value.dateValue,
       veranstaltungszeit: validated.value.time,
       veranstaltungsname: validated.value.venueName,
@@ -552,6 +562,7 @@ export async function createQuiz(data: {
 }
 
 export async function updateQuiz(data: {
+  mode?: QuizMode;
   quizId: number;
   eventSeriesId: number;
   titel: string;
@@ -567,6 +578,7 @@ export async function updateQuiz(data: {
   presentationTemplateId?: string | null;
   solutionStrategy?: QuizSolutionStrategy;
 }) {
+  if (data.mode !== undefined && !isQuizMode(data.mode)) return { success: false, message: "Der Quizmodus ist ungültig." };
   if (!isQuizSolutionStrategy(data.solutionStrategy ?? DEFAULT_NEW_QUIZ_SOLUTION_STRATEGY)) {
     return { success: false, message: "Die AuflÃ¶sungsstrategie ist ungÃ¼ltig." };
   }
@@ -636,6 +648,7 @@ export async function updateQuiz(data: {
       data: {
         eventreihe_id: validated.value.eventSeriesId,
         titel: validated.value.title,
+        quiz_modus: data.mode,
         quiz_datum: validated.value.dateValue,
         veranstaltungszeit: validated.value.time,
         veranstaltungsname: validated.value.venueName,
@@ -812,6 +825,7 @@ export async function copyQuiz(data: {
         shared_design_template_id:original.shared_design_template_id,
         answer_form_template_id: original.shared_design_template_id ? original.answer_form_template_id : validated.value.presentationTemplateId,
         aufloesungsstrategie: original.aufloesungsstrategie,
+        quiz_modus: original.quiz_modus,
 
         intro_logo_url: original.intro_logo_url,
         intro_musik_url: original.intro_musik_url,
@@ -1134,6 +1148,7 @@ export async function getQuizDetails(
     eventreihe_name: quiz.eventreihe.name,
     eventreihe_archiviert: quiz.eventreihe.ist_archiviert,
     titel: quiz.titel,
+    quiz_modus: normalizeQuizMode(quiz.quiz_modus),
     quiz_datum: quiz.quiz_datum
       ? quiz.quiz_datum.toISOString().split("T")[0]
       : null,
@@ -1406,9 +1421,9 @@ export async function searchFragenForQuiz(data: {
     mediaState: data.filters.media === "ALL"
       ? null
       : data.filters.media === "WITH" ? "with" : "without",
-    answerMode: null,
+    answerMode: data.filters.answerMode ?? null,
     statuses: [...getQuestionStatusesForContentFilter(data.filters.status)],
-    templateIds: data.filters.templateId ? [data.filters.templateId] : [],
+    templateIds: data.filters.templateIds ?? (data.filters.templateId ? [data.filters.templateId] : []),
     usageState: data.filters.usage === "ALL" ? null : data.filters.usage,
     lifecycleFilter: data.filters.questionLifecycle,
     limit: 25,
@@ -4798,6 +4813,12 @@ async function loadQuizAuswertungAlleAntworten(quizId: number, db: Prisma.Transa
         maximumPointsLabel,
         templateId: quizFrage.fragen.vorlage?.code ?? null,
         richtigeAntwort: richtigeAntworten || offeneMusterloesung || "-",
+        reviewSolutions: quizFrage.fragen.antworten.filter(a => a.ist_richtig).map(a => a.antwort),
+        reviewFields: quizFrage.fragen.antwortfelder.map(field => ({
+          id: field.antwortfeld_id, label: field.label,
+          answer: effectiveSubmission?.structuredAnswers.get(field.antwortfeld_id) ?? null,
+          solutions: field.loesungen.filter(solution => solution.ist_akzeptiert).map(solution => solution.loesung_text),
+        })),
 
         team_antwort_id: antwort?.team_antwort_id ?? null,
         evaluationRevision: antwort ? evaluationRevision(antwort) : null,

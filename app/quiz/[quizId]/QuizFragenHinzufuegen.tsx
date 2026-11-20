@@ -220,8 +220,8 @@ export default function QuizFragenHinzufuegen({
         loading={isLoading}
         hideContentType
         onChange={setFilters}
-        onTemplateChange={(templateId) => {
-          const next = { ...filters, templateId };
+        onTemplateChange={(templateIds) => {
+          const next = { ...filters, templateId: templateIds[0] ?? null, templateIds };
           setFilters(next);
           void handleSearch(next);
         }}

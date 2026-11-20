@@ -96,17 +96,17 @@ test("question template filter round-trips with text, category and URL state", (
   );
 });
 
-test("template filtering is single-select, registry-fed and server-side", () => {
+test("template filtering is multi-select, registry-fed and server-side", () => {
   const filters = readFileSync(new URL("./ContentFilters.tsx", import.meta.url), "utf8");
   const page = readFileSync(new URL("./ContentLibraryPage.tsx", import.meta.url), "utf8");
   const actions = readFileSync(new URL("./actions.ts", import.meta.url), "utf8");
 
-  assert.match(filters, /<option value="">Alle Templates<\/option>/);
-  assert.match(filters, /templates\.filter\(\(template\) => template\.availableForFiltering\)/);
+  assert.match(filters, /<TemplateFilterCombobox/);
+  assert.match(filters, /templates\.filter\(template => template\.availableForFiltering\)/);
   assert.match(page, /localizeQuestionTemplates/);
   assert.match(page, /loadDynamicQuestionTemplates\(baseTemplates\)/);
-  assert.match(actions, /templateIds: filters\.templateId \? \[filters\.templateId\] : \[\]/);
-  assert.match(actions, /restrictToQuestionTemplate = filters\.templateId !== null/);
+  assert.match(actions, /templateIds: selectedContentTemplateIds\(filters\)/);
+  assert.match(actions, /restrictToQuestionTemplate = selectedContentTemplateIds\(filters\)\.length > 0/);
   assert.match(actions, /includeStories = !restrictToQuestionTemplate/);
   assert.match(actions, /includePolls = !restrictToQuestionTemplate/);
   const questionSearch = readFileSync(new URL("../../fragen/actions.ts", import.meta.url), "utf8");
