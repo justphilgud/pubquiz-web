@@ -81,6 +81,9 @@ keine Anwendungsregel geändert.
 
 ## Ursprüngliche gemeinsame Preview und technische Abnahme
 
+Historischer Nachweis der ursprünglichen Kategoriegrenzen. Für den aktuellen
+Stand gilt die Ergänzung „Kategoriegrenzen 20/30 %“ am Ende dieses Berichts.
+
 - [Pull Request #173](https://github.com/justphilgud/pubquiz-web/pull/173).
 - [Gemeinsame Preview / Quizliste](https://pubquiz-4ugu195wb-just-phil-gud.vercel.app/quiz).
 - [Testquiz mit zwei Blöcken](https://pubquiz-4ugu195wb-just-phil-gud.vercel.app/quiz/2).
@@ -201,3 +204,20 @@ Testbrowser und temporäre lokale Bypass-Kopie sind nach der Abnahme entfernt.
 Der abschließende Dokumentationscommit enthält ausschließlich diese Ergebnisse
 und Bilder; Anwendung, Schema und Tests entsprechen dem geprüften Deployment.
 AP5 bleibt unverändert. Kein Merge, Production-Backup oder Production-Deployment.
+
+## Ergänzung 20.11.2026: Kategoriegrenzen 20/30 %
+
+Die neue Anforderung ersetzt ausschließlich die Grenzen für Sachkategorien im
+abwechslungsreichen Quiz: bis einschließlich 20 % grün, über 20 % bis einschließlich
+30 % gelb, über 30 % rot. Kategorien ohne Fragen bleiben ausgeblendet; Themenquiz
+bleibt neutral. Die zentrale reine Berechnung liefert Anzeige, Block-/Gesamtstatus
+und Empfehlungsbedarf; die Regeltabelle verwendet dieselben zentralen Grenzen.
+Auch Ausgleichsalternativen verwenden jetzt den grünen Bereich bis 20 % statt der
+historischen separaten 10-%-Schwelle. Template-Regeln und AP5 bleiben unverändert.
+
+Lokale Tests erfolgreich: alle 18 Ampeltests, einschließlich exakt 20/30 % und
+knapp darüber ohne Rundung, 5/6/7/8 von 25 mit konsistenten Gesamtstatus und
+Empfehlungen, Themenquiz, unveränderten Templatewerten sowie Mehrfachkategorien
+mit zusammen 120 %. Typecheck, geändertes ESLint und Analysis-/Client-Browsertests
+erfolgreich. Neue gemeinsame Preview und gehostete Nachweise werden vor Übergabe
+ergänzt. Keine Migration oder neue Abhängigkeit für diese Grenzwertänderung.

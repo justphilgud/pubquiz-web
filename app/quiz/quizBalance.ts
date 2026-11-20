@@ -2,6 +2,12 @@ import { questionTemplateIds as T, resolveCanonicalQuestionTemplateId } from "@/
 import { normalizeQuizMode, type QuizMode } from "./quizMode";
 
 export type BalanceStatus = "RED" | "YELLOW" | "GREEN" | "NONE";
+export const CATEGORY_BALANCE_LIMITS = { greenMax: 20, yellowMax: 30 } as const;
+export const CATEGORY_BALANCE_RULE = {
+  red: `>${CATEGORY_BALANCE_LIMITS.yellowMax} %`,
+  yellow: `>${CATEGORY_BALANCE_LIMITS.greenMax}–${CATEGORY_BALANCE_LIMITS.yellowMax} %`,
+  green: `≤${CATEGORY_BALANCE_LIMITS.greenMax} %`,
+};
 export type BalanceGroup = "open" | "closed" | "audio" | "facts" | "image" | "creative" | "ordering" | "pairs" | "trueFalse" | "estimate" | "poll";
 type RegistryId = (typeof T)[keyof typeof T];
 /** Exhaustive: a new registry template must receive a deliberate planning policy. */
@@ -43,7 +49,7 @@ export function questionBalanceGroup(question: BalanceQuestion): BalanceGroup | 
 export function balanceStatus(group: BalanceGroup | "category", count: number, total: number): BalanceStatus {
   if (!total || group === "estimate" || group === "poll" || (group === "category" && !count)) return "NONE";
   const p = count * 100;
-  if (group === "category") return p > 20 * total ? "RED" : p >= 10 * total ? "YELLOW" : "GREEN";
+  if (group === "category") return p > CATEGORY_BALANCE_LIMITS.yellowMax * total ? "RED" : p > CATEGORY_BALANCE_LIMITS.greenMax * total ? "YELLOW" : "GREEN";
   if (group === "open") return p < 5 * total || p > 25 * total ? "RED" : p <= 10 * total || p > 20 * total ? "YELLOW" : "GREEN";
   if (group === "closed") return p < 10 * total || p > 60 * total ? "RED" : p < 15 * total || p > 50 * total ? "YELLOW" : "GREEN";
   if (group === "audio") return p < 10 * total || p > 30 * total ? "RED" : p < 15 * total || p > 25 * total ? "YELLOW" : "GREEN";
@@ -84,7 +90,7 @@ export function getQuizBalance(input: { questions: readonly BalanceQuestion[]; s
     });
     const displayedCategories = categories.filter(category => category.count > 0);
     const overCategory = displayedCategories.some(c => c.status === "RED" || c.status === "YELLOW");
-    const alternative = overCategory ? categories.filter(c => c.availableForSearch !== false && c.count * 100 < 10 * questions.length).sort((a, b) => a.count - b.count || a.name.localeCompare(b.name, "de"))[0] : undefined;
+    const alternative = overCategory ? categories.filter(c => c.availableForSearch !== false && (c.count === 0 || c.status === "GREEN")).sort((a, b) => a.count - b.count || a.name.localeCompare(b.name, "de"))[0] : undefined;
     const recommendations: { label: string; href: string }[] = [];
     for (const group of groups) {
       if (!questions.length || group.status === "NONE" || group.status === "GREEN") continue;

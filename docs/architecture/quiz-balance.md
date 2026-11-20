@@ -22,7 +22,7 @@ Modusparameter bleibt der gespeicherte Wert erhalten; Kopien übernehmen ihn.
 Schnellquiz verwendet den Datenbankstandard. Rechte, Navigation und Laufzeit ändern
 sich nicht. Ein bewusster Moduswechsel wird gespeichert und beim Neuladen wirksam.
 
-Im abwechslungsreichen Quiz bleiben alle bisherigen Regeln unverändert. Im
+Im abwechslungsreichen Quiz gelten die unten verbindlich dokumentierten Grenzen. Im
 Themenquiz bleiben Sachkategorien mit Anzahl und Blockanteil sichtbar, aber neutral:
 keine grüne/gelbe/rote Kategorieampel, kein Einfluss auf Block-/Gesamtstatus und
 keine Kategorie-Ausgleichsempfehlung oder daraus abgeleiteter Kategorie-Suchfilter.
@@ -52,7 +52,7 @@ zur Fragenzahl, erhalten selbst aber keine Ampel.
 | Offene Fragen | Standard, effektiv offen | <5 % oder >25 % | 5–10 % oder >20–25 % | >10–20 % |
 | Geschlossene Fragen | Standard, effektiv geschlossen; Multiple Choice | <10 % oder >60 % | 10–<15 % oder >50–60 % | 15–50 % |
 | Audio-Fragen | Musik rückwärts, normale Musik, 8-Bit-Musik, Übersetzt-vorgelesen | <10 % oder >30 % | 10–<15 % oder >25–30 % | 15–25 % |
-| Sachkategorien, abwechslungsreiches Quiz | Bestehende zugeordnete Kategorien, z. B. Politik, Wirtschaft, Kultur, Film, Geografie | >20 % | 10–20 % | >0–<10 % |
+| Sachkategorien, abwechslungsreiches Quiz | Bestehende zugeordnete Kategorien, z. B. Politik, Wirtschaft, Kultur, Film, Geografie | >30 % | >20–30 % | ≤20 % |
 | Sachkategorien, Themenquiz | Dieselben Kategorien und Anteile; neutrale Anzeige ohne Ausgleichsempfehlung | — | — | — |
 | Fakten | Person, Jahr, Land, Freitext | 0 Fragen | — | ≥1 Frage |
 | Bild | FaceMorph, Pixelbild, Kunstwerk | 0 Fragen | — | ≥1 Frage |
@@ -62,6 +62,13 @@ zur Fragenzahl, erhalten selbst aber keine Ampel.
 | Wahr oder Falsch | Wahr oder Falsch | 0 Fragen | — | ≥1 Frage |
 | Schätzfrage | Schätzfrage | — | — | — |
 | Umfragen | Einfachauswahl, Mehrfachauswahl, Skala | — | — | — |
+
+Die Kategoriegrenzen wurden mit der Ergänzung vom 20.11.2026 ausdrücklich geändert;
+sie ersetzen die ursprünglichen Kategoriegrenzen des Auftrags. Templategrenzen
+bleiben unverändert. `CATEGORY_BALANCE_LIMITS` liefert die Zahlen für Berechnung
+und Regelanzeige. Genau 20 % sind grün, genau 30 % gelb; erst darüber wechselt die
+Ampel. Bei 25 Fragen bedeuten 5 grün, 6–7 gelb und ab 8 rot. Nicht vorhandene
+Kategorien bleiben ausgeblendet; leere Blöcke haben keine Bezugsgröße.
 
 `BALANCE_TEMPLATE_GROUPS` ist ein exhaustives `Record` aller aktuellen Registry-IDs;
 neue IDs erzwingen eine bewusste Ergänzung. Sachkategorien mit null Fragen sind
@@ -97,6 +104,11 @@ kann eine aktive wenig vertretene Alternative empfohlen werden, auch ein bislang
 nicht verwendetes Thema. Solche Themen sind Empfehlungen, keine Null-Ampelzeilen
 und keine Pflicht, alle Kategorien zu verwenden. Bestehen zugleich Gruppen- und
 Themenbedarf, enthält derselbe Link beide Filter.
+Dabei lösen ausschließlich gelbe/rote Kategorien (über 20 %) Kategorie-Ausgleich
+aus; Alternativen stammen aus dem grünen Bereich bis einschließlich 20 % oder
+sind bislang unbenutzt. Es gibt keine separate historische 10-%-Schwelle mehr.
+Kategorieanzeige, Block-/Gesamtstatus und Empfehlungsbedarf verwenden dieselben
+ungerundeten Bewertungen. Im Themenquiz entsteht dieser Kategoriebedarf nie.
 
 Die Links sind echte `/fragen`-Links mit `target="_blank"` und
 `rel="noopener noreferrer"`. Sie setzen Frage-Inhaltstyp, Freigabestatus und die
@@ -140,6 +152,9 @@ Kürzung und Umformulierung bleiben vollständig beim Nutzer.
   Zusatzregel, fehlende Blöcke und kombinierte Suchlinks.
   Quizmodus: Film-only grün bei ausgeglichenen Templates, neutrale Kategorien,
   weiterhin rote Templatewarnungen, keine Kategorie-Ausgleichsfilter, Rückwechsel.
+  Kategoriegrenzen: genau 20/30 %, knapp darüber, 5/6/7/8 von 25, konsistente
+  Block-/Gesamtstatus und Empfehlungen, grüne Alternativen bis 20 % sowie
+  überlappende Kategorieanteile über 100 % ohne Normalisierung.
 - `excel-question-import.integration.test.ts`: echte additive Quizmodus-Migration,
   Altbestands-/Insertstandard, dauerhafter Wechsel, Erhalt bei anderen Updates und
   DB-Constraints gegen ungültige/NULL-Werte.
