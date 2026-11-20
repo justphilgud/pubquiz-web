@@ -47,14 +47,15 @@ test("all current registry templates belong to a deliberate disjoint group, alia
 
 test("each block owns its denominator, duplicate categories count once, zero categories stay hidden", () => {
   const result = getQuizBalance({
-    questions: [q({ templateId: "musik", categoryIds: [1,1] }), ...Array.from({ length: 9 }, () => q()), ...Array.from({ length: 4 }, () => q({ sectionId: 2 })), q({ sectionId: null })],
+    questions: [q({ templateId: "musik", categoryIds: [1,1] }), ...Array.from({ length: 9 }, () => q()), ...Array.from({ length: 4 }, (_, i) => q({ sectionId: 2, categoryIds: i === 0 ? [1] : [] })), q({ sectionId: null })],
     sections: [{ id: 1, title: "A" }, { id: 2, title: "B" }], categories: [{ id: 1, name: "Kultur" }, { id: 2, name: "Film" }],
   });
   assert.deepEqual(result.blocks.map(b => b.total), [10, 4]);
   assert.equal(result.blocks[0].categories[0].count, 1);
   assert.equal(result.blocks[0].categories[0].status, "GREEN");
   assert.equal(result.blocks[0].categories.length, 1);
-  assert.equal(result.blocks[1].categories.length, 0);
+  assert.equal(result.blocks[1].categories[0].status, "YELLOW", "1/4 is 25% in this block, not the pooled quiz share");
+  assert.equal(result.blocks[1].categories.length, 1);
   assert.equal(result.unassigned, 1);
 });
 
