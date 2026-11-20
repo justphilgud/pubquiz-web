@@ -71,7 +71,7 @@ export function prepareLovdPrint(input:BingoPrint):BingoPrint {
  if(!settings.layout)settings.layout={version:3,format:'A4_FOUR',textFont:'ARIMO'};
  settings.partnerBack=1;
  if(lovd.includes(settings.frontLogo))settings.frontLogo=LOVD_SMALL_LOGO;
- settings.backLogos=settings.backLogos.map(ref=>lovd.includes(ref)?LOVD_LIGHT_LOGO:ref===PHIL_LOGO?PHIL_PRINT_LOGO:ref);
- if(settings.backLogos.length===2&&settings.backLogos.includes(LOVD_LIGHT_LOGO)&&settings.backLogos.includes(PHIL_PRINT_LOGO))settings.backLogos=[LOVD_LIGHT_LOGO,PHIL_PRINT_LOGO];
+ settings.backLogos=settings.backLogos.map(ref=>lovd.includes(ref)?LOVD_LOGO:ref===PHIL_LOGO?PHIL_PRINT_LOGO:ref);
+ if(settings.backLogos.length===2&&settings.backLogos.includes(LOVD_LOGO)&&settings.backLogos.includes(PHIL_PRINT_LOGO))settings.backLogos=[LOVD_LOGO,PHIL_PRINT_LOGO];
  return settings;
 }

@@ -58,7 +58,7 @@ with pdfplumber.open(browser) as pdf:
  f=sorted(frame(pdf.pages[0],side),key=lambda r:(round(r['top'],3),r['x0']))[11]
  b=next(r for r in frame(pdf.pages[1],side) if 'A-012' in (pdf.pages[1].crop((r['x0'],r['top'],r['x1'],r['bottom'])).extract_text() or ''))
  normalize(browser,0,f,out/'A-012-front.pdf',600);back_image=normalize(browser,1,b,out/'A-012-back.pdf',600)
- # Transparent corners of both image bounds paint the exact same background, without a black rectangle.
+ # The Phil Gud logo blends into the card. The LOVD tile keeps its own original red.
  for im in pdf.pages[1].images:
   if b['x0']<=im['x0']<b['x1'] and b['y0']<=im['y0']<b['y0']+side*.5:
    x=int((im['x0']-b['x0']+1)*600/72);y=int((b['y1']-im['y1']+1)*600/72)
@@ -66,7 +66,19 @@ with pdfplumber.open(browser) as pdf:
 reader=PdfReader(browser);fonts=[]
 for index in [1,3]:
  page=reader.pages[index];objects=page['/Resources']['/XObject'].get_object()
- assert all('/SMask' in obj.get_object() for obj in objects.values() if obj.get_object().get('/Subtype')=='/Image')
+ # PDF image bytes are shared across slots. Compare the embedded tile with the original
+ # artwork and verify the separate partner mark still has an alpha mask.
+ images=[obj.get_object() for obj in objects.values() if obj.get_object().get('/Subtype')=='/Image']
+ masked=[im for im in images if '/SMask' in im]
+ tiles=[im for im in images if '/SMask' not in im]
+ assert masked and tiles
+ with Image.open('public/branding/lovd/lovd-stelp.png') as original:
+  reference=original.convert('RGB').resize((128,128),Image.Resampling.LANCZOS)
+ for tile in tiles:
+  assert tile['/Width']==tile['/Height'] and tile['/ColorSpace']=='/DeviceRGB'
+  decoded=Image.frombytes('RGB',(tile['/Width'],tile['/Height']),tile.get_data())
+  diff=ImageChops.difference(decoded.resize(reference.size,Image.Resampling.LANCZOS),reference)
+  assert max(ImageStat.Stat(diff).mean)<1
  for font in page['/Resources']['/Font'].get_object().values():
   f=font.get_object();d=f['/DescendantFonts'][0].get_object()['/FontDescriptor'].get_object();data=d['/FontFile2'].get_object().get_data();font_path=out/f'embedded-code-{index}.ttf';font_path.write_bytes(data)
   cmap=f['/ToUnicode'].get_object().get_data().decode();pairs=[]
@@ -84,5 +96,5 @@ with pdfplumber.open(root/'lovd-old-browser-13.pdf') as original:
     assert a.extract_text()==b.extract_text()
     assert [(r['x0'],r['y0'],r['width'],r['height'],r.get('non_stroking_color')) for r in a.rects]==[(r['x0'],r['y0'],r['width'],r['height'],r.get('non_stroking_color')) for r in b.rects]
    assert all(c['size']==8 for p in historical.pages[1::2] for c in p.chars)
-summary={'RGB':[106,36,28],'profilesMm':[89,92.5,93],'frontTypographyUnchanged':True,'regularCodePt':6.5,'regularCodeFonts':fonts,'transparentOriginalsWithSoftMasks':True,'crossPerBack':True,'LProtectionMeasured':True,'historicalV3Still8ptAndOriginalColors':True,'comparisons':comparisons}
+summary={'RGB':[106,36,28],'profilesMm':[89,92.5,93],'frontTypographyUnchanged':True,'regularCodePt':6.5,'regularCodeFonts':fonts,'originalRedLovdTile':True,'transparentPhilGud':True,'crossPerBack':True,'LProtectionMeasured':True,'historicalV3Still8ptAndOriginalColors':True,'comparisons':comparisons}
 (out/'verification.json').write_text(json.dumps(summary,indent=2));print(json.dumps({k:v for k,v in summary.items() if k!='comparisons'}))

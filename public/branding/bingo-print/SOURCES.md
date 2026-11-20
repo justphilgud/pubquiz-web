@@ -9,4 +9,4 @@
 - SHA-256: `711300bfa49424924b62050b6a5339e11f233def82c3dfd797b48d390f12a06d`.
 - 3126 × 773 Pixel, transparent, RGB. Keine Umfärbung, Rekonstruktion oder Beschneidung.
 
-Die bestehende vollständige Wortmarke `../lovd/lovd-stelp-creme-rgb.png` bleibt auf der Rückseite; ihre Herkunft steht in `../lovd/SOURCES.md`. Das vorhandene transparente Phil-Gud-Druckoriginal bleibt unverändert.
+Oben auf der Rückseite wird die bestehende rote Originalkachel `../lovd/lovd-stelp.png` mit der hellen LOVD/STELP-Wortmarke gedruckt. Darunter stehen das × und das transparente Phil-Gud-Druckoriginal.

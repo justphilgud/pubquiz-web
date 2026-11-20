@@ -6,7 +6,7 @@ import {mkdirSync,writeFileSync} from 'node:fs';
 import {join} from 'node:path';
 import {getPresentationTemplate} from '@/app/rendering/templateRegistry';
 import type {SharedDesign} from '@/app/rendering/sharedDesign/sharedDesign';
-import {defaultBingoPrint,newBingoPrint,prepareLovdPrint,parseBingoPrint,LOVD_RED,LOVD_LIGHT_LOGO,LOVD_SMALL_LOGO,PHIL_PRINT_LOGO} from './bingoPrint';
+import {defaultBingoPrint,newBingoPrint,prepareLovdPrint,parseBingoPrint,LOVD_RED,LOVD_LOGO,LOVD_LIGHT_LOGO,LOVD_SMALL_LOGO,PHIL_PRINT_LOGO} from './bingoPrint';
 import {cardProfiles} from './printFormats';
 import {parsePrintSnapshot} from './printSnapshot';
 import {parseTermSet} from './termSet';
@@ -15,12 +15,12 @@ import {systemPrintTemplates} from './printTemplates';
 const t=getPresentationTemplate('lovd-ungegoogelt')!;
 const design:SharedDesign={version:1,templateId:t.id,name:'LOVD × Phil Gud',config:{version:1,tokens:t.tokens,design:t.design,surfaces:{presentation:t.variant,moderation:'BRANDED',answerForm:'BRANDED'}}};
 test('new inherited LOVD settings correct branding while preserving explicit colors/fonts and Phil Gud',()=>{
- const next=newBingoPrint(design);assert.equal(next.colors.header,LOVD_RED);assert.equal(next.colors.heading,'#FFF9E9');assert.equal(next.partnerBack,1);assert.equal(next.frontLogo,LOVD_SMALL_LOGO);assert.deepEqual(next.backLogos,[LOVD_LIGHT_LOGO,PHIL_PRINT_LOGO]);
+ const next=newBingoPrint(design);assert.equal(next.colors.header,LOVD_RED);assert.equal(next.colors.heading,'#FFF9E9');assert.equal(next.partnerBack,1);assert.equal(next.frontLogo,LOVD_SMALL_LOGO);assert.deepEqual(next.backLogos,[LOVD_LOGO,PHIL_PRINT_LOGO]);
  const explicit={...next,partnerBack:undefined,headerFont:'MONTSERRAT' as const,numberFont:'ARIMO' as const,colors:{...next.colors,header:'#123456',heading:'#FFFFFF'}};delete explicit.partnerBack;
  const current=prepareLovdPrint(explicit);assert.deepEqual(current.colors,explicit.colors);assert.equal(current.headerFont,'MONTSERRAT');assert.equal(current.numberFont,'ARIMO');assert.ok(parseBingoPrint(current));assert.equal(parseBingoPrint({...current,partnerBack:2}),null);
  const phil=systemPrintTemplates()[0].config.bingoPrint!;assert.deepEqual(prepareLovdPrint(phil),phil);assert.equal(phil.partnerBack,undefined);
- assert.deepEqual(prepareLovdPrint({...next,backLogos:[PHIL_PRINT_LOGO,LOVD_LIGHT_LOGO]}).backLogos,[LOVD_LIGHT_LOGO,PHIL_PRINT_LOGO]);
- const central=systemPrintTemplates()[1].config.bingoPrint!;assert.equal(central.colors.header,LOVD_RED);assert.equal(central.partnerBack,1);
+ assert.deepEqual(prepareLovdPrint({...next,backLogos:[PHIL_PRINT_LOGO,LOVD_LIGHT_LOGO]}).backLogos,[LOVD_LOGO,PHIL_PRINT_LOGO]);
+ const central=systemPrintTemplates()[1].config.bingoPrint!;assert.equal(central.colors.header,LOVD_RED);assert.equal(central.partnerBack,1);assert.deepEqual(central.backLogos,[LOVD_LOGO,PHIL_PRINT_LOGO]);
 });
 test('new V3 LOVD keeps the old front typography on every profile, freezes code face and exports old snapshots unchanged',{timeout:120000},async()=>{
  const bundle=await build({stdin:{contents:"export * from './app/bingo/preparation/printAssets.server';export * from './app/bingo/preparation/pdf.server';",resolveDir:process.cwd()},bundle:true,write:false,platform:'node',format:'cjs',packages:'external',plugins:[{name:'marker',setup(b){b.onResolve({filter:/^server-only$/},()=>({path:'marker',namespace:'fixture'}));b.onLoad({filter:/.*/,namespace:'fixture'},()=>({contents:''}));}}]});
