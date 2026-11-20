@@ -5,7 +5,7 @@ import {requirePrintTemplateReader} from './printTemplateAccess.server';
 import {getPresentationTemplate} from '@/app/rendering/templateRegistry';
 import {capturePrintSnapshot} from './printAssets.server';
 import {parseBingoPrint} from './bingoPrint';
-import {printFormat} from './printFormats';
+import {printFormat,changePrintFormat} from './printFormats';
 import {parsePrintSnapshot} from './printSnapshot';
 import {parseTermSet} from './termSet';
 import {createReferenceCardsPdf} from './pdfReference.server';
@@ -19,7 +19,7 @@ export async function previewCentralPrintTemplate(input:unknown){
   if(!template||template.config.purpose!=='BINGO_PRINT'||(!admin&&!['ACTIVE','SYSTEM'].includes(template.status)))throw Error('Druckvorlage nicht verfügbar.');
   if(r.settings!==undefined)await requireAdmin();
   const settings=parseBingoPrint(r.settings??template.config.bingoPrint);if(!settings||settings.layout?.version!==4)throw Error('Ungültige Druckeinstellungen.');
-  settings.layout.format=printFormat(r.format);const base=getPresentationTemplate('phil-gud')!;
+  settings.layout={version:4,textFont:settings.layout.textFont,...changePrintFormat(settings.layout,printFormat(r.format))};const base=getPresentationTemplate('phil-gud')!;
   const design:SharedDesign={version:1,templateId:base.id,name:template.name,config:{version:1,tokens:base.tokens,design:base.design,surfaces:{presentation:base.variant,moderation:'BRANDED',answerForm:'BRANDED'}}};
   let snapshot=await capturePrintSnapshot(design,'Synthetische Druckvorschau','Beispielrunde',settings,{id:template.id,name:template.name});
   if(r.mode==='TERMS'){

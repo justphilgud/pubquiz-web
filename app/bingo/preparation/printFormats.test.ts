@@ -1,6 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { exportParts, geometry, position, printFormat, printFormats } from './printFormats';
+import { cardProfiles, changePrintFormat, parsePrintLayout, exportParts, geometry, position, printFormat, printFormats } from './printFormats';
+
+test('SRA3 retains every existing profile and mirrors the complete three-column grid',()=>{
+  for(const profile of cardProfiles){
+    const selected=changePrintFormat({format:profile},'SRA3_TWELVE');
+    assert.deepEqual(selected,{format:'SRA3_TWELVE',cardProfile:profile});
+    assert.deepEqual(parsePrintLayout(selected),selected);
+    const g=geometry(selected.format,selected.cardProfile),base=geometry(profile);
+    assert.equal(g.sideMm,base.sideMm);assert.equal(g.capacity,12);
+    assert.equal(g.widthMm,320);assert.equal(g.heightMm,450);assert.equal(g.gapMm,5);
+    for(let slot=0;slot<12;slot++){
+      const f=position(selected.format,slot,false,profile),b=position(selected.format,slot,true,profile);
+      assert.ok(Math.abs(f.x+b.x+f.side-g.width)<1e-8);assert.equal(f.y,b.y);
+      assert.ok(Math.min(f.x,f.y,g.width-f.x-f.side,g.height-f.y-f.side)>=10*72/25.4);
+    }
+    assert.deepEqual(changePrintFormat(selected,'A6_ONE'),{format:'A6_ONE'});
+  }
+  assert.equal(position('SRA3_TWELVE',0,true).x,position('SRA3_TWELVE',2).x);
+  assert.throws(()=>parsePrintLayout({format:'SRA3_TWELVE'}));
+  assert.throws(()=>parsePrintLayout({format:'SRA3_TWELVE',cardProfile:'SRA3_TWELVE'}));
+  assert.throws(()=>parsePrintLayout({format:'A4_FOUR',cardProfile:'A4_SIX'}));
+});
 test('V3 physical formats retain safe margins, square cells and long-edge front/back ownership', () => {
   for (const format of Object.keys(printFormats) as (keyof typeof printFormats)[]) {
     const g = geometry(format);

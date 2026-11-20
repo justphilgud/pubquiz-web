@@ -1,3 +1,6 @@
+import {mkdirSync,writeFileSync} from 'node:fs';
+import {join} from 'node:path';
+import {changePrintFormat} from '../../app/bingo/preparation/printFormats';
 import {execFileSync} from 'node:child_process';
 import {Client as PgClient} from 'pg';
 import {existsSync} from 'node:fs';
@@ -35,6 +38,52 @@ export async function exercisePrintTemplates(db:Client,api:Api){
  const stableCards=(await db.query('SELECT to_jsonb(c) data FROM pubquiz.bingo_cards c WHERE series_id=$1 ORDER BY id',[sid])).rows;
  await db.query("UPDATE pubquiz.eventreihe_eventarten SET ist_freigeschaltet=false WHERE eventreihe_id=10 AND eventart='BINGO'");await assert.rejects(api.print.readPrintDesign(1,target));await assert.rejects(api.print.savePrintDesign(1,{target,expectedStateHash:data.stateHash,config:selection}));await db.query("UPDATE pubquiz.eventreihe_eventarten SET ist_freigeschaltet=true WHERE eventreihe_id=10 AND eventart='BINGO'");
  assert.deepEqual((await db.query('SELECT to_jsonb(c) data FROM pubquiz.bingo_cards c WHERE series_id=$1 ORDER BY id',[sid])).rows,stableCards);
+ // SRA3 is an explicit generation choice, independent of an inherited 89-mm profile.
+ const inheritedBefore=(await db.query('SELECT bingo_print_config FROM pubquiz.eventreihen WHERE eventreihe_id=10')).rows[0].bingo_print_config;
+ await db.query('UPDATE pubquiz.eventreihen SET bingo_print_config=$1 WHERE eventreihe_id=10',[JSON.stringify(selection)]);
+ const sraGame=await api.creation.createBingoEvent(1,{seriesId:10,title:'SRA3 13-card acceptance',date:'',time:'',roundCount:1,requestId:randomUUID()});
+ const sraTarget={kind:'BINGO',id:sraGame.id};
+ let sraPrep=await api.readPreparation(1,sraGame.id);
+ assert.deepEqual(JSON.parse(JSON.stringify(sraPrep.printLayout)),{format:'A4_SIX'});
+ const sraLayout=changePrintFormat(sraPrep.printLayout!,'SRA3_TWELVE');
+ const sraCommand={gameId:sraGame.id,expectedSeriesId:10,revision:sraPrep.revision,operation:'generate',roundId:sraPrep.rounds[0].id,count:13,requestId:randomUUID(),printLayout:sraLayout};
+ const sraCreated=await api.writePreparation(1,sraCommand);
+ assert.equal((await api.writePreparation(1,sraCommand)).seriesId,sraCreated.seriesId);
+ await assert.rejects(api.writePreparation(1,{...sraCommand,printLayout:{format:'SRA3_TWELVE',cardProfile:'A4_FOUR'}}),/anderen Angaben/);
+ const sraReload=await api.readExport(1,sraGame.id,sraCreated.seriesId!,1,13);
+ assert.ok(sraReload.snapshot.version===4);
+ if(sraReload.snapshot.version!==4)throw Error('SRA3 snapshot');
+ assert.deepEqual(sraReload.snapshot.settings.layout,{version:4,format:'SRA3_TWELVE',cardProfile:'A4_SIX',textFont:'PHIL_GUD'});
+ if(process.env.BINGO_SRA3_OUTPUT){mkdirSync(process.env.BINGO_SRA3_OUTPUT,{recursive:true});writeFileSync(join(process.env.BINGO_SRA3_OUTPUT,'generated.json'),JSON.stringify(sraReload));writeFileSync(join(process.env.BINGO_SRA3_OUTPUT,'generation.json'),JSON.stringify({gameId:sraGame.id,seriesId:sraCreated.seriesId,shortCodes:sraReload.cards.map(c=>c.shortCode),layout:sraReload.snapshot.settings.layout}));}
+ // Additional print version of the same cards, preserving the original frozen version.
+ const sraDesign=await api.print.readPrintDesign(1,sraTarget);
+ await api.print.savePrintDesign(1,{target:sraTarget,expectedStateHash:sraDesign.stateHash,config:{...selection,format:'A6_ONE'}});
+ const sraPreview=await api.print.previewPrintDesign(1,{target:sraTarget,seriesId:sraCreated.seriesId});
+ sraPrep=await api.readPreparation(1,sraGame.id);
+ await api.print.redesignSeries(1,{gameId:sraGame.id,seriesId:sraCreated.seriesId,expectedRevision:sraPrep.revision,previewHash:sraPreview.hash,confirmed:true});
+ assert.deepEqual((await api.readExport(1,sraGame.id,sraCreated.seriesId!,1,13,2)).cards,sraReload.cards);
+ assert.deepEqual((await api.readExport(1,sraGame.id,sraCreated.seriesId!,1,13,1)).snapshot,sraReload.snapshot);
+ // Existing baseline series can likewise receive SRA3 as a new, explicitly confirmed version.
+ data=await api.print.readPrintDesign(1,target);
+ await api.print.savePrintDesign(1,{target,expectedStateHash:data.stateHash,config:{...selection,...sraLayout}});
+ const newPreview=await api.print.previewPrintDesign(1,{target,seriesId:sid});prep=await api.readPreparation(1,game.id);
+ await api.print.redesignSeries(1,{gameId:game.id,seriesId:sid,expectedRevision:prep.revision,previewHash:newPreview.hash,confirmed:true});
+ const added=await api.readExport(1,game.id,sid,1,7,3);
+ assert.deepEqual(added.cards,originalCards);assert.equal(added.snapshot.version===4&&added.snapshot.settings.layout?.cardProfile,'A4_SIX');
+ assert.deepEqual((await api.readExport(1,game.id,sid,1,7,1)).snapshot,original.snapshot);
+ await db.query('UPDATE pubquiz.eventreihen SET bingo_print_config=$1 WHERE eventreihe_id=10',[inheritedBefore]);
+ // New LOVD defaults are resolved through real series inheritance without promoting V3 typography.
+ const lovdSeriesBefore=(await db.query('SELECT shared_design_template_id,bingo_print_config FROM pubquiz.eventreihen WHERE eventreihe_id=10')).rows[0];
+ await db.query("UPDATE pubquiz.eventreihen SET shared_design_template_id='lovd-ungegoogelt',bingo_print_config=NULL WHERE eventreihe_id=10");
+ const lovdGame=await api.creation.createBingoEvent(1,{seriesId:10,title:'LOVD inherited partner correction',date:'',time:'',roundCount:1,requestId:randomUUID()});
+ const lovdPrep=await api.readPreparation(1,lovdGame.id);
+ const lovdGenerated=await api.writePreparation(1,{gameId:lovdGame.id,expectedSeriesId:10,revision:lovdPrep.revision,operation:'generate',roundId:lovdPrep.rounds[0].id,count:13,requestId:randomUUID(),printLayout:{format:'SRA3_TWELVE',cardProfile:'A4_FOUR'}});
+ const lovdExport=await api.readExport(1,lovdGame.id,lovdGenerated.seriesId!,1,13);
+ assert.equal(lovdExport.snapshot.version,3);if(lovdExport.snapshot.version!==3)throw Error('V3 retained');assert.equal(lovdExport.snapshot.settings.partnerBack,1);assert.equal(lovdExport.snapshot.settings.colors.header,'#6A241C');assert.ok(lovdExport.snapshot.codeFont);
+ for(const row of (await db.query('SELECT to_jsonb(s) data FROM pubquiz.bingo_card_series s WHERE id=$1',[lovdGenerated.seriesId])).rows)assert.doesNotThrow(()=>inspectRow(row.data,new Set(),'pubquiz','bingo_card_series'));
+ await db.query('UPDATE pubquiz.eventreihen SET shared_design_template_id=$1,bingo_print_config=$2 WHERE eventreihe_id=10',[lovdSeriesBefore.shared_design_template_id,lovdSeriesBefore.bingo_print_config]);
+ console.info('LOVD real inherited V3 generation, corrected RGB, frozen regular code face and backup integrity PASS');
+ console.info('SRA3 inherited profile, explicit generation, idempotence/reload, immutable historical and additional print versions: PASS');
  console.info('V4 populated additive migration, strict template selection, role/product gates, immutable redesign, historical export and frozen integrity: PASS');
 }
 

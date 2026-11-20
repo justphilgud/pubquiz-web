@@ -177,3 +177,9 @@ allein aus Canvas, Textextraktion oder mathematischer Spiegelung ableiten.
 ### Bingo-Matching (Vertragsversion 2)
 
 Die neue gezielte Erweiterung ist in [bingo-matching.md](./bingo-matching.md) beschrieben: unabhängige Medien-/Kartenantwort, unveränderliche spielgebundene Fassung, 90 Verwaltungszeilen bei unverändertem 75er-Regelkern und aktuelle Berechtigungsprüfung. Bestehende V1-Karten-/Laufzeitverträge bleiben erhalten. Vollständige Zuordnungen und Medienbytes gehören ausdrücklich nicht in regelmäßige Statusabfragen. Praktische Nachweise und Grenzen stehen im zugehörigen Matching-Abnahmebericht.
+
+## SRA3-Ergänzung (20.11.2026)
+
+[SRA3](bingo-sra3.md) verwendet die bisherigen Kartenkanten und V3-Textregeln unverändert auf einem zusätzlichen 3×4-Bogen. Das 89-mm-Profil behält insbesondere seine 36-Zeichen-Vorgrenze.
+
+Für neue LOVD-Druckstände ergänzt [die gespeicherte Partnergestaltung aus PR174](bingo-sra3.md#lovd-partnerkorrektur-in-pr174-20112026) die Rückseite und offiziellen Markenflächen. V3-Fronttypografie und Textregeln bleiben erhalten; alte Druckstände ohne Marker behalten ihre bisherige Ausführung.

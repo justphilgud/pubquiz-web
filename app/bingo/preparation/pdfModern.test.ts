@@ -17,7 +17,7 @@ test('V3 renderer embeds original Phil Gud digits, separates IDs onto backs and 
   const template=getPresentationTemplate('phil-gud')!,design:SharedDesign={version:1,templateId:template.id,name:'Phil Gud',config:{version:1,tokens:template.tokens,design:template.design,surfaces:{presentation:template.variant,moderation:'BRANDED',answerForm:'BRANDED'}}};
   const cards:StoredCard[]=Array.from({length:7},(_,i)=>({id:`card-${i}`,code:`BG-0123456789AB-000${i+1}`,shortCode:`A-00${i+1}`,ordinal:i+1,cells:[[1,16,31,46,61],[2,17,32,47,62],[3,18,null,48,63],[4,19,34,49,64],[5,20,35,50,65]]}));
   for(const format of Object.keys(printFormats) as PrintFormat[]){
-    const settings=newBingoPrint(design);settings.layout!.format=format;
+    const settings=newBingoPrint(design);settings.layout!.format=format;if(format==='SRA3_TWELVE')settings.layout!.cardProfile='A4_FOUR';
     const snapshot=await api.capturePrintSnapshot(design,'Titel','Runde 1',settings);
     assert.equal(snapshot.version,3);if(snapshot.version!==3)throw Error('snapshot');
     assert.equal(snapshot.settings.numberFont,'PHIL_GUD');

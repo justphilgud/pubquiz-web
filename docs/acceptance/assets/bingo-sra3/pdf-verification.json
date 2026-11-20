@@ -1,0 +1,28 @@
+{
+  "cases": 36,
+  "cardSidesCompared": 72,
+  "maximumMeanPixelDifference": 0.8385954717630854,
+  "maximumChangedFraction": 0.0067937901744719925,
+  "pageMm": [
+    320,
+    450
+  ],
+  "edgesMm": [
+    89.0,
+    92.5,
+    93.0
+  ],
+  "duplexCounts": [
+    1,
+    12,
+    13
+  ],
+  "range": "5\u201317",
+  "browser": {
+    "duplexPages": 4,
+    "frontPages": 2,
+    "previewPages": 2,
+    "all13FrontsAndBackCodesVerified": true,
+    "previewMatchesFirstSheet": true
+  }
+}

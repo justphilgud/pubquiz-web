@@ -38,7 +38,7 @@ test('V4 actual PDFs: both brands, numbers/text, all formats, immutable IDs, emb
  const words=['ABBA','Bob Dylan','Take That','Queen','Adele','Lady Gaga','Pink Floyd','U2','Die Ärzte','Falco','Nena','AC/DC','Oasis','Prince','Lou Reed','Bon Jovi','Elton John','Boney M.','Kiss','Earth Wind & Fire','Dua Lipa','Billy Joel','R.E.M.','The Who'];
  const terms=parseTermSet({version:1,name:'Synthetische Musik',publication:'DIRECT',entries:Array.from({length:75},(_,i)=>({number:i+1,text:words[i]??`Band ${i+1}`}))});
  for(const template of systemPrintTemplates())for(const format of Object.keys(printFormats) as PrintFormat[]){
-  const settings=structuredClone(template.config.bingoPrint!);settings.layout!.format=format;
+  const settings=structuredClone(template.config.bingoPrint!);settings.layout!.format=format;if(format==='SRA3_TWELVE')settings.layout!.cardProfile='A4_FOUR';
   const numeric=await api.capturePrintSnapshot(design,'Vorschau','Runde 1',settings,{id:template.id,name:template.name});assert.equal(numeric.version,4);if(numeric.version!==4)throw Error('snapshot');
   assert.deepEqual(numeric.templateSource,{id:template.id,name:template.name});
   const g=geometry(format),face=api.regularFace(Buffer.from(numeric.text.bytes,'base64'));

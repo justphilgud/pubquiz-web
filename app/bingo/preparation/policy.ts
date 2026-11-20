@@ -1,3 +1,4 @@
+import {parsePrintLayout,type PrintLayout} from './printFormats';
 import type { TermSet } from './termSet';
 import { isGameId } from "@/app/games/gameDraft";
 import { validateCard, type CardLayout } from "../core/cards";
@@ -17,7 +18,7 @@ export type BingoCommand = Base & (
   | { operation: "saveRound"; roundId: string; label: string; target: number; strategy: CardStrategy; issued: number | null }
   | { operation: "moveRound"; roundId: string; direction: -1 | 1 }
   | { operation: "removeRound"; roundId: string }
-  | { operation: "generate"; roundId: string; count: number; requestId: string }
+  | { operation: "generate"; roundId: string; count: number; requestId: string; printLayout?: PrintLayout }
   | { operation: "attach" | "detach"; roundId: string; seriesId: string }
 );
 function integer(value: unknown, min: number, max: number, field: string): number {
@@ -42,7 +43,7 @@ export function parseCommand(input: unknown): BingoCommand {
       if (r.direction !== -1 && r.direction !== 1) throw denied();
       result = { ...base, operation: r.operation, roundId: uuid(r.roundId), direction: r.direction }; break;
     case "removeRound": result = { ...base, operation: r.operation, roundId: uuid(r.roundId) }; break;
-    case "generate": result = { ...base, operation: r.operation, roundId: uuid(r.roundId), count: integer(r.count, 1, MAX_GENERATE, "count"), requestId: uuid(r.requestId) }; break;
+    case "generate": result = { ...base, operation: r.operation, roundId: uuid(r.roundId), count: integer(r.count, 1, MAX_GENERATE, "count"), requestId: uuid(r.requestId), ...(r.printLayout===undefined?{}:{printLayout:parsePrintLayout(r.printLayout)}) }; break;
     case "attach": case "detach": result = { ...base, operation: r.operation, roundId: uuid(r.roundId), seriesId: uuid(r.seriesId) }; break;
     default: throw denied();
   }
@@ -70,5 +71,5 @@ export function decodeCard(value: unknown): CardLayout {
 }
 export type RoundView = { terms?:TermSet|null; locked?:boolean; id: string; position: number; label: string; target: number; strategy: CardStrategy; issued: number | null; cardCount: number; series: { id: string; code: string; count: number;duplex?:boolean }[]; history: { actor: string; at: string; before: number | null; after: number | null }[] };
 export type SeriesView = { id: string; code: string; count: number; originRoundId: string; createdAt: string; designName: string; olderDesign: boolean };
-export type PreparationView = { termSets?:{id:string;config:TermSet;createdAt?:string}[]; gameId: string; title: string; seriesId: number; revision: number; archived: boolean; rounds: RoundView[]; roundCount: number; page: number; available: SeriesView[]; seriesPage: number; seriesCount: number };
+export type PreparationView = { printLayout?:PrintLayout; termSets?:{id:string;config:TermSet;createdAt?:string}[]; gameId: string; title: string; seriesId: number; revision: number; archived: boolean; rounds: RoundView[]; roundCount: number; page: number; available: SeriesView[]; seriesPage: number; seriesCount: number };
 export type StoredCard = { id: string; code: string; shortCode?: string; ordinal: number; cells: CardLayout };
