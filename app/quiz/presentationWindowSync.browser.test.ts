@@ -29,7 +29,9 @@ test("presentation acknowledges committed targets without focus or animation fra
  const root=createRoot(document.getElementById('root'));
  const publicWindow=location.search.includes('public');
  window.framesRequested=0;
- if(publicWindow) window.requestAnimationFrame=()=>{window.framesRequested++;return 0};
+ window.freezeFrames=()=>{window.requestAnimationFrame=()=>{window.framesRequested++;return 0}};
+ window.receipts=[];
+ if(!publicWindow){const observer=new BroadcastChannel('pubquiz-presentation-904');observer.onmessage=({data})=>{if(data.kind==='applied'||data.kind==='rendered')window.receipts.push(data)}}
  function Player({position}){usePresentationRenderReceipt(904,position.key,position.reveal);return <h1>{position.key}:{position.reveal}</h1>}
  function Moderator(){const wait=usePresentationWindowReceipt(904);window.check=position=>{window.done=null;wait(position).then(result=>window.done=result)};return <button>Moderation bleibt fokussiert</button>}
  window.show=position=>flushSync(()=>root.render(publicWindow?<Player position={position}/>:<Moderator/>));
@@ -123,6 +125,9 @@ test("presentation acknowledges committed targets without focus or animation fra
     const player=await call('Target.attachToTarget',{targetId:playerTarget.targetId,flatten:true});
     async function playerEval(expression:string){const r=await call('Runtime.evaluate',{expression,returnByValue:true},player.sessionId);assert.equal(r.exceptionDetails,undefined);return r.result?.value;}
     for(let i=0;i<100 && !await playerEval("typeof window.show==='function'");i++)await delay(50);
+    for(let i=0;i<100 && !await evaluate('window.receipts.length>0');i++)await delay(50);
+    assert.ok(await evaluate("window.receipts.some(p=>p.key==='block:1')"),'established player peer before losing focus');
+    await playerEval('window.freezeFrames()');
     await call('Target.activateTarget',{targetId});
     await delay(200);
     assert.equal(await playerEval('document.hasFocus()'),false,'presentation has no focus');
@@ -131,6 +136,7 @@ test("presentation acknowledges committed targets without focus or animation fra
       await playerEval('window.show('+JSON.stringify(position)+')');
       for(let i=0;i<100 && !await evaluate('window.done===true');i++)await delay(50);
       assert.equal(await evaluate('window.done'),true,JSON.stringify(position));
+      assert.ok(await evaluate('window.receipts.some(p=>p.key==='+JSON.stringify(position.key)+'&&p.reveal==='+position.reveal+')'),'target receipt really arrived over BroadcastChannel');
       assert.equal(await playerEval('document.hasFocus()'),false);
     }
     assert.equal(await playerEval('window.framesRequested'),0,'no rAF required for commit acknowledgement');
