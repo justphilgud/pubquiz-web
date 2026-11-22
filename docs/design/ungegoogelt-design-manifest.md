@@ -485,8 +485,10 @@ halten den Fokusmoment und enthüllen danach Platz 3, 2 und 1. Die Bewegung wird
 den bestehenden Moderationsschritten ausgelöst und darf deren Bestätigung nicht
 verzögern. Platz 1 erhält eine längere, deutlich gesteigerte Choreografie; danach
 bleibt die Szene mit dezentem, pixelartigem Wippen bis zum nächsten Klick stehen.
-Bei `prefers-reduced-motion` entfallen die Animationen, die Reihenfolge und die
-kurze Fokus-Pause bleiben verständlich.
+Bei `prefers-reduced-motion` entfallen Animationen und Fokus-Pause; die nächste
+vorhandene Ranggruppe erscheint unmittelbar an ihrer Endposition. Das gilt auch
+für Konfetti und die Pseudo-Elemente des Raketenschweifs. Quadratische Bildflächen
+bewahren Fotos vollständig mit `contain`, statt Gesichter zum Füllen anzuschneiden.
 
 ### Was wir vermeiden
 

@@ -18,7 +18,7 @@ neue Datenbankfelder noch Migrationen oder zusätzliche Abhängigkeiten.
 Die vorhandenen Moderationsklicks lösen weiterhin genau die Enthüllungen 3 → 2 → 1
 aus. Animationen und Zeitgeber sind rein lokal und quittieren oder verzögern keinen
 Folienwechsel. Bei `prefers-reduced-motion` entfallen CSS-Animationen; die kurze
-Fokus-Pause und die vorhandene Reihenfolge bleiben bestehen.
+Reihenfolge bleibt bestehen; die Teamkarte erscheint unmittelbar ohne Fokus-Pause.
 
 ## Änderungen
 
@@ -49,6 +49,24 @@ Fokus-Pause und die vorhandene Reihenfolge bleiben bestehen.
   Ergebnis aus der PR-CI steht noch aus.
 
 ## Weitere Abnahme
+
+### Vervollständigung von PR177
+
+Der vorhandene PR wird auf ausdrücklichen Nutzerwunsch weiterverwendet. Bei der
+technischen Prüfung ergänzt: sofortige Endposition bei reduzierter Bewegung,
+abgeschaltete Schweif-/Pseudo-Elementanimationen, begrenzte fokussierbare Fläche
+für große Gleichstände sowie Erhalt konfigurierter Folientitel/Beschreibungen.
+Die Architektur trennt unveränderte Ranglisten-/Snapshot-/Navigationslogik von
+lokaler Choreografie und rein dekorativer Crowd. Keine Migration, neue Abhängigkeit
+oder Änderung von Bewertungen. Keine Production-Aktion und kein Merge beauftragt.
+
+Zusätzliche Browserfälle: schnelle Revealfolge 0→1→3 ohne verspäteten alten Timer,
+erneutes Öffnen eines enthüllten Gewinnerstands ohne neues Finale, zwölf Teams im
+Gleichstand, quadratische breite/hohe Fotos und `prefers-reduced-motion` auch für
+Pseudo-Elemente. Lokaler echter Zwei-Fenster-Browserlauf erfolgreich; 70 fokussierte
+Unit-/Renderer-/Snapshot-/Navigationsregressionen, Typecheck und Changed-file ESLint
+erfolgreich. Die nachstehenden früheren lokalen Umgebungseinschränkungen sind damit
+historisch; aktuelle CI und gehostete Preview folgen für den Abschlussstand.
 
 Die Browserregression fand bei hochkantigem Teamfoto eine nicht quadratische
 Bildfläche. Der Rahmen wurde auf eine feste quadratische Fläche mit begrenzter

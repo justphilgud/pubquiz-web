@@ -38,7 +38,7 @@ test("presentation acknowledges committed targets without focus or animation fra
  function Moderator(){const wait=usePresentationWindowReceipt(904);window.check=position=>{window.done=null;wait(position).then(result=>window.done=result)};return <button>Moderation bleibt fokussiert</button>}
  window.show=position=>flushSync(()=>root.render(publicWindow?<Player position={position}/>:<Moderator/>));
  const podiumScores=[{teamId:1,teamname:'Ohne Foto',punkte:30},{teamId:2,teamname:'Breit',punkte:20,photoUrl:'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="80"><rect width="800" height="80" fill="red"/></svg>')},{teamId:3,teamname:'Hoch',punkte:10,photoUrl:'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="800"><rect width="80" height="800" fill="blue"/></svg>')}];
- window.podiumReveal=revealCount=>flushSync(()=>root.render(<div className="presentation-template presentation-readable" data-design-style="EDITORIAL" style={{height:'90vh',containerType:'size',display:'flex',flexDirection:'column',background:'#14181C','--quiz-text':'#FFF9E9','--quiz-background':'#14181C','--quiz-surface':'#302C29','--quiz-border':'#FFF9E9'}}><PodiumCeremony revealCount={revealCount} scores={podiumScores}/></div>));
+ window.podiumReveal=(revealCount,scores=podiumScores)=>flushSync(()=>root.render(<div className="presentation-template presentation-readable" data-design-style="EDITORIAL" style={{height:'90vh',containerType:'size',display:'flex',flexDirection:'column',background:'#14181C','--quiz-text':'#FFF9E9','--quiz-background':'#14181C','--quiz-surface':'#302C29','--quiz-border':'#FFF9E9'}}><PodiumCeremony revealCount={revealCount} scores={scores}/></div>));
  window.podium=()=>window.podiumReveal(3);
  window.show({key:'block:1',reveal:1});
  window.duration=()=>flushSync(()=>root.render(<QuestionDurationPreview value={{questionSeconds:4,translationSeconds:8,audioUrls:[{url:'/tone.wav',label:'Audiodatei'}]}}/>));
@@ -195,6 +195,23 @@ test("presentation acknowledges committed targets without focus or animation fra
     await delay(350);
     assert.equal(await evaluate("getComputedStyle(document.querySelector('.podium-firework-tail')).opacity"),'0');
     assert.equal(await evaluate("document.querySelectorAll('.podium-team').length"),3);
+    await evaluate('window.podiumReveal(0);window.podiumReveal(1);window.podiumReveal(3)');
+    await delay(2300);
+    assert.equal(await evaluate("document.querySelector('.podium-ceremony').dataset.phase"),'winner','an old settling timer must not replace a newer reveal');
+    await evaluate('window.guide();window.podiumReveal(3)');
+    assert.equal(await evaluate("document.querySelector('.podium-ceremony').dataset.phase"),'finale','reopening a persisted winner does not replay the rocket');
+    assert.equal(await evaluate("document.querySelectorAll('.podium-confetti-piece').length"),0);
+    await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]},sessionId);
+    await evaluate('window.podiumReveal(0);window.podiumReveal(1)');
+    assert.equal(await evaluate("document.querySelector('.podium-ceremony').dataset.phase"),'rank3-hold');
+    assert.equal(await evaluate("getComputedStyle(document.querySelector('.podium-team')).visibility"),'visible');
+    await evaluate('window.podiumReveal(3)');
+    assert.equal(await evaluate("getComputedStyle(document.querySelector('.podium-firework-tail')).display"),'none');
+    assert.equal(await evaluate("document.querySelector('.podium-ceremony').getAnimations({subtree:true}).filter(a=>a.playState==='running').length"),0,'reduced motion includes decorative pseudo-elements');
+    await evaluate('window.podiumReveal(0);window.podiumReveal(1,Array.from({length:12},(_,i)=>({teamId:i+1,teamname:"Punktgleiches Team "+i,punkte:50})))');
+    assert.equal(await evaluate("document.querySelectorAll('.podium-identity').length"),12);
+    assert.ok(await evaluate("(()=>{const e=document.querySelector('.podium-team-content'),r=e.getBoundingClientRect();return e.tabIndex===0&&e.scrollHeight>e.clientHeight&&r.top>=0&&r.bottom<=innerHeight})()"),'large ties remain accessible in a bounded focusable scroll area');
+    await call('Emulation.setEmulatedMedia',{features:[]},sessionId);
     await evaluate('window.duration()');
     for(let i=0;i<100 && !await evaluate("document.body.textContent.includes('Dateidauer')");i++)await delay(50);
     const text=await evaluate<string>('document.body.textContent');

@@ -93,6 +93,12 @@ export function PodiumCeremony({ scores, revealCount, showPoints = true }: {
     }
 
     setEnteringPlace(latestPlace);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      clearSettling(true);
+      setEnteringPlace(null);
+      setPhase(stablePhase(revealCount, latestPlace));
+      return;
+    }
     if (previous === 0 && revealCount === 1) {
       const friends = Array.from(stageRef.current?.querySelectorAll<HTMLElement>("[data-podium-friend]") ?? []);
       const transforms = friends.map((friend) => getComputedStyle(friend).transform);
@@ -178,7 +184,8 @@ export function PodiumCeremony({ scores, revealCount, showPoints = true }: {
       data-place={group.place}
       data-entering={enteringPlace === group.place ? "true" : undefined}
     >
-      <div className="podium-team-content">
+      <div className="podium-team-content" tabIndex={group.entries.length > 2 ? 0 : undefined}
+        aria-label={group.entries.length > 2 ? `Punktgleiche Teams auf Platz ${group.place}; bei Bedarf scrollen` : undefined}>
         <b className="podium-rank-label">Platz {group.place}</b>
         <div className="podium-identities" data-count={group.entries.length}>
           {group.entries.map((team, index) => <div

@@ -1373,6 +1373,7 @@ function renderZwischenstandSlide() {
 
 function renderEndstandSlide() {
   return <section className="presentation-flow-slide presentation-flow-ranking presentation-ranking-ceremony" data-flow-type="WINNER">
+    <h2 className="podium-scene-title">Das Podium</h2>
     <PodiumCeremony scores={punktestand} revealCount={endstandRevealCount} />
   </section>;
 }
@@ -2290,6 +2291,8 @@ function renderFlowStandingsSlide(
       className="presentation-flow-slide presentation-flow-ranking presentation-ranking-ceremony"
       data-flow-type={type}
     >
+      <h2 className="podium-scene-title">{config.title ?? "Das Podium"}</h2>
+      {config.body && <p className="podium-scene-description">{config.body}</p>}
       <PodiumCeremony scores={punktestand} revealCount={endstandRevealCount} showPoints={showPoints} />
 
     </section>
