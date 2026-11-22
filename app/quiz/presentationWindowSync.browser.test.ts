@@ -3,7 +3,7 @@ import { spawn } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { basename, join, resolve } from "node:path";
 import test from "node:test";
 import { setTimeout as delay } from "node:timers/promises";
 import { build } from "esbuild";
@@ -12,7 +12,7 @@ import tailwindcss from "@tailwindcss/postcss";
 
 type ProtocolResult = { targetId?: string; sessionId?: string; result?: { value?: unknown }; exceptionDetails?: unknown };
 
-test("presentation acknowledges committed targets without focus or animation frames", { timeout: 60_000 }, async () => {
+test("presentation acknowledges committed targets without focus or animation frames", { timeout: 120_000 }, async () => {
   const chrome = [process.env.CHROME_BIN, "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
     "/usr/bin/google-chrome", "/usr/bin/chromium"].find((path) => path && existsSync(path));
   assert.ok(chrome, "Chrome required");
@@ -37,7 +37,9 @@ test("presentation acknowledges committed targets without focus or animation fra
  function Player({position}){usePresentationRenderReceipt(904,position.key,position.reveal);return <h1>{position.key}:{position.reveal}</h1>}
  function Moderator(){const wait=usePresentationWindowReceipt(904);window.check=position=>{window.done=null;wait(position).then(result=>window.done=result)};return <button>Moderation bleibt fokussiert</button>}
  window.show=position=>flushSync(()=>root.render(publicWindow?<Player position={position}/>:<Moderator/>));
- window.podium=()=>flushSync(()=>root.render(<div className="presentation-template presentation-readable" data-design-style="EDITORIAL" style={{height:'90vh',containerType:'size',display:'flex',flexDirection:'column',background:'#14181C','--quiz-text':'#FFF9E9','--quiz-background':'#14181C','--quiz-surface':'#302C29','--quiz-border':'#FFF9E9'}}><PodiumCeremony revealCount={3} scores={[{teamname:'Ohne Foto',punkte:30},{teamname:'Breit',punkte:20,photoUrl:'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="80"><rect width="800" height="80" fill="red"/></svg>')},{teamname:'Hoch',punkte:10,photoUrl:'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="800"><rect width="80" height="800" fill="blue"/></svg>')}]}/></div>));
+ const podiumScores=[{teamId:1,teamname:'Ohne Foto',punkte:30},{teamId:2,teamname:'Breit',punkte:20,photoUrl:'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="800" height="80"><rect width="800" height="80" fill="red"/></svg>')},{teamId:3,teamname:'Hoch',punkte:10,photoUrl:'data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="800"><rect width="80" height="800" fill="blue"/></svg>')}];
+ window.podiumReveal=revealCount=>flushSync(()=>root.render(<div className="presentation-template presentation-readable" data-design-style="EDITORIAL" style={{height:'90vh',containerType:'size',display:'flex',flexDirection:'column',background:'#14181C','--quiz-text':'#FFF9E9','--quiz-background':'#14181C','--quiz-surface':'#302C29','--quiz-border':'#FFF9E9'}}><PodiumCeremony revealCount={revealCount} scores={podiumScores}/></div>));
+ window.podium=()=>window.podiumReveal(3);
  window.show({key:'block:1',reveal:1});
  window.duration=()=>flushSync(()=>root.render(<QuestionDurationPreview value={{questionSeconds:4,translationSeconds:8,audioUrls:[{url:'/tone.wav',label:'Audiodatei'}]}}/>));
  window.balance=(categorized=true)=>flushSync(()=>root.render(<QuizBalanceSummary balance={getQuizBalance({questions:Array.from({length:25},(_,i)=>({sectionId:1,templateId:'musik',answerMode:'OPEN',categoryIds:categorized&&i===0?[1]:[]})),sections:[{id:1,title:'Prüfblock'}],categories:[{id:1,name:'Film'},{id:2,name:'Kultur'}]})}/>));
@@ -55,8 +57,13 @@ test("presentation acknowledges committed targets without focus or animation fra
       define: { "process.env.NODE_ENV": '"production"', "process.env": "{}" } }),
     postcss([tailwindcss()]).process(readFileSync('app/globals.css','utf8'), { from: resolve("app/globals.css") }),
   ]);
+  const podiumAssets = resolve("public/assets/podium-ceremony");
   const server = createServer((request, response) => {
-    if (request.url === "/tone.wav") {
+    if (request.url?.startsWith("/assets/podium-ceremony/")) {
+      const assetPath = join(podiumAssets, basename(decodeURIComponent(request.url)));
+      response.setHeader("Content-Type", "image/webp");
+      response.end(readFileSync(assetPath));
+    } else if (request.url === "/tone.wav") {
       const wav=Buffer.alloc(32044); wav.write('RIFF');wav.writeUInt32LE(32036,4);wav.write('WAVEfmt ',8);wav.writeUInt32LE(16,16);wav.writeUInt16LE(1,20);wav.writeUInt16LE(1,22);wav.writeUInt32LE(8000,24);wav.writeUInt32LE(16000,28);wav.writeUInt16LE(2,32);wav.writeUInt16LE(16,34);wav.write('data',36);wav.writeUInt32LE(32000,40);
       response.setHeader('Content-Type','audio/wav');response.end(wav);
     } else if (request.url === "/bundle.js") {
@@ -148,14 +155,43 @@ test("presentation acknowledges committed targets without focus or animation fra
       assert.equal(await playerEval('document.hasFocus()'),false);
     }
     assert.equal(await playerEval('window.framesRequested'),0,'no rAF required for commit acknowledgement');
-    await evaluate('window.podium()');
+    await evaluate('window.podiumReveal(0)');
+    assert.equal(await evaluate("document.querySelectorAll('[data-podium-friend]').length"),5);
+    assert.equal(await evaluate("document.querySelectorAll('.podium-team').length"),0);
+    assert.equal(await evaluate("document.querySelector('.podium-ceremony').dataset.phase"),'dance');
+    assert.match(await evaluate("getComputedStyle(document.querySelector('.podium-ceremony')).backgroundImage"),/stage\.webp/);
+    assert.equal(await evaluate("getComputedStyle(document.querySelector('[data-podium-friend=teal]')).animationName"),'podium-dance-teal');
+    await evaluate('window.podiumReveal(1)');
+    assert.equal(await evaluate("document.querySelector('.podium-ceremony').dataset.phase"),'settling');
+    assert.equal(await evaluate("getComputedStyle(document.querySelector('.podium-team')).visibility"),'hidden');
+    await delay(2300);
+    assert.equal(await evaluate("document.querySelector('.podium-ceremony').dataset.phase"),'rank3-reveal');
+    assert.equal(await evaluate("document.querySelector('.podium-team').dataset.place"),'3');
+    assert.equal(await evaluate("document.querySelectorAll('.podium-confetti-piece').length"),56);
+    assert.equal(await evaluate("getComputedStyle(document.querySelector('[data-podium-friend=yellow]')).animationName"),'podium-happy-bounce');
+    await evaluate('window.podiumReveal(2)');
+    assert.equal(await evaluate("document.querySelector('.podium-ceremony').dataset.phase"),'rank2-reveal');
+    assert.equal(await evaluate("document.querySelectorAll('.podium-confetti-piece').length"),74);
+    await evaluate('window.podiumReveal(3)');
+    assert.equal(await evaluate("document.querySelector('.podium-ceremony').dataset.phase"),'winner');
+    assert.equal(await evaluate("getComputedStyle(document.querySelector('[data-podium-friend=gudi]')).animationName"),'podium-gudi-firework-flight');
+    assert.equal(await evaluate("getComputedStyle(document.querySelector('[data-podium-friend=teal]')).animationName"),'podium-teal-boomerang');
+    assert.equal(await evaluate("document.querySelectorAll('.podium-confetti-piece').length"),112);
+    assert.equal(await evaluate("document.querySelectorAll('.podium-team-photo').length"),3);
+    assert.equal(await evaluate("[...document.querySelectorAll('.podium-team-photo')].filter(img=>img.src.startsWith('data:image/svg+xml')).length"),2);
+    assert.ok(await evaluate("[...document.querySelectorAll('.podium-team-photo-frame')].every(frame=>Math.abs(frame.getBoundingClientRect().width-frame.getBoundingClientRect().height)<2)"));
+    assert.equal(await evaluate("getComputedStyle(document.querySelector('.podium-firework-tail')).opacity"),'1');
+    assert.match(await evaluate("getComputedStyle(document.querySelector('.podium-gudi-art--hat')).backgroundImage"),/gudi-party-hat\.webp/);
     await delay(4000);
-    assert.equal(await evaluate("document.querySelectorAll('.podium-team-photo').length"),2);
-    assert.equal(await evaluate("[...document.querySelectorAll('.podium-identity')].find(x=>x.textContent==='Ohne Foto').querySelectorAll('img').length"),0);
     assert.ok(await evaluate("[...document.querySelectorAll('.podium-team-photo')].every(img=>getComputedStyle(img).objectFit==='contain' && img.getBoundingClientRect().height>=72)"));
     mkdirSync('.artifacts/quiz-corrections',{recursive:true});
     const screenshot=await call('Page.captureScreenshot',{format:'png'},sessionId) as {data:string};
     writeFileSync('.artifacts/quiz-corrections/podium.png',Buffer.from(screenshot.data,'base64'));
+    await delay(4200);
+    assert.equal(await evaluate("document.querySelector('.podium-ceremony').dataset.phase"),'finale');
+    assert.equal(await evaluate("getComputedStyle(document.querySelector('[data-podium-friend=gudi]')).animationName"),'podium-n64-sway');
+    assert.equal(await evaluate("getComputedStyle(document.querySelector('.podium-firework-tail')).opacity"),'0');
+    assert.equal(await evaluate("document.querySelectorAll('.podium-team').length"),3);
     await evaluate('window.duration()');
     for(let i=0;i<100 && !await evaluate("document.body.textContent.includes('Dateidauer')");i++)await delay(50);
     const text=await evaluate<string>('document.body.textContent');
@@ -186,8 +222,9 @@ test("presentation acknowledges committed targets without focus or animation fra
   } finally {
     socket?.close();
     if (browser.exitCode === null && browser.pid) {
+      const exited = new Promise<void>((done) => browser.once("exit", () => done()));
       browser.kill();
-      await new Promise<void>((done) => browser.once("exit", () => done()));
+      await Promise.race([exited, delay(2_000)]);
     }
     await new Promise<void>((done) => server.close(() => done()));
     rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 });

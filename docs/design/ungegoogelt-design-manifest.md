@@ -479,6 +479,15 @@ Bewegung ist präzise, ruhig und sicher. Spielerische Momente dürfen lebendiger
 
 Stillstand ist Teil der Choreografie. Ein bedeutender Moment braucht Zeit, um wahrgenommen zu werden. Nicht jede Sekunde muss animiert sein.
 
+Die Siegerehrung ist eine gezielte Ausnahme von der ruhigen Grundbewegung: Vor der
+ersten Enthüllung tanzen die Figuren über die Bühne; beim Klick sammeln sie sich,
+halten den Fokusmoment und enthüllen danach Platz 3, 2 und 1. Die Bewegung wird mit
+den bestehenden Moderationsschritten ausgelöst und darf deren Bestätigung nicht
+verzögern. Platz 1 erhält eine längere, deutlich gesteigerte Choreografie; danach
+bleibt die Szene mit dezentem, pixelartigem Wippen bis zum nächsten Klick stehen.
+Bei `prefers-reduced-motion` entfallen die Animationen, die Reihenfolge und die
+kurze Fokus-Pause bleiben verständlich.
+
 ### Was wir vermeiden
 
 - dauerhafte Bewegung im Hintergrund
