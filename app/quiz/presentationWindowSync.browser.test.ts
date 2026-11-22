@@ -179,7 +179,8 @@ test("presentation acknowledges committed targets without focus or animation fra
     assert.equal(await evaluate("document.querySelectorAll('.podium-confetti-piece').length"),112);
     assert.equal(await evaluate("document.querySelectorAll('.podium-team-photo').length"),3);
     assert.equal(await evaluate("[...document.querySelectorAll('.podium-team-photo')].filter(img=>img.src.startsWith('data:image/svg+xml')).length"),2);
-    assert.ok(await evaluate("[...document.querySelectorAll('.podium-team-photo-frame')].every(frame=>Math.abs(frame.getBoundingClientRect().width-frame.getBoundingClientRect().height)<2)"));
+    const photoFrameSizes=await evaluate<Array<{width:number;height:number}>>("[...document.querySelectorAll('.podium-team-photo-frame')].map(frame=>{const r=frame.getBoundingClientRect();return {width:r.width,height:r.height}})");
+    assert.ok(photoFrameSizes.every(frame=>Math.abs(frame.width-frame.height)<2),`Podium photo frames must stay square: ${JSON.stringify(photoFrameSizes)}`);
     assert.equal(await evaluate("getComputedStyle(document.querySelector('.podium-firework-tail')).opacity"),'1');
     assert.match(await evaluate("getComputedStyle(document.querySelector('.podium-gudi-art--hat')).backgroundImage"),/gudi-party-hat\.webp/);
     await delay(4000);
