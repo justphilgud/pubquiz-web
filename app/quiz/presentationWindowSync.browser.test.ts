@@ -181,6 +181,7 @@ test("presentation acknowledges committed targets without focus or animation fra
     assert.equal(await evaluate("[...document.querySelectorAll('.podium-team-photo')].filter(img=>img.src.startsWith('data:image/svg+xml')).length"),2);
     const photoFrameSizes=await evaluate<Array<{width:number;height:number}>>("[...document.querySelectorAll('.podium-team-photo-frame')].map(frame=>{const r=frame.getBoundingClientRect();return {width:r.width,height:r.height}})");
     assert.ok(photoFrameSizes.every(frame=>Math.abs(frame.width-frame.height)<2),`Podium photo frames must stay square: ${JSON.stringify(photoFrameSizes)}`);
+    await delay(350);
     assert.equal(await evaluate("getComputedStyle(document.querySelector('.podium-firework-tail')).opacity"),'1');
     assert.match(await evaluate("getComputedStyle(document.querySelector('.podium-gudi-art--hat')).backgroundImage"),/gudi-party-hat\.webp/);
     await delay(4000);
@@ -191,6 +192,7 @@ test("presentation acknowledges committed targets without focus or animation fra
     await delay(4200);
     assert.equal(await evaluate("document.querySelector('.podium-ceremony').dataset.phase"),'finale');
     assert.equal(await evaluate("getComputedStyle(document.querySelector('[data-podium-friend=gudi]')).animationName"),'podium-n64-sway');
+    await delay(350);
     assert.equal(await evaluate("getComputedStyle(document.querySelector('.podium-firework-tail')).opacity"),'0');
     assert.equal(await evaluate("document.querySelectorAll('.podium-team').length"),3);
     await evaluate('window.duration()');

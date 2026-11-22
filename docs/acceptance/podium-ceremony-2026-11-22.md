@@ -48,10 +48,11 @@ Fokus-Pause und die vorhandene Reihenfolge bleiben bestehen.
   Rangkonfetti, Fotos, quadratische Bildrahmen, Partyhut und Raketenabschluss; ihr
   Ergebnis aus der PR-CI steht noch aus.
 
-## Release-Status
+## Weitere Abnahme
 
-Diese Änderung baut auf dem offenen PR #175 auf, dessen geschützter
-Production-Backup-Lauf am 22.11.2026 noch aktiv war. Um dessen geprüften
-Releasekandidaten nicht auszutauschen, liegt die Animation auf einem separaten
-Branch. PR, gehostete Preview, CI und Production-Smoke folgen über diesen Branch.
-Noch kein Merge, kein Production-Deployment und keine Produktionsdatenänderung.
+Die Browserregression fand bei hochkantigem Teamfoto eine nicht quadratische
+Bildfläche. Der Rahmen wurde auf eine feste quadratische Fläche mit begrenzter
+Mindesthöhe umgestellt. Die korrigierte Browserregression prüft außerdem, dass die
+Schweif-Einblendung und das Jubelbild vollständig auslaufen. PR-CI und Preview müssen
+vor dem Merge erfolgreich abgenommen werden. Diese Änderung ergänzt keine
+Quizfragen, Bewertungen oder Live-Daten.
