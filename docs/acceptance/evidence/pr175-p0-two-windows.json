@@ -1,0 +1,4375 @@
+{
+  "rows": [
+    {
+      "run": 0,
+      "cid": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+      "requestId": "8mqtg-1795359021098-50f0854b7dd5",
+      "phases": [
+        {
+          "id": "9hkcp-1795359021898-131861eb7052",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "snapshot-poll",
+          "event": "start",
+          "at": 1795359021976
+        },
+        {
+          "id": "9hkcp-1795359021898-131861eb7052",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "snapshot-poll",
+          "event": "end",
+          "at": 1795359022002,
+          "durationMs": 26
+        },
+        {
+          "id": "9hkcp-1795359021898-131861eb7052",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359021938
+        },
+        {
+          "id": "9hkcp-1795359021898-131861eb7052",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359021940
+        },
+        {
+          "id": "9hkcp-1795359021898-131861eb7052",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359021940,
+          "durationMs": 0
+        },
+        {
+          "id": "9hkcp-1795359021898-131861eb7052",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359021940,
+          "durationMs": 2
+        },
+        {
+          "id": "9hkcp-1795359021787-6a2bae634688",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359021816
+        },
+        {
+          "id": "9hkcp-1795359021787-6a2bae634688",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359021818
+        },
+        {
+          "id": "9hkcp-1795359021787-6a2bae634688",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359021818,
+          "durationMs": 0
+        },
+        {
+          "id": "9hkcp-1795359021787-6a2bae634688",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359021818,
+          "durationMs": 2
+        },
+        {
+          "id": "9hkcp-1795359021787-6a2bae634688",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "status-poll",
+          "event": "start",
+          "at": 1795359021850
+        },
+        {
+          "id": "9hkcp-1795359021787-6a2bae634688",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "status-poll",
+          "event": "end",
+          "at": 1795359021872,
+          "durationMs": 22
+        },
+        {
+          "id": "zngz6-1795359021521-07ea33853d06",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359021553
+        },
+        {
+          "id": "zngz6-1795359021521-07ea33853d06",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359021555
+        },
+        {
+          "id": "zngz6-1795359021521-07ea33853d06",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359021556,
+          "durationMs": 1
+        },
+        {
+          "id": "zngz6-1795359021521-07ea33853d06",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359021556,
+          "durationMs": 3
+        },
+        {
+          "id": "7kx96-1795359021204-c77d314da3fd",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359021242
+        },
+        {
+          "id": "7kx96-1795359021204-c77d314da3fd",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359021246
+        },
+        {
+          "id": "7kx96-1795359021204-c77d314da3fd",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359021246,
+          "durationMs": 0
+        },
+        {
+          "id": "7kx96-1795359021204-c77d314da3fd",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359021246,
+          "durationMs": 4
+        },
+        {
+          "id": "7kx96-1795359021204-c77d314da3fd",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359021285
+        },
+        {
+          "id": "7kx96-1795359021204-c77d314da3fd",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359021327,
+          "durationMs": 42,
+          "queryCount": 23,
+          "queryDurationMs": 51.260083000015584
+        },
+        {
+          "id": "8mqtg-1795359021098-50f0854b7dd5",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359021135
+        },
+        {
+          "id": "8mqtg-1795359021098-50f0854b7dd5",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359021137
+        },
+        {
+          "id": "8mqtg-1795359021098-50f0854b7dd5",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359021137,
+          "durationMs": 0
+        },
+        {
+          "id": "8mqtg-1795359021098-50f0854b7dd5",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359021137,
+          "durationMs": 2
+        },
+        {
+          "id": "8mqtg-1795359021098-50f0854b7dd5",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "navigation",
+          "event": "start",
+          "at": 1795359021180
+        },
+        {
+          "id": "8mqtg-1795359021098-50f0854b7dd5",
+          "correlationId": "4b5e17c8-39df-4757-bb02-b9efc01f89b1",
+          "stage": "navigation",
+          "event": "end",
+          "at": 1795359021330,
+          "durationMs": 150,
+          "access": 16.004463000004762,
+          "validation": 0.00137900000117952,
+          "presentationMutation": 34.40580599999521,
+          "blockMutation": 0.002683999999135267,
+          "interactionMutation": 30.66744600000675,
+          "queryCount": 73,
+          "queryDurationMs": 213.62688699999853
+        }
+      ],
+      "total": 995,
+      "server": 150,
+      "queries": 73,
+      "querySum": 213.62688699999853,
+      "request": 281.9610000005923,
+      "ttfb": 281.485,
+      "commit": 934,
+      "ack": 935,
+      "receive": 936,
+      "navCount": 1
+    },
+    {
+      "run": 1,
+      "cid": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+      "requestId": "qktpp-1795359023152-91f20f951490",
+      "phases": [
+        {
+          "id": "hhnr4-1795359025026-77e102075715",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "snapshot-poll",
+          "event": "start",
+          "at": 1795359025101
+        },
+        {
+          "id": "hhnr4-1795359025026-77e102075715",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "snapshot-poll",
+          "event": "end",
+          "at": 1795359025128,
+          "durationMs": 27
+        },
+        {
+          "id": "hhnr4-1795359025026-77e102075715",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359025057
+        },
+        {
+          "id": "hhnr4-1795359025026-77e102075715",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359025059
+        },
+        {
+          "id": "hhnr4-1795359025026-77e102075715",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359025060,
+          "durationMs": 1
+        },
+        {
+          "id": "hhnr4-1795359025026-77e102075715",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359025060,
+          "durationMs": 3
+        },
+        {
+          "id": "989ww-1795359024802-54a9ac23da82",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359024911
+        },
+        {
+          "id": "989ww-1795359024802-54a9ac23da82",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359024913
+        },
+        {
+          "id": "989ww-1795359024802-54a9ac23da82",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359024913,
+          "durationMs": 0
+        },
+        {
+          "id": "989ww-1795359024802-54a9ac23da82",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359024913,
+          "durationMs": 2
+        },
+        {
+          "id": "989ww-1795359024802-54a9ac23da82",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "status-poll",
+          "event": "start",
+          "at": 1795359024964
+        },
+        {
+          "id": "989ww-1795359024802-54a9ac23da82",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "status-poll",
+          "event": "end",
+          "at": 1795359024986,
+          "durationMs": 22
+        },
+        {
+          "id": "hhnr4-1795359024797-2ba0bf0a88c9",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359024830
+        },
+        {
+          "id": "hhnr4-1795359024797-2ba0bf0a88c9",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359024836
+        },
+        {
+          "id": "hhnr4-1795359024797-2ba0bf0a88c9",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359024836,
+          "durationMs": 0
+        },
+        {
+          "id": "hhnr4-1795359024797-2ba0bf0a88c9",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359024836,
+          "durationMs": 6
+        },
+        {
+          "id": "hhnr4-1795359024797-2ba0bf0a88c9",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359024872
+        },
+        {
+          "id": "hhnr4-1795359024797-2ba0bf0a88c9",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359024917,
+          "durationMs": 45,
+          "queryCount": 23,
+          "queryDurationMs": 55.11554099998466
+        },
+        {
+          "id": "qktpp-1795359024517-3608788077b7",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359024546
+        },
+        {
+          "id": "qktpp-1795359024517-3608788077b7",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359024548
+        },
+        {
+          "id": "qktpp-1795359024517-3608788077b7",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359024549,
+          "durationMs": 1
+        },
+        {
+          "id": "qktpp-1795359024517-3608788077b7",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359024550,
+          "durationMs": 4
+        },
+        {
+          "id": "hhnr4-1795359023920-edb950fb5af0",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359023950
+        },
+        {
+          "id": "hhnr4-1795359023920-edb950fb5af0",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359023952
+        },
+        {
+          "id": "hhnr4-1795359023920-edb950fb5af0",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359023952,
+          "durationMs": 0
+        },
+        {
+          "id": "hhnr4-1795359023920-edb950fb5af0",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359023952,
+          "durationMs": 2
+        },
+        {
+          "id": "hhnr4-1795359023920-edb950fb5af0",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359023982
+        },
+        {
+          "id": "hhnr4-1795359023920-edb950fb5af0",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359024024,
+          "durationMs": 42,
+          "queryCount": 23,
+          "queryDurationMs": 53.35597600001347
+        },
+        {
+          "id": "qktpp-1795359023152-91f20f951490",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359023184
+        },
+        {
+          "id": "qktpp-1795359023152-91f20f951490",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359023186
+        },
+        {
+          "id": "qktpp-1795359023152-91f20f951490",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359023186,
+          "durationMs": 0
+        },
+        {
+          "id": "qktpp-1795359023152-91f20f951490",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359023186,
+          "durationMs": 2
+        },
+        {
+          "id": "qktpp-1795359023152-91f20f951490",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "navigation",
+          "event": "start",
+          "at": 1795359023228
+        },
+        {
+          "id": "qktpp-1795359023152-91f20f951490",
+          "correlationId": "c9b1e82f-08e9-49bd-b684-2b7a31d92b1c",
+          "stage": "navigation",
+          "event": "end",
+          "at": 1795359023369,
+          "durationMs": 141,
+          "access": 15.965652999999293,
+          "validation": 0.0018650000056368299,
+          "presentationMutation": 34.48566600000049,
+          "blockMutation": 0.0027170000030309893,
+          "interactionMutation": 30.299299000005703,
+          "queryCount": 73,
+          "queryDurationMs": 188.7776939999967
+        }
+      ],
+      "total": 2071,
+      "server": 141,
+      "queries": 73,
+      "querySum": 188.7776939999967,
+      "request": 320.6439999921713,
+      "ttfb": 319.913,
+      "commit": 2017,
+      "ack": 2019,
+      "receive": 2019,
+      "navCount": 1
+    },
+    {
+      "run": 2,
+      "cid": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+      "requestId": "9hkcp-1795359027069-4669710f27d0",
+      "phases": [
+        {
+          "id": "dnrnn-1795359029029-5386a1fd4119",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359029065
+        },
+        {
+          "id": "dnrnn-1795359029029-5386a1fd4119",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359029068
+        },
+        {
+          "id": "dnrnn-1795359029029-5386a1fd4119",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359029068,
+          "durationMs": 0
+        },
+        {
+          "id": "dnrnn-1795359029029-5386a1fd4119",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359029068,
+          "durationMs": 3
+        },
+        {
+          "id": "dnrnn-1795359029029-5386a1fd4119",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "snapshot-poll",
+          "event": "start",
+          "at": 1795359029097
+        },
+        {
+          "id": "dnrnn-1795359029029-5386a1fd4119",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "snapshot-poll",
+          "event": "end",
+          "at": 1795359029124,
+          "durationMs": 27
+        },
+        {
+          "id": "4drsr-1795359029025-4af78257bfde",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359029063
+        },
+        {
+          "id": "4drsr-1795359029025-4af78257bfde",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359029065
+        },
+        {
+          "id": "4drsr-1795359029025-4af78257bfde",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359029065,
+          "durationMs": 0
+        },
+        {
+          "id": "4drsr-1795359029025-4af78257bfde",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359029066,
+          "durationMs": 3
+        },
+        {
+          "id": "jxtlm-1795359028846-7438fe17181f",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "status-poll",
+          "event": "start",
+          "at": 1795359028922
+        },
+        {
+          "id": "jxtlm-1795359028846-7438fe17181f",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "status-poll",
+          "event": "end",
+          "at": 1795359028945,
+          "durationMs": 23
+        },
+        {
+          "id": "jxtlm-1795359028846-7438fe17181f",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359028884
+        },
+        {
+          "id": "jxtlm-1795359028846-7438fe17181f",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359028885
+        },
+        {
+          "id": "jxtlm-1795359028846-7438fe17181f",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359028885,
+          "durationMs": 0
+        },
+        {
+          "id": "jxtlm-1795359028846-7438fe17181f",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359028886,
+          "durationMs": 2
+        },
+        {
+          "id": "dnrnn-1795359028507-e1d99b2c4313",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359028546
+        },
+        {
+          "id": "dnrnn-1795359028507-e1d99b2c4313",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359028548
+        },
+        {
+          "id": "dnrnn-1795359028507-e1d99b2c4313",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359028548,
+          "durationMs": 0
+        },
+        {
+          "id": "dnrnn-1795359028507-e1d99b2c4313",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359028548,
+          "durationMs": 2
+        },
+        {
+          "id": "dnrnn-1795359028507-e1d99b2c4313",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359028580
+        },
+        {
+          "id": "dnrnn-1795359028507-e1d99b2c4313",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359028618,
+          "durationMs": 38,
+          "queryCount": 23,
+          "queryDurationMs": 51.15288500001043
+        },
+        {
+          "id": "f2wx8-1795359027525-1c65fb3fd03a",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359027597
+        },
+        {
+          "id": "f2wx8-1795359027525-1c65fb3fd03a",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359027636,
+          "durationMs": 39,
+          "queryCount": 23,
+          "queryDurationMs": 47.87899699998525
+        },
+        {
+          "id": "f2wx8-1795359027525-1c65fb3fd03a",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359027564
+        },
+        {
+          "id": "f2wx8-1795359027525-1c65fb3fd03a",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359027566
+        },
+        {
+          "id": "f2wx8-1795359027525-1c65fb3fd03a",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359027566,
+          "durationMs": 0
+        },
+        {
+          "id": "f2wx8-1795359027525-1c65fb3fd03a",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359027566,
+          "durationMs": 2
+        },
+        {
+          "id": "4fb9b-1795359027525-9b3d2cd18178",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359027552
+        },
+        {
+          "id": "4fb9b-1795359027525-9b3d2cd18178",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359027553
+        },
+        {
+          "id": "4fb9b-1795359027525-9b3d2cd18178",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359027554,
+          "durationMs": 1
+        },
+        {
+          "id": "4fb9b-1795359027525-9b3d2cd18178",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359027554,
+          "durationMs": 2
+        },
+        {
+          "id": "9hkcp-1795359027069-4669710f27d0",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359027097
+        },
+        {
+          "id": "9hkcp-1795359027069-4669710f27d0",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359027100
+        },
+        {
+          "id": "9hkcp-1795359027069-4669710f27d0",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359027100,
+          "durationMs": 0
+        },
+        {
+          "id": "9hkcp-1795359027069-4669710f27d0",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359027101,
+          "durationMs": 4
+        },
+        {
+          "id": "9hkcp-1795359027069-4669710f27d0",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "navigation",
+          "event": "start",
+          "at": 1795359027142
+        },
+        {
+          "id": "9hkcp-1795359027069-4669710f27d0",
+          "correlationId": "81198ec9-29be-43f4-95a9-4bb76a91325b",
+          "stage": "navigation",
+          "event": "end",
+          "at": 1795359027293,
+          "durationMs": 151,
+          "access": 17.52343299999484,
+          "validation": 0.0013839999955962412,
+          "presentationMutation": 33.89587599999504,
+          "blockMutation": 0.0030390000029001385,
+          "interactionMutation": 30.4904400000014,
+          "queryCount": 73,
+          "queryDurationMs": 215.49930699999823
+        }
+      ],
+      "total": 2177,
+      "server": 151,
+      "queries": 73,
+      "querySum": 215.49930699999823,
+      "request": 282.74100000271574,
+      "ttfb": 281.671,
+      "commit": 2133,
+      "ack": 2134,
+      "receive": 2134,
+      "navCount": 1
+    },
+    {
+      "run": 3,
+      "cid": "17b78300-61de-4a8e-9009-10626ff41bc7",
+      "requestId": "gw2pz-1795359031158-781a6a9e6c2c",
+      "phases": [
+        {
+          "id": "l7jm2-1795359032918-ca6d1c6d1064",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "snapshot-poll",
+          "event": "start",
+          "at": 1795359032979
+        },
+        {
+          "id": "l7jm2-1795359032918-ca6d1c6d1064",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "snapshot-poll",
+          "event": "end",
+          "at": 1795359033010,
+          "durationMs": 31
+        },
+        {
+          "id": "l7jm2-1795359032918-ca6d1c6d1064",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359032947
+        },
+        {
+          "id": "l7jm2-1795359032918-ca6d1c6d1064",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359032948
+        },
+        {
+          "id": "l7jm2-1795359032918-ca6d1c6d1064",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359032948,
+          "durationMs": 0
+        },
+        {
+          "id": "l7jm2-1795359032918-ca6d1c6d1064",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359032949,
+          "durationMs": 2
+        },
+        {
+          "id": "l7jm2-1795359032786-6e3f08998440",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "status-poll",
+          "event": "start",
+          "at": 1795359032865
+        },
+        {
+          "id": "l7jm2-1795359032786-6e3f08998440",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "status-poll",
+          "event": "end",
+          "at": 1795359032889,
+          "durationMs": 24
+        },
+        {
+          "id": "l7jm2-1795359032786-6e3f08998440",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359032829
+        },
+        {
+          "id": "l7jm2-1795359032786-6e3f08998440",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359032830
+        },
+        {
+          "id": "l7jm2-1795359032786-6e3f08998440",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359032830,
+          "durationMs": 0
+        },
+        {
+          "id": "l7jm2-1795359032786-6e3f08998440",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359032830,
+          "durationMs": 1
+        },
+        {
+          "id": "4dcqv-1795359032221-743dd4ca3050",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359032288
+        },
+        {
+          "id": "4dcqv-1795359032221-743dd4ca3050",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359032331,
+          "durationMs": 43,
+          "queryCount": 23,
+          "queryDurationMs": 53.511795000005804
+        },
+        {
+          "id": "4dcqv-1795359032221-743dd4ca3050",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359032256
+        },
+        {
+          "id": "4dcqv-1795359032221-743dd4ca3050",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359032257
+        },
+        {
+          "id": "4dcqv-1795359032221-743dd4ca3050",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359032258,
+          "durationMs": 1
+        },
+        {
+          "id": "4dcqv-1795359032221-743dd4ca3050",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359032258,
+          "durationMs": 2
+        },
+        {
+          "id": "5flk2-1795359032013-30fed80904d5",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359032058
+        },
+        {
+          "id": "5flk2-1795359032013-30fed80904d5",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359032064
+        },
+        {
+          "id": "5flk2-1795359032013-30fed80904d5",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359032064,
+          "durationMs": 0
+        },
+        {
+          "id": "5flk2-1795359032013-30fed80904d5",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359032065,
+          "durationMs": 7
+        },
+        {
+          "id": "4dcqv-1795359031344-8644ccd7c7e7",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359031402
+        },
+        {
+          "id": "4dcqv-1795359031344-8644ccd7c7e7",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359031444,
+          "durationMs": 42,
+          "queryCount": 23,
+          "queryDurationMs": 51.46802999998181
+        },
+        {
+          "id": "4dcqv-1795359031344-8644ccd7c7e7",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359031372
+        },
+        {
+          "id": "4dcqv-1795359031344-8644ccd7c7e7",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359031373
+        },
+        {
+          "id": "4dcqv-1795359031344-8644ccd7c7e7",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359031374,
+          "durationMs": 1
+        },
+        {
+          "id": "4dcqv-1795359031344-8644ccd7c7e7",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359031374,
+          "durationMs": 2
+        },
+        {
+          "id": "gw2pz-1795359031158-781a6a9e6c2c",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "navigation",
+          "event": "start",
+          "at": 1795359031225
+        },
+        {
+          "id": "gw2pz-1795359031158-781a6a9e6c2c",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "navigation",
+          "event": "end",
+          "at": 1795359031360,
+          "durationMs": 135,
+          "access": 16.359362999995938,
+          "validation": 0.0014550000050803646,
+          "presentationMutation": 29.89151000000129,
+          "blockMutation": 0.0030540000007022172,
+          "interactionMutation": 28.99907600000006,
+          "queryCount": 73,
+          "queryDurationMs": 184.19416100002127
+        },
+        {
+          "id": "gw2pz-1795359031158-781a6a9e6c2c",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359031194
+        },
+        {
+          "id": "gw2pz-1795359031158-781a6a9e6c2c",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359031195
+        },
+        {
+          "id": "gw2pz-1795359031158-781a6a9e6c2c",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359031196,
+          "durationMs": 1
+        },
+        {
+          "id": "gw2pz-1795359031158-781a6a9e6c2c",
+          "correlationId": "17b78300-61de-4a8e-9009-10626ff41bc7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359031196,
+          "durationMs": 2
+        }
+      ],
+      "total": 1945,
+      "server": 135,
+      "queries": 73,
+      "querySum": 184.19416100002127,
+      "request": 223.38000001036562,
+      "ttfb": 222.391,
+      "commit": 1880,
+      "ack": 1882,
+      "receive": 1882,
+      "navCount": 1
+    },
+    {
+      "run": 4,
+      "cid": "9f453d62-6039-4d29-96ca-718bfac0e153",
+      "requestId": "l7jm2-1795359035146-1eadd86b3f7b",
+      "phases": [
+        {
+          "id": "bpkp9-1795359036927-08522ce1d897",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "snapshot-poll",
+          "event": "start",
+          "at": 1795359037007
+        },
+        {
+          "id": "bpkp9-1795359036927-08522ce1d897",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "snapshot-poll",
+          "event": "end",
+          "at": 1795359037035,
+          "durationMs": 28
+        },
+        {
+          "id": "bpkp9-1795359036927-08522ce1d897",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359036962
+        },
+        {
+          "id": "bpkp9-1795359036927-08522ce1d897",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359036965
+        },
+        {
+          "id": "bpkp9-1795359036927-08522ce1d897",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359036965,
+          "durationMs": 0
+        },
+        {
+          "id": "bpkp9-1795359036927-08522ce1d897",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359036965,
+          "durationMs": 3
+        },
+        {
+          "id": "vn87h-1795359036833-a74c858e356f",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359036914
+        },
+        {
+          "id": "vn87h-1795359036833-a74c858e356f",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359036956,
+          "durationMs": 42,
+          "queryCount": 23,
+          "queryDurationMs": 45.44346400000359
+        },
+        {
+          "id": "vn87h-1795359036833-a74c858e356f",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359036869
+        },
+        {
+          "id": "vn87h-1795359036833-a74c858e356f",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359036872
+        },
+        {
+          "id": "vn87h-1795359036833-a74c858e356f",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359036872,
+          "durationMs": 0
+        },
+        {
+          "id": "vn87h-1795359036833-a74c858e356f",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359036872,
+          "durationMs": 3
+        },
+        {
+          "id": "bpkp9-1795359036787-ae4ac106c2c0",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "status-poll",
+          "event": "start",
+          "at": 1795359036884
+        },
+        {
+          "id": "bpkp9-1795359036787-ae4ac106c2c0",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "status-poll",
+          "event": "end",
+          "at": 1795359036904,
+          "durationMs": 20
+        },
+        {
+          "id": "bpkp9-1795359036787-ae4ac106c2c0",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359036827
+        },
+        {
+          "id": "bpkp9-1795359036787-ae4ac106c2c0",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359036831
+        },
+        {
+          "id": "bpkp9-1795359036787-ae4ac106c2c0",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359036831,
+          "durationMs": 0
+        },
+        {
+          "id": "bpkp9-1795359036787-ae4ac106c2c0",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359036831,
+          "durationMs": 4
+        },
+        {
+          "id": "8mqtg-1795359036520-22394f805c5b",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359036555
+        },
+        {
+          "id": "8mqtg-1795359036520-22394f805c5b",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359036557
+        },
+        {
+          "id": "8mqtg-1795359036520-22394f805c5b",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359036558,
+          "durationMs": 1
+        },
+        {
+          "id": "8mqtg-1795359036520-22394f805c5b",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359036558,
+          "durationMs": 3
+        },
+        {
+          "id": "pgrtx-1795359035954-03ac07ea2ee7",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359036024
+        },
+        {
+          "id": "pgrtx-1795359035954-03ac07ea2ee7",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359036059,
+          "durationMs": 35,
+          "queryCount": 23,
+          "queryDurationMs": 44.65952199999447
+        },
+        {
+          "id": "pgrtx-1795359035954-03ac07ea2ee7",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359035988
+        },
+        {
+          "id": "pgrtx-1795359035954-03ac07ea2ee7",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359035989
+        },
+        {
+          "id": "pgrtx-1795359035954-03ac07ea2ee7",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359035990,
+          "durationMs": 1
+        },
+        {
+          "id": "pgrtx-1795359035954-03ac07ea2ee7",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359035990,
+          "durationMs": 2
+        },
+        {
+          "id": "l7jm2-1795359035146-1eadd86b3f7b",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "navigation",
+          "event": "start",
+          "at": 1795359035211
+        },
+        {
+          "id": "l7jm2-1795359035146-1eadd86b3f7b",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "navigation",
+          "event": "end",
+          "at": 1795359035325,
+          "durationMs": 114,
+          "access": 15.61519799999951,
+          "validation": 0.0016259999974863604,
+          "presentationMutation": 23.36204999999609,
+          "blockMutation": 0.0009600000048521906,
+          "interactionMutation": 23.44136499999877,
+          "queryCount": 73,
+          "queryDurationMs": 160.38862800005154
+        },
+        {
+          "id": "l7jm2-1795359035146-1eadd86b3f7b",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359035177
+        },
+        {
+          "id": "l7jm2-1795359035146-1eadd86b3f7b",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359035179
+        },
+        {
+          "id": "l7jm2-1795359035146-1eadd86b3f7b",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359035179,
+          "durationMs": 0
+        },
+        {
+          "id": "l7jm2-1795359035146-1eadd86b3f7b",
+          "correlationId": "9f453d62-6039-4d29-96ca-718bfac0e153",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359035180,
+          "durationMs": 3
+        }
+      ],
+      "total": 2008,
+      "server": 114,
+      "queries": 73,
+      "querySum": 160.38862800005154,
+      "request": 200.15000001876615,
+      "ttfb": 199.064,
+      "commit": 1921,
+      "ack": 1922,
+      "receive": 1922,
+      "navCount": 1
+    },
+    {
+      "run": 5,
+      "cid": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+      "requestId": "4dcqv-1795359039132-803740ecd9be",
+      "phases": [
+        {
+          "id": "jbfqn-1795359041016-17d1e86347d4",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359041057
+        },
+        {
+          "id": "jbfqn-1795359041016-17d1e86347d4",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359041060
+        },
+        {
+          "id": "jbfqn-1795359041016-17d1e86347d4",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359041060,
+          "durationMs": 0
+        },
+        {
+          "id": "jbfqn-1795359041016-17d1e86347d4",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359041061,
+          "durationMs": 4
+        },
+        {
+          "id": "vn87h-1795359040920-c3256f0c27e6",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "snapshot-poll",
+          "event": "start",
+          "at": 1795359040997
+        },
+        {
+          "id": "vn87h-1795359040920-c3256f0c27e6",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "snapshot-poll",
+          "event": "end",
+          "at": 1795359041020,
+          "durationMs": 23
+        },
+        {
+          "id": "vn87h-1795359040920-c3256f0c27e6",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359040955
+        },
+        {
+          "id": "vn87h-1795359040920-c3256f0c27e6",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359040959
+        },
+        {
+          "id": "vn87h-1795359040920-c3256f0c27e6",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359040959,
+          "durationMs": 0
+        },
+        {
+          "id": "vn87h-1795359040920-c3256f0c27e6",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359040959,
+          "durationMs": 4
+        },
+        {
+          "id": "vn87h-1795359040798-15947aa5aedc",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "status-poll",
+          "event": "start",
+          "at": 1795359040873
+        },
+        {
+          "id": "vn87h-1795359040798-15947aa5aedc",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "status-poll",
+          "event": "end",
+          "at": 1795359040897,
+          "durationMs": 24
+        },
+        {
+          "id": "vn87h-1795359040798-15947aa5aedc",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359040828
+        },
+        {
+          "id": "vn87h-1795359040798-15947aa5aedc",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359040831
+        },
+        {
+          "id": "vn87h-1795359040798-15947aa5aedc",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359040831,
+          "durationMs": 0
+        },
+        {
+          "id": "vn87h-1795359040798-15947aa5aedc",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359040832,
+          "durationMs": 4
+        },
+        {
+          "id": "j7n6t-1795359040536-81acbf2f9d49",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359040621
+        },
+        {
+          "id": "j7n6t-1795359040536-81acbf2f9d49",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359040578
+        },
+        {
+          "id": "j7n6t-1795359040536-81acbf2f9d49",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359040580
+        },
+        {
+          "id": "j7n6t-1795359040536-81acbf2f9d49",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359040581,
+          "durationMs": 1
+        },
+        {
+          "id": "j7n6t-1795359040536-81acbf2f9d49",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359040581,
+          "durationMs": 3
+        },
+        {
+          "id": "j7n6t-1795359040536-81acbf2f9d49",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359040705,
+          "durationMs": 84,
+          "queryCount": 23,
+          "queryDurationMs": 109.79748900001869
+        },
+        {
+          "id": "tvb9d-1795359039570-9c0f758adc18",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359039666
+        },
+        {
+          "id": "tvb9d-1795359039570-9c0f758adc18",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359039674
+        },
+        {
+          "id": "tvb9d-1795359039570-9c0f758adc18",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359039674,
+          "durationMs": 0
+        },
+        {
+          "id": "tvb9d-1795359039570-9c0f758adc18",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359039675,
+          "durationMs": 9
+        },
+        {
+          "id": "tvb9d-1795359039570-9c0f758adc18",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359039708
+        },
+        {
+          "id": "tvb9d-1795359039570-9c0f758adc18",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359039746,
+          "durationMs": 38,
+          "queryCount": 23,
+          "queryDurationMs": 51.81642900001316
+        },
+        {
+          "id": "9hkcp-1795359039519-d7da8711a041",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359039553
+        },
+        {
+          "id": "9hkcp-1795359039519-d7da8711a041",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359039556
+        },
+        {
+          "id": "9hkcp-1795359039519-d7da8711a041",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359039556,
+          "durationMs": 0
+        },
+        {
+          "id": "9hkcp-1795359039519-d7da8711a041",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359039556,
+          "durationMs": 3
+        },
+        {
+          "id": "4dcqv-1795359039132-803740ecd9be",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "navigation",
+          "event": "start",
+          "at": 1795359039198
+        },
+        {
+          "id": "4dcqv-1795359039132-803740ecd9be",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "navigation",
+          "event": "end",
+          "at": 1795359039334,
+          "durationMs": 136,
+          "access": 19.927275000001828,
+          "validation": 0.0008329999982379377,
+          "presentationMutation": 28.162041000003228,
+          "blockMutation": 0.0022300000055111013,
+          "interactionMutation": 26.93004800000199,
+          "queryCount": 73,
+          "queryDurationMs": 189.04438399999344
+        },
+        {
+          "id": "4dcqv-1795359039132-803740ecd9be",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359039164
+        },
+        {
+          "id": "4dcqv-1795359039132-803740ecd9be",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359039166
+        },
+        {
+          "id": "4dcqv-1795359039132-803740ecd9be",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359039166,
+          "durationMs": 0
+        },
+        {
+          "id": "4dcqv-1795359039132-803740ecd9be",
+          "correlationId": "e67f2b76-e712-4f42-b3da-07d8c3547e18",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359039167,
+          "durationMs": 3
+        }
+      ],
+      "total": 1935,
+      "server": 136,
+      "queries": 73,
+      "querySum": 189.04438399999344,
+      "request": 225.3529999870807,
+      "ttfb": 224.394,
+      "commit": 1914,
+      "ack": 1915,
+      "receive": 1915,
+      "navCount": 1
+    },
+    {
+      "run": 6,
+      "cid": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+      "requestId": "mjgsd-1795359043069-3e64b1c4333a",
+      "phases": [
+        {
+          "id": "l7jm2-1795359045103-a91f93ba3644",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359045137
+        },
+        {
+          "id": "l7jm2-1795359045103-a91f93ba3644",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359045143
+        },
+        {
+          "id": "l7jm2-1795359045103-a91f93ba3644",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359045144,
+          "durationMs": 1
+        },
+        {
+          "id": "l7jm2-1795359045103-a91f93ba3644",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359045144,
+          "durationMs": 7
+        },
+        {
+          "id": "l7jm2-1795359045103-a91f93ba3644",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359045174
+        },
+        {
+          "id": "l7jm2-1795359045103-a91f93ba3644",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359045218,
+          "durationMs": 44,
+          "queryCount": 23,
+          "queryDurationMs": 54.58321400002751
+        },
+        {
+          "id": "mjgsd-1795359044911-815a1de129cc",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359044946
+        },
+        {
+          "id": "mjgsd-1795359044911-815a1de129cc",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359044949
+        },
+        {
+          "id": "mjgsd-1795359044911-815a1de129cc",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359044949,
+          "durationMs": 0
+        },
+        {
+          "id": "mjgsd-1795359044911-815a1de129cc",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359044949,
+          "durationMs": 3
+        },
+        {
+          "id": "mjgsd-1795359044911-815a1de129cc",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "snapshot-poll",
+          "event": "start",
+          "at": 1795359045022
+        },
+        {
+          "id": "mjgsd-1795359044911-815a1de129cc",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "snapshot-poll",
+          "event": "end",
+          "at": 1795359045058,
+          "durationMs": 36
+        },
+        {
+          "id": "gw2pz-1795359044791-75e90a97b83e",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359044824
+        },
+        {
+          "id": "gw2pz-1795359044791-75e90a97b83e",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359044832
+        },
+        {
+          "id": "gw2pz-1795359044791-75e90a97b83e",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359044832,
+          "durationMs": 0
+        },
+        {
+          "id": "gw2pz-1795359044791-75e90a97b83e",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359044832,
+          "durationMs": 8
+        },
+        {
+          "id": "gw2pz-1795359044791-75e90a97b83e",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "status-poll",
+          "event": "start",
+          "at": 1795359044865
+        },
+        {
+          "id": "gw2pz-1795359044791-75e90a97b83e",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "status-poll",
+          "event": "end",
+          "at": 1795359044888,
+          "durationMs": 23
+        },
+        {
+          "id": "gw2pz-1795359044198-5aafd92c4c0f",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359044229
+        },
+        {
+          "id": "gw2pz-1795359044198-5aafd92c4c0f",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359044232
+        },
+        {
+          "id": "gw2pz-1795359044198-5aafd92c4c0f",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359044232,
+          "durationMs": 0
+        },
+        {
+          "id": "gw2pz-1795359044198-5aafd92c4c0f",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359044232,
+          "durationMs": 3
+        },
+        {
+          "id": "gw2pz-1795359044198-5aafd92c4c0f",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359044272
+        },
+        {
+          "id": "gw2pz-1795359044198-5aafd92c4c0f",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359044318,
+          "durationMs": 46,
+          "queryCount": 23,
+          "queryDurationMs": 54.93559400000231
+        },
+        {
+          "id": "x2j6t-1795359044011-ad70a030dfa2",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359044043
+        },
+        {
+          "id": "x2j6t-1795359044011-ad70a030dfa2",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359044045
+        },
+        {
+          "id": "x2j6t-1795359044011-ad70a030dfa2",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359044045,
+          "durationMs": 0
+        },
+        {
+          "id": "x2j6t-1795359044011-ad70a030dfa2",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359044045,
+          "durationMs": 2
+        },
+        {
+          "id": "jxtlm-1795359043287-b5b1377eb15e",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359043378
+        },
+        {
+          "id": "jxtlm-1795359043287-b5b1377eb15e",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359043421,
+          "durationMs": 43,
+          "queryCount": 23,
+          "queryDurationMs": 54.73644799999602
+        },
+        {
+          "id": "jxtlm-1795359043287-b5b1377eb15e",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359043321
+        },
+        {
+          "id": "jxtlm-1795359043287-b5b1377eb15e",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359043323
+        },
+        {
+          "id": "jxtlm-1795359043287-b5b1377eb15e",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359043323,
+          "durationMs": 0
+        },
+        {
+          "id": "jxtlm-1795359043287-b5b1377eb15e",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359043323,
+          "durationMs": 2
+        },
+        {
+          "id": "mjgsd-1795359043069-3e64b1c4333a",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "navigation",
+          "event": "start",
+          "at": 1795359043145
+        },
+        {
+          "id": "mjgsd-1795359043069-3e64b1c4333a",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359043103
+        },
+        {
+          "id": "mjgsd-1795359043069-3e64b1c4333a",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359043105
+        },
+        {
+          "id": "mjgsd-1795359043069-3e64b1c4333a",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359043106,
+          "durationMs": 1
+        },
+        {
+          "id": "mjgsd-1795359043069-3e64b1c4333a",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359043106,
+          "durationMs": 3
+        },
+        {
+          "id": "mjgsd-1795359043069-3e64b1c4333a",
+          "correlationId": "d3060219-dae3-4379-8e3b-00e25c9643d7",
+          "stage": "navigation",
+          "event": "end",
+          "at": 1795359043304,
+          "durationMs": 159,
+          "access": 18.879394999996293,
+          "validation": 0.0009990000035031699,
+          "presentationMutation": 38.6391089999961,
+          "blockMutation": 0.001786000000720378,
+          "interactionMutation": 33.93445499999507,
+          "queryCount": 73,
+          "queryDurationMs": 206.82447800000955
+        }
+      ],
+      "total": 2068,
+      "server": 159,
+      "queries": 73,
+      "querySum": 206.82447800000955,
+      "request": 257.8429999994114,
+      "ttfb": 256.736,
+      "commit": 2017,
+      "ack": 2018,
+      "receive": 2018,
+      "navCount": 1
+    },
+    {
+      "run": 7,
+      "cid": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+      "requestId": "x2j6t-1795359047209-bd081ba898f1",
+      "phases": [
+        {
+          "id": "pgrtx-1795359048912-a6baa9db60d5",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359048944
+        },
+        {
+          "id": "pgrtx-1795359048912-a6baa9db60d5",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359048947
+        },
+        {
+          "id": "pgrtx-1795359048912-a6baa9db60d5",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359048947,
+          "durationMs": 0
+        },
+        {
+          "id": "pgrtx-1795359048912-a6baa9db60d5",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359048948,
+          "durationMs": 4
+        },
+        {
+          "id": "pgrtx-1795359048912-a6baa9db60d5",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "snapshot-poll",
+          "event": "start",
+          "at": 1795359048978
+        },
+        {
+          "id": "pgrtx-1795359048912-a6baa9db60d5",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "snapshot-poll",
+          "event": "end",
+          "at": 1795359049011,
+          "durationMs": 33
+        },
+        {
+          "id": "nf859-1795359048789-b1febc653a10",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359048829
+        },
+        {
+          "id": "nf859-1795359048789-b1febc653a10",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359048831
+        },
+        {
+          "id": "nf859-1795359048789-b1febc653a10",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359048831,
+          "durationMs": 0
+        },
+        {
+          "id": "nf859-1795359048789-b1febc653a10",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359048831,
+          "durationMs": 2
+        },
+        {
+          "id": "nf859-1795359048789-b1febc653a10",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "status-poll",
+          "event": "start",
+          "at": 1795359048863
+        },
+        {
+          "id": "nf859-1795359048789-b1febc653a10",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "status-poll",
+          "event": "end",
+          "at": 1795359048888,
+          "durationMs": 25
+        },
+        {
+          "id": "kgdph-1795359048719-f86861c09a0f",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359048757
+        },
+        {
+          "id": "kgdph-1795359048719-f86861c09a0f",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359048763
+        },
+        {
+          "id": "kgdph-1795359048719-f86861c09a0f",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359048763,
+          "durationMs": 0
+        },
+        {
+          "id": "kgdph-1795359048719-f86861c09a0f",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359048764,
+          "durationMs": 7
+        },
+        {
+          "id": "kgdph-1795359048719-f86861c09a0f",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359048799
+        },
+        {
+          "id": "kgdph-1795359048719-f86861c09a0f",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359048844,
+          "durationMs": 45,
+          "queryCount": 23,
+          "queryDurationMs": 54.910531000001356
+        },
+        {
+          "id": "jxtlm-1795359048515-b005e95a9122",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359048550
+        },
+        {
+          "id": "jxtlm-1795359048515-b005e95a9122",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359048553
+        },
+        {
+          "id": "jxtlm-1795359048515-b005e95a9122",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359048553,
+          "durationMs": 0
+        },
+        {
+          "id": "jxtlm-1795359048515-b005e95a9122",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359048554,
+          "durationMs": 4
+        },
+        {
+          "id": "z2smm-1795359047821-33b44ab8c56c",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359047854
+        },
+        {
+          "id": "z2smm-1795359047821-33b44ab8c56c",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359047856
+        },
+        {
+          "id": "z2smm-1795359047821-33b44ab8c56c",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359047856,
+          "durationMs": 0
+        },
+        {
+          "id": "z2smm-1795359047821-33b44ab8c56c",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359047856,
+          "durationMs": 2
+        },
+        {
+          "id": "z2smm-1795359047821-33b44ab8c56c",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359047888
+        },
+        {
+          "id": "z2smm-1795359047821-33b44ab8c56c",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359047932,
+          "durationMs": 44,
+          "queryCount": 23,
+          "queryDurationMs": 55.730109000054654
+        },
+        {
+          "id": "x2j6t-1795359047209-bd081ba898f1",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359047241
+        },
+        {
+          "id": "x2j6t-1795359047209-bd081ba898f1",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359047243
+        },
+        {
+          "id": "x2j6t-1795359047209-bd081ba898f1",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359047243,
+          "durationMs": 0
+        },
+        {
+          "id": "x2j6t-1795359047209-bd081ba898f1",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359047243,
+          "durationMs": 2
+        },
+        {
+          "id": "x2j6t-1795359047209-bd081ba898f1",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "navigation",
+          "event": "start",
+          "at": 1795359047275
+        },
+        {
+          "id": "x2j6t-1795359047209-bd081ba898f1",
+          "correlationId": "e63f7e87-e67d-45ca-9617-4bad6f808f01",
+          "stage": "navigation",
+          "event": "end",
+          "at": 1795359047434,
+          "durationMs": 159,
+          "access": 21.227106000005733,
+          "validation": 0.0011329999979352579,
+          "presentationMutation": 31.865575000003446,
+          "blockMutation": 0.0012070000084349886,
+          "interactionMutation": 33.839368999993894,
+          "queryCount": 73,
+          "queryDurationMs": 201.66905299994687
+        }
+      ],
+      "total": 1987,
+      "server": 159,
+      "queries": 73,
+      "querySum": 201.66905299994687,
+      "request": 246.72900000587106,
+      "ttfb": 245.943,
+      "commit": 1926,
+      "ack": 1927,
+      "receive": 1927,
+      "navCount": 1
+    },
+    {
+      "run": 8,
+      "cid": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+      "requestId": "8mqtg-1795359051067-0d6e1d7a1fdb",
+      "phases": [
+        {
+          "id": "rnmjm-1795359051913-eec687066922",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "snapshot-poll",
+          "event": "start",
+          "at": 1795359051995
+        },
+        {
+          "id": "rnmjm-1795359051913-eec687066922",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "snapshot-poll",
+          "event": "end",
+          "at": 1795359052026,
+          "durationMs": 31
+        },
+        {
+          "id": "rnmjm-1795359051913-eec687066922",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359051951
+        },
+        {
+          "id": "rnmjm-1795359051913-eec687066922",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359051952
+        },
+        {
+          "id": "rnmjm-1795359051913-eec687066922",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359051952,
+          "durationMs": 0
+        },
+        {
+          "id": "rnmjm-1795359051913-eec687066922",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359051952,
+          "durationMs": 1
+        },
+        {
+          "id": "kgdph-1795359051798-8d0f0c2b4c69",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "status-poll",
+          "event": "start",
+          "at": 1795359051868
+        },
+        {
+          "id": "kgdph-1795359051798-8d0f0c2b4c69",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "status-poll",
+          "event": "end",
+          "at": 1795359051889,
+          "durationMs": 21
+        },
+        {
+          "id": "kgdph-1795359051798-8d0f0c2b4c69",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359051835
+        },
+        {
+          "id": "kgdph-1795359051798-8d0f0c2b4c69",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359051836
+        },
+        {
+          "id": "kgdph-1795359051798-8d0f0c2b4c69",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359051836,
+          "durationMs": 0
+        },
+        {
+          "id": "kgdph-1795359051798-8d0f0c2b4c69",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359051837,
+          "durationMs": 2
+        },
+        {
+          "id": "gw2pz-1795359051517-9735bdf8fbd0",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359051549
+        },
+        {
+          "id": "gw2pz-1795359051517-9735bdf8fbd0",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359051550
+        },
+        {
+          "id": "gw2pz-1795359051517-9735bdf8fbd0",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359051550,
+          "durationMs": 0
+        },
+        {
+          "id": "gw2pz-1795359051517-9735bdf8fbd0",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359051551,
+          "durationMs": 2
+        },
+        {
+          "id": "gg8lr-1795359051401-c839294a2f5b",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359051478
+        },
+        {
+          "id": "gg8lr-1795359051401-c839294a2f5b",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359051517,
+          "durationMs": 39,
+          "queryCount": 23,
+          "queryDurationMs": 48.11164900001313
+        },
+        {
+          "id": "gg8lr-1795359051401-c839294a2f5b",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359051444
+        },
+        {
+          "id": "gg8lr-1795359051401-c839294a2f5b",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359051446
+        },
+        {
+          "id": "gg8lr-1795359051401-c839294a2f5b",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359051446,
+          "durationMs": 0
+        },
+        {
+          "id": "gg8lr-1795359051401-c839294a2f5b",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359051446,
+          "durationMs": 2
+        },
+        {
+          "id": "8mqtg-1795359051067-0d6e1d7a1fdb",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "navigation",
+          "event": "end",
+          "at": 1795359051287,
+          "durationMs": 144,
+          "access": 15.66204199999629,
+          "validation": 0.0007970000006025657,
+          "presentationMutation": 35.08631600000081,
+          "blockMutation": 0.0012229999992996454,
+          "interactionMutation": 34.89253599999938,
+          "queryCount": 73,
+          "queryDurationMs": 186.58922099985648
+        },
+        {
+          "id": "8mqtg-1795359051067-0d6e1d7a1fdb",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359051099
+        },
+        {
+          "id": "8mqtg-1795359051067-0d6e1d7a1fdb",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359051101
+        },
+        {
+          "id": "8mqtg-1795359051067-0d6e1d7a1fdb",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359051101,
+          "durationMs": 0
+        },
+        {
+          "id": "8mqtg-1795359051067-0d6e1d7a1fdb",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359051101,
+          "durationMs": 2
+        },
+        {
+          "id": "8mqtg-1795359051067-0d6e1d7a1fdb",
+          "correlationId": "ad826f3c-bc09-4987-9cb4-66f852a56142",
+          "stage": "navigation",
+          "event": "start",
+          "at": 1795359051143
+        }
+      ],
+      "total": 997,
+      "server": 144,
+      "queries": 73,
+      "querySum": 186.58922099985648,
+      "request": 242.72999999811873,
+      "ttfb": 241.611,
+      "commit": 987,
+      "ack": 988,
+      "receive": 988,
+      "navCount": 1
+    },
+    {
+      "run": 9,
+      "cid": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+      "requestId": "nj5nf-1795359054114-21d1f47a8a38",
+      "phases": [
+        {
+          "id": "d6h59-1795359056016-804bfa86e17b",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359056047
+        },
+        {
+          "id": "d6h59-1795359056016-804bfa86e17b",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359056049
+        },
+        {
+          "id": "d6h59-1795359056016-804bfa86e17b",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359056049,
+          "durationMs": 0
+        },
+        {
+          "id": "d6h59-1795359056016-804bfa86e17b",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359056051,
+          "durationMs": 4
+        },
+        {
+          "id": "pgrtx-1795359055956-ae0aaeb501cd",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359055986
+        },
+        {
+          "id": "pgrtx-1795359055956-ae0aaeb501cd",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359055989
+        },
+        {
+          "id": "pgrtx-1795359055956-ae0aaeb501cd",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359055989,
+          "durationMs": 0
+        },
+        {
+          "id": "pgrtx-1795359055956-ae0aaeb501cd",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359055989,
+          "durationMs": 3
+        },
+        {
+          "id": "pgrtx-1795359055956-ae0aaeb501cd",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359056028
+        },
+        {
+          "id": "pgrtx-1795359055956-ae0aaeb501cd",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359056070,
+          "durationMs": 42,
+          "queryCount": 23,
+          "queryDurationMs": 54.96230600004492
+        },
+        {
+          "id": "fkpl8-1795359055924-0ce85f5ec970",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "snapshot-poll",
+          "event": "start",
+          "at": 1795359055987
+        },
+        {
+          "id": "fkpl8-1795359055924-0ce85f5ec970",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "snapshot-poll",
+          "event": "end",
+          "at": 1795359056018,
+          "durationMs": 31
+        },
+        {
+          "id": "fkpl8-1795359055924-0ce85f5ec970",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359055953
+        },
+        {
+          "id": "fkpl8-1795359055924-0ce85f5ec970",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359055955
+        },
+        {
+          "id": "fkpl8-1795359055924-0ce85f5ec970",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359055955,
+          "durationMs": 0
+        },
+        {
+          "id": "fkpl8-1795359055924-0ce85f5ec970",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359055955,
+          "durationMs": 2
+        },
+        {
+          "id": "pgrtx-1795359055799-498de160f24f",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "status-poll",
+          "event": "start",
+          "at": 1795359055874
+        },
+        {
+          "id": "pgrtx-1795359055799-498de160f24f",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "status-poll",
+          "event": "end",
+          "at": 1795359055898,
+          "durationMs": 24
+        },
+        {
+          "id": "pgrtx-1795359055799-498de160f24f",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359055828
+        },
+        {
+          "id": "pgrtx-1795359055799-498de160f24f",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359055830
+        },
+        {
+          "id": "pgrtx-1795359055799-498de160f24f",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359055831,
+          "durationMs": 1
+        },
+        {
+          "id": "pgrtx-1795359055799-498de160f24f",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359055831,
+          "durationMs": 3
+        },
+        {
+          "id": "4dcqv-1795359055049-84bad041ea57",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359055089
+        },
+        {
+          "id": "4dcqv-1795359055049-84bad041ea57",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359055091
+        },
+        {
+          "id": "4dcqv-1795359055049-84bad041ea57",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359055091,
+          "durationMs": 0
+        },
+        {
+          "id": "4dcqv-1795359055049-84bad041ea57",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359055091,
+          "durationMs": 2
+        },
+        {
+          "id": "4dcqv-1795359055049-84bad041ea57",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359055122
+        },
+        {
+          "id": "4dcqv-1795359055049-84bad041ea57",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359055166,
+          "durationMs": 44,
+          "queryCount": 23,
+          "queryDurationMs": 54.78775699995458
+        },
+        {
+          "id": "fkpl8-1795359054521-202671e65ded",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359054553
+        },
+        {
+          "id": "fkpl8-1795359054521-202671e65ded",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359054555
+        },
+        {
+          "id": "fkpl8-1795359054521-202671e65ded",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359054555,
+          "durationMs": 0
+        },
+        {
+          "id": "fkpl8-1795359054521-202671e65ded",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359054555,
+          "durationMs": 2
+        },
+        {
+          "id": "pgrtx-1795359054140-12e7ca9b8e6e",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359054178
+        },
+        {
+          "id": "pgrtx-1795359054140-12e7ca9b8e6e",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359054181
+        },
+        {
+          "id": "pgrtx-1795359054140-12e7ca9b8e6e",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359054181,
+          "durationMs": 0
+        },
+        {
+          "id": "pgrtx-1795359054140-12e7ca9b8e6e",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359054181,
+          "durationMs": 3
+        },
+        {
+          "id": "pgrtx-1795359054140-12e7ca9b8e6e",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359054219
+        },
+        {
+          "id": "pgrtx-1795359054140-12e7ca9b8e6e",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359054262,
+          "durationMs": 43,
+          "queryCount": 23,
+          "queryDurationMs": 53.697538999971584
+        },
+        {
+          "id": "nj5nf-1795359054114-21d1f47a8a38",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "navigation",
+          "event": "start",
+          "at": 1795359054199
+        },
+        {
+          "id": "nj5nf-1795359054114-21d1f47a8a38",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359054154
+        },
+        {
+          "id": "nj5nf-1795359054114-21d1f47a8a38",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359054156
+        },
+        {
+          "id": "nj5nf-1795359054114-21d1f47a8a38",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359054156,
+          "durationMs": 0
+        },
+        {
+          "id": "nj5nf-1795359054114-21d1f47a8a38",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359054156,
+          "durationMs": 2
+        },
+        {
+          "id": "nj5nf-1795359054114-21d1f47a8a38",
+          "correlationId": "1a940a23-e6bd-4474-ab70-84704e3070a7",
+          "stage": "navigation",
+          "event": "end",
+          "at": 1795359054341,
+          "durationMs": 142,
+          "access": 14.714321000006748,
+          "validation": 0.0010029999975813553,
+          "presentationMutation": 36.74224900000263,
+          "blockMutation": 0.0015559999883407727,
+          "interactionMutation": 33.01576500000374,
+          "queryCount": 73,
+          "queryDurationMs": 182.9016389999597
+        }
+      ],
+      "total": 1984,
+      "server": 142,
+      "queries": 73,
+      "querySum": 182.9016389999597,
+      "request": 248.43599999439903,
+      "ttfb": 247.496,
+      "commit": 1931,
+      "ack": 1932,
+      "receive": 1932,
+      "navCount": 1
+    },
+    {
+      "run": 10,
+      "cid": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+      "requestId": "fxrwl-1795359058173-f1405c97f350",
+      "phases": [
+        {
+          "id": "s49pm-1795359071467-b366c1328a95",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359071533
+        },
+        {
+          "id": "s49pm-1795359071467-b366c1328a95",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359071575,
+          "durationMs": 42,
+          "queryCount": 23,
+          "queryDurationMs": 56.52064399996016
+        },
+        {
+          "id": "x2j6t-1795359070925-97119c7945eb",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-poll",
+          "event": "start",
+          "at": 1795359071028
+        },
+        {
+          "id": "x2j6t-1795359070925-97119c7945eb",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-poll",
+          "event": "end",
+          "at": 1795359071055,
+          "durationMs": 27
+        },
+        {
+          "id": "v5vth-1795359070796-bf7a6beb760b",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "status-poll",
+          "event": "start",
+          "at": 1795359070876
+        },
+        {
+          "id": "v5vth-1795359070796-bf7a6beb760b",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "status-poll",
+          "event": "end",
+          "at": 1795359070897,
+          "durationMs": 21
+        },
+        {
+          "id": "r5dnf-1795359069671-e85be5aad046",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359069746
+        },
+        {
+          "id": "r5dnf-1795359069671-e85be5aad046",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359069785,
+          "durationMs": 39,
+          "queryCount": 23,
+          "queryDurationMs": 51.55562199999986
+        },
+        {
+          "id": "v5vth-1795359068914-c8cc47920b6e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-poll",
+          "event": "start",
+          "at": 1795359069004
+        },
+        {
+          "id": "v5vth-1795359068914-c8cc47920b6e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-poll",
+          "event": "end",
+          "at": 1795359069030,
+          "durationMs": 26
+        },
+        {
+          "id": "hh7kv-1795359068793-68fccd650e4e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359068826
+        },
+        {
+          "id": "hh7kv-1795359068793-68fccd650e4e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359068830
+        },
+        {
+          "id": "hh7kv-1795359068793-68fccd650e4e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359068830,
+          "durationMs": 0
+        },
+        {
+          "id": "hh7kv-1795359068793-68fccd650e4e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359068830,
+          "durationMs": 4
+        },
+        {
+          "id": "hh7kv-1795359068793-68fccd650e4e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "status-poll",
+          "event": "start",
+          "at": 1795359068868
+        },
+        {
+          "id": "hh7kv-1795359068793-68fccd650e4e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "status-poll",
+          "event": "end",
+          "at": 1795359068892,
+          "durationMs": 24
+        },
+        {
+          "id": "vqkbc-1795359068747-088ce8ee2d84",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359068783
+        },
+        {
+          "id": "vqkbc-1795359068747-088ce8ee2d84",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359068785
+        },
+        {
+          "id": "vqkbc-1795359068747-088ce8ee2d84",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359068785,
+          "durationMs": 0
+        },
+        {
+          "id": "vqkbc-1795359068747-088ce8ee2d84",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359068785,
+          "durationMs": 2
+        },
+        {
+          "id": "vqkbc-1795359068747-088ce8ee2d84",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359068818
+        },
+        {
+          "id": "vqkbc-1795359068747-088ce8ee2d84",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359068876,
+          "durationMs": 58,
+          "queryCount": 23,
+          "queryDurationMs": 66.40287099996931
+        },
+        {
+          "id": "s49pm-1795359068017-268006ac7b3f",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359068052
+        },
+        {
+          "id": "s49pm-1795359068017-268006ac7b3f",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359068054
+        },
+        {
+          "id": "s49pm-1795359068017-268006ac7b3f",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359068054,
+          "durationMs": 0
+        },
+        {
+          "id": "s49pm-1795359068017-268006ac7b3f",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359068054,
+          "durationMs": 2
+        },
+        {
+          "id": "pgrtx-1795359067859-b7f693c939cb",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359067897
+        },
+        {
+          "id": "pgrtx-1795359067859-b7f693c939cb",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359067899
+        },
+        {
+          "id": "pgrtx-1795359067859-b7f693c939cb",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359067899,
+          "durationMs": 0
+        },
+        {
+          "id": "pgrtx-1795359067859-b7f693c939cb",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359067899,
+          "durationMs": 2
+        },
+        {
+          "id": "pgrtx-1795359067859-b7f693c939cb",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359067929
+        },
+        {
+          "id": "pgrtx-1795359067859-b7f693c939cb",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359067969,
+          "durationMs": 40,
+          "queryCount": 23,
+          "queryDurationMs": 53.19992599997204
+        },
+        {
+          "id": "hh7kv-1795359066951-c260049ef726",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359066989
+        },
+        {
+          "id": "hh7kv-1795359066951-c260049ef726",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359066992
+        },
+        {
+          "id": "hh7kv-1795359066951-c260049ef726",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359066992,
+          "durationMs": 0
+        },
+        {
+          "id": "hh7kv-1795359066951-c260049ef726",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359066992,
+          "durationMs": 3
+        },
+        {
+          "id": "hh7kv-1795359066951-c260049ef726",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359067031
+        },
+        {
+          "id": "hh7kv-1795359066951-c260049ef726",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359067078,
+          "durationMs": 47,
+          "queryCount": 23,
+          "queryDurationMs": 56.84215400001267
+        },
+        {
+          "id": "qbj98-1795359066930-932cb869d8d9",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-poll",
+          "event": "start",
+          "at": 1795359067000
+        },
+        {
+          "id": "qbj98-1795359066930-932cb869d8d9",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-poll",
+          "event": "end",
+          "at": 1795359067028,
+          "durationMs": 28
+        },
+        {
+          "id": "qbj98-1795359066930-932cb869d8d9",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359066966
+        },
+        {
+          "id": "qbj98-1795359066930-932cb869d8d9",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359066968
+        },
+        {
+          "id": "qbj98-1795359066930-932cb869d8d9",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359066969,
+          "durationMs": 1
+        },
+        {
+          "id": "qbj98-1795359066930-932cb869d8d9",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359066969,
+          "durationMs": 3
+        },
+        {
+          "id": "vqkbc-1795359066799-cf08f96e91e3",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359066843
+        },
+        {
+          "id": "vqkbc-1795359066799-cf08f96e91e3",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359066846
+        },
+        {
+          "id": "vqkbc-1795359066799-cf08f96e91e3",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359066847,
+          "durationMs": 1
+        },
+        {
+          "id": "vqkbc-1795359066799-cf08f96e91e3",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359066847,
+          "durationMs": 4
+        },
+        {
+          "id": "vqkbc-1795359066799-cf08f96e91e3",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "status-poll",
+          "event": "start",
+          "at": 1795359066886
+        },
+        {
+          "id": "vqkbc-1795359066799-cf08f96e91e3",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "status-poll",
+          "event": "end",
+          "at": 1795359066909,
+          "durationMs": 23
+        },
+        {
+          "id": "vqkbc-1795359066514-5a752c2d8b29",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359066558
+        },
+        {
+          "id": "vqkbc-1795359066514-5a752c2d8b29",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359066560
+        },
+        {
+          "id": "vqkbc-1795359066514-5a752c2d8b29",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359066560,
+          "durationMs": 0
+        },
+        {
+          "id": "vqkbc-1795359066514-5a752c2d8b29",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359066560,
+          "durationMs": 2
+        },
+        {
+          "id": "rnmjm-1795359066061-bfffae22fd26",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359066098
+        },
+        {
+          "id": "rnmjm-1795359066061-bfffae22fd26",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359066100
+        },
+        {
+          "id": "rnmjm-1795359066061-bfffae22fd26",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359066101,
+          "durationMs": 1
+        },
+        {
+          "id": "rnmjm-1795359066061-bfffae22fd26",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359066101,
+          "durationMs": 3
+        },
+        {
+          "id": "rnmjm-1795359066061-bfffae22fd26",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359066129
+        },
+        {
+          "id": "rnmjm-1795359066061-bfffae22fd26",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359066175,
+          "durationMs": 46,
+          "queryCount": 23,
+          "queryDurationMs": 58.32845999994606
+        },
+        {
+          "id": "hhnr4-1795359065168-587931a055e5",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359065200
+        },
+        {
+          "id": "hhnr4-1795359065168-587931a055e5",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359065202
+        },
+        {
+          "id": "hhnr4-1795359065168-587931a055e5",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359065202,
+          "durationMs": 0
+        },
+        {
+          "id": "hhnr4-1795359065168-587931a055e5",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359065202,
+          "durationMs": 2
+        },
+        {
+          "id": "hhnr4-1795359065168-587931a055e5",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359065234
+        },
+        {
+          "id": "hhnr4-1795359065168-587931a055e5",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359065278,
+          "durationMs": 44,
+          "queryCount": 23,
+          "queryDurationMs": 59.37668000005942
+        },
+        {
+          "id": "vqkbc-1795359065012-dc07e05c4d66",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359065081
+        },
+        {
+          "id": "vqkbc-1795359065012-dc07e05c4d66",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359065091
+        },
+        {
+          "id": "vqkbc-1795359065012-dc07e05c4d66",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359065091,
+          "durationMs": 0
+        },
+        {
+          "id": "vqkbc-1795359065012-dc07e05c4d66",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359065091,
+          "durationMs": 10
+        },
+        {
+          "id": "hhnr4-1795359064915-7c20401a091d",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-poll",
+          "event": "start",
+          "at": 1795359064983
+        },
+        {
+          "id": "hhnr4-1795359064915-7c20401a091d",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-poll",
+          "event": "end",
+          "at": 1795359065013,
+          "durationMs": 30
+        },
+        {
+          "id": "hhnr4-1795359064915-7c20401a091d",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359064950
+        },
+        {
+          "id": "hhnr4-1795359064915-7c20401a091d",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359064951
+        },
+        {
+          "id": "hhnr4-1795359064915-7c20401a091d",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359064952,
+          "durationMs": 1
+        },
+        {
+          "id": "hhnr4-1795359064915-7c20401a091d",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359064952,
+          "durationMs": 2
+        },
+        {
+          "id": "vqkbc-1795359064790-edc42a3f3833",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "status-poll",
+          "event": "start",
+          "at": 1795359064867
+        },
+        {
+          "id": "vqkbc-1795359064790-edc42a3f3833",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "status-poll",
+          "event": "end",
+          "at": 1795359064892,
+          "durationMs": 25
+        },
+        {
+          "id": "vqkbc-1795359064790-edc42a3f3833",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359064835
+        },
+        {
+          "id": "vqkbc-1795359064790-edc42a3f3833",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359064836
+        },
+        {
+          "id": "vqkbc-1795359064790-edc42a3f3833",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359064837,
+          "durationMs": 1
+        },
+        {
+          "id": "vqkbc-1795359064790-edc42a3f3833",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359064837,
+          "durationMs": 2
+        },
+        {
+          "id": "fxrwl-1795359064261-72b9a7ff4a39",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359064290
+        },
+        {
+          "id": "fxrwl-1795359064261-72b9a7ff4a39",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359064292
+        },
+        {
+          "id": "fxrwl-1795359064261-72b9a7ff4a39",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359064292,
+          "durationMs": 0
+        },
+        {
+          "id": "fxrwl-1795359064261-72b9a7ff4a39",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359064292,
+          "durationMs": 2
+        },
+        {
+          "id": "fxrwl-1795359064261-72b9a7ff4a39",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359064325
+        },
+        {
+          "id": "fxrwl-1795359064261-72b9a7ff4a39",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359064376,
+          "durationMs": 51,
+          "queryCount": 23,
+          "queryDurationMs": 57.217152000026545
+        },
+        {
+          "id": "pgrtx-1795359063912-37bc2357f81e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359063940
+        },
+        {
+          "id": "pgrtx-1795359063912-37bc2357f81e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359063942
+        },
+        {
+          "id": "pgrtx-1795359063912-37bc2357f81e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359063942,
+          "durationMs": 0
+        },
+        {
+          "id": "pgrtx-1795359063912-37bc2357f81e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359063943,
+          "durationMs": 3
+        },
+        {
+          "id": "pgrtx-1795359063912-37bc2357f81e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-poll",
+          "event": "start",
+          "at": 1795359063973
+        },
+        {
+          "id": "pgrtx-1795359063912-37bc2357f81e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-poll",
+          "event": "end",
+          "at": 1795359063999,
+          "durationMs": 26
+        },
+        {
+          "id": "gg8lr-1795359063794-6f9e68306541",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359063834
+        },
+        {
+          "id": "gg8lr-1795359063794-6f9e68306541",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359063838
+        },
+        {
+          "id": "gg8lr-1795359063794-6f9e68306541",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359063839,
+          "durationMs": 1
+        },
+        {
+          "id": "gg8lr-1795359063794-6f9e68306541",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359063839,
+          "durationMs": 5
+        },
+        {
+          "id": "gg8lr-1795359063794-6f9e68306541",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "status-poll",
+          "event": "start",
+          "at": 1795359063868
+        },
+        {
+          "id": "gg8lr-1795359063794-6f9e68306541",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "status-poll",
+          "event": "end",
+          "at": 1795359063890,
+          "durationMs": 22
+        },
+        {
+          "id": "rnmjm-1795359063510-17ed788ebe9f",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359063553
+        },
+        {
+          "id": "rnmjm-1795359063510-17ed788ebe9f",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359063555
+        },
+        {
+          "id": "rnmjm-1795359063510-17ed788ebe9f",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359063555,
+          "durationMs": 0
+        },
+        {
+          "id": "rnmjm-1795359063510-17ed788ebe9f",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359063555,
+          "durationMs": 2
+        },
+        {
+          "id": "qbj98-1795359063371-ac744a81cd94",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359063407
+        },
+        {
+          "id": "qbj98-1795359063371-ac744a81cd94",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359063409
+        },
+        {
+          "id": "qbj98-1795359063371-ac744a81cd94",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359063409,
+          "durationMs": 0
+        },
+        {
+          "id": "qbj98-1795359063371-ac744a81cd94",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359063409,
+          "durationMs": 2
+        },
+        {
+          "id": "qbj98-1795359063371-ac744a81cd94",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359063442
+        },
+        {
+          "id": "qbj98-1795359063371-ac744a81cd94",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359063485,
+          "durationMs": 43,
+          "queryCount": 23,
+          "queryDurationMs": 56.85277099996165
+        },
+        {
+          "id": "cnz6k-1795359062414-75ffa599ca64",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359062483
+        },
+        {
+          "id": "cnz6k-1795359062414-75ffa599ca64",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359062584,
+          "durationMs": 101,
+          "queryCount": 23,
+          "queryDurationMs": 56.96574499999406
+        },
+        {
+          "id": "cnz6k-1795359062414-75ffa599ca64",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359062449
+        },
+        {
+          "id": "cnz6k-1795359062414-75ffa599ca64",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359062451
+        },
+        {
+          "id": "cnz6k-1795359062414-75ffa599ca64",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359062451,
+          "durationMs": 0
+        },
+        {
+          "id": "cnz6k-1795359062414-75ffa599ca64",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359062451,
+          "durationMs": 2
+        },
+        {
+          "id": "2tmpf-1795359062019-8b6365c54711",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359062045
+        },
+        {
+          "id": "2tmpf-1795359062019-8b6365c54711",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359062048
+        },
+        {
+          "id": "2tmpf-1795359062019-8b6365c54711",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359062048,
+          "durationMs": 0
+        },
+        {
+          "id": "2tmpf-1795359062019-8b6365c54711",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359062048,
+          "durationMs": 3
+        },
+        {
+          "id": "vn87h-1795359061919-e6b60ef85447",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-poll",
+          "event": "start",
+          "at": 1795359061997
+        },
+        {
+          "id": "vn87h-1795359061919-e6b60ef85447",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-poll",
+          "event": "end",
+          "at": 1795359062030,
+          "durationMs": 33
+        },
+        {
+          "id": "vn87h-1795359061919-e6b60ef85447",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359061956
+        },
+        {
+          "id": "vn87h-1795359061919-e6b60ef85447",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359061958
+        },
+        {
+          "id": "vn87h-1795359061919-e6b60ef85447",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359061959,
+          "durationMs": 1
+        },
+        {
+          "id": "vn87h-1795359061919-e6b60ef85447",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359061959,
+          "durationMs": 3
+        },
+        {
+          "id": "vn87h-1795359061784-5163d274244d",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "status-poll",
+          "event": "start",
+          "at": 1795359061867
+        },
+        {
+          "id": "vn87h-1795359061784-5163d274244d",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "status-poll",
+          "event": "end",
+          "at": 1795359061891,
+          "durationMs": 24
+        },
+        {
+          "id": "vn87h-1795359061784-5163d274244d",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359061821
+        },
+        {
+          "id": "vn87h-1795359061784-5163d274244d",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359061823
+        },
+        {
+          "id": "vn87h-1795359061784-5163d274244d",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359061823,
+          "durationMs": 0
+        },
+        {
+          "id": "vn87h-1795359061784-5163d274244d",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359061823,
+          "durationMs": 2
+        },
+        {
+          "id": "hhnr4-1795359061501-4d9757bf5577",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359061534
+        },
+        {
+          "id": "hhnr4-1795359061501-4d9757bf5577",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359061536
+        },
+        {
+          "id": "hhnr4-1795359061501-4d9757bf5577",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359061536,
+          "durationMs": 0
+        },
+        {
+          "id": "hhnr4-1795359061501-4d9757bf5577",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359061536,
+          "durationMs": 2
+        },
+        {
+          "id": "hhnr4-1795359061501-4d9757bf5577",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359061575
+        },
+        {
+          "id": "hhnr4-1795359061501-4d9757bf5577",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359061626,
+          "durationMs": 51,
+          "queryCount": 23,
+          "queryDurationMs": 69.7252020000451
+        },
+        {
+          "id": "j7n6t-1795359060605-545711f00261",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359060639
+        },
+        {
+          "id": "j7n6t-1795359060605-545711f00261",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359060641
+        },
+        {
+          "id": "j7n6t-1795359060605-545711f00261",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359060641,
+          "durationMs": 0
+        },
+        {
+          "id": "j7n6t-1795359060605-545711f00261",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359060641,
+          "durationMs": 2
+        },
+        {
+          "id": "j7n6t-1795359060605-545711f00261",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359060670
+        },
+        {
+          "id": "j7n6t-1795359060605-545711f00261",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359060717,
+          "durationMs": 47,
+          "queryCount": 23,
+          "queryDurationMs": 63.354940999968676
+        },
+        {
+          "id": "6lz9x-1795359060605-683aa2be2126",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359060648
+        },
+        {
+          "id": "6lz9x-1795359060605-683aa2be2126",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359060650
+        },
+        {
+          "id": "6lz9x-1795359060605-683aa2be2126",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359060651,
+          "durationMs": 1
+        },
+        {
+          "id": "6lz9x-1795359060605-683aa2be2126",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359060651,
+          "durationMs": 3
+        },
+        {
+          "id": "x2j6t-1795359059955-c667367630aa",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359060024
+        },
+        {
+          "id": "x2j6t-1795359059955-c667367630aa",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359060025
+        },
+        {
+          "id": "x2j6t-1795359059955-c667367630aa",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359060026,
+          "durationMs": 1
+        },
+        {
+          "id": "x2j6t-1795359059955-c667367630aa",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359060026,
+          "durationMs": 2
+        },
+        {
+          "id": "x2j6t-1795359059955-c667367630aa",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-poll",
+          "event": "start",
+          "at": 1795359060081
+        },
+        {
+          "id": "x2j6t-1795359059955-c667367630aa",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-poll",
+          "event": "end",
+          "at": 1795359060104,
+          "durationMs": 23
+        },
+        {
+          "id": "rnmjm-1795359059791-ef3443dfb80e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359059825
+        },
+        {
+          "id": "rnmjm-1795359059791-ef3443dfb80e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359059827
+        },
+        {
+          "id": "rnmjm-1795359059791-ef3443dfb80e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359059827,
+          "durationMs": 0
+        },
+        {
+          "id": "rnmjm-1795359059791-ef3443dfb80e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359059827,
+          "durationMs": 2
+        },
+        {
+          "id": "rnmjm-1795359059791-ef3443dfb80e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "status-poll",
+          "event": "start",
+          "at": 1795359059862
+        },
+        {
+          "id": "rnmjm-1795359059791-ef3443dfb80e",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "status-poll",
+          "event": "end",
+          "at": 1795359059882,
+          "durationMs": 20
+        },
+        {
+          "id": "fxrwl-1795359059647-da9e9efd0a8a",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359059688
+        },
+        {
+          "id": "fxrwl-1795359059647-da9e9efd0a8a",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359059690
+        },
+        {
+          "id": "fxrwl-1795359059647-da9e9efd0a8a",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359059690,
+          "durationMs": 0
+        },
+        {
+          "id": "fxrwl-1795359059647-da9e9efd0a8a",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359059690,
+          "durationMs": 2
+        },
+        {
+          "id": "fxrwl-1795359059647-da9e9efd0a8a",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359059721
+        },
+        {
+          "id": "fxrwl-1795359059647-da9e9efd0a8a",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359059773,
+          "durationMs": 52,
+          "queryCount": 23,
+          "queryDurationMs": 65.65016199996171
+        },
+        {
+          "id": "qbj98-1795359059055-c4cbf74abd90",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359059092
+        },
+        {
+          "id": "qbj98-1795359059055-c4cbf74abd90",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359059094
+        },
+        {
+          "id": "qbj98-1795359059055-c4cbf74abd90",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359059094,
+          "durationMs": 0
+        },
+        {
+          "id": "qbj98-1795359059055-c4cbf74abd90",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359059094,
+          "durationMs": 2
+        },
+        {
+          "id": "qbj98-1795359058715-59bf7b51fdbe",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "end",
+          "at": 1795359058831,
+          "durationMs": 41,
+          "queryCount": 23,
+          "queryDurationMs": 52.78618199999619
+        },
+        {
+          "id": "qbj98-1795359058715-59bf7b51fdbe",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359058748
+        },
+        {
+          "id": "qbj98-1795359058715-59bf7b51fdbe",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359058750
+        },
+        {
+          "id": "qbj98-1795359058715-59bf7b51fdbe",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359058750,
+          "durationMs": 0
+        },
+        {
+          "id": "qbj98-1795359058715-59bf7b51fdbe",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359058750,
+          "durationMs": 2
+        },
+        {
+          "id": "qbj98-1795359058715-59bf7b51fdbe",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "snapshot-http",
+          "event": "start",
+          "at": 1795359058790
+        },
+        {
+          "id": "fxrwl-1795359058173-f1405c97f350",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "navigation",
+          "event": "end",
+          "at": 1795359058403,
+          "durationMs": 136,
+          "access": 15.921296000000439,
+          "validation": 0.000897999998414889,
+          "presentationMutation": 32.971621999997296,
+          "blockMutation": 0.000985000006039627,
+          "interactionMutation": 29.814306000000215,
+          "queryCount": 73,
+          "queryDurationMs": 184.95977600006154
+        },
+        {
+          "id": "fxrwl-1795359058173-f1405c97f350",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "navigation",
+          "event": "start",
+          "at": 1795359058267
+        },
+        {
+          "id": "fxrwl-1795359058173-f1405c97f350",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "start",
+          "at": 1795359058213
+        },
+        {
+          "id": "fxrwl-1795359058173-f1405c97f350",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "start",
+          "at": 1795359058215
+        },
+        {
+          "id": "fxrwl-1795359058173-f1405c97f350",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-after-auth",
+          "event": "end",
+          "at": 1795359058215,
+          "durationMs": 0
+        },
+        {
+          "id": "fxrwl-1795359058173-f1405c97f350",
+          "correlationId": "f1951cb7-389a-4962-a9b9-124f4d793da6",
+          "stage": "proxy-request",
+          "event": "end",
+          "at": 1795359058215,
+          "durationMs": 2
+        }
+      ],
+      "total": 2005,
+      "server": 136,
+      "queries": 73,
+      "querySum": 184.95977600006154,
+      "request": 724.8060000129044,
+      "ttfb": 723.981,
+      "commit": 1965,
+      "ack": 1966,
+      "receive": 1966,
+      "navCount": 1
+    }
+  ],
+  "median": 1996,
+  "p95": 2177,
+  "stats": {
+    "snapshot-poll": {
+      "count": 28,
+      "min": 23,
+      "max": 36
+    },
+    "proxy-after-auth": {
+      "count": 160,
+      "min": 0,
+      "max": 1
+    },
+    "proxy-request": {
+      "count": 160,
+      "min": 1,
+      "max": 32
+    },
+    "status-poll": {
+      "count": 28,
+      "min": 19,
+      "max": 25
+    },
+    "snapshot-http": {
+      "count": 55,
+      "min": 35,
+      "max": 120
+    },
+    "navigation": {
+      "count": 22,
+      "min": 114,
+      "max": 335
+    }
+  }
+}
