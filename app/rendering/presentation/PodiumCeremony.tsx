@@ -184,8 +184,8 @@ export function PodiumCeremony({ scores, revealCount, showPoints = true }: {
       data-place={group.place}
       data-entering={enteringPlace === group.place ? "true" : undefined}
     >
-      <div className="podium-team-content" tabIndex={group.entries.length > 2 ? 0 : undefined}
-        aria-label={group.entries.length > 2 ? `Punktgleiche Teams auf Platz ${group.place}; bei Bedarf scrollen` : undefined}>
+      <div className="podium-team-content" tabIndex={0}
+        aria-label={`Teams auf Platz ${group.place}; bei Bedarf scrollen`}>
         <b className="podium-rank-label">Platz {group.place}</b>
         <div className="podium-identities" data-count={group.entries.length}>
           {group.entries.map((team, index) => <div
