@@ -79,7 +79,7 @@ export async function exercisePrintTemplates(db:Client,api:Api){
  const lovdPrep=await api.readPreparation(1,lovdGame.id);
  const lovdGenerated=await api.writePreparation(1,{gameId:lovdGame.id,expectedSeriesId:10,revision:lovdPrep.revision,operation:'generate',roundId:lovdPrep.rounds[0].id,count:13,requestId:randomUUID(),printLayout:{format:'SRA3_TWELVE',cardProfile:'A4_FOUR'}});
  const lovdExport=await api.readExport(1,lovdGame.id,lovdGenerated.seriesId!,1,13);
- assert.equal(lovdExport.snapshot.version,3);if(lovdExport.snapshot.version!==3)throw Error('V3 retained');assert.equal(lovdExport.snapshot.settings.partnerBack,1);assert.equal(lovdExport.snapshot.settings.colors.header,'#6A241C');assert.ok(lovdExport.snapshot.codeFont);
+ assert.equal(lovdExport.snapshot.version,3);if(lovdExport.snapshot.version!==3)throw Error('V3 retained');assert.equal(lovdExport.snapshot.settings.partnerBack,1);assert.equal(lovdExport.snapshot.settings.colors.header,'#74291D');assert.ok(lovdExport.snapshot.codeFont);
  for(const row of (await db.query('SELECT to_jsonb(s) data FROM pubquiz.bingo_card_series s WHERE id=$1',[lovdGenerated.seriesId])).rows)assert.doesNotThrow(()=>inspectRow(row.data,new Set(),'pubquiz','bingo_card_series'));
  await db.query('UPDATE pubquiz.eventreihen SET shared_design_template_id=$1,bingo_print_config=$2 WHERE eventreihe_id=10',[lovdSeriesBefore.shared_design_template_id,lovdSeriesBefore.bingo_print_config]);
  console.info('LOVD real inherited V3 generation, corrected RGB, frozen regular code face and backup integrity PASS');

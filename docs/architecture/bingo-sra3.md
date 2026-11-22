@@ -38,7 +38,7 @@ Duplex folgt der langen Kante: auf jeden Vorderseitenbogen folgt unmittelbar sei
 
 ## LOVD-Partnerkorrektur in PR174 (20.11.2026)
 
-Für neue LOVD-Druckstände gilt [der Nachtrag mit regulärem Muster und Messungen](../acceptance/bingo-lovd-pr174-2026-11-20.md). Der geerbte V3-Frontpfad bleibt hinsichtlich Raster, Größen, Schriftdateien und Textpassung erhalten. Implizite Standardfarben werden auf LOVD Red `#6A241C` / BINGO Creme Catalana `#FFF9E9` korrigiert; explizite individuelle Farbfelder und Schriftentscheidungen bleiben erhalten.
+Für neue LOVD-Druckstände gilt [der Nachtrag mit regulärem Muster und Messungen](../acceptance/bingo-lovd-pr174-2026-11-20.md). Der geerbte V3-Frontpfad bleibt hinsichtlich Raster, Größen, Schriftdateien und Textpassung erhalten. Implizite Standardfarben werden auf den häufigsten Rotton der eingebetteten originalen Rückseitenkachel `#74291D` (Kopfzeile und Freifeld) / BINGO Creme Catalana `#FFF9E9` korrigiert; explizite individuelle Farbfelder und Schriftentscheidungen bleiben erhalten.
 
 Die neue optionale gespeicherte Gestaltungsvariante `partnerBack:1` nutzt oben die rote LOVD/STELP-Originalkachel (`/branding/lovd/lovd-stelp.png`), darunter das transparente Phil-Gud-Original, freie L-Schutzzonen und die gemeinsame Partner-Rückseite mit × und regulärer grauer 6,5-pt-Kennung. V3-Snapshots mit diesem Marker enthalten zusätzlich den streng geprüften eingefrorenen `codeFont` (Arimo Regular 400). V3 ohne Marker behält unverändert die alte Rückseite und seine bisherige JSON-Struktur. V4 behält sein Frontlayout und seinen bisherigen Pflicht-`codeFont`; neue LOVD-Systemwerte enthalten ebenfalls den Marker. Der Marker ist eine versionierte Gestaltungsentscheidung, kein Papierformat und keine Umstellung auf V4.
 

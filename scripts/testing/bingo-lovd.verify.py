@@ -6,7 +6,7 @@ from pypdf import PdfReader,PdfWriter,Transformation
 from pypdf.generic import RectangleObject
 from PIL import Image,ImageChops,ImageStat
 root=Path('.artifacts/bingo-sra3');out=root/'lovd-correction';out.mkdir(exist_ok=True);pt=72/25.4
-profiles={'A4_FOUR':92.5,'A4_SIX':89,'A6_ONE':93};red=(106/255,36/255,28/255)
+profiles={'A4_FOUR':92.5,'A4_SIX':89,'A6_ONE':93};tile_rgb=(116,41,29);red=tuple(channel/255 for channel in tile_rgb)
 def close(a,b,eps=1e-5):return all(abs(x-y)<eps for x,y in zip(a,b))
 def frame(page,side):return [r for r in page.rects if abs(r['width']-side)<.001 and abs(r['height']-side)<.001 and r.get('fill')]
 def normalize(src,index,r,dest,dpi=144):
@@ -77,6 +77,7 @@ for index in [1,3]:
  for tile in tiles:
   assert tile['/Width']==tile['/Height'] and tile['/ColorSpace']=='/DeviceRGB'
   decoded=Image.frombytes('RGB',(tile['/Width'],tile['/Height']),tile.get_data())
+  assert max(decoded.getcolors(decoded.width * decoded.height))[1] == tile_rgb
   diff=ImageChops.difference(decoded.resize(reference.size,Image.Resampling.LANCZOS),reference)
   assert max(ImageStat.Stat(diff).mean)<1
  for font in page['/Resources']['/Font'].get_object().values():
@@ -96,5 +97,5 @@ with pdfplumber.open(root/'lovd-old-browser-13.pdf') as original:
     assert a.extract_text()==b.extract_text()
     assert [(r['x0'],r['y0'],r['width'],r['height'],r.get('non_stroking_color')) for r in a.rects]==[(r['x0'],r['y0'],r['width'],r['height'],r.get('non_stroking_color')) for r in b.rects]
    assert all(c['size']==8 for p in historical.pages[1::2] for c in p.chars)
-summary={'RGB':[106,36,28],'profilesMm':[89,92.5,93],'frontTypographyUnchanged':True,'regularCodePt':6.5,'regularCodeFonts':fonts,'originalRedLovdTile':True,'transparentPhilGud':True,'crossPerBack':True,'LProtectionMeasured':True,'historicalV3Still8ptAndOriginalColors':True,'comparisons':comparisons}
+summary={'RGB':list(tile_rgb),'profilesMm':[89,92.5,93],'frontTypographyUnchanged':True,'regularCodePt':6.5,'regularCodeFonts':fonts,'originalRedLovdTile':True,'transparentPhilGud':True,'crossPerBack':True,'LProtectionMeasured':True,'historicalV3Still8ptAndOriginalColors':True,'comparisons':comparisons}
 (out/'verification.json').write_text(json.dumps(summary,indent=2));print(json.dumps({k:v for k,v in summary.items() if k!='comparisons'}))

@@ -5,7 +5,8 @@ export const PHIL_PRINT_LOGO = "/branding/bingo-print/phil-gud.png";
 export const LOVD_PRINT_LOGO = "/branding/bingo-print/lovd.png";
 export const LOVD_SMALL_LOGO = "/branding/bingo-print/lovd-small-creme.png";
 export const LOVD_LIGHT_LOGO = "/branding/lovd/lovd-stelp-creme-rgb.png";
-export const LOVD_RED = "#6A241C";
+// Most frequent RGB pixel in the original LOVD tile embedded on the back.
+export const LOVD_RED = "#74291D";
 export const LOVD_CREAM = "#FFF9E9";
 export const LOVD_LOGO = "/branding/lovd/lovd-stelp.png";
 export const printFonts = [
