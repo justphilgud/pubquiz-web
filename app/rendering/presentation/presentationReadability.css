@@ -433,6 +433,7 @@
 .podium-crowd { z-index: auto; }
 .podium-friend {
   position: absolute;
+  z-index: 2;
   bottom: 7%;
   display: block;
   background-position: center bottom;
@@ -471,7 +472,7 @@
 .podium-ceremony[data-phase="rank2-reveal"] .podium-friend--orange { animation-name: podium-wobble-bounce; }
 .podium-ceremony[data-phase="rank2-reveal"] .podium-friend--blue { animation-name: podium-tilt-hop; }
 .podium-ceremony[data-phase="winner"] .podium-friend--teal { animation: podium-teal-boomerang 2.6s cubic-bezier(.22,.7,.28,1) 3 both; z-index: 12; }
-.podium-ceremony[data-phase="winner"] .podium-friend--gudi { animation: podium-gudi-firework-flight 7.8s cubic-bezier(.18,.78,.24,1) 1 both; z-index: 14; }
+.podium-ceremony[data-phase="winner"] .podium-friend--gudi { animation: podium-gudi-firework-flight 7.8s cubic-bezier(.18,.78,.24,1) 1 both; z-index: 32; }
 .podium-ceremony[data-phase="winner"] .podium-friend--orange { animation: podium-orange-spin 1.95s cubic-bezier(.25,.8,.25,1) 4 both; z-index: 12; }
 .podium-ceremony[data-phase="winner"] .podium-friend--blue { animation: podium-blue-leaps 1.3s cubic-bezier(.15,.85,.25,1) 6 both; z-index: 12; }
 .podium-ceremony[data-phase="winner"] .podium-friend--yellow { animation: podium-superball 2.6s cubic-bezier(.2,.75,.25,1) 3 both; z-index: 30; }

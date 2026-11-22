@@ -175,6 +175,7 @@ test("presentation acknowledges committed targets without focus or animation fra
     await evaluate('window.podiumReveal(3)');
     assert.equal(await evaluate("document.querySelector('.podium-ceremony').dataset.phase"),'winner');
     assert.equal(await evaluate("getComputedStyle(document.querySelector('[data-podium-friend=gudi]')).animationName"),'podium-gudi-firework-flight');
+    assert.ok(await evaluate("Number(getComputedStyle(document.querySelector('[data-podium-friend=gudi]')).zIndex)>Number(getComputedStyle(document.querySelector('.podium-team[data-place=\"1\"]')).zIndex)"),'Gudi flight remains visible in front of the cards');
     assert.equal(await evaluate("getComputedStyle(document.querySelector('[data-podium-friend=teal]')).animationName"),'podium-teal-boomerang');
     assert.equal(await evaluate("document.querySelectorAll('.podium-confetti-piece').length"),112);
     assert.equal(await evaluate("document.querySelectorAll('.podium-team-photo').length"),3);
@@ -192,6 +193,7 @@ test("presentation acknowledges committed targets without focus or animation fra
     await delay(4200);
     assert.equal(await evaluate("document.querySelector('.podium-ceremony').dataset.phase"),'finale');
     assert.equal(await evaluate("getComputedStyle(document.querySelector('[data-podium-friend=gudi]')).animationName"),'podium-n64-sway');
+    assert.ok(await evaluate("Number(getComputedStyle(document.querySelector('[data-podium-friend=gudi]')).zIndex)>Number(getComputedStyle(document.querySelector('.podium-stands')).zIndex)"),'resting figures are not hidden behind the podium');
     await delay(350);
     assert.equal(await evaluate("getComputedStyle(document.querySelector('.podium-firework-tail')).opacity"),'0');
     assert.equal(await evaluate("document.querySelectorAll('.podium-team').length"),3);
