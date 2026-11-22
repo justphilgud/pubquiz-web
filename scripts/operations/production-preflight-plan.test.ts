@@ -4,7 +4,7 @@ import {execFileSync} from "node:child_process";
 import {migrationFiles,assessMigrations} from "./production-preflight";
 import { readFileSync } from "node:fs";
 import { APPROVED_PREFLIGHT_PLANS, approvedPreflightPlan, hasApprovedDeltaEvidence, hasApprovedPendingDelta,
-  NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN, ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN, BINGO_POLLING_NO_DELTA_PREFLIGHT_PLAN, BINGO_MATCHING_UX_NO_DELTA_PREFLIGHT_PLAN, QUIZ_MODERATION_PR175_NO_DELTA_PREFLIGHT_PLAN, approvedNoDeltaPreflightPlan, assertNoDeltaManifest, hasCompleteNoDeltaHistory } from "./production-preflight-plan";
+  NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN, ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN, BINGO_POLLING_NO_DELTA_PREFLIGHT_PLAN, BINGO_MATCHING_UX_NO_DELTA_PREFLIGHT_PLAN, QUIZ_MODERATION_PR175_NO_DELTA_PREFLIGHT_PLAN, PODIUM_PR177_NO_DELTA_PREFLIGHT_PLAN, approvedNoDeltaPreflightPlan, assertNoDeltaManifest, hasCompleteNoDeltaHistory } from "./production-preflight-plan";
 import { needsApplicationDeployment } from "./deployment-scope";
 
 test("only exact reviewed release pairs and SQL checksums are eligible", () => {
@@ -281,6 +281,85 @@ test("PR175 Operations plan stays in isolated safety CI and cannot deploy applic
   }
   const safety = readFileSync(".github/workflows/production-preflight-ci.yml", "utf8");
   assert.match(safety, /baseline: 31f99fe4f01596880dcec8ba614108fa5e1cd440\s+candidate: 948b164de02bf3ec0edd3ab98352528a09b8905f/);
+  assert.match(safety, /postgres:17/);
+  assert.match(safety, /127\.0\.0\.1:5432\/preflight_ci/);
+  assert.doesNotMatch(safety, /environment:|secrets\.|PRODUCTION_BACKUP_DATABASE_URL/);
+  const protectedWorkflow = readFileSync(".github/workflows/production-read-only-preflight.yml", "utf8");
+  assert.match(protectedWorkflow, /environment: production/);
+  assert.match(protectedWorkflow, /environment: operations-backup/);
+  assert.match(protectedWorkflow, /github.ref == 'refs\/heads\/main'/);
+  assert.doesNotMatch(protectedWorkflow, /db:deploy|vercel.*deploy|acceptance-cli|workflow_run:/);
+});
+
+test("PR177 pins only its approved 79-migration pair and rejects even coherently changed evidence", () => {
+  const plan = PODIUM_PR177_NO_DELTA_PREFLIGHT_PLAN;
+  assert.deepEqual(plan, {
+    baselineSha: "e75c47cb4a2167a09303dad2540a252ea6860b1f",
+    candidateSha: "ec8a9fe0c73cb9fc17ffba69e73fc6c94d6f740c",
+    migrationCount: 79,
+    lastMigration: "20261119150000_add_quiz_mode",
+    manifestSha256: "8af6aff9799497bf6415f2e235bf5f74e7d2807c449d0872761d5e70fc0adb35",
+    schemaSha256: "c285d05ddb25bebba4314e74afd075f480462b816fb3ba0da468780e515727f8",
+  });
+  const {baselineSha, candidateSha} = plan;
+  execFileSync("git", ["merge-base", "--is-ancestor", baselineSha, candidateSha]);
+  const before = migrationFiles(baselineSha), after = migrationFiles(candidateSha);
+  const schema = (sha: string) => execFileSync("git", ["show", `${sha}:prisma/schema.prisma`], {encoding: "utf8"});
+  const a = schema(baselineSha), b = schema(candidateSha);
+  const verify = (left = before, right = after, sa = a, sb = b) =>
+    assertNoDeltaManifest(baselineSha, candidateSha, left, right, sa, sb);
+  assert.equal(approvedNoDeltaPreflightPlan(baselineSha, candidateSha), plan);
+  assert.equal(verify().migrationCount, 79);
+
+  const oldPlans = [NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN,
+    ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN, BINGO_POLLING_NO_DELTA_PREFLIGHT_PLAN,
+    BINGO_MATCHING_UX_NO_DELTA_PREFLIGHT_PLAN, QUIZ_MODERATION_PR175_NO_DELTA_PREFLIGHT_PLAN];
+  const invalidPairs = [[candidateSha, baselineSha], [baselineSha, baselineSha],
+    ["a".repeat(40), candidateSha], [baselineSha, "b".repeat(40)],
+    [baselineSha.slice(0, 8), candidateSha], [baselineSha, candidateSha.slice(0, 8)],
+    ...oldPlans.flatMap(old => [[old.baselineSha, candidateSha], [baselineSha, old.candidateSha]])];
+  for (const [base, candidate] of invalidPairs) {
+    assert.equal(approvedNoDeltaPreflightPlan(base, candidate), undefined);
+    assert.throws(() => assertNoDeltaManifest(base, candidate, before, after, a, b));
+  }
+  for (const old of oldPlans) assert.equal(approvedNoDeltaPreflightPlan(old.baselineSha, old.candidateSha), old);
+
+  const changed = after.map((file, i) => i === 0 ? {...file, checksum: "0".repeat(64)} : file);
+  const duplicate = after.map((file, i) => i === 78 ? after[0] : file);
+  const extra = [...after, {...after[0], name: "unexpected"}];
+  for (const invalid of [after.slice(1), extra, changed, duplicate]) assert.throws(() => verify(before, invalid));
+  assert.throws(() => verify(changed, changed), /NO_DELTA_PINNED_BYTES_UNVERIFIED/);
+  assert.throws(() => verify([...before].reverse(), [...after].reverse()), /NO_DELTA_PINNED_BYTES_UNVERIFIED/);
+  assert.throws(() => verify(before, after, a + " ", b));
+  assert.throws(() => verify(before, after, a, b + " "));
+  assert.throws(() => verify(before, after, a + " ", b + " "), /NO_DELTA_PINNED_BYTES_UNVERIFIED/);
+
+  const rows = before.map(file => ({migration_name: file.name, checksum: file.checksum, finished_at: "done", rolled_back_at: null}));
+  const history = assessMigrations(after, before, rows);
+  assert.equal(hasCompleteNoDeltaHistory(history, after, plan), true);
+  assert.equal(hasCompleteNoDeltaHistory(history, after), false);
+  for (const invalid of [{...history, gate: {status: "BLOCKED"}}, {...history, gate: {status: "FAIL"}},
+    {...history, applied: history.applied.slice(1)}, {...history, applied: [...history.applied, "extra"]},
+    {...history, applied: history.applied.map((name, i) => i === 78 ? history.applied[0] : name)},
+    {...history, pending: [plan.lastMigration]}, {...history, expected: [plan.lastMigration]}]) {
+    assert.equal(hasCompleteNoDeltaHistory(invalid, after, plan), false);
+  }
+  for (const invalidRows of [rows.slice(1), [...rows, {...rows[0], migration_name: "unexpected"}],
+    [{...rows[0], finished_at: null}, ...rows.slice(1)],
+    [{...rows[0], checksum: "0".repeat(64)}, ...rows.slice(1)]]) {
+    assert.equal(assessMigrations(after, before, invalidRows).gate.status, "FAIL");
+  }
+});
+
+test("PR177 Operations plan stays in isolated safety CI and cannot deploy application or weaken protected workflow", () => {
+  const paths = ["scripts/operations/production-preflight-plan.ts", "scripts/operations/production-preflight-plan.test.ts",
+    ".github/workflows/production-preflight-ci.yml", "docs/operations/pr177-release-preflight.md"];
+  assert.equal(needsApplicationDeployment(paths), false);
+  for (const path of ["app/quiz/actions.ts", "prisma/schema.prisma", "prisma/migrations/extra/migration.sql"]) {
+    assert.equal(needsApplicationDeployment([...paths, path]), true);
+  }
+  const safety = readFileSync(".github/workflows/production-preflight-ci.yml", "utf8");
+  assert.match(safety, /baseline: e75c47cb4a2167a09303dad2540a252ea6860b1f\s+candidate: ec8a9fe0c73cb9fc17ffba69e73fc6c94d6f740c/);
   assert.match(safety, /postgres:17/);
   assert.match(safety, /127\.0\.0\.1:5432\/preflight_ci/);
   assert.doesNotMatch(safety, /environment:|secrets\.|PRODUCTION_BACKUP_DATABASE_URL/);
