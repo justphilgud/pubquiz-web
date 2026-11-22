@@ -59,8 +59,18 @@ export const BINGO_MATCHING_UX_NO_DELTA_PREFLIGHT_PLAN = Object.freeze({
   schemaSha256: "9d7d5860b8cd5a6fb497b880c283fe61e26993018200912fe6a71997803e6ac9",
 });
 
+// PR175: separately authorized immutable pair, complete 79-file manifest, no SQL delta.
+export const QUIZ_MODERATION_PR175_NO_DELTA_PREFLIGHT_PLAN = Object.freeze({
+  baselineSha: "31f99fe4f01596880dcec8ba614108fa5e1cd440",
+  candidateSha: "948b164de02bf3ec0edd3ab98352528a09b8905f",
+  migrationCount: 79,
+  lastMigration: "20261119150000_add_quiz_mode",
+  manifestSha256: "8af6aff9799497bf6415f2e235bf5f74e7d2807c449d0872761d5e70fc0adb35",
+  schemaSha256: "c285d05ddb25bebba4314e74afd075f480462b816fb3ba0da468780e515727f8",
+});
+
 export function approvedNoDeltaPreflightPlan(baseline: string, candidate: string) {
-  return [NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN, ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN, BINGO_POLLING_NO_DELTA_PREFLIGHT_PLAN, BINGO_MATCHING_UX_NO_DELTA_PREFLIGHT_PLAN]
+  return [NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN, ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN, BINGO_POLLING_NO_DELTA_PREFLIGHT_PLAN, BINGO_MATCHING_UX_NO_DELTA_PREFLIGHT_PLAN, QUIZ_MODERATION_PR175_NO_DELTA_PREFLIGHT_PLAN]
     .find(plan => baseline === plan.baselineSha && candidate === plan.candidateSha);
 }
 
