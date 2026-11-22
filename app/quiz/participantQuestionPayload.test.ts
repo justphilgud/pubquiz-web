@@ -151,6 +151,7 @@ test("initial/RSC call with no valid participant session has no questions or sol
 test("direct Server Action cannot request presentation scope without quiz authorization", async () => {
   let reads = 0;
   const fn = execute("getQuizLiveSnapshot", "app/quiz/actions.ts", {
+    startRequestNavigationTrace: async () => () => {},
     resolveParticipantSession: async () => ({ quiz_team_session_id: 9 }),
     requireQuizViewer: async () => { throw new Error("FORBIDDEN"); },
     getQuizLiveSnapshotData: async () => { reads++; return { participant: true }; },
@@ -163,6 +164,7 @@ test("direct Server Action cannot request presentation scope without quiz author
 test("moderator HTTP transport rejects a normal participant before reading data", async () => {
   let reads = 0;
   const fn = execute("POST", "app/api/quiz/live-snapshot/route.ts", {
+    startRequestNavigationTrace: async () => () => {},
     auth: async () => null,
     getQuizLiveSnapshotData: async () => { reads++; },
     withPrismaQueryDiagnostics: async (f: () => Promise<unknown>) => ({ result: await f(), diagnostics: null }),

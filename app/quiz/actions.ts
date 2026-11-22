@@ -1,4 +1,5 @@
 "use server";
+import { startRequestNavigationTrace } from "@/app/lib/navigationTrace.server";
 import { DEFAULT_QUIZ_MODE, isQuizMode, normalizeQuizMode, type QuizMode } from "./quizMode";
 
 import { newQuizIntroMedia, selectedQuizIntroMedia } from "./quizIntroMedia";
@@ -3611,6 +3612,7 @@ export async function getQuizLiveSnapshot(
   includeTeamJoinState = false,
   presentationQuestionAssignmentId?: number,
 ) {
+  const finishTrace = await startRequestNavigationTrace("snapshot-poll");
   const participantSession = await resolveParticipantSession(
     quizId,
     quizTeamSessionToken,
@@ -3619,7 +3621,7 @@ export async function getQuizLiveSnapshot(
       presentationQuestionAssignmentId !== undefined) {
     await requireQuizViewer(quizId);
   }
-  return getQuizLiveSnapshotData(
+  const snapshot = await getQuizLiveSnapshotData(
     quizId,
     participantSession?.quiz_team_session_id ?? null,
     {
@@ -3628,6 +3630,8 @@ export async function getQuizLiveSnapshot(
       presentationQuestionAssignmentId,
     },
   );
+  finishTrace();
+  return snapshot;
 }
 
 export async function submitTeamAntwort(data: {

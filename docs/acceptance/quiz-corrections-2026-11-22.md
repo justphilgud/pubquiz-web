@@ -1,5 +1,10 @@
 # Quiz-Korrekturen: Abnahme und Ist-Analyse
 
+**P0-Releaseblocker:** Die spätere echte Preview zeigte erhebliche Verzögerungen.
+Die [gesonderte korrelierte Latenzdiagnose](pr175-p0-latency-2026-11-22.md) ergänzt
+die folgenden lokalen Nachweise; PR175 ist bis zu ihrer bestandenen Abnahme nicht
+releasebereit. Kein Merge oder Production-Eingriff im Diagnoseauftrag.
+
 Basis: aktuelles `origin/main` vom 22.11.2026, `31f99fe4f01596880dcec8ba614108fa5e1cd440`.
 Separater Branch `codex/quiz-moderation-corrections`. Kein Merge, kein Production-
 Deployment, keine produktiven Quiz-, Antwort- oder Bewertungsänderungen.

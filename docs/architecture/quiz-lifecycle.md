@@ -38,6 +38,20 @@ Wartezeit auf Anwendung im Player. Die vorhandenen serverseitigen Phasenmessunge
 Tests: `navigationTransition.test.ts`, `sponsorNavigation.test.ts` und der
 [Abnahmebericht](../reports/lovd-november.md).
 
+### Befristete P0-Diagnose auf Preview (22.11.2026)
+
+Für die reale Latenzuntersuchung kann der isolierte Testbrowser eine zufällige
+`x-qa-correlation`-ID mitsenden. Ausschließlich `VERCEL_ENV=preview` veröffentlicht
+dann `navigation-trace`-Start-/Endzeitpunkte für Proxy nach Authentifizierung,
+Navigationsaktion, Statuspoll, Snapshotpoll und HTTP-Snapshot sowie freigegebene
+numerische Prisma-/Phasenmesswerte. Die Diagnose endet automatisch am 24.11.2026
+um 00:00 UTC. Andere Umgebungen und unzulässige Headerwerte erzeugen keine Einträge.
+Es werden keine Quiz-/Teamnamen, Positionenschlüssel, Antworten, Medieninhalte,
+Cookies, Tokens oder SQL-Parameter protokolliert. Der Testbrowser zeichnet seine
+Netzwerk-, React- und Broadcast-Ereignisse getrennt unter derselben ID auf.
+Dies verändert weder Nutzdaten noch Rollen, Lifecycle oder Navigationssperren und
+ist noch keine Behauptung einer behobenen Latenz. Regression: `navigationTrace.test.ts`.
+
 ## Ergänzung 16. Oktober 2026: dauerhaftes Meme-Archiv
 
 Reset löscht weiterhin Sessions, Antworten, Runs und Votingdaten, aber keine
