@@ -69,8 +69,18 @@ export const QUIZ_MODERATION_PR175_NO_DELTA_PREFLIGHT_PLAN = Object.freeze({
   schemaSha256: "c285d05ddb25bebba4314e74afd075f480462b816fb3ba0da468780e515727f8",
 });
 
+// PR177: exact podium release; existing schema and complete migration manifest unchanged.
+export const PODIUM_PR177_NO_DELTA_PREFLIGHT_PLAN = Object.freeze({
+  baselineSha: "e75c47cb4a2167a09303dad2540a252ea6860b1f",
+  candidateSha: "ec8a9fe0c73cb9fc17ffba69e73fc6c94d6f740c",
+  migrationCount: 79,
+  lastMigration: "20261119150000_add_quiz_mode",
+  manifestSha256: "8af6aff9799497bf6415f2e235bf5f74e7d2807c449d0872761d5e70fc0adb35",
+  schemaSha256: "c285d05ddb25bebba4314e74afd075f480462b816fb3ba0da468780e515727f8"
+});
+
 export function approvedNoDeltaPreflightPlan(baseline: string, candidate: string) {
-  return [NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN, ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN, BINGO_POLLING_NO_DELTA_PREFLIGHT_PLAN, BINGO_MATCHING_UX_NO_DELTA_PREFLIGHT_PLAN, QUIZ_MODERATION_PR175_NO_DELTA_PREFLIGHT_PLAN]
+  return [NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN, ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN, BINGO_POLLING_NO_DELTA_PREFLIGHT_PLAN, BINGO_MATCHING_UX_NO_DELTA_PREFLIGHT_PLAN, QUIZ_MODERATION_PR175_NO_DELTA_PREFLIGHT_PLAN, PODIUM_PR177_NO_DELTA_PREFLIGHT_PLAN]
     .find(plan => baseline === plan.baselineSha && candidate === plan.candidateSha);
 }
 
