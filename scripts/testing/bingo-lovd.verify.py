@@ -42,12 +42,17 @@ with pdfplumber.open(browser) as pdf:
    assert not any(r.get('fill') and close(r.get('non_stroking_color',()),(1,1,1)) for r in page.rects)
    diagonals=[l for l in page.lines if abs(l['linewidth']-.35)<.001 and l['width']>1 and l['height']>1]
    assert len(diagonals)==2*len(frame(page,side))
-   # Primary LOVD logo is above the cross, and its L-length expanded box remains free.
+   # Both marks have equal height. The × stays inside their shared gap,
+   # and the LOVD tile keeps its L-length clearspace at the card edges.
    for r in frame(page,side):
     images=[im for im in page.images if r['x0']<=im['x0'] and im['x1']<=r['x1'] and r['y0']<=im['y0'] and im['y1']<=r['y1']]
-    assert len(images)==2;lovd=max(images,key=lambda im:im['y0']);clearance=lovd['width']*752/3126
-    assert min(lovd['x0']-r['x0'],r['x1']-lovd['x1'],r['y1']-lovd['y1'])>=clearance
-    assert lovd['y0']-clearance>=r['y0']+side*.565+6
+    assert len(images)==2;lovd=max(images,key=lambda im:im['y0']);phil=min(images,key=lambda im:im['y0'])
+    assert abs(lovd['height']-phil['height'])<.01
+    assert abs(lovd['height']-side*.37)<.01
+    clearance=lovd['width']*752/3126
+    assert min(lovd['x0']-r['x0'],r['x1']-lovd['x1'],r['y1']-lovd['y1'],lovd['y0']-r['y0'])>=clearance
+    gap_lines=[line for line in page.lines if line['linewidth']==.35 and abs((line['x0']+line['x1'])/2-(r['x0']+r['x1'])/2)<10 and min(line['y0'],line['y1'])>phil['y1'] and max(line['y0'],line['y1'])<lovd['y0']]
+    assert len(gap_lines)==2 and max(max(line['width'],line['height']) for line in gap_lines)<10
   else:
    rects=[r for r in page.rects if r.get('fill') and isinstance(r.get('non_stroking_color'),tuple) and close(r['non_stroking_color'],red)]
    assert len(rects)==6*len(frame(page,side))

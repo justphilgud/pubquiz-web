@@ -9,9 +9,11 @@ export function drawPartnerBack(page:PDFPage,{x,y,side}:{x:number;y:number;side:
  if(!lovd)page.drawRectangle({x:x+9,y:y+9,width:side-18,height:side-18,borderColor:codeInk,borderWidth:.25,opacity:.25,borderOpacity:.4});
  if(backs.length===1)logo(page,backs[0],x+side/2,y+side/2+3,side*.68,side*.72);
  else{
-  logo(page,backs[0],x+side/2,y+side*(lovd?.79:.75),lovd?side*.40:side*.62,side*.25);
-  logo(page,backs[1],x+side/2,y+side*.31,side*.36,side*.37);
-  const cx=x+side/2,cy=y+side*.565,r=6;
+  // New LOVD backs use equal-height logos with clear outer margins.
+  // The smaller × sits in the compact gap between both marks.
+  logo(page,backs[0],x+side/2,y+side*(lovd?.725:.75),lovd?side*.50:side*.62,lovd?side*.37:side*.25);
+  logo(page,backs[1],x+side/2,y+side*(lovd?.275:.31),side*.36,side*.37);
+  const cx=x+side/2,cy=y+side*(lovd?.50:.565),r=lovd?3.5:6;
   for(const direction of [-1,1])page.drawLine({start:{x:cx-r,y:cy-direction*r},end:{x:cx+r,y:cy+direction*r},thickness:.35,color:codeInk});
  }
  draw(page,shortCode,code,6.5,x+14,y+14,side-28,codeInk,true);
