@@ -7,6 +7,19 @@ import { balanceStatus, BALANCE_TEMPLATE_GROUPS, getQuizBalance, questionBalance
 
 const q = (changes: Partial<BalanceQuestion> = {}): BalanceQuestion => ({ sectionId: 1, templateId: "standard", answerMode: "OPEN", categoryIds: [], ...changes });
 
+test("uncategorized questions stay separate, no categories stay neutral, themed distribution stays ungraded", () => {
+  const input = { questions: [q({ categoryIds:[1,1] }), ...Array.from({length:24},()=>q())], sections:[{id:1,title:"Block"}], categories:[{id:1,name:"Film"},{id:2,name:"Kultur"}] };
+  const block = getQuizBalance(input).blocks[0];
+  assert.equal(block.total,25); assert.equal(block.categorizedTotal,1); assert.equal(block.uncategorizedTotal,24);
+  assert.equal(block.categories[0].status,"RED");
+  const empty = getQuizBalance({...input,questions:input.questions.map(question=>({...question,categoryIds:[]}))}).blocks[0];
+  assert.equal(empty.categorizedTotal,0); assert.equal(empty.uncategorizedTotal,25); assert.deepEqual(empty.categories,[]);
+  const themed = getQuizBalance({...input,mode:"THEMED"}).blocks[0];
+  assert.equal(themed.categories[0].status,"NONE");
+  assert.ok(themed.recommendations.every(r=>!r.href.includes("categoryId")));
+  for(const [count,status] of [[999,"GREEN"],[1000,"GREEN"],[2000,"GREEN"],[2001,"YELLOW"],[3000,"YELLOW"],[3001,"RED"]] as const) assert.equal(balanceStatus("category",count,10000),status);
+});
+
 // 25 questions with green template groups, so categories alone determine status.
 const balanced25 = () => [
   ...Array(4).fill("standard"), ...Array(8).fill("multiple_choice"), ...Array(4).fill("musik"),
@@ -52,9 +65,9 @@ test("each block owns its denominator, duplicate categories count once, zero cat
   });
   assert.deepEqual(result.blocks.map(b => b.total), [10, 4]);
   assert.equal(result.blocks[0].categories[0].count, 1);
-  assert.equal(result.blocks[0].categories[0].status, "GREEN");
+  assert.equal(result.blocks[0].categories[0].status, "RED", "one of one categorized questions; nine uncategorized questions do not dilute it");
   assert.equal(result.blocks[0].categories.length, 1);
-  assert.equal(result.blocks[1].categories[0].status, "YELLOW", "1/4 is 25% in this block, not the pooled quiz share");
+  assert.equal(result.blocks[1].categories[0].status, "RED", "one of one categorized questions in this block");
   assert.equal(result.blocks[1].categories.length, 1);
   assert.equal(result.unassigned, 1);
 });
@@ -134,8 +147,8 @@ test("themed quiz preserves block template warnings and recommendations without 
 
 test("25-question category boundaries drive display, block/overall status and recommendations together", () => {
   for (const [count, expected] of [[5,"GREEN"],[6,"YELLOW"],[7,"YELLOW"],[8,"RED"]] as const) {
-    const input = { questions: balanced25().map((question, i) => ({ ...question, categoryIds: i < count ? [1] : [] })),
-      sections: [{ id: 1, title: "25 Fragen" }], categories: [{ id: 1, name: "Film" }, { id: 2, name: "Kultur" }] };
+    const input = { questions: balanced25().map((question, i) => ({ ...question, categoryIds: i < count ? [1] : [i+3] })),
+      sections: [{ id: 1, title: "25 Fragen" }], categories: [{ id: 1, name: "Film" }, { id: 2, name: "Kultur" }, ...Array.from({length:25},(_,i)=>({id:i+3,name:`Thema ${i}`}))] };
     const result = getQuizBalance(input);
     const block = result.blocks[0];
     assert.equal(block.total, 25);
@@ -163,9 +176,9 @@ test("category comparisons do not round just above 20 or 30 percent", () => {
 
 test("category alternatives use the same green limit, including exactly 20 percent", () => {
   const result = getQuizBalance({ questions: balanced25().map((question, i) => ({ ...question,
-    categoryIds: i < 6 ? [1] : i < 11 ? [2] : [],
-  })), sections: [{ id: 1, title: "Block" }], categories: [{ id: 1, name: "Film" }, { id: 2, name: "Kultur" }] });
-  assert.deepEqual(result.blocks[0].categories.map(c => c.status), ["YELLOW", "GREEN"]);
+    categoryIds: i < 6 ? [1] : i < 11 ? [2] : [i+3],
+  })), sections: [{ id: 1, title: "Block" }], categories: [{ id: 1, name: "Film" }, { id: 2, name: "Kultur" }, ...Array.from({length:14},(_,i)=>({id:i+14,name:`Thema ${i}`,availableForSearch:false}))] });
+  assert.deepEqual(result.blocks[0].categories.slice(0,2).map(c => c.status), ["YELLOW", "GREEN"]);
   assert.equal(new URL(result.blocks[0].recommendations[0].href, "https://quiz.invalid").searchParams.get("categoryId"), "2");
 });
 
@@ -175,8 +188,10 @@ test("overlapping category shares may exceed 100 percent without double counting
   })), sections: [{ id: 1, title: "Block" }], categories: [1,2,3,4,5,6].map(id => ({ id, name: `Kategorie ${id}` })) });
   const block = result.blocks[0];
   assert.equal(block.total, 25);
-  assert.ok(block.categories.every(c => c.count === 5 && c.status === "GREEN"));
-  assert.equal(block.categories.reduce((sum, c) => sum + c.count / block.total * 100, 0), 120);
-  assert.equal(block.status, "GREEN");
+  assert.equal(block.categorizedTotal, 5);
+  assert.equal(block.uncategorizedTotal, 20);
+  assert.ok(block.categories.every(c => c.count === 5 && c.status === "RED"));
+  assert.equal(block.categories.reduce((sum, c) => sum + c.count / block.categorizedTotal * 100, 0), 600);
+  assert.equal(block.status, "RED");
   assert.deepEqual(block.recommendations, []);
 });

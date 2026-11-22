@@ -66,6 +66,7 @@ export type ContentSearchItem = {
   canApprove?: boolean;
   justApproved?: boolean;
   questionMetrics?: {
+    durationPreview?: ReturnType<typeof import("./questionDuration").questionDurationPreview>;
     answerCount: number;
     difficulty: string | null;
     answerMode: string;

@@ -390,6 +390,9 @@
 .podium-team strong { display: block; font-size: clamp(20px, 2.1cqw, 40px); line-height: 1.15; overflow-wrap: anywhere; animation: podium-name 3.6s both; }
 .podium-team b { font-size: clamp(18px, 1.8cqw, 32px); color: var(--quiz-text); }
 .podium-team span { font-size: clamp(16px, 1.3cqw, 24px); }
+.podium-identities { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: center; gap: .6rem; width: 100%; }
+.podium-identity { flex: 1 1 0; min-width: 0; }
+.podium-team-photo { display: block; width: 100%; height: clamp(72px, 14cqh, 180px); object-fit: contain; margin: 0 auto .5rem; }
 @keyframes podium-arrive {
   0%, 72% { left: 10%; bottom: 42%; width: 80%; z-index: 3; }
   0%, 8% { opacity: 0; }

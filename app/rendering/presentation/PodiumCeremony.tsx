@@ -7,7 +7,7 @@ export const PODIUM_REVEAL_DURATION_MS = 3_600;
 
 /** Stable keyed rank groups: only a newly mounted group performs the reveal. */
 export function PodiumCeremony({ scores, revealCount, showPoints = true }: {
-  scores: readonly { teamname: string; punkte: number; tieBreakPlace?: number }[];
+  scores: readonly { teamname: string; punkte: number; tieBreakPlace?: number; photoUrl?: string | null }[];
   revealCount: number;
   showPoints?: boolean;
 }) {
@@ -19,7 +19,12 @@ export function PodiumCeremony({ scores, revealCount, showPoints = true }: {
     {visiblePodiumGroups.map(group => <article className="podium-team" key={group.place} data-place={group.place}>
       <div className="podium-team-content">
         <b>Platz {group.place}</b>
-        <strong>{group.entries.map(team => team.teamname).join(" · ")}</strong>
+        <div className="podium-identities">{group.entries.map((team, index) => <div className="podium-identity" key={index}>
+          {team.photoUrl && /* Trusted team profile media; preserve the full image. */
+            // eslint-disable-next-line @next/next/no-img-element
+            <img className="podium-team-photo" src={team.photoUrl} alt={`Team ${team.teamname}`} />}
+          <strong>{team.teamname}</strong>
+        </div>)}</div>
         {showPoints && <span>{formatQuizPoints(group.entries[0].punkte)} Punkte</span>}
       </div>
     </article>)}

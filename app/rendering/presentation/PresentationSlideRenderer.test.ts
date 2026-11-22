@@ -43,6 +43,23 @@ test("LOVD November: every registered question template exposes the shared block
   }
 });
 
+test("Meme, translation and pairs keep deck numbers on question, solution and moderation preview in every layout", () => {
+  for (const style of ["EDITORIAL", "NEON", "KOMM_ONE", "BIRTHDAY", "CORPORATE", "PHIL_GUD"] as const) {
+    for (const templateId of [questionTemplateIds.memeCaption, questionTemplateIds.translationReadAloud, questionTemplateIds.pairs]) {
+      const fixture = buildPresentationQualityFixture("short", style);
+      assert.ok(fixture.slide.typ === "frage");
+      fixture.slide.frage.templateId = templateId;
+      for(const number of [17,1,8,17]) for(const typ of ["frage","aufloesung"] as const) {
+        const slide = {...fixture.slide,typ,frageIndexImBlock:number};
+        const html = renderToStaticMarkup(createElement(PresentationSlideRenderer,{...fixture,slide}));
+        assert.match(html,new RegExp(`Frage ${number}${typ==='aufloesung'?' · Auflösung':''}`),`${style}/${templateId}/${typ}`);
+        const preview = renderToStaticMarkup(createElement(PresentationPreview,{slide}));
+        assert.match(preview,new RegExp(`Frage ${number}`));
+      }
+    }
+  }
+});
+
 test("LOVD November: next preview follows reordered flow with configured title and type fallback", () => {
   const fixture = buildPresentationQualityFixture("qr", "EDITORIAL");
   assert.ok(fixture.slide.typ === "ablauf");

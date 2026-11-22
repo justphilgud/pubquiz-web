@@ -2855,7 +2855,7 @@ function renderAktuellenSlide() {
       {slideLabel !== "VOR DEM START" && (
         <PresentationDesignHeader
           theme={theme}
-          slideLabel={slide?.typ === "frage" ? `Frage ${slide.frageIndexImBlock}` : slideLabel}
+          slideLabel={slide?.typ === "frage" || slide?.typ === "aufloesung" ? `Frage ${slide.frageIndexImBlock}${slide.typ === "aufloesung" ? " · Auflösung" : ""}` : slideLabel}
           slideNumber={slideIndex + 1}
           slideCount={slides.length}
           sponsor={slide?.typ === "frage" ? parseQuestionSponsor(slide.frage.templateConfig?.sponsor) ?? undefined : undefined}

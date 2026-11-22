@@ -65,6 +65,7 @@ import CurrentSlidePanel from "./components/CurrentSlidePanel";
 import MemeModerationReview, { type MemeModerationReviewHandle } from "./components/MemeModerationReview";
 import MemePresentationControls, { type MemePresentationControlsHandle } from "./components/MemePresentationControls";
 import MemeSubmissionControls from "./components/MemeSubmissionControls";
+import MemeFlowGuide from "./components/MemeFlowGuide";
 import { startMemePresentationAction } from "@/app/quiz/memeVotingActions";
 import type { ResolvedQuizTheme } from "@/app/rendering/theme/quizTheme";
 import type { PresentationLiveState } from "@/app/rendering/presentation/presentationLiveState";
@@ -157,12 +158,13 @@ export default function ModerationClient({
   const transition = useRef(new NavigationTransition());
   const [transitionPending, setTransitionPending] = useState(false);
   const [unconfirmedPosition, setUnconfirmedPosition] = useState<{ key: string; reveal: number } | null>(null);
-  const waitForPresentation = usePresentationWindowReceipt(quizId);
+  const waitForPresentation = usePresentationWindowReceipt(quizId, position => {
+    setUnconfirmedPosition(previous => previous?.key === position.key && previous.reveal === position.reveal ? null : previous);
+  });
 
   async function confirmPresentation(position: { key: string; reveal: number }) {
     setUnconfirmedPosition(position);
-    await waitForPresentation(position);
-    setUnconfirmedPosition(null);
+    if (await waitForPresentation(position)) setUnconfirmedPosition(null);
   }
 
   async function runNavigation(action: () => Promise<void>) {
@@ -171,8 +173,7 @@ export default function ModerationClient({
       setTransitionPending(true);
       try {
         setActionError(null);
-        if (unconfirmedPosition) await confirmPresentation(unconfirmedPosition);
-        else await action();
+        await action();
       } catch (cause) {
         setActionError(`${cause instanceof Error ? cause.message : "Wechsel fehlgeschlagen."} Bitte Verbindung prüfen und erneut versuchen.`);
       } finally { setTransitionPending(false); }
@@ -1041,7 +1042,8 @@ export default function ModerationClient({
           }}>{questionHidden ? "Frage wieder einblenden" : "Frage schließen / ausblenden"}</button>}
           {actionError && <p role="alert">{actionError}</p>}
           {transitionPending && <p role="status">Folienwechsel läuft … Bitte warten.</p>}
-          {unconfirmedPosition && !transitionPending && <button type="button" onClick={() => void runNavigation(async () => {})}>Anzeige erneut prüfen</button>}
+          {unconfirmedPosition && !transitionPending && <div role="status">Wechsel gespeichert. Die Rückmeldung des Präsentationsfensters steht noch aus; weitere Navigation ist möglich. <button type="button" onClick={() => void runNavigation(() => confirmPresentation(unconfirmedPosition))}>Anzeige erneut prüfen</button></div>}
+          {actionError && <button type="button" disabled={transitionPending} onClick={() => void runNavigation(async () => { const snapshot = await fetchQuizLiveSnapshot(quizId, false); applyLiveState(snapshot.presentationState); setUnconfirmedPosition(null); })}>Gespeicherten Folienstand synchronisieren</button>}
           <Link href={`/quiz/${quizId}`} className="ml-auto inline-flex min-h-9 items-center rounded-lg px-2 py-1 text-sm font-medium text-zinc-300 underline-offset-4 hover:text-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300">
             {backToQuizLabel}
           </Link>
@@ -1076,8 +1078,9 @@ export default function ModerationClient({
             />
 
             <div className="sticky top-0 z-20 rounded-xl border border-zinc-800 bg-zinc-950/95 p-2 shadow-lg backdrop-blur">
+              {(aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung") && aktuellerSlide.frage.templateId === "meme_beschriften" && <MemeFlowGuide />}
               <ModerationToolbar
-                navigationPending={transitionPending || unconfirmedPosition !== null}
+                navigationPending={transitionPending}
                 nextLabel={aktuellerSlide?.typ === "frage" && aktuellerSlide.frage.templateId === "meme_beschriften"
                   ? memePresentationState
                     ? getMemeAdvanceLabel({ ...memePresentationState, hasResult: Boolean(memePresentationState.result) })

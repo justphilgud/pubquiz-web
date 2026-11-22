@@ -151,6 +151,7 @@ export async function searchContent(filters: ContentFiltersState, pageCursor?: s
       canClone: question.can_clone,
       canArchive: question.can_archive,
       questionMetrics: {
+        durationPreview: question.durationPreview,
         answerCount: question.antworten_anzahl,
         difficulty: question.schwierigkeitslevel,
         answerMode: question.answer_mode === "OPEN" ? "Offen" : question.answer_mode === "CLOSED" ? "Geschlossen" : "Nicht eindeutig",

@@ -24,9 +24,9 @@ function getSlideTypLabel(slide: Slide | undefined) {
   if (!slide) return "—";
   if (slide.typ === "ablauf") return getQuizFlowTypeLabel(slide.element.type);
 
-  if (slide.typ === "frage") return "Frage";
+  if (slide.typ === "frage") return `Frage ${slide.frageIndexImBlock}`;
   if (slide.typ === "funny") return "Funny";
-  if (slide.typ === "aufloesung") return "Auflösung";
+  if (slide.typ === "aufloesung") return `Frage ${slide.frageIndexImBlock} · Auflösung`;
   if (slide.typ === "pause") return "Pause";
   if (slide.typ === "block") return "Block";
   if (slide.typ === "fixer-slide") return "Fix";

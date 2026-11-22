@@ -3,7 +3,7 @@
   "version": "0.2.0",
   "private": true,
   "scripts": {
-    "test:lovd-november": "node --import tsx --test app/quiz/navigationTransition.test.ts app/quiz/podiumSnapshot.test.ts app/quiz/presentationWindowSync.test.ts",
+    "test:lovd-november": "node --import tsx --test app/quiz/navigationTransition.test.ts app/quiz/podiumSnapshot.test.ts app/quiz/presentationWindowSync.test.ts app/components/content/questionDuration.test.ts app/quiz/presentationWindowSync.browser.test.ts",
     "dev": "npm run dev:check && next dev",
     "dev:check": "tsx scripts/env-check.ts",
     "prebuild": "npm run db:generate",

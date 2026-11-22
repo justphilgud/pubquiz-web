@@ -13,7 +13,7 @@ const filename = "app/quiz/[quizId]/moderation/ModerationClient.tsx";
 const original = readFileSync(filename, "utf8");
 
 type Effect = { dependencies: readonly unknown[]; cleanup?: () => void };
-type View = { funnyQuestionIds: Set<number>; funnyAnswers: unknown[]; slideIndex: number; antwortStatus: { antwortenEingegangen: number }; lifecycleState: typeof initialState; goToSlide: (index: number) => Promise<void> };
+type View = { funnyQuestionIds: Set<number>; funnyAnswers: unknown[]; slideIndex: number; antwortStatus: { antwortenEingegangen: number }; lifecycleState: typeof initialState; goToSlide: (index: number) => Promise<void>; runNavigation: (action:()=>Promise<void>)=>Promise<void>; unconfirmedPosition: unknown; transitionPending:boolean };
 const initialState: live.PresentationLiveState = { ...live.resolvePresentationLiveState(null), lifecycle: "RUNNING" as const, slideKey: "question:101:question" };
 
 /** Executes the actual component body/effects with deterministic React hook semantics.
@@ -32,7 +32,7 @@ function harness(source = original) {
     }
   }
   const body = source.slice(source.indexOf("type QuizLiveSnapshot"), source.indexOf("\n  return (", source.indexOf("  useModerationHotkeys"))) +
-    "\n return { funnyQuestionIds, funnyAnswers, slideIndex, antwortStatus, lifecycleState, goToSlide };\n}";
+    "\n return { funnyQuestionIds, funnyAnswers, slideIndex, antwortStatus, lifecycleState, goToSlide, runNavigation, unconfirmedPosition, transitionPending };\n}";
   const compiled = ts.transpileModule(body, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.CommonJS } }).outputText;
   let cursor = 0;
   let dirty = false;
@@ -64,7 +64,7 @@ function harness(source = original) {
   const exported: { default?: (input: typeof props) => View } = {};
   runInNewContext(compiled, {
     ...imports, ...deck, ...live, ...slideMetadata, NavigationTransition,
-    usePresentationWindowReceipt: () => async () => {},
+    usePresentationWindowReceipt: () => async () => false,
     performance: { mark: () => {}, measure: () => {} },
     mayApplyLiveSnapshot, exports: exported, AbortController, console,
     window: { setTimeout: (fn: () => void, delay: number) => schedule(fn, delay), clearTimeout: (id: number) => timers.delete(id), setInterval: (fn: () => void, delay: number) => schedule(fn, delay, delay), clearInterval: (id: number) => timers.delete(id) },
@@ -130,6 +130,23 @@ test("LOVD: actual navigation remains current after a delayed old snapshot; inte
   await h.view().goToSlide(previousIndex); await h.settle(); await h.advance(750);
   assert.equal(h.view().slideIndex, previousIndex);
   h.unmount();
+});
+
+test("P0: actual moderation continues after missing receipt, drops rapid repeated clicks and recovers after errors", async () => {
+  const h=harness();await h.settle();
+  const start=h.view().slideIndex;
+  let finish!:()=>void;
+  const delayed=new Promise<void>(resolve=>{finish=resolve});
+  const first=h.view().runNavigation(async()=>{await delayed;await h.view().goToSlide(start+1)});
+  for(let i=0;i<5;i++)await h.view().runNavigation(async()=>assert.fail('duplicate input queued'));
+  finish();await first;await h.settle();
+  assert.equal(h.view().slideIndex,start+1);assert.ok(h.view().unconfirmedPosition);assert.equal(h.view().transitionPending,false);
+  await h.view().runNavigation(()=>h.view().goToSlide(start+2));await h.settle();
+  assert.equal(h.view().slideIndex,start+2,'missing receipt does not replace the next action with a permanent retry');
+  await h.view().runNavigation(async()=>{throw new Error('network error')});await h.settle();
+  assert.equal(h.view().transitionPending,false);
+  await h.view().runNavigation(()=>h.view().goToSlide(start));await h.settle();
+  assert.equal(h.view().slideIndex,start);h.unmount();
 });
 
 test("B10a: unchanged empty funny state and reconstructed quiz do not restart requests", async () => {
