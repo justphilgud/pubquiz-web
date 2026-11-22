@@ -26,6 +26,8 @@ test("presentation acknowledges committed targets without focus or animation fra
  import QuizBalanceSummary from './app/quiz/planning/QuizBalanceSummary';
  import {getQuizBalance} from './app/quiz/quizBalance';
  import MemeFlowGuide from './app/quiz/[quizId]/moderation/components/MemeFlowGuide';
+ import PresentationSlideRenderer from './app/rendering/presentation/PresentationSlideRenderer';
+ import {buildPresentationQualityFixture} from './app/rendering/presentation/presentationQualityFixtures';
  const root=createRoot(document.getElementById('root'));
  const publicWindow=location.search.includes('public');
  window.framesRequested=0;
@@ -40,12 +42,18 @@ test("presentation acknowledges committed targets without focus or animation fra
  window.duration=()=>flushSync(()=>root.render(<QuestionDurationPreview value={{questionSeconds:4,translationSeconds:8,audioUrls:[{url:'/tone.wav',label:'Audiodatei'}]}}/>));
  window.balance=(categorized=true)=>flushSync(()=>root.render(<QuizBalanceSummary balance={getQuizBalance({questions:Array.from({length:25},(_,i)=>({sectionId:1,templateId:'musik',answerMode:'OPEN',categoryIds:categorized&&i===0?[1]:[]})),sections:[{id:1,title:'Prüfblock'}],categories:[{id:1,name:'Film'},{id:2,name:'Kultur'}]})}/>));
  window.guide=()=>flushSync(()=>root.render(<div style={{background:'#14181C',padding:20}}><MemeFlowGuide/></div>));
+ window.question=(templateId,typ,number,style)=>{
+   const fixture=buildPresentationQualityFixture('short',style);fixture.theme.identity.logoUrl=null;fixture.slide={...fixture.slide,typ,frageIndexImBlock:number};fixture.slide.frage.templateId=templateId;
+   if(templateId==='paare_bilden')fixture.slide.frage.templateConfig={templateData:{kind:'PAIRS',pairs:[{leftId:'a',rightId:'b',left:'Berlin',right:'Deutschland'},{leftId:'c',rightId:'d',left:'Paris',right:'Frankreich'}]}};
+   if(templateId==='uebersetzt_vorgelesen')fixture.slide.frage.templateConfig={templateData:{kind:'TRANSLATION_READ_ALOUD',originalText:'Original',translation:'Übersetzung',sourceLanguage:'en',targetLanguage:'de',speed:1,voiceProvider:'BROWSER',voiceId:'default',voiceStyle:'',voiceInstruction:''}};
+   fixture.slides=[fixture.slide];flushSync(()=>root.render(<PresentationSlideRenderer {...fixture}/>));
+ };
 `;
   const [{ outputFiles }, css] = await Promise.all([
     build({ stdin: { contents: entry, resolveDir: process.cwd(), loader: "tsx" },
       bundle: true, platform: "browser", write: false, jsx: "automatic",
-      define: { "process.env.NODE_ENV": '"production"' } }),
-    postcss([tailwindcss()]).process('@import "tailwindcss";', { from: resolve("app/globals.css") }),
+      define: { "process.env.NODE_ENV": '"production"', "process.env": "{}" } }),
+    postcss([tailwindcss()]).process(readFileSync('app/globals.css','utf8'), { from: resolve("app/globals.css") }),
   ]);
   const server = createServer((request, response) => {
     if (request.url === "/tone.wav") {
@@ -56,10 +64,10 @@ test("presentation acknowledges committed targets without focus or animation fra
       response.end(outputFiles[0].contents);
     } else if (request.url === "/style.css") {
       response.setHeader("Content-Type", "text/css");
-      response.end(css.css + '\n' + readFileSync('app/rendering/presentation/presentationReadability.css','utf8'));
+      response.end(css.css);
     } else {
       response.setHeader("Content-Type", "text/html");
-      response.end('<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/style.css"><div id="root" style="height:100dvh"></div><script src="/bundle.js"></script>');
+      response.end('<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/style.css"><div id="root" style="height:100dvh"></div><script>window.fixtureErrors=[];addEventListener("error",e=>window.fixtureErrors.push(e.message));</script><script src="/bundle.js"></script>');
     }
   });
   await new Promise<void>((ready) => server.listen(0, "127.0.0.1", ready));
@@ -117,7 +125,7 @@ test("presentation acknowledges committed targets without focus or animation fra
         if (await evaluate("typeof window.show === 'function'")) return;
         await delay(50);
       }
-      assert.fail("Fixture did not load");
+      assert.fail("Fixture did not load: "+await evaluate('JSON.stringify(window.fixtureErrors)'));
     }
     await loaded();
 
@@ -169,6 +177,12 @@ test("presentation acknowledges committed targets without focus or animation fra
     const guide=await evaluate<string>('document.body.textContent');assert.match(guide,/Abstimmung schließen/);assert.match(guide,/Keine eingereichten/);
     const guideScreenshot=await call('Page.captureScreenshot',{format:'png'},sessionId) as {data:string};
     writeFileSync('.artifacts/quiz-corrections/meme-guide.png',Buffer.from(guideScreenshot.data,'base64'));
+    for(const style of ['EDITORIAL','CORPORATE','BIRTHDAY'])for(const template of ['meme_beschriften','uebersetzt_vorgelesen','paare_bilden'])for(const phase of ['frage','aufloesung']){
+      await evaluate('window.question('+[template,phase,17,style].map(value=>JSON.stringify(value)).join(',')+')');await delay(30);
+      assert.ok(await evaluate("(()=>{const label=document.querySelector('[data-question-sequence=\"17\"] > p');if(!label)return false;const r=label.getBoundingClientRect();return label.textContent.includes('Frage 17')&&r.width>0&&r.height>0&&r.top>=0&&r.bottom<=innerHeight})()"),style+'/'+template+'/'+phase);
+    }
+    const numberScreenshot=await call('Page.captureScreenshot',{format:'png'},sessionId) as {data:string};
+    writeFileSync('.artifacts/quiz-corrections/question-number.png',Buffer.from(numberScreenshot.data,'base64'));
   } finally {
     socket?.close();
     if (browser.exitCode === null && browser.pid) {

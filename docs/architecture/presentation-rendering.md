@@ -7,6 +7,9 @@ Auflösung die Decknummer `frageIndexImBlock`; Auflösungen ergänzen „· Aufl
 Dies schließt Meme, Übersetzt-vorgelesen und Paare in allen Designwelten ein.
 Die kleine Moderationsvorschau verwendet dieselbe Nummer. Erklärungen und andere
 Nicht-Fragefolien erhalten keine Fragennummer. Wiederholung/Sprung zählen nicht lokal.
+Meme, Übersetzt-vorgelesen und Paare erhalten zusätzlich eine gemeinsame kompakte
+Nummernzeile innerhalb der Inhaltsfläche; dadurch hängt ihre Nummer nicht nur am
+kleinen Designheader oder an einem vom Spezialtemplate übersprungenen Standardzweig.
 Der Meme-Bereich der Moderation erklärt die tatsächliche Folge Schließen → Review →
 Einzelvorstellung → Übersicht(en) → Abstimmung → Finalisierung → nächste Quizfolie;
 leerer ausdrücklich abgeschlossener Review überspringt nur die eigene Auflösung.

@@ -53,6 +53,7 @@ test("Meme, translation and pairs keep deck numbers on question, solution and mo
         const slide = {...fixture.slide,typ,frageIndexImBlock:number};
         const html = renderToStaticMarkup(createElement(PresentationSlideRenderer,{...fixture,slide}));
         assert.match(html,new RegExp(`Frage ${number}${typ==='aufloesung'?' · Auflösung':''}`),`${style}/${templateId}/${typ}`);
+        assert.match(html,new RegExp(`data-question-sequence="${number}"`),"number is inside the question composition, not only in header metadata");
         const preview = renderToStaticMarkup(createElement(PresentationPreview,{slide}));
         assert.match(preview,new RegExp(`Frage ${number}`));
       }

@@ -56,6 +56,10 @@ innerhalb des Inhalts erhielten dort keinen zusätzlichen Nummerntext. Der Heade
 verwendet nun auf Frage und Auflösung `frageIndexImBlock`; auch die kleine
 Moderationsvorschau zeigt diese Nummer. Alle vorhandenen Frage-Inhaltsnummern
 bleiben erhalten. Intro/Trenner/Erklärung werden nicht nummeriert.
+Meme, Übersetzung und Paare erhalten zudem eine gemeinsame Nummernzeile in der
+Inhaltsfläche selbst: Ihre frühen Spezialzweige hatten die Nummernzeile des
+Standardfrage-Inhalts nicht übernommen. Die Regression verlangt deshalb explizit
+`data-question-sequence` innerhalb der Komposition und prüft nicht nur den Header.
 Renderer-Regression: Meme, Übersetzt-vorgelesen und Paare in sechs Designwelten,
 Frage/Auflösung und Moderationsvorschau, Nummernfolge 17 → 1 → 8 → 17; bestehende
 Decktests prüfen die Neuordnung und den Neustart bei Blockwechsel.
