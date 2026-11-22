@@ -6,7 +6,7 @@ import { isSafeTemplateAssetReference } from "@/app/rendering/presentationTempla
 import { parseSharedDesign, type SharedDesign } from "@/app/rendering/sharedDesign/sharedDesign";
 import { asset, designHash, parsePrintSnapshot, type PrintSnapshot } from "./printSnapshot";
 import { BingoPreparationError } from "./policy";
-import { defaultBingoPrint, printFonts, printContrastIssues, type BingoPrint } from "@/app/bingo/preparation/bingoPrint";
+import { defaultBingoPrint, prepareLovdPrint, printFonts, printContrastIssues, type BingoPrint } from "@/app/bingo/preparation/bingoPrint";
 
 const fonts: Record<string, string> = {
   "geist-sans": "geist", "geist-mono": "geistmono", "source-sans-3": "sourcesans3", "plus-jakarta-sans": "plusjakartasans", "space-grotesk": "spacegrotesk", montserrat: "montserrat", nunito: "nunito", oswald: "oswald", "roboto-slab": "robotoslab", lora: "lora", "playfair-display": "playfairdisplay",
@@ -52,11 +52,11 @@ export async function capturePrintSnapshot(input: SharedDesign, title: string, r
   const [display,body,logo,...backLogos]=await Promise.all([printFont(font(settings.headerFont).family),printFont(font(settings.numberFont).family),loadPrintLogo(settings.frontLogo).then(b=>asset('Vorderes Logo',b)),...settings.backLogos.map((ref,i)=>loadPrintLogo(ref).then(b=>asset(`Rückseitenlogo ${i+1}`,b)))]);
   display.name=font(settings.headerFont).name;body.name=font(settings.numberFont).name;
   const common={title,roundLabel,design,designHash:designHash(design),display,body,logo,settings,backLogos};
-  if(settings.layout){const text=await printFont(font(settings.layout.textFont).family);text.name=font(settings.layout.textFont).name;return parsePrintSnapshot({...common,version:settings.layout.version,text,terms:null,...(settings.layout.version===4?{codeFont:await printFont("Arial, Helvetica, sans-serif"),...(templateSource?{templateSource}:{})}: {})});}
+  if(settings.layout){const text=await printFont(font(settings.layout.textFont).family);text.name=font(settings.layout.textFont).name;return parsePrintSnapshot({...common,version:settings.layout.version,text,terms:null,...(settings.layout.version===4||settings.partnerBack===1?{codeFont:await printFont("Arial, Helvetica, sans-serif"),...(settings.layout.version===4&&templateSource?{templateSource}:{})}: {})});}
   return parsePrintSnapshot({...common,version:2});
 }
 
 /** Only called by new-card generation or an explicitly selected redesign, never by old exports. */
 export function captureNewPrintSnapshot(input:SharedDesign,title:string,roundLabel:string,settings:BingoPrint,templateSource?:{id:string;name:string}){
- return capturePrintSnapshot(input,title,roundLabel,settings.layout?settings:{...settings,layout:{version:3,format:'A4_FOUR',textFont:'ARIMO'}},templateSource);
+ return capturePrintSnapshot(input,title,roundLabel,prepareLovdPrint(settings.layout?settings:{...settings,layout:{version:3,format:'A4_FOUR',textFont:'ARIMO'}}),templateSource);
 }

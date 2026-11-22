@@ -1,3 +1,4 @@
+import {geometry} from './printFormats';
 import {parsePrintSelection} from './printTemplates';
 import {availablePrintTemplates,selectedPrintSource} from './printTemplateRepository.server';
 import { parsePrintSnapshot } from './printSnapshot';
@@ -5,7 +6,7 @@ import "server-only";
 import { Prisma } from "@/app/generated/prisma/client";
 import { prisma } from "@/app/lib/prisma";
 import { sharedDesignContext, resolveSharedDesign, validateTarget } from "@/app/rendering/sharedDesign/sharedDesignRepository.server";
-import { parseBingoPrint, printContrastIssues, shortCardCode, PHIL_LOGO, LOVD_LOGO, PHIL_PRINT_LOGO, LOVD_PRINT_LOGO, type BingoPrint } from "@/app/bingo/preparation/bingoPrint";
+import { parseBingoPrint, printContrastIssues, shortCardCode, PHIL_LOGO, LOVD_LOGO, PHIL_PRINT_LOGO, LOVD_PRINT_LOGO, LOVD_LIGHT_LOGO, LOVD_SMALL_LOGO, type BingoPrint } from "@/app/bingo/preparation/bingoPrint";
 import { preparationContext } from "./access.server";
 import { resolveSelectedPrint } from "./printTemplateRepository.server";
 import { capturePrintSnapshot,captureNewPrintSnapshot } from "./printAssets.server";
@@ -44,7 +45,7 @@ export async function readPrintDesign(userId:number,target:unknown){
 }
 
 function existingLogosOnly(config:BingoPrint,c:Awaited<ReturnType<typeof designContext>>){
-  const allowed=new Set([PHIL_LOGO,LOVD_LOGO,PHIL_PRINT_LOGO,LOVD_PRINT_LOGO,c.design.config.tokens.assets.logo,c.settings.frontLogo,...c.settings.backLogos,c.inherited.frontLogo,...c.inherited.backLogos]);
+  const allowed=new Set([PHIL_LOGO,LOVD_LOGO,PHIL_PRINT_LOGO,LOVD_PRINT_LOGO,LOVD_LIGHT_LOGO,LOVD_SMALL_LOGO,c.design.config.tokens.assets.logo,c.settings.frontLogo,...c.settings.backLogos,c.inherited.frontLogo,...c.inherited.backLogos]);
   if([config.frontLogo,...config.backLogos].some(ref=>!allowed.has(ref)))throw new BingoPreparationError('Bitte ein vorhandenes Druck-, Reihen- oder Vorlagenlogo auswählen.');
 }
 export async function savePrintDesign(userId:number,input:unknown){
@@ -69,7 +70,7 @@ export async function previewPrintDesign(userId:number,input:unknown){
     if(!parsePrintSelection(r.config))existingLogosOnly(settings,c);
     let snapshot=await (r.seriesId===undefined?capturePrintSnapshot:captureNewPrintSnapshot)(c.design,'Druckvorschau','Vorschau',settings,await selectedPrintSource(tx,r.config===undefined?c.own??c.series.bingo_print_config:r.config===null?(c.target.kind==='SERIES'?null:c.series.bingo_print_config):r.config));
     let card;let cards;
-    if(r.seriesId!==undefined){if(c.target.kind!=='BINGO'||typeof r.seriesId!=='string')throw denied();const series=await tx.bingo_card_series.findFirst({where:{id:r.seriesId,game_id:c.target.id},include:{short_label:true}});if(!series?.short_label)throw denied();const row=await tx.bingo_cards.findFirstOrThrow({where:{series_id:series.id},orderBy:{ordinal:'asc'}});card={...storedCard(row),shortCode:shortCardCode(series.short_label.prefix,row.ordinal)};const rows=await tx.bingo_cards.findMany({where:{series_id:series.id},orderBy:{ordinal:'asc'},take:7});cards=rows.map(row=>({...storedCard(row),shortCode:shortCardCode(series.short_label!.prefix,row.ordinal)}));const original=parsePrintSnapshot(series.print_snapshot);if((snapshot.version===3||snapshot.version===4)&&(original.version===3||original.version===4))snapshot=parsePrintSnapshot({...snapshot,terms:original.terms});}
+    if(r.seriesId!==undefined){if(c.target.kind!=='BINGO'||typeof r.seriesId!=='string')throw denied();const series=await tx.bingo_card_series.findFirst({where:{id:r.seriesId,game_id:c.target.id},include:{short_label:true}});if(!series?.short_label)throw denied();const row=await tx.bingo_cards.findFirstOrThrow({where:{series_id:series.id},orderBy:{ordinal:'asc'}});card={...storedCard(row),shortCode:shortCardCode(series.short_label.prefix,row.ordinal)};const rows=await tx.bingo_cards.findMany({where:{series_id:series.id},orderBy:{ordinal:'asc'},take:(snapshot.version===3||snapshot.version===4)&&snapshot.settings.layout?.format==='SRA3_TWELVE'?geometry(snapshot.settings.layout.format,snapshot.settings.layout.cardProfile).capacity+1:7});cards=rows.map(row=>({...storedCard(row),shortCode:shortCardCode(series.short_label!.prefix,row.ordinal)}));const original=parsePrintSnapshot(series.print_snapshot);if((snapshot.version===3||snapshot.version===4)&&(original.version===3||original.version===4))snapshot=parsePrintSnapshot({...snapshot,terms:original.terms});}
     return {snapshot,card,cards,hash:sha256(canonical(snapshot)),stateHash:c.stateHash};
   },{timeout:30000,isolationLevel:'RepeatableRead'});
 }

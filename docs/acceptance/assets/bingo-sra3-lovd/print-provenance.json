@@ -1,0 +1,163 @@
+{
+  "historical": {
+    "version": 3,
+    "templateId": "lovd-ungegoogelt",
+    "layout": {
+      "format": "SRA3_TWELVE",
+      "version": 3,
+      "textFont": "ARIMO",
+      "cardProfile": "A4_FOUR"
+    },
+    "partnerBack": null,
+    "colors": {
+      "back": "#14181C",
+      "grid": "#414141",
+      "header": "#C64D3B",
+      "heading": "#14181C",
+      "numbers": "#14181C",
+      "background": "#FFFFFF"
+    },
+    "frontLogo": "/branding/lovd/lovd-stelp-creme-rgb.png",
+    "backLogos": [
+      "/branding/lovd/lovd-stelp.png",
+      "/branding/phil-gud/website-logo.jpg"
+    ],
+    "display": {
+      "name": "Phil Gud Display Regular",
+      "sha256": "ab4436805cd8dc4f947279b81a34d8103a3bf42da578e685368df6452631658d"
+    },
+    "body": {
+      "name": "Phil Gud Display Regular",
+      "sha256": "ab4436805cd8dc4f947279b81a34d8103a3bf42da578e685368df6452631658d"
+    },
+    "text": {
+      "name": "Arimo Regular (Arial-kompatibel)",
+      "sha256": "e43898b143ec826ac8cb4034816458a7047fbe0836558de2a1f8c6223ae3e0ca"
+    },
+    "codeFont": null
+  },
+  "historicalUnchanged": true,
+  "current": {
+    "version": 3,
+    "templateId": "lovd-ungegoogelt",
+    "layout": {
+      "format": "SRA3_TWELVE",
+      "version": 3,
+      "textFont": "ARIMO",
+      "cardProfile": "A4_FOUR"
+    },
+    "partnerBack": 1,
+    "colors": {
+      "back": "#14181C",
+      "grid": "#414141",
+      "header": "#6A241C",
+      "heading": "#FFF9E9",
+      "numbers": "#14181C",
+      "background": "#FFFFFF"
+    },
+    "frontLogo": "/branding/bingo-print/lovd-small-creme.png",
+    "backLogos": [
+      "/branding/lovd/lovd-stelp-creme-rgb.png",
+      "/branding/bingo-print/phil-gud.png"
+    ],
+    "display": {
+      "name": "Phil Gud Display Regular",
+      "sha256": "ab4436805cd8dc4f947279b81a34d8103a3bf42da578e685368df6452631658d"
+    },
+    "body": {
+      "name": "Phil Gud Display Regular",
+      "sha256": "ab4436805cd8dc4f947279b81a34d8103a3bf42da578e685368df6452631658d"
+    },
+    "text": {
+      "name": "Arimo Regular (Arial-kompatibel)",
+      "sha256": "e43898b143ec826ac8cb4034816458a7047fbe0836558de2a1f8c6223ae3e0ca"
+    },
+    "codeFont": {
+      "name": "Arimo (Arial-kompatibel)",
+      "sha256": "e43898b143ec826ac8cb4034816458a7047fbe0836558de2a1f8c6223ae3e0ca"
+    }
+  },
+  "newVersions": [
+    {
+      "number": 2,
+      "version": 3,
+      "templateId": "lovd-ungegoogelt",
+      "layout": {
+        "format": "A4_FOUR",
+        "version": 3,
+        "textFont": "ARIMO"
+      },
+      "partnerBack": 1,
+      "colors": {
+        "back": "#14181C",
+        "grid": "#414141",
+        "header": "#6A241C",
+        "heading": "#FFF9E9",
+        "numbers": "#14181C",
+        "background": "#FFFFFF"
+      },
+      "frontLogo": "/branding/bingo-print/lovd-small-creme.png",
+      "backLogos": [
+        "/branding/lovd/lovd-stelp-creme-rgb.png",
+        "/branding/bingo-print/phil-gud.png"
+      ],
+      "display": {
+        "name": "Phil Gud Display Regular",
+        "sha256": "ab4436805cd8dc4f947279b81a34d8103a3bf42da578e685368df6452631658d"
+      },
+      "body": {
+        "name": "Phil Gud Display Regular",
+        "sha256": "ab4436805cd8dc4f947279b81a34d8103a3bf42da578e685368df6452631658d"
+      },
+      "text": {
+        "name": "Arimo Regular (Arial-kompatibel)",
+        "sha256": "e43898b143ec826ac8cb4034816458a7047fbe0836558de2a1f8c6223ae3e0ca"
+      },
+      "codeFont": {
+        "name": "Arimo (Arial-kompatibel)",
+        "sha256": "e43898b143ec826ac8cb4034816458a7047fbe0836558de2a1f8c6223ae3e0ca"
+      }
+    },
+    {
+      "number": 3,
+      "version": 3,
+      "templateId": "lovd-ungegoogelt",
+      "layout": {
+        "format": "SRA3_TWELVE",
+        "version": 3,
+        "textFont": "ARIMO",
+        "cardProfile": "A4_FOUR"
+      },
+      "partnerBack": 1,
+      "colors": {
+        "back": "#14181C",
+        "grid": "#414141",
+        "header": "#6A241C",
+        "heading": "#FFF9E9",
+        "numbers": "#14181C",
+        "background": "#FFFFFF"
+      },
+      "frontLogo": "/branding/bingo-print/lovd-small-creme.png",
+      "backLogos": [
+        "/branding/lovd/lovd-stelp-creme-rgb.png",
+        "/branding/bingo-print/phil-gud.png"
+      ],
+      "display": {
+        "name": "Phil Gud Display Regular",
+        "sha256": "ab4436805cd8dc4f947279b81a34d8103a3bf42da578e685368df6452631658d"
+      },
+      "body": {
+        "name": "Phil Gud Display Regular",
+        "sha256": "ab4436805cd8dc4f947279b81a34d8103a3bf42da578e685368df6452631658d"
+      },
+      "text": {
+        "name": "Arimo Regular (Arial-kompatibel)",
+        "sha256": "e43898b143ec826ac8cb4034816458a7047fbe0836558de2a1f8c6223ae3e0ca"
+      },
+      "codeFont": {
+        "name": "Arimo (Arial-kompatibel)",
+        "sha256": "e43898b143ec826ac8cb4034816458a7047fbe0836558de2a1f8c6223ae3e0ca"
+      }
+    }
+  ]
+}
