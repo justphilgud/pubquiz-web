@@ -1,0 +1,91 @@
+{
+  "assumptions": [
+    "Platform request timestamp and requestDurationMs delimit platform handling",
+    "No wall-clock jump between the fast and slow requests (~35 seconds)",
+    "Both transport directions have non-negative duration",
+    "CDP monotonic request duration is used; no raw subtraction of uncalibrated clocks"
+  ],
+  "fast": [
+    {
+      "requestId": "blgv6-1795354576210-7f69df42b4a0",
+      "browserMs": 213.9339999994263,
+      "platformMs": 115,
+      "clockOffsetLowerMs": 5340.38818359375,
+      "clockOffsetUpperMs": 5439.322265625
+    },
+    {
+      "requestId": "vpn2q-1795354576281-4102e0f8c3e3",
+      "browserMs": 532.9389999969862,
+      "platformMs": 316,
+      "clockOffsetLowerMs": 5305.60400390625,
+      "clockOffsetUpperMs": 5522.54296875
+    },
+    {
+      "requestId": "wflk5-1795354576719-a19f19df0658",
+      "browserMs": 187.67700000898913,
+      "platformMs": 99,
+      "clockOffsetLowerMs": 5331.550048828125,
+      "clockOffsetUpperMs": 5420.22705078125
+    }
+  ],
+  "offsetIntervalMs": [
+    5340.38818359375,
+    5420.22705078125
+  ],
+  "slow": [
+    {
+      "requestId": "bpkp9-1795354610300-d2a702319af2",
+      "browserMs": 27403.88100000564,
+      "platformMs": 241,
+      "clientMinusEdgeStartMs": 5324.551025390625,
+      "outboundUpperMs": 95.676025390625,
+      "afterPlatformLowerMs": 27067.204974615015,
+      "unaccountedMs": 27162.88100000564
+    },
+    {
+      "requestId": "bckfm-1795354610980-07caf0f6daed",
+      "browserMs": 29479.698000010103,
+      "platformMs": 1429,
+      "clientMinusEdgeStartMs": 5326.325927734375,
+      "outboundUpperMs": 93.901123046875,
+      "afterPlatformLowerMs": 27956.796876963228,
+      "unaccountedMs": 28050.698000010103
+    },
+    {
+      "requestId": "j24r8-1795354611981-8d9a4a410d41",
+      "browserMs": 28485.350999981165,
+      "platformMs": 96,
+      "clientMinusEdgeStartMs": 5316.511962890625,
+      "outboundUpperMs": 103.715087890625,
+      "afterPlatformLowerMs": 28285.63591209054,
+      "unaccountedMs": 28389.350999981165
+    },
+    {
+      "requestId": "6jcjl-1795354637579-a9d81a915249",
+      "browserMs": 24839.546000002883,
+      "platformMs": 140,
+      "clientMinusEdgeStartMs": 5330.617919921875,
+      "outboundUpperMs": 89.609130859375,
+      "afterPlatformLowerMs": 24609.93686914351,
+      "unaccountedMs": 24699.546000002883
+    },
+    {
+      "requestId": "dhv76-1795354640453-7bf5df499e82",
+      "browserMs": 21967.718999978388,
+      "platformMs": 103,
+      "clientMinusEdgeStartMs": 5334.14599609375,
+      "outboundUpperMs": 86.0810546875,
+      "afterPlatformLowerMs": 21778.637945290888,
+      "unaccountedMs": 21864.718999978388
+    },
+    {
+      "requestId": "dnrnn-1795354641217-7c13caf5a59d",
+      "browserMs": 43268.71800000663,
+      "platformMs": 162,
+      "clientMinusEdgeStartMs": 5328.60302734375,
+      "outboundUpperMs": 91.6240234375,
+      "afterPlatformLowerMs": 43015.09397656913,
+      "unaccountedMs": 43106.71800000663
+    }
+  ]
+}
