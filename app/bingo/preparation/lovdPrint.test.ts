@@ -1,3 +1,4 @@
+import {PDFDocument,PDFArray,PDFRawStream,decodePDFRawStream} from 'pdf-lib';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {build} from 'esbuild';
@@ -39,6 +40,26 @@ test('new V3 LOVD keeps the old front typography on every profile, freezes code 
    const a=parsePrintSnapshot({...old,terms:text?terms:null}),b=parsePrintSnapshot({...same,terms:text?terms:null});
    const sraSettings={...settings,layout:{...settings.layout,format:'SRA3_TWELVE' as const,cardProfile:profile}},sra=await api.captureNewPrintSnapshot(design,'Legacy','Round',sraSettings);
    const c=parsePrintSnapshot({...sra,terms:text?terms:null});
+   if(profile==='A4_FOUR'&&!text){
+    const pdf=await PDFDocument.load(await api.createCardsPdf(c,cards,'duplex'));
+    const contents=pdf.getPage(1).node.Contents();assert.ok(contents instanceof PDFArray);
+    const operators=Array.from({length:contents.size()},(_,i)=>{const stream=pdf.context.lookup(contents.get(i));assert.ok(stream instanceof PDFRawStream);return Buffer.from(decodePDFRawStream(stream).decode()).toString('utf8');}).join('\n');
+    const stack:number[][]=[],images:number[][]=[];let matrix=[1,0,0,1,0,0];
+    const tokens=/(-?[\d.]+) (-?[\d.]+) (-?[\d.]+) (-?[\d.]+) (-?[\d.]+) (-?[\d.]+) cm|\b(q|Q)\b|\/[^\s]+ Do/g;
+    for(const match of operators.matchAll(tokens)){
+     if(match[7]==='q')stack.push([...matrix]);else if(match[7]==='Q')matrix=stack.pop()!;
+     else if(match[1]!==undefined){const [a,b,c,d,e,f]=matrix,[g,h,i,j,k,l]=match.slice(1,7).map(Number);matrix=[a*g+c*h,b*g+d*h,a*i+c*j,b*i+d*j,a*k+c*l+e,b*k+d*l+f];}
+     else images.push([...matrix]);
+    }
+    assert.equal(images.length,2);
+    const [lovd,phil]=images,side=92.5*72/25.4;
+    assert.ok(Math.abs(lovd[0]-65.55)<.005&&Math.abs(lovd[3]-65.55)<.005,'actual smaller square LOVD image');
+    assert.ok(Math.abs(phil[0]-78.78)<.005&&Math.abs(phil[3]-97.02)<.005,'Phil Gud image dimensions retained');
+    assert.ok(lovd[3]<phil[3]);
+    const cross=[...operators.matchAll(/0\.35 w[\s\S]*?(-?[\d.]+) (-?[\d.]+) m\n(-?[\d.]+) (-?[\d.]+) l/g)];assert.equal(cross.length,2);
+    for(const line of cross){assert.ok(Math.abs(Math.abs(Number(line[3])-Number(line[1]))-12)<.001);assert.ok(Math.abs(Math.abs(Number(line[4])-Number(line[2]))-12)<.001);assert.ok(Math.abs((Number(line[2])+Number(line[4]))/2-(phil[5]+phil[3]/2+side*(.565-.31)))<.001);}
+   }
+
    const before=await api.createCardsPdf(a,cards,'duplex'),after=await api.createCardsPdf(b,cards,'duplex'),sheet=await api.createCardsPdf(c,cards,'duplex');
    if(out){const kind=text?'terms':'numbers';writeFileSync(join(out,`${profile}-${kind}-old.pdf`),before);writeFileSync(join(out,`${profile}-${kind}-new.pdf`),after);writeFileSync(join(out,`${profile}-${kind}-sra3.pdf`),sheet);}
   }
