@@ -2,6 +2,22 @@
 
 ## Zweck und bestehende Zuständigkeiten
 
+### Korrektur 22.11.2026: Kategoriebezugsmenge
+
+Die Rückfrage zum widersprüchlichen neuen Auftrag wurde ausdrücklich entschieden:
+**Grün ≤20 %, Gelb >20–30 %, Rot >30 % bleibt verbindlich.** Die alten 10-/20-%-Grenzen
+werden nicht wieder eingeführt. Neu ist ausschließlich der Kategorie-Nenner:
+Fragen mit mindestens einer tatsächlichen Kategoriezuordnung **im jeweiligen Block**.
+Jede solche Frage zählt einmal im Nenner und einmal je ihrer Kategorien im Zähler;
+Mehrfachzuordnungen dürfen zusammen mehr als 100 % ergeben. „Ohne Kategorie“ zeigt
+Anzahl und Anteil an allen Blockfragen separat und ist keine erfundene Kategorie.
+Ohne zugeordnete Fragen bleibt der Kategorieabschnitt neutral („Keine Kategorien
+zugeordnet“). Template-Nenner und -Ampeln bleiben die gesamte Blockfragenzahl.
+Beispiel: 1 Filmfrage und 24 unzugeordnete Fragen ergeben Film 100 % von 1, nicht 4 %
+von 25. Bei 25 **zugeordneten** Fragen gilt weiterhin 5 grün, 6–7 gelb, ab 8 rot.
+Die folgenden älteren Angaben „Blockanteil“ meinen für Kategorien nun diese
+zugeordneten Fragen; Anzeige, Status und Suchalternativen teilen denselben Nenner.
+
 Die Quizliste und die Vorbereitung zeigen kompakt den Fragenmix je Fragenblock.
 Ein Klick öffnet den vorhandenen `Modal` mit Ringdiagramm, Zählwerten, Regeln und
 Empfehlungen. `quizBalance.ts` berechnet rein aus Zuweisungen, Block- und
@@ -184,3 +200,16 @@ Die neue AP5-Anwendungsverbesserung ist getrennt in
 [Bewertungsworkflow](evaluation-workflow.md#ap5-anwendungsergänzung-20112026) beschrieben.
 Sie teilt weder Ampelmodell noch Ampeloberfläche und verändert nicht die historische
 AP5-Aggregation. Gemeinsamer Browsernachweis prüft nur beide getrennten Oberflächen.
+
+## Dauer in der Fragensuche (22.11.2026)
+
+Die autorisierte Suchprojektion liefert für Übersetzt-vorgelesen die gleiche
+`estimateReadingDuration` wie der Editor: Fragetext bei Normaltempo, Übersetzung
+bei ihrer konfigurierten Geschwindigkeit, jeweils ausdrücklich als Schätzung.
+Suchzeile und Vorschau verwenden diese Daten ohne Textänderung. Für Übersetzungs-
+und Musiktemplates lädt die sichtbare Suchzeile lediglich Audiodatei-Metadaten;
+erst eine positive endliche Browserdauer wird als „Dateidauer“ angezeigt. Kein
+Autoplay, keine zusätzliche Dauer in der DB und kein erratener Wert bei fehlender
+oder nicht lesbarer Datei. Verborgene Treffer laden keine Metadaten. Berechtigung,
+Suchfilter, Cursor, Antwortprüfung und Templateauswahl behalten ihre Zuständigkeit.
+Tests: `questionDuration.test.ts` und Browserprobe mit zweisekündiger WAV-Datei.

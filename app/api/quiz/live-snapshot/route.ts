@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { startRequestNavigationTrace } from "@/app/lib/navigationTrace.server";
 import { getQuizLiveSnapshotData } from "@/app/quiz/interaction/interaction.server";
 import {
   logLivePerformance,
@@ -14,6 +15,7 @@ type LiveSnapshotRequest = {
 };
 
 export async function POST(request: Request) {
+  const finishTrace = await startRequestNavigationTrace("snapshot-http");
   const requestStartedAt = performance.now();
   const phases: Record<string, number> = {};
   let payloadBytes = 0;
@@ -73,5 +75,6 @@ export async function POST(request: Request) {
     queryDurationMs: diagnostics?.queryDurationMs ?? null,
     total: performance.now() - requestStartedAt,
   });
+  finishTrace({ queryCount: diagnostics?.queryCount ?? null, queryDurationMs: diagnostics?.queryDurationMs ?? null });
   return result;
 }

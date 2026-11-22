@@ -1,6 +1,7 @@
 import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
 import { authConfig } from "./auth.config";
+import { startNavigationTrace } from "./app/lib/navigationTrace";
 
 const { auth } = NextAuth(authConfig);
 
@@ -32,7 +33,8 @@ function isPublicPath(pathname: string) {
   return false;
 }
 
-export const proxy = auth((req) => {
+const authenticatedProxy = auth((req) => {
+  startNavigationTrace("proxy-after-auth", req.headers.get("x-qa-correlation"))();
   const { pathname } = req.nextUrl;
 
   if (isPublicPath(pathname)) {
@@ -50,6 +52,12 @@ export const proxy = auth((req) => {
 
   return NextResponse.next();
 });
+
+export async function proxy(...args: Parameters<typeof authenticatedProxy>) {
+  const finishTrace = startNavigationTrace("proxy-request", args[0].headers.get("x-qa-correlation"));
+  try { return await authenticatedProxy(...args); }
+  finally { finishTrace(); }
+}
 
 export const config = {
   matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)"],

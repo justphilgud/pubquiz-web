@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element -- Authorized editorial thumbnails have dynamic source dimensions. */
 import { MediaBadge, ScopeBadge, StatusBadge, UsageSummary } from "./ContentBadges";
 import ContentActions from "./ContentActions";
+import QuestionDurationPreview from "./QuestionDurationPreview";
 import type { ContentQuizOption, ContentSearchItem, ContentTemplateOption } from "./contentLibrary";
 
 export default function ContentResultRow({ item, quizzes, templates, returnTo, onNavigate, onUpdated }: { item: ContentSearchItem; quizzes: ContentQuizOption[]; templates: ContentTemplateOption[]; returnTo?: string; onNavigate?: () => void; onUpdated?: (item: ContentSearchItem) => void }) {
@@ -14,6 +15,7 @@ export default function ContentResultRow({ item, quizzes, templates, returnTo, o
     <h2 className="mt-2 break-words text-base font-bold text-slate-950">{item.title}</h2>
     <p className="mt-1 font-mono text-xs text-slate-500">Content-ID #{item.id} · {item.subtype}</p>
     {item.questionMetrics && <QuestionSolutionPreview preview={item.questionMetrics.solutionPreview} />}
+    {item.questionMetrics?.durationPreview && <QuestionDurationPreview value={item.questionMetrics.durationPreview} />}
     {item.questionMetrics && <p className="mt-2 text-xs text-slate-600">{item.questionMetrics.categories.join(" · ") || "Keine Kategorie"} · {templateName}</p>}
     {item.justApproved && <p role="status" className="mt-2 text-sm font-semibold text-emerald-800">Gerade freigegeben – wird beim Aktualisieren neu einsortiert bzw. ausgeblendet.</p>}
     <details id={detailsId} className="mt-2"><summary className="min-h-11 cursor-pointer py-3 text-sm font-semibold">Details und Verwendungen</summary><dl className="mt-2 grid gap-x-5 gap-y-3 border-t border-slate-100 pt-4 text-sm sm:grid-cols-3 lg:grid-cols-4">

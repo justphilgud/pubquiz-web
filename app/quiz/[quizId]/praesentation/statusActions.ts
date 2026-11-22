@@ -1,5 +1,6 @@
 "use server";
 import { freezeQuizDesign } from "@/app/rendering/sharedDesign/sharedDesignRepository.server";
+import { startRequestNavigationTrace } from "@/app/lib/navigationTrace.server";
 import { assertMemeArchiveResetSafe } from "../../memeArchive/archive.server";
 
 import { presentationCountdownDeadline } from "../../blockCountdown";
@@ -52,8 +53,10 @@ export async function getOrCreatePraesentationStatus(quizId: number) {
 }
 
 export async function getPraesentationStatus(quizId: number) {
+  const finishTrace = await startRequestNavigationTrace("status-poll");
   await requireQuizViewer(quizId);
   const status = await ensureQuizBlockDeadlines(quizId);
+  finishTrace();
   return { ...status, serverNow: Date.now() };
 }
 
@@ -157,6 +160,7 @@ export async function setPraesentationSlideIndex(
   expectedSlideKey?: string | null,
 ) {
   const navigationRequestedAt = new Date();
+  const finishTrace = await startRequestNavigationTrace("navigation");
   const requestStartedAt = performance.now();
   const phases: Record<string, number> = {};
   const { result, diagnostics } = await withPrismaQueryDiagnostics(async () => {
@@ -395,6 +399,7 @@ export async function setPraesentationSlideIndex(
     queryDurationMs: diagnostics?.queryDurationMs ?? null,
     total: performance.now() - requestStartedAt,
   });
+  finishTrace({ ...phases, queryCount: diagnostics?.queryCount ?? null, queryDurationMs: diagnostics?.queryDurationMs ?? null });
   return result;
 }
 async function getAntwortStatusData(

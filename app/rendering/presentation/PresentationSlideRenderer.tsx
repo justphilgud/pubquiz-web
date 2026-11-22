@@ -2764,6 +2764,17 @@ function renderAktuellenSlide() {
 }
 
   const overlayMedia = currentSlideMedia;
+  function renderNumberedSlideContent() {
+    const content = renderAktuellenSlide();
+    if (!slide || (slide.typ !== "frage" && slide.typ !== "aufloesung")) return content;
+    const data = slide.frage.templateConfig?.templateData;
+    if (![questionTemplateIds.memeCaption, questionTemplateIds.translationReadAloud, questionTemplateIds.pairs].some(id => id === slide.frage.templateId)
+      && data?.kind !== "TRANSLATION_READ_ALOUD" && data?.kind !== "PAIRS") return content;
+    return <div className="flex h-full min-h-0 flex-col gap-2" data-question-sequence={slide.frageIndexImBlock}>
+      <p className="presentation-question-label shrink-0 text-sm font-bold uppercase tracking-wider text-[var(--quiz-text)]">Frage {slide.frageIndexImBlock}{slide.typ === "aufloesung" ? " · Auflösung" : ""}</p>
+      <div className="min-h-0 flex-1">{content}</div>
+    </div>;
+  }
   const isFaceMorphSolution = slide?.typ === "aufloesung" && slide.frage.presentationLayouts.solution.contentRole === "FACE_MORPH";
   const isMemeQuestionOrSolution = Boolean(
     slide &&
@@ -2855,7 +2866,7 @@ function renderAktuellenSlide() {
       {slideLabel !== "VOR DEM START" && (
         <PresentationDesignHeader
           theme={theme}
-          slideLabel={slide?.typ === "frage" ? `Frage ${slide.frageIndexImBlock}` : slideLabel}
+          slideLabel={slide?.typ === "frage" || slide?.typ === "aufloesung" ? `Frage ${slide.frageIndexImBlock}${slide.typ === "aufloesung" ? " · Auflösung" : ""}` : slideLabel}
           slideNumber={slideIndex + 1}
           slideCount={slides.length}
           sponsor={slide?.typ === "frage" ? parseQuestionSponsor(slide.frage.templateConfig?.sponsor) ?? undefined : undefined}
@@ -2865,7 +2876,7 @@ function renderAktuellenSlide() {
       <PresentationDesignStage theme={theme} storybookComposition={storybookComposition} contentKey={`${slideIndex}:${slideContentKey}:${pollContentKey}:${theme.design.stylePreset}:${templateRevealCount}:${estimationPhase}`}>
         {sponsorMoment?.phase !== "SPONSOR" && estimationPhase !== "HIDDEN"
           ? renderSchaetzfrageOverlay()
-          : renderAktuellenSlide()}
+          : renderNumberedSlideContent()}
       </PresentationDesignStage>
       {slide?.typ === "frage" && pixelState && (
         <div className="presentation-runtime-status absolute bottom-6 right-8 z-40 max-w-[60%] rounded-xl border px-6 py-3 text-center" style={{ background: "var(--quiz-surface-strong)", color: "var(--quiz-text)", borderColor: "var(--quiz-border)" }}>

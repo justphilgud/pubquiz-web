@@ -2,6 +2,24 @@
 
 ## LOVD November 2026
 
+Korrektur 22.11.2026: Der gemeinsame Designheader verwendet auf Frage **und**
+Auflösung die Decknummer `frageIndexImBlock`; Auflösungen ergänzen „· Auflösung“.
+Dies schließt Meme, Übersetzt-vorgelesen und Paare in allen Designwelten ein.
+Die kleine Moderationsvorschau verwendet dieselbe Nummer. Erklärungen und andere
+Nicht-Fragefolien erhalten keine Fragennummer. Wiederholung/Sprung zählen nicht lokal.
+Meme, Übersetzt-vorgelesen und Paare erhalten zusätzlich eine gemeinsame kompakte
+Nummernzeile innerhalb der Inhaltsfläche; dadurch hängt ihre Nummer nicht nur am
+kleinen Designheader oder an einem vom Spezialtemplate übersprungenen Standardzweig.
+Der Meme-Bereich der Moderation erklärt die tatsächliche Folge Schließen → Review →
+Einzelvorstellung → Übersicht(en) → Abstimmung → Finalisierung → nächste Quizfolie;
+leerer ausdrücklich abgeschlossener Review überspringt nur die eigene Auflösung.
+Die Hauptaktion unterscheidet letztes Meme/Übersicht sowie Ergebnis/nächste Folie.
+`PodiumCeremony` zeigt vorhandene `photoUrl` aus dem unveränderten Ranglisten-Snapshot
+groß und mit `object-fit: contain`, einschließlich einzelner Teamidentitäten bei
+Gleichstand. Ohne Foto entsteht kein leerer Rahmen. Podestposition und Reveal 3→2→1
+bleiben unverändert. Tests: Renderer, Meme-Voting, Snapshot und der echte
+`presentationWindowSync.browser.test.ts` mit zwei Fenstern und Fotoformaten.
+
 Alle Fragezweige verwenden im gemeinsamen Header `frageIndexImBlock`, einschließlich
 Pixel- und Spezialfragen. Nummern entstehen aus dem Deck, nicht aus Klick- oder
 Animationszustand. Der nächste Block beginnt wieder mit Frage 1. Bereits vorhandene

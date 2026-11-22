@@ -1,0 +1,72 @@
+[
+  {
+    "requestId": "bckfm-1795354610980-07caf0f6daed",
+    "deploymentId": "dpl_GvbNQ7Hy5PZQ9TQi5rYqGZf1hG1d",
+    "environment": "preview",
+    "timestamp": "2026-11-22T13:36:50.980Z",
+    "status": 200,
+    "requestDurationMs": 1429,
+    "traceId": "",
+    "hasFunctionCrashed": false,
+    "events": [
+      {
+        "source": "serverless-middleware",
+        "timestamp": "2026-11-22T13:36:51.008Z",
+        "httpStatus": 200,
+        "region": "fra1",
+        "durationMs": 7,
+        "concurrency": 1,
+        "functionRuntime": "nodejs24.x",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "functionBytecodeHit": -1
+      },
+      {
+        "source": "serverless",
+        "timestamp": "2026-11-22T13:36:51.391Z",
+        "httpStatus": 200,
+        "region": "fra1",
+        "durationMs": 1023,
+        "concurrency": 1,
+        "functionRuntime": "nodejs24.x",
+        "functionStartType": "prewarmed",
+        "functionColdStartDurationMs": 323,
+        "functionBytecodeHit": -1
+      }
+    ],
+    "proxyEvents": [
+      {
+        "source": "static",
+        "timestamp": "2026-11-22 13:36:50.980",
+        "httpStatus": 200,
+        "region": "fra1"
+      }
+    ],
+    "functionEvents": [
+      {
+        "source": "serverless",
+        "timestamp": "2026-11-22 13:36:51.008",
+        "httpStatus": 200,
+        "region": "fra1",
+        "durationMs": 7,
+        "concurrency": 1,
+        "functionRuntime": "nodejs24.x",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "functionBytecodeHit": -1
+      },
+      {
+        "source": "serverless",
+        "timestamp": "2026-11-22 13:36:51.391",
+        "httpStatus": 200,
+        "region": "fra1",
+        "durationMs": 1023,
+        "concurrency": 1,
+        "functionRuntime": "nodejs24.x",
+        "functionStartType": "prewarmed",
+        "functionColdStartDurationMs": 323,
+        "functionBytecodeHit": -1
+      }
+    ]
+  }
+]

@@ -1,0 +1,355 @@
+[
+  {
+    "requestId": "blgv6-1795354576210-7f69df42b4a0",
+    "role": "mod",
+    "op": "liveSnapshotHTTP",
+    "startUTC": 1795354581550.3882,
+    "browserMs": 213.9339999994263,
+    "ttfbMs": 212.501,
+    "platformMs": 115,
+    "status": 200,
+    "events": [
+      {
+        "source": "serverless",
+        "timestamp": "2026-11-22T13:36:16.286Z",
+        "durationMs": 39,
+        "region": "fra1",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "concurrency": 1
+      },
+      {
+        "source": "serverless-middleware",
+        "timestamp": "2026-11-22T13:36:16.244Z",
+        "durationMs": 6,
+        "region": "fra1",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "concurrency": 1
+      }
+    ],
+    "performance": [
+      {
+        "operation": "moderator-live-snapshot",
+        "auth": 1.9911590000047,
+        "parse": 0.12773400000151014,
+        "snapshot": 30.95584300000337,
+        "serialization": 0.0071779999998398125,
+        "payloadBytes": 1020,
+        "queryCount": 23,
+        "queryDurationMs": 40.369034999996074,
+        "total": 33.18929400000343
+      }
+    ]
+  },
+  {
+    "requestId": "vpn2q-1795354576281-4102e0f8c3e3",
+    "role": "mod",
+    "op": "otherAction",
+    "startUTC": 1795354581586.604,
+    "browserMs": 532.9389999969862,
+    "ttfbMs": 457.265,
+    "platformMs": 316,
+    "status": 200,
+    "events": [
+      {
+        "source": "serverless",
+        "timestamp": "2026-11-22T13:36:16.341Z",
+        "durationMs": 256,
+        "region": "fra1",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "concurrency": 2
+      },
+      {
+        "source": "serverless-middleware",
+        "timestamp": "2026-11-22T13:36:16.307Z",
+        "durationMs": 5,
+        "region": "fra1",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "concurrency": 1
+      }
+    ],
+    "performance": [
+      {
+        "operation": "moderator-slide-mutation",
+        "access": 17.402960999999777,
+        "validation": 0.0013909999979659915,
+        "presentationMutation": 75.49858200000017,
+        "blockMutation": 0.0032869999995455146,
+        "interactionMutation": 66.57821800000966,
+        "queryCount": 74,
+        "queryDurationMs": 439.10265100000834,
+        "total": 248.9240940000018
+      }
+    ]
+  },
+  {
+    "requestId": "wflk5-1795354576719-a19f19df0658",
+    "role": "mod",
+    "op": "otherAction",
+    "startUTC": 1795354582050.55,
+    "browserMs": 187.67700000898913,
+    "ttfbMs": 186.389,
+    "platformMs": 99,
+    "status": 200,
+    "events": [
+      {
+        "source": "serverless-middleware",
+        "timestamp": "2026-11-22T13:36:16.750Z",
+        "durationMs": 5,
+        "region": "fra1",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "concurrency": 1
+      },
+      {
+        "source": "serverless",
+        "timestamp": "2026-11-22T13:36:16.785Z",
+        "durationMs": 33,
+        "region": "fra1",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "concurrency": 1
+      }
+    ],
+    "performance": [
+      {
+        "operation": "moderator-answer-status",
+        "queryCount": 12,
+        "queryDurationMs": 23.835511999976006,
+        "total": 28.107130000003963
+      }
+    ]
+  },
+  {
+    "requestId": "bpkp9-1795354610300-d2a702319af2",
+    "role": "mod",
+    "op": "otherAction",
+    "startUTC": 1795354615624.551,
+    "browserMs": 27403.88100000564,
+    "ttfbMs": 27237.867,
+    "platformMs": 241,
+    "status": 200,
+    "events": [
+      {
+        "source": "serverless",
+        "timestamp": "2026-11-22T13:36:50.370Z",
+        "durationMs": 170,
+        "region": "fra1",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "concurrency": 1
+      },
+      {
+        "source": "serverless-middleware",
+        "timestamp": "2026-11-22T13:36:50.332Z",
+        "durationMs": 11,
+        "region": "fra1",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "concurrency": 1
+      }
+    ],
+    "performance": [
+      {
+        "operation": "moderator-slide-mutation",
+        "access": 15.78320600000734,
+        "validation": 0.00130899999930989,
+        "presentationMutation": 26.060664999997243,
+        "blockMutation": 0.0035189999907743186,
+        "interactionMutation": 21.866565000003902,
+        "queryCount": 73,
+        "queryDurationMs": 361.592896999995,
+        "total": 164.07404400000814
+      }
+    ]
+  },
+  {
+    "requestId": "bckfm-1795354610980-07caf0f6daed",
+    "role": "mod",
+    "op": "liveSnapshotHTTP",
+    "startUTC": 1795354616306.326,
+    "browserMs": 29479.698000010103,
+    "ttfbMs": 29477.999,
+    "platformMs": 1429,
+    "status": 200,
+    "events": [
+      {
+        "source": "serverless-middleware",
+        "timestamp": "2026-11-22T13:36:51.008Z",
+        "durationMs": 7,
+        "region": "fra1",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "concurrency": 1
+      },
+      {
+        "source": "serverless",
+        "timestamp": "2026-11-22T13:36:51.391Z",
+        "durationMs": 1023,
+        "region": "fra1",
+        "functionStartType": "prewarmed",
+        "functionColdStartDurationMs": 323,
+        "concurrency": 1
+      }
+    ],
+    "performance": [
+      {
+        "operation": "moderator-live-snapshot",
+        "auth": 20.2044920000003,
+        "parse": 1.198210999999901,
+        "snapshot": 524.0913399999995,
+        "serialization": 0.008706999999958498,
+        "payloadBytes": 1020,
+        "queryCount": 23,
+        "queryDurationMs": 266.146303,
+        "total": 548.0741240000002
+      }
+    ]
+  },
+  {
+    "requestId": "j24r8-1795354611981-8d9a4a410d41",
+    "role": "public",
+    "op": "otherAction",
+    "startUTC": 1795354617297.512,
+    "browserMs": 28485.350999981165,
+    "ttfbMs": 28482.222,
+    "platformMs": 96,
+    "status": 200,
+    "events": [
+      {
+        "source": "serverless-middleware",
+        "timestamp": "2026-11-22T13:36:52.020Z",
+        "durationMs": 6,
+        "region": "fra1",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "concurrency": 1
+      },
+      {
+        "source": "serverless",
+        "timestamp": "2026-11-22T13:36:52.054Z",
+        "durationMs": 22,
+        "region": "fra1",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "concurrency": 1
+      }
+    ],
+    "performance": []
+  },
+  {
+    "requestId": "6jcjl-1795354637579-a9d81a915249",
+    "role": "mod",
+    "op": "otherAction",
+    "startUTC": 1795354642909.618,
+    "browserMs": 24839.546000002883,
+    "ttfbMs": 24836.691,
+    "platformMs": 140,
+    "status": 200,
+    "events": [
+      {
+        "source": "serverless-middleware",
+        "timestamp": "2026-11-22T13:37:17.620Z",
+        "durationMs": 7,
+        "region": "fra1",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "concurrency": 1
+      },
+      {
+        "source": "serverless",
+        "timestamp": "2026-11-22T13:37:17.652Z",
+        "durationMs": 67,
+        "region": "fra1",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "concurrency": 1
+      }
+    ],
+    "performance": [
+      {
+        "operation": "moderator-answer-status",
+        "queryCount": 12,
+        "queryDurationMs": 101.02304899998126,
+        "total": 62.23372599999129
+      }
+    ]
+  },
+  {
+    "requestId": "dhv76-1795354640453-7bf5df499e82",
+    "role": "public",
+    "op": "otherAction",
+    "startUTC": 1795354645787.146,
+    "browserMs": 21967.718999978388,
+    "ttfbMs": 21965.112,
+    "platformMs": 103,
+    "status": 200,
+    "events": [
+      {
+        "source": "serverless",
+        "timestamp": "2026-11-22T13:37:20.530Z",
+        "durationMs": 26,
+        "region": "fra1",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "concurrency": 1
+      },
+      {
+        "source": "serverless-middleware",
+        "timestamp": "2026-11-22T13:37:20.491Z",
+        "durationMs": 7,
+        "region": "fra1",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "concurrency": 1
+      }
+    ],
+    "performance": []
+  },
+  {
+    "requestId": "dnrnn-1795354641217-7c13caf5a59d",
+    "role": "mod",
+    "op": "liveSnapshotHTTP",
+    "startUTC": 1795354646545.603,
+    "browserMs": 43268.71800000663,
+    "ttfbMs": 43264.615,
+    "platformMs": 162,
+    "status": 200,
+    "events": [
+      {
+        "source": "serverless-middleware",
+        "timestamp": "2026-11-22T13:37:21.252Z",
+        "durationMs": 5,
+        "region": "fra1",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "concurrency": 1
+      },
+      {
+        "source": "serverless",
+        "timestamp": "2026-11-22T13:37:21.283Z",
+        "durationMs": 97,
+        "region": "fra1",
+        "functionStartType": "hot",
+        "functionColdStartDurationMs": -1,
+        "concurrency": 1
+      }
+    ],
+    "performance": [
+      {
+        "operation": "moderator-live-snapshot",
+        "auth": 5.31168500000058,
+        "parse": 0.4275229999984731,
+        "snapshot": 78.5800889999955,
+        "serialization": 0.007820999999239575,
+        "payloadBytes": 1020,
+        "queryCount": 23,
+        "queryDurationMs": 111.00048100001004,
+        "total": 84.5750160000025
+      }
+    ]
+  }
+]

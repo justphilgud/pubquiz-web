@@ -2,6 +2,16 @@
 
 ## AP5-Anwendungsergänzung 20.11.2026
 
+Klarstellung 22.11.2026: Die Checkbox heißt „Nur ungeklärte automatische Prüffälle“.
+Sie wählt berechnete REVIEW_REQUIRED-Fälle ohne MANUAL, ohne fehlende Abgabe und
+ohne NOT_PLAYED/PENDING. Sie ist kein zweiter Antwortmodusfilter. „Nur offene Fragen“
+wählt den effektiven Modus; „nur falsche Antworten“ schließt nur automatisch richtige
+Fälle aus und kann daher auch bereits manuell richtige Fälle enthalten. Unbeantwortet
+ist ein separater Submissionzustand. Die Filter werden geschnitten, nicht addiert.
+Die neue Erläuterung verändert keine dieser Regeln. Normalisierte exakte Erkennung
+bleibt im Evaluator; Ähnlichkeit und passende FaceMorph-Fremdfelder bleiben reine
+Prüfhinweise. Keine neue automatische Bewertung, keine Änderung am AP5-Analysebericht.
+
 Die historische Analyse unten bleibt als fester Befund erhalten. Die nun beauftragte
 Anwendungsverbesserung liegt ausschließlich in der Antwortprüfung, getrennt von
 Quiz-Ampeln und deren Modus. Keine neue Persistenz, Migration oder Abhängigkeit.

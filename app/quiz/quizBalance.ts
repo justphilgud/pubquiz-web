@@ -78,6 +78,7 @@ export function getQuizBalance(input: { questions: readonly BalanceQuestion[]; s
   const mode = normalizeQuizMode(input.mode);
   const blocks = input.sections.map(section => {
     const questions = input.questions.filter(q => q.sectionId === section.id);
+    const categorizedTotal = questions.filter(q => q.categoryIds.some(id => input.categories.some(c => c.id === id))).length;
     const groups = BALANCE_RULES.map(rule => {
       const count = questions.filter(q => questionBalanceGroup(q) === rule.id).length;
       const upperGreen = rule.id === "open" ? 20 : rule.id === "closed" ? 50 : null;
@@ -85,7 +86,7 @@ export function getQuizBalance(input: { questions: readonly BalanceQuestion[]; s
     });
     const categories = input.categories.map(category => {
       const count = questions.filter(q => q.categoryIds.includes(category.id)).length;
-      return { ...category, count, status: mode === "THEMED" ? "NONE" as const : balanceStatus("category", count, questions.length) };
+      return { ...category, count, status: mode === "THEMED" ? "NONE" as const : balanceStatus("category", count, categorizedTotal) };
     });
     const displayedCategories = categories.filter(category => category.count > 0);
     const overCategory = displayedCategories.some(c => c.status === "RED" || c.status === "YELLOW");
@@ -100,7 +101,7 @@ export function getQuizBalance(input: { questions: readonly BalanceQuestion[]; s
       });
     }
     if (alternative && !recommendations.some(r => new URL(r.href, "https://quiz.invalid").searchParams.has("categoryId"))) recommendations.push({ label: `${alternative.name} statt stark vertretener Sachkategorien suchen`, href: balanceSearchHref({ categoryId: alternative.id }) });
-    return { ...section, total: questions.length, groups, categories: displayedCategories, recommendations,
+    return { ...section, total: questions.length, categorizedTotal, uncategorizedTotal: questions.length - categorizedTotal, groups, categories: displayedCategories, recommendations,
       unknown: questions.filter(q => questionBalanceGroup(q) === "unknown").length,
       status: worstBalanceStatus([...groups.map(g => g.status), ...displayedCategories.map(c => c.status)]),
     };

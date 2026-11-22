@@ -135,4 +135,8 @@ test("Meme navigation names opening and closing explicitly", () => {
   assert.equal(getMemeAdvanceLabel(state), "Abstimmung starten");
   assert.equal(getMemeAdvanceLabel({ ...state, phase: "VOTING_OPEN" }), "Abstimmung schließen");
   assert.equal(getMemeAdvanceLabel({ ...state, overviewPage: 0 }), "Nächste Meme-Übersicht");
+  assert.equal(getMemeAdvanceLabel({...state,phase:"PRESENTING",activeCandidateNumber:1,candidates:[{number:1},{number:2}]}),"Nächstes Meme vorstellen");
+  assert.equal(getMemeAdvanceLabel({...state,phase:"PRESENTING",activeCandidateNumber:2,candidates:[{number:1},{number:2}]}),"Meme-Übersicht zeigen");
+  assert.equal(getMemeAdvanceLabel({...state,phase:"VOTING_CLOSED",hasResult:false}),"Meme-Ergebnis finalisieren");
+  assert.equal(getMemeAdvanceLabel({...state,phase:"VOTING_CLOSED",hasResult:true}),"Zur nächsten Quizfolie");
 });

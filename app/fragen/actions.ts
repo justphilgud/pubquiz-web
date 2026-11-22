@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/app/lib/prisma";
+import { questionDurationPreview } from "@/app/components/content/questionDuration";
 import { revalidatePath } from "next/cache";
 import { writeFile, mkdir } from "fs/promises";
 import path from "path";
@@ -494,6 +495,7 @@ export async function searchFragen(data: {
       updatedAt: frage.updated_at.toISOString(),
       canApprove: !frage.ist_archiviert && !frage.freigegeben && canApproveScopedQuestion(actor, mapQuestionAccessContext(frage)),
       frage: frage.frage,
+      durationPreview: questionDurationPreview(frage.vorlage?.code ?? null, frage.frage, frage.template_config_json, frage.medien),
       quelle: frage.quelle,
       schwierigkeitslevel: frage.schwierigkeitslevel?.toString() ?? null,
       ist_archiviert: frage.ist_archiviert,

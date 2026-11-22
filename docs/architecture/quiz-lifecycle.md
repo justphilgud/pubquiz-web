@@ -10,24 +10,47 @@ prüft optional den erwarteten Ausgangsschlüssel unter dem bestehenden Quiz-Loc
 ein bereits erreichtes Ziel bleibt idempotent. Veraltete Fenster überschreiben
 keine inzwischen geänderte Position.
 
-`presentationWindowSync` bestätigt über BroadcastChannel den gerenderten Stand
+`presentationWindowSync` bestätigt über BroadcastChannel den angewendeten Stand
 der verbundenen Präsentationsfenster desselben Browserprofils und Ursprungs.
-Zwei Renderframes und endliche Podiumsanimationen gehen der Bestätigung voraus.
+Die Bestätigung erfolgt nach dem React-Commit des Zielzustands, unabhängig von
+Fokus, Sichtbarkeit, Animationsframes und Podiumsanimationen. Sie ist keine
+Behauptung über tatsächlich am Beamer sichtbare Pixel. Die frühere Wartefolge
+aus zwei Frames und Animationen konnte im Hintergrund dauerhaft aussetzen.
 Diese Quittung ist keine zweite fachliche Zustandsquelle und schreibt keine DB.
 Öffentliche Fenster beantworten nur ausdrückliche Probes, niemals die Quittungen
 anderer Fenster. Der Protokolltest schützt dadurch vor Echo-Rückkopplungen bei
 mehreren gleichzeitig geöffneten Präsentationen.
-Ein Timeout lässt nur die erneute Anzeigeprüfung zu; es führt nicht zum nächsten
-Wechsel. Ohne verbundenes lokales Fenster endet die Sperre nach Serverbestätigung.
+Ein Timeout zeigt einen getrennten Hinweis „Wechsel gespeichert“ und entsperrt
+weitere Navigation. „Anzeige erneut prüfen“ prüft nur die bereits gespeicherte
+Zielposition und navigiert nicht erneut. Verspätete passende Quittungen löschen
+den Hinweis automatisch. Echte Aktionsfehler bleiben Fehler; „Gespeicherten
+Folienstand synchronisieren“ lädt ausschließlich den Live-Snapshot. Der
+Serververgleich des erwarteten Ausgangsschlüssels verhindert ein Überspringen
+nach einer verlorenen Aktionsantwort. Ohne verbundenes lokales Fenster endet
+die Sperre nach Serverbestätigung.
 Andere Geräte/Browserprofile liefern keine solche Quittung. Die bestehenden
 Server-Snapshots bleiben dort maßgeblich; eine geräteübergreifende sichtbare
 Renderbestätigung ist damit nicht nachgewiesen.
 
 Browser-Performanceeinträge `pubquiz-navigation-server` und
-`pubquiz-presentation-visible` trennen Eingabe→Serverbestätigung und die weitere
-Wartezeit auf Sichtbarkeit. Die vorhandenen serverseitigen Phasenmessungen bleiben.
+`pubquiz-presentation-applied` trennen Eingabe→Serverbestätigung und die weitere
+Wartezeit auf Anwendung im Player. Die vorhandenen serverseitigen Phasenmessungen bleiben.
 Tests: `navigationTransition.test.ts`, `sponsorNavigation.test.ts` und der
 [Abnahmebericht](../reports/lovd-november.md).
+
+### Befristete P0-Diagnose auf Preview (22.11.2026)
+
+Für die reale Latenzuntersuchung kann der isolierte Testbrowser eine zufällige
+`x-qa-correlation`-ID mitsenden. Ausschließlich `VERCEL_ENV=preview` veröffentlicht
+dann `navigation-trace`-Start-/Endzeitpunkte für Proxy nach Authentifizierung,
+Navigationsaktion, Statuspoll, Snapshotpoll und HTTP-Snapshot sowie freigegebene
+numerische Prisma-/Phasenmesswerte. Die Diagnose endet automatisch am 24.11.2026
+um 00:00 UTC. Andere Umgebungen und unzulässige Headerwerte erzeugen keine Einträge.
+Es werden keine Quiz-/Teamnamen, Positionenschlüssel, Antworten, Medieninhalte,
+Cookies, Tokens oder SQL-Parameter protokolliert. Der Testbrowser zeichnet seine
+Netzwerk-, React- und Broadcast-Ereignisse getrennt unter derselben ID auf.
+Dies verändert weder Nutzdaten noch Rollen, Lifecycle oder Navigationssperren und
+ist noch keine Behauptung einer behobenen Latenz. Regression: `navigationTrace.test.ts`.
 
 ## Ergänzung 16. Oktober 2026: dauerhaftes Meme-Archiv
 

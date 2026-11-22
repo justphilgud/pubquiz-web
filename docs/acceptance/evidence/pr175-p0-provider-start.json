@@ -1,0 +1,2264 @@
+{
+  "previous": {
+    "deploymentId": "dpl_7BJyG4rjuYsH7CPWo6DXMeH69p6h",
+    "url": "https://pubquiz-7s7nnkgkr-just-phil-gud.vercel.app",
+    "head": "fd3317fd3eee40249c824db3376be872b26c2b8f",
+    "metrics": {
+      "query": {
+        "metric": "vercel.function_invocation.count",
+        "aggregation": "sum",
+        "groupBy": [
+          "function_start_type"
+        ],
+        "filter": "(deployment_id eq 'dpl_7BJyG4rjuYsH7CPWo6DXMeH69p6h') and (environment eq 'preview')",
+        "startTime": "2026-11-22T14:44:26.000Z",
+        "endTime": "2026-11-22T15:32:58.240Z",
+        "granularity": {
+          "minutes": 1
+        },
+        "orderBy": "count",
+        "orderDirection": "desc"
+      },
+      "summary": [
+        {
+          "vercel_function_invocation_count_sum": 1249,
+          "function_start_type": "hot"
+        },
+        {
+          "vercel_function_invocation_count_sum": 23,
+          "function_start_type": "prewarmed"
+        }
+      ],
+      "data": [
+        {
+          "timestamp": "2026-11-22T14:44:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T14:44:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T14:45:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T14:45:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T14:46:00.000Z",
+          "vercel_function_invocation_count_sum": 126,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T14:46:00.000Z",
+          "vercel_function_invocation_count_sum": 6,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T14:47:00.000Z",
+          "vercel_function_invocation_count_sum": 140,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T14:47:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T14:48:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T14:48:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T14:49:00.000Z",
+          "vercel_function_invocation_count_sum": 60,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T14:49:00.000Z",
+          "vercel_function_invocation_count_sum": 7,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T14:50:00.000Z",
+          "vercel_function_invocation_count_sum": 211,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T14:50:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T14:51:00.000Z",
+          "vercel_function_invocation_count_sum": 49,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T14:51:00.000Z",
+          "vercel_function_invocation_count_sum": 1,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T14:52:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T14:52:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T14:53:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T14:53:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T14:54:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T14:54:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T14:55:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T14:55:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T14:56:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T14:56:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T14:57:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T14:57:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T14:58:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T14:58:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T14:59:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T14:59:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:00:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:00:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:01:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:01:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:02:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:02:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:03:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:03:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:04:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:04:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:05:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:05:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:06:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:06:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:07:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:07:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:08:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:08:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:09:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:09:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:10:00.000Z",
+          "vercel_function_invocation_count_sum": 60,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:10:00.000Z",
+          "vercel_function_invocation_count_sum": 5,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:11:00.000Z",
+          "vercel_function_invocation_count_sum": 209,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:11:00.000Z",
+          "vercel_function_invocation_count_sum": 3,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:12:00.000Z",
+          "vercel_function_invocation_count_sum": 220,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:12:00.000Z",
+          "vercel_function_invocation_count_sum": 1,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:13:00.000Z",
+          "vercel_function_invocation_count_sum": 174,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:13:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:14:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:14:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:15:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:15:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:16:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:16:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:17:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:17:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:18:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:18:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:19:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:19:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:20:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:20:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:21:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:21:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:22:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:22:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:23:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:23:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:24:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:24:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:25:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:25:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:26:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:26:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:27:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:27:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:28:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:28:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:29:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:29:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:30:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:30:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:31:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:31:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:32:00.000Z",
+          "vercel_function_invocation_count_sum": null,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:32:00.000Z",
+          "vercel_function_invocation_count_sum": null,
+          "function_start_type": "prewarmed"
+        }
+      ],
+      "statistics": {
+        "bytesRead": 67879668,
+        "rowsRead": 1380227,
+        "dbTimeSeconds": 0.387
+      },
+      "orderBy": "count",
+      "orderDirection": "desc"
+    },
+    "firstRequests": [
+      {
+        "requestId": "lwqfl-1795358782777-310aad9913e3",
+        "operation": "login",
+        "method": "GET",
+        "browserMs": 1835.3749999951106,
+        "platformMs": 1810,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:22.777Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:23.407Z",
+            "durationMs": 34,
+            "functionStartType": "prewarmed",
+            "functionColdStartDurationMs": 429,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:24.061Z",
+            "durationMs": 523,
+            "functionStartType": "prewarmed",
+            "functionColdStartDurationMs": 569,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "2tjj4-1795358787072-3195d8e0d164",
+        "operation": "other",
+        "method": "GET",
+        "browserMs": 863.152000005357,
+        "platformMs": 844,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:27.072Z",
+        "events": [
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:27.168Z",
+            "durationMs": 748,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:27.106Z",
+            "durationMs": 27,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "xcpn9-1795358788018-08943de6026e",
+        "operation": "moderation",
+        "method": "GET",
+        "browserMs": 868.3850000088569,
+        "platformMs": 849,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:28.018Z",
+        "events": [
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:28.092Z",
+            "durationMs": 774,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:28.051Z",
+            "durationMs": 13,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "47vmf-1795358788125-e75762d7cb0e",
+        "operation": "other",
+        "method": "GET",
+        "browserMs": 421.9790000061039,
+        "platformMs": 399,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:28.125Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:28.260Z",
+            "durationMs": 13,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:28.516Z",
+            "durationMs": 8,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "nfsxg-1795358788125-6513a4baf1e6",
+        "operation": "other",
+        "method": "GET",
+        "browserMs": 457.67699999851175,
+        "platformMs": 428,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:28.125Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:28.285Z",
+            "durationMs": 10,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:28.539Z",
+            "durationMs": 6,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "kcjj9-1795358788125-f893f3399617",
+        "operation": "other",
+        "method": "GET",
+        "browserMs": 271.1809999891557,
+        "platformMs": 250,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:28.125Z",
+        "events": [
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:28.309Z",
+            "durationMs": 67,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:28.155Z",
+            "durationMs": 12,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "svvdk-1795358788125-bf9b91f511db",
+        "operation": "other",
+        "method": "GET",
+        "browserMs": 428.8869999872986,
+        "platformMs": 411,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:28.125Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:28.274Z",
+            "durationMs": 13,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:28.527Z",
+            "durationMs": 8,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "lwqfl-1795358788402-9e51941a917d",
+        "operation": "other",
+        "method": "GET",
+        "browserMs": 209.99699999811128,
+        "platformMs": 187,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:28.402Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:28.524Z",
+            "durationMs": 46,
+            "functionStartType": "prewarmed",
+            "functionColdStartDurationMs": 270,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:28.575Z",
+            "durationMs": 14,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "gbbcn-1795358788555-372df202a29e",
+        "operation": "other",
+        "method": "GET",
+        "browserMs": 90.50500000012107,
+        "platformMs": 73,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:28.555Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:28.567Z",
+            "durationMs": 19,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:28.598Z",
+            "durationMs": 31,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "zl7qz-1795358788584-b44120d5022f",
+        "operation": "other",
+        "method": "GET",
+        "browserMs": 295.11099998489954,
+        "platformMs": 274,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:28.584Z",
+        "events": [
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:28.778Z",
+            "durationMs": 83,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:28.632Z",
+            "durationMs": 42,
+            "functionStartType": "prewarmed",
+            "functionColdStartDurationMs": 265,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "jxzd8-1795358788949-6a50768297ac",
+        "operation": "presentation",
+        "method": "GET",
+        "browserMs": 1396.967999986373,
+        "platformMs": 1378,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:28.949Z",
+        "events": [
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:29.225Z",
+            "durationMs": 1104,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:29.081Z",
+            "durationMs": 21,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "z6c2z-1795358789281-44b57b636822",
+        "operation": "other",
+        "method": "POST",
+        "browserMs": 1629.0179999778047,
+        "platformMs": 1600,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:29.281Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:29.310Z",
+            "durationMs": 18,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:29.878Z",
+            "durationMs": 1006,
+            "functionStartType": "prewarmed",
+            "functionColdStartDurationMs": 502,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "fjvjt-1795358789286-802128166a7c",
+        "operation": "moderation",
+        "method": "POST",
+        "browserMs": 886.6589999815915,
+        "platformMs": 794,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:29.286Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:29.317Z",
+            "durationMs": 19,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:29.460Z",
+            "durationMs": 620,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "rtrlf-1795358790830-73817b162997",
+        "operation": "moderation",
+        "method": "POST",
+        "browserMs": 857.4209999933373,
+        "platformMs": 766,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:30.830Z",
+        "events": [
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:30.912Z",
+            "durationMs": 682,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:30.865Z",
+            "durationMs": 15,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "rvwqw-1795358790831-d284488ffdbe",
+        "operation": "presentation",
+        "method": "POST",
+        "browserMs": 194.16700000874698,
+        "platformMs": 117,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:30.831Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:30.859Z",
+            "durationMs": 13,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:30.900Z",
+            "durationMs": 48,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "fjvjt-1795358791016-309d96ff5b82",
+        "operation": "presentation",
+        "method": "POST",
+        "browserMs": 250.42900000698864,
+        "platformMs": 229,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:31.016Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:31.047Z",
+            "durationMs": 11,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:31.191Z",
+            "durationMs": 50,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "fjvjt-1795358791810-3bb6d7b8f9a2",
+        "operation": "other",
+        "method": "POST",
+        "browserMs": 195.99800001014955,
+        "platformMs": 169,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:31.810Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:31.845Z",
+            "durationMs": 12,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:31.899Z",
+            "durationMs": 81,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "fkpl8-1795358792074-d23e97293324",
+        "operation": "presentation",
+        "method": "POST",
+        "browserMs": 228.4829999844078,
+        "platformMs": 115,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:32.074Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:32.108Z",
+            "durationMs": 13,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:32.155Z",
+            "durationMs": 34,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "fkpl8-1795358792252-96220c27de02",
+        "operation": "presentation",
+        "method": "POST",
+        "browserMs": 165.4500000004191,
+        "platformMs": 113,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:32.252Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:32.280Z",
+            "durationMs": 10,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:32.320Z",
+            "durationMs": 45,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "fjvjt-1795358792824-d4ef57d9884b",
+        "operation": "moderation",
+        "method": "POST",
+        "browserMs": 255.9670000046026,
+        "platformMs": 174,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:32.824Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:32.860Z",
+            "durationMs": 22,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:32.931Z",
+            "durationMs": 48,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "fkpl8-1795358792824-6cc88a7a60d4",
+        "operation": "other",
+        "method": "POST",
+        "browserMs": 178.42800001380965,
+        "platformMs": 143,
+        "status": 200,
+        "timestamp": "2026-11-22T14:46:32.824Z",
+        "events": [
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T14:46:32.891Z",
+            "durationMs": 77,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T14:46:32.848Z",
+            "durationMs": 16,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      }
+    ]
+  },
+  "fresh": {
+    "deploymentId": "dpl_AEU7YVVrhZ9ThA3nDBLVVYTUWdVt",
+    "url": "https://pubquiz-dea876kie-just-phil-gud.vercel.app",
+    "head": "69e5aeeaf656f5a0124213798ab60fd961526eee",
+    "metrics": {
+      "query": {
+        "metric": "vercel.function_invocation.count",
+        "aggregation": "sum",
+        "groupBy": [
+          "function_start_type"
+        ],
+        "filter": "(deployment_id eq 'dpl_AEU7YVVrhZ9ThA3nDBLVVYTUWdVt') and (environment eq 'preview')",
+        "startTime": "2026-11-22T15:33:00.000Z",
+        "endTime": "2026-11-22T15:38:00.000Z",
+        "granularity": {
+          "minutes": 1
+        },
+        "orderBy": "count",
+        "orderDirection": "desc"
+      },
+      "summary": [
+        {
+          "vercel_function_invocation_count_sum": 390,
+          "function_start_type": "hot"
+        },
+        {
+          "vercel_function_invocation_count_sum": 6,
+          "function_start_type": "prewarmed"
+        }
+      ],
+      "data": [
+        {
+          "timestamp": "2026-11-22T15:33:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:33:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:34:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:34:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:35:00.000Z",
+          "vercel_function_invocation_count_sum": 17,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:35:00.000Z",
+          "vercel_function_invocation_count_sum": 5,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:36:00.000Z",
+          "vercel_function_invocation_count_sum": 221,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:36:00.000Z",
+          "vercel_function_invocation_count_sum": 1,
+          "function_start_type": "prewarmed"
+        },
+        {
+          "timestamp": "2026-11-22T15:37:00.000Z",
+          "vercel_function_invocation_count_sum": 152,
+          "function_start_type": "hot"
+        },
+        {
+          "timestamp": "2026-11-22T15:37:00.000Z",
+          "vercel_function_invocation_count_sum": 0,
+          "function_start_type": "prewarmed"
+        }
+      ],
+      "statistics": {
+        "bytesRead": 64718410,
+        "rowsRead": 1269900,
+        "dbTimeSeconds": 6.173
+      },
+      "orderBy": "count",
+      "orderDirection": "desc"
+    },
+    "firstRequests": [
+      {
+        "requestId": "cstf2-1795361753589-4e73a91d0948",
+        "operation": "login",
+        "method": "GET",
+        "browserMs": 1722.9419999930542,
+        "platformMs": 1698,
+        "status": 200,
+        "timestamp": "2026-11-22T15:35:53.589Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T15:35:54.200Z",
+            "durationMs": 29,
+            "functionStartType": "prewarmed",
+            "functionColdStartDurationMs": 403,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T15:35:54.802Z",
+            "durationMs": 487,
+            "functionStartType": "prewarmed",
+            "functionColdStartDurationMs": 529,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "kmlb6-1795361757411-af9d06fd5c0a",
+        "operation": "other",
+        "method": "GET",
+        "browserMs": 763.8089999963995,
+        "platformMs": 731,
+        "status": 200,
+        "timestamp": "2026-11-22T15:35:57.411Z",
+        "events": [
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T15:35:57.494Z",
+            "durationMs": 641,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T15:35:57.440Z",
+            "durationMs": 23,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "lmg8h-1795361758241-0a1c69bbe724",
+        "operation": "moderation",
+        "method": "GET",
+        "browserMs": 868.6600000073668,
+        "platformMs": 846,
+        "status": 200,
+        "timestamp": "2026-11-22T15:35:58.241Z",
+        "events": [
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T15:35:58.322Z",
+            "durationMs": 765,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T15:35:58.279Z",
+            "durationMs": 12,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "w9l94-1795361758396-7ec50582672b",
+        "operation": "other",
+        "method": "GET",
+        "browserMs": 474.0730000194162,
+        "platformMs": 391,
+        "status": 200,
+        "timestamp": "2026-11-22T15:35:58.396Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T15:35:58.654Z",
+            "durationMs": 13,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T15:35:58.781Z",
+            "durationMs": 5,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "v8kkh-1795361758396-4ec8c8c18561",
+        "operation": "other",
+        "method": "GET",
+        "browserMs": 473.5440000076778,
+        "platformMs": 380,
+        "status": 200,
+        "timestamp": "2026-11-22T15:35:58.396Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T15:35:58.668Z",
+            "durationMs": 6,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T15:35:58.770Z",
+            "durationMs": 7,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "g8kpq-1795361758396-7f11dbbcc5e6",
+        "operation": "other",
+        "method": "GET",
+        "browserMs": 472.96399998595007,
+        "platformMs": 370,
+        "status": 200,
+        "timestamp": "2026-11-22T15:35:58.396Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T15:35:58.530Z",
+            "durationMs": 11,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T15:35:58.758Z",
+            "durationMs": 7,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "rphkz-1795361758396-373b5bfc0a25",
+        "operation": "other",
+        "method": "GET",
+        "browserMs": 307.27000001934357,
+        "platformMs": 219,
+        "status": 200,
+        "timestamp": "2026-11-22T15:35:58.396Z",
+        "events": [
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T15:35:58.558Z",
+            "durationMs": 57,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T15:35:58.425Z",
+            "durationMs": 12,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "rphkz-1795361758656-1037b7af9bc0",
+        "operation": "other",
+        "method": "GET",
+        "browserMs": 240.6300000147894,
+        "platformMs": 200,
+        "status": 200,
+        "timestamp": "2026-11-22T15:35:58.656Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T15:35:58.794Z",
+            "durationMs": 51,
+            "functionStartType": "prewarmed",
+            "functionColdStartDurationMs": 292,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T15:35:58.849Z",
+            "durationMs": 9,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "v8kkh-1795361758820-af7f9ad6573a",
+        "operation": "other",
+        "method": "GET",
+        "browserMs": 151.64799999911338,
+        "platformMs": 104,
+        "status": 200,
+        "timestamp": "2026-11-22T15:35:58.820Z",
+        "events": [
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T15:35:58.905Z",
+            "durationMs": 18,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T15:35:58.851Z",
+            "durationMs": 15,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "w9l94-1795361758820-ca964574fac2",
+        "operation": "other",
+        "method": "GET",
+        "browserMs": 150.9949999745004,
+        "platformMs": 73,
+        "status": 200,
+        "timestamp": "2026-11-22T15:35:58.820Z",
+        "events": [
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T15:35:58.871Z",
+            "durationMs": 21,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T15:35:58.826Z",
+            "durationMs": 28,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "pz8kk-1795361759174-539163244efc",
+        "operation": "presentation",
+        "method": "GET",
+        "browserMs": 437.70899999071844,
+        "platformMs": 406,
+        "status": 200,
+        "timestamp": "2026-11-22T15:35:59.174Z",
+        "events": [
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T15:35:59.387Z",
+            "durationMs": 191,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T15:35:59.236Z",
+            "durationMs": 12,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "nqzms-1795361759416-fae8521f77b4",
+        "operation": "other",
+        "method": "POST",
+        "browserMs": 1626.8399999826215,
+        "platformMs": 1609,
+        "status": 200,
+        "timestamp": "2026-11-22T15:35:59.416Z",
+        "events": [
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T15:36:00.005Z",
+            "durationMs": 1024,
+            "functionStartType": "prewarmed",
+            "functionColdStartDurationMs": 503,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T15:35:59.442Z",
+            "durationMs": 17,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "rphkz-1795361759424-f0b637f8b971",
+        "operation": "moderation",
+        "method": "POST",
+        "browserMs": 119.02400001417845,
+        "platformMs": 99,
+        "status": 200,
+        "timestamp": "2026-11-22T15:35:59.424Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T15:35:59.452Z",
+            "durationMs": 15,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T15:35:59.469Z",
+            "durationMs": 52,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "kmlb6-1795361759800-5eabf4de9185",
+        "operation": "presentation",
+        "method": "POST",
+        "browserMs": 1152.5480000127573,
+        "platformMs": 1134,
+        "status": 200,
+        "timestamp": "2026-11-22T15:35:59.800Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T15:35:59.828Z",
+            "durationMs": 16,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T15:35:59.871Z",
+            "durationMs": 1069,
+            "functionStartType": "prewarmed",
+            "functionColdStartDurationMs": 263,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "d25l9-1795361760954-2b6e7193d4b3",
+        "operation": "presentation",
+        "method": "POST",
+        "browserMs": 175.6370000075549,
+        "platformMs": 158,
+        "status": 200,
+        "timestamp": "2026-11-22T15:36:00.954Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T15:36:00.996Z",
+            "durationMs": 13,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T15:36:01.040Z",
+            "durationMs": 71,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "rkmbc-1795361761708-b91d98f273f0",
+        "operation": "moderation",
+        "method": "POST",
+        "browserMs": 207.95700000599027,
+        "platformMs": 189,
+        "status": 200,
+        "timestamp": "2026-11-22T15:36:01.708Z",
+        "events": [
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T15:36:01.769Z",
+            "durationMs": 9,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T15:36:01.817Z",
+            "durationMs": 80,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "7jlgp-1795361761884-e56aaf614360",
+        "operation": "presentation",
+        "method": "POST",
+        "browserMs": 129.52499999664724,
+        "platformMs": 109,
+        "status": 200,
+        "timestamp": "2026-11-22T15:36:01.884Z",
+        "events": [
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T15:36:01.953Z",
+            "durationMs": 41,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T15:36:01.916Z",
+            "durationMs": 12,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      },
+      {
+        "requestId": "wlzjl-1795361762026-81ba08088f70",
+        "operation": "presentation",
+        "method": "POST",
+        "browserMs": 146.8180000083521,
+        "platformMs": 115,
+        "status": 200,
+        "timestamp": "2026-11-22T15:36:02.026Z",
+        "events": [
+          {
+            "source": "serverless",
+            "timestamp": "2026-11-22T15:36:02.097Z",
+            "durationMs": 44,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          },
+          {
+            "source": "serverless-middleware",
+            "timestamp": "2026-11-22T15:36:02.061Z",
+            "durationMs": 10,
+            "functionStartType": "hot",
+            "functionColdStartDurationMs": -1,
+            "region": "fra1"
+          }
+        ]
+      }
+    ],
+    "warm": {
+      "origin": "https://pubquiz-dea876kie-just-phil-gud.vercel.app",
+      "head": "69e5aeeaf656f5a0124213798ab60fd961526eee",
+      "deploymentId": "dpl_AEU7YVVrhZ9ThA3nDBLVVYTUWdVt",
+      "median": 1055.5,
+      "p95": 1989,
+      "rows": [
+        {
+          "run": 0,
+          "cid": "9dd44c45-5c6a-45f8-96de-4c2dbe4ff008",
+          "requestId": "r6rml-1795361791061-2c90b91d7c1b",
+          "totalMs": 1051,
+          "player": {
+            "focused": false,
+            "visibility": "hidden"
+          },
+          "alerts": [],
+          "dispatchMs": 68.70703125,
+          "browserNavigationMs": 442.70200000028126,
+          "platformMs": 415,
+          "status": 200,
+          "commitMs": 975,
+          "ackMs": 976,
+          "receiveMs": 976,
+          "events": [
+            {
+              "source": "serverless",
+              "timestamp": "2026-11-22T15:36:31.147Z",
+              "durationMs": 329,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            },
+            {
+              "source": "serverless-middleware",
+              "timestamp": "2026-11-22T15:36:31.102Z",
+              "durationMs": 6,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            }
+          ],
+          "performance": [
+            {
+              "operation": "moderator-slide-mutation",
+              "access": 16.80553499999951,
+              "validation": 0.0015399999974761158,
+              "presentationMutation": 62.37270400000125,
+              "blockMutation": 0.003928999998606741,
+              "interactionMutation": 35.318090000000666,
+              "queryCount": 73,
+              "queryDurationMs": 581.2162000000535,
+              "total": 321.2324149999986
+            }
+          ],
+          "navigationRequests": 1
+        },
+        {
+          "run": 1,
+          "cid": "ec65bd23-94a8-444f-8990-826460f5ffeb",
+          "requestId": "848vr-1795361794046-807dcaedaf31",
+          "totalMs": 1103,
+          "player": {
+            "focused": false,
+            "visibility": "hidden"
+          },
+          "alerts": [],
+          "dispatchMs": 93.697021484375,
+          "browserNavigationMs": 215.52100000553764,
+          "platformMs": 197,
+          "status": 200,
+          "commitMs": 1044,
+          "ackMs": 1045,
+          "receiveMs": 1046,
+          "events": [
+            {
+              "source": "serverless",
+              "timestamp": "2026-11-22T15:36:34.103Z",
+              "durationMs": 140,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            },
+            {
+              "source": "serverless-middleware",
+              "timestamp": "2026-11-22T15:36:34.070Z",
+              "durationMs": 8,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            }
+          ],
+          "performance": [
+            {
+              "operation": "moderator-slide-mutation",
+              "access": 14.901206999995338,
+              "validation": 0.0014260000025387853,
+              "presentationMutation": 32.83869200000481,
+              "blockMutation": 0.0030200000037439167,
+              "interactionMutation": 23.00027399999817,
+              "queryCount": 73,
+              "queryDurationMs": 195.1732880000054,
+              "total": 134.35311199999705
+            }
+          ],
+          "navigationRequests": 1
+        },
+        {
+          "run": 2,
+          "cid": "da563973-9f25-48ec-9c55-d3f802788d13",
+          "requestId": "g7n5w-1795361797044-0ae2fe460413",
+          "totalMs": 1003,
+          "player": {
+            "focused": false,
+            "visibility": "hidden"
+          },
+          "alerts": [],
+          "dispatchMs": 60.69287109375,
+          "browserNavigationMs": 249.48100000619888,
+          "platformMs": 231,
+          "status": 200,
+          "commitMs": 950,
+          "ackMs": 951,
+          "receiveMs": 951,
+          "events": [
+            {
+              "source": "serverless-middleware",
+              "timestamp": "2026-11-22T15:36:37.077Z",
+              "durationMs": 6,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            },
+            {
+              "source": "serverless",
+              "timestamp": "2026-11-22T15:36:37.127Z",
+              "durationMs": 147,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            }
+          ],
+          "performance": [
+            {
+              "operation": "moderator-slide-mutation",
+              "access": 18.26115800000116,
+              "validation": 0.001644000003580004,
+              "presentationMutation": 34.74786000000313,
+              "blockMutation": 0.00459699999919394,
+              "interactionMutation": 30.660015999994357,
+              "queryCount": 73,
+              "queryDurationMs": 187.0827739999586,
+              "total": 139.96470799999952
+            }
+          ],
+          "navigationRequests": 1
+        },
+        {
+          "run": 3,
+          "cid": "86943231-c552-42d3-aefa-69bbc9e6af87",
+          "requestId": "2dkq8-1795361798983-8c6f06a3f6f9",
+          "totalMs": 1002,
+          "player": {
+            "focused": false,
+            "visibility": "hidden"
+          },
+          "alerts": [],
+          "dispatchMs": 2.241943359375,
+          "browserNavigationMs": 259.898999996949,
+          "platformMs": 240,
+          "status": 200,
+          "commitMs": 951,
+          "ackMs": 952,
+          "receiveMs": 952,
+          "events": [
+            {
+              "source": "serverless-middleware",
+              "timestamp": "2026-11-22T15:36:39.019Z",
+              "durationMs": 6,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            },
+            {
+              "source": "serverless",
+              "timestamp": "2026-11-22T15:36:39.053Z",
+              "durationMs": 164,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            }
+          ],
+          "performance": [
+            {
+              "operation": "moderator-slide-mutation",
+              "access": 18.91739499999676,
+              "validation": 0.0018790000031003729,
+              "presentationMutation": 29.481140000003506,
+              "blockMutation": 0.00274100000387989,
+              "interactionMutation": 36.17149000000063,
+              "queryCount": 73,
+              "queryDurationMs": 223.2391919999718,
+              "total": 155.33558699999412
+            }
+          ],
+          "navigationRequests": 1
+        },
+        {
+          "run": 4,
+          "cid": "eb9a5b66-1134-44b0-b0a7-ebf42b3ffdd0",
+          "requestId": "c99dw-1795361801002-df91680fce7a",
+          "totalMs": 965,
+          "player": {
+            "focused": false,
+            "visibility": "hidden"
+          },
+          "alerts": [],
+          "dispatchMs": 1.580078125,
+          "browserNavigationMs": 215.3200000175275,
+          "platformMs": 196,
+          "status": 200,
+          "commitMs": 945,
+          "ackMs": 946,
+          "receiveMs": 946,
+          "events": [
+            {
+              "source": "serverless-middleware",
+              "timestamp": "2026-11-22T15:36:41.037Z",
+              "durationMs": 7,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            },
+            {
+              "source": "serverless",
+              "timestamp": "2026-11-22T15:36:41.069Z",
+              "durationMs": 130,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            }
+          ],
+          "performance": [
+            {
+              "operation": "moderator-slide-mutation",
+              "access": 16.664104999996198,
+              "validation": 0.0014920000030542724,
+              "presentationMutation": 24.642297999998846,
+              "blockMutation": 0.0033130000010714866,
+              "interactionMutation": 23.64904600000591,
+              "queryCount": 73,
+              "queryDurationMs": 182.19930600005318,
+              "total": 123.03714700000273
+            }
+          ],
+          "navigationRequests": 1
+        },
+        {
+          "run": 5,
+          "cid": "ffac9411-2e3b-4f1f-8680-73ccd67fa5f1",
+          "requestId": "dz8gq-1795361803037-1352e9f46785",
+          "totalMs": 1052,
+          "player": {
+            "focused": false,
+            "visibility": "hidden"
+          },
+          "alerts": [],
+          "dispatchMs": 41.916015625,
+          "browserNavigationMs": 222.9230000230018,
+          "platformMs": 203,
+          "status": 200,
+          "commitMs": 994,
+          "ackMs": 995,
+          "receiveMs": 995,
+          "events": [
+            {
+              "source": "serverless",
+              "timestamp": "2026-11-22T15:36:43.110Z",
+              "durationMs": 129,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            },
+            {
+              "source": "serverless-middleware",
+              "timestamp": "2026-11-22T15:36:43.072Z",
+              "durationMs": 6,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            }
+          ],
+          "performance": [
+            {
+              "operation": "moderator-slide-mutation",
+              "access": 17.09559799999988,
+              "validation": 0.0009849999987636693,
+              "presentationMutation": 25.78282400000171,
+              "blockMutation": 0.0009560000034980476,
+              "interactionMutation": 25.493993999996746,
+              "queryCount": 73,
+              "queryDurationMs": 168.0974559999304,
+              "total": 122.66461800000252
+            }
+          ],
+          "navigationRequests": 1
+        },
+        {
+          "run": 6,
+          "cid": "8258ae0e-f2c5-4076-bd6e-13d614963e5c",
+          "requestId": "dz8gq-1795361806018-b211b14b3211",
+          "totalMs": 1971,
+          "player": {
+            "focused": false,
+            "visibility": "hidden"
+          },
+          "alerts": [],
+          "dispatchMs": 5.02685546875,
+          "browserNavigationMs": 247.27700001676567,
+          "platformMs": 229,
+          "status": 200,
+          "commitMs": 1921,
+          "ackMs": 1922,
+          "receiveMs": 1923,
+          "events": [
+            {
+              "source": "serverless-middleware",
+              "timestamp": "2026-11-22T15:36:46.046Z",
+              "durationMs": 6,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            },
+            {
+              "source": "serverless",
+              "timestamp": "2026-11-22T15:36:46.083Z",
+              "durationMs": 164,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            }
+          ],
+          "performance": [
+            {
+              "operation": "moderator-slide-mutation",
+              "access": 25.80349999999453,
+              "validation": 0.0017709999956423417,
+              "presentationMutation": 33.50901600000361,
+              "blockMutation": 0.0012409999981173314,
+              "interactionMutation": 30.707650000003923,
+              "queryCount": 73,
+              "queryDurationMs": 196.3971989999336,
+              "total": 152.1595010000019
+            }
+          ],
+          "navigationRequests": 1
+        },
+        {
+          "run": 7,
+          "cid": "00e99196-176d-4268-9806-530ad0b6c44d",
+          "requestId": "4jg8h-1795361809048-9076f011d078",
+          "totalMs": 943,
+          "player": {
+            "focused": false,
+            "visibility": "hidden"
+          },
+          "alerts": [],
+          "dispatchMs": 2.924072265625,
+          "browserNavigationMs": 201.90800001728348,
+          "platformMs": 181,
+          "status": 200,
+          "commitMs": 904,
+          "ackMs": 905,
+          "receiveMs": 905,
+          "events": [
+            {
+              "source": "serverless-middleware",
+              "timestamp": "2026-11-22T15:36:49.084Z",
+              "durationMs": 7,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            },
+            {
+              "source": "serverless",
+              "timestamp": "2026-11-22T15:36:49.120Z",
+              "durationMs": 109,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            }
+          ],
+          "performance": [
+            {
+              "operation": "moderator-slide-mutation",
+              "access": 14.191384999998263,
+              "validation": 0.0010069999989354983,
+              "presentationMutation": 21.16971700000431,
+              "blockMutation": 0.0008739999975659885,
+              "interactionMutation": 20.018090999998094,
+              "queryCount": 73,
+              "queryDurationMs": 146.9640270000018,
+              "total": 102.9855499999976
+            }
+          ],
+          "navigationRequests": 1
+        },
+        {
+          "run": 8,
+          "cid": "1b8c238f-aa95-4c81-8280-cbada6876497",
+          "requestId": "d9x9k-1795361812050-efea1e01ab0c",
+          "totalMs": 1059,
+          "player": {
+            "focused": false,
+            "visibility": "hidden"
+          },
+          "alerts": [],
+          "dispatchMs": 63.68896484375,
+          "browserNavigationMs": 226.265000004787,
+          "platformMs": 206,
+          "status": 200,
+          "commitMs": 977,
+          "ackMs": 979,
+          "receiveMs": 979,
+          "events": [
+            {
+              "source": "serverless",
+              "timestamp": "2026-11-22T15:36:52.123Z",
+              "durationMs": 132,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            },
+            {
+              "source": "serverless-middleware",
+              "timestamp": "2026-11-22T15:36:52.087Z",
+              "durationMs": 9,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            }
+          ],
+          "performance": [
+            {
+              "operation": "moderator-slide-mutation",
+              "access": 14.334232000001066,
+              "validation": 0.0009349999963887967,
+              "presentationMutation": 27.925532000001112,
+              "blockMutation": 0.0008230000021285377,
+              "interactionMutation": 27.265424999997776,
+              "queryCount": 73,
+              "queryDurationMs": 191.22943300004408,
+              "total": 126.16217899999901
+            }
+          ],
+          "navigationRequests": 1
+        },
+        {
+          "run": 9,
+          "cid": "d7188d47-826c-443c-af62-77e3241abfc3",
+          "requestId": "7t9vt-1795361815128-24ced114c4df",
+          "totalMs": 1989,
+          "player": {
+            "focused": false,
+            "visibility": "hidden"
+          },
+          "alerts": [],
+          "dispatchMs": 44.3369140625,
+          "browserNavigationMs": 238.24799997964874,
+          "platformMs": 180,
+          "status": 200,
+          "commitMs": 1964,
+          "ackMs": 1965,
+          "receiveMs": 1966,
+          "events": [
+            {
+              "source": "serverless-middleware",
+              "timestamp": "2026-11-22T15:36:55.157Z",
+              "durationMs": 6,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            },
+            {
+              "source": "serverless",
+              "timestamp": "2026-11-22T15:36:55.183Z",
+              "durationMs": 125,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            }
+          ],
+          "performance": [
+            {
+              "operation": "moderator-slide-mutation",
+              "access": 13.33513099999982,
+              "validation": 0.000911999995878432,
+              "presentationMutation": 31.448359999994864,
+              "blockMutation": 0.0008729999972274527,
+              "interactionMutation": 22.008301000001666,
+              "queryCount": 73,
+              "queryDurationMs": 160.9076579999819,
+              "total": 118.79416700000002
+            }
+          ],
+          "navigationRequests": 1
+        },
+        {
+          "run": 10,
+          "cid": "e9d10cfe-1fef-42ed-8620-d650f110a2bd",
+          "requestId": "dz8gq-1795361819090-de7e1363b91e",
+          "totalMs": 1932,
+          "player": {
+            "focused": false,
+            "visibility": "hidden"
+          },
+          "alerts": [],
+          "dispatchMs": 2.07080078125,
+          "browserNavigationMs": 214.25299998372793,
+          "platformMs": 195,
+          "status": 200,
+          "commitMs": 1883,
+          "ackMs": 1884,
+          "receiveMs": 1884,
+          "events": [
+            {
+              "source": "serverless-middleware",
+              "timestamp": "2026-11-22T15:36:59.119Z",
+              "durationMs": 5,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            },
+            {
+              "source": "serverless",
+              "timestamp": "2026-11-22T15:36:59.156Z",
+              "durationMs": 128,
+              "region": "fra1",
+              "functionStartType": "hot",
+              "functionColdStartDurationMs": -1,
+              "concurrency": 1
+            }
+          ],
+          "performance": [
+            {
+              "operation": "moderator-slide-mutation",
+              "access": 13.677255000002333,
+              "validation": 0.0009719999943627045,
+              "presentationMutation": 26.89732599999843,
+              "blockMutation": 0.0008940000043367036,
+              "interactionMutation": 26.564132999999856,
+              "queryCount": 73,
+              "queryDurationMs": 192.31376900002215,
+              "total": 122.64839600000414
+            }
+          ],
+          "navigationRequests": 1
+        }
+      ]
+    }
+  },
+  "coldVerified": false,
+  "settingsChanged": false
+}

@@ -79,6 +79,7 @@ function navigationHarness(previousKey: string, previousIndex: number, expired =
     "@/app/quiz/quizBlockLiveState": { parseQuizBlockPreviewSectionId },
     "@/app/quiz/interaction/interaction.server": { ...windowExports, syncInteractionForPresentation: async (_: unknown, input: { slideKey: string }) => { syncCalls.push(input.slideKey); } },
     "@/app/lib/prismaQueryDiagnostics.server": { logLivePerformance: () => {}, withPrismaQueryDiagnostics: async (work: () => unknown) => ({ result: await work(), diagnostics: null }) },
+    "@/app/lib/navigationTrace.server": { startRequestNavigationTrace: async () => () => {} },
   };
   const exports: Record<string, (...args: unknown[]) => Promise<unknown>> = {};
   const source = readFileSync("app/quiz/[quizId]/praesentation/statusActions.ts", "utf8");

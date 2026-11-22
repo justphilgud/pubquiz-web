@@ -1,0 +1,570 @@
+{
+  "origin": "https://pubquiz-qmi9cc9to-just-phil-gud.vercel.app",
+  "head": "b878a7050dd21bc109ebd82e4cb26eb450e9d337",
+  "deploymentId": "dpl_GvbNQ7Hy5PZQ9TQi5rYqGZf1hG1d",
+  "median": 1868,
+  "p95": 1998,
+  "rows": [
+    {
+      "run": 0,
+      "cid": "c60260f0-7367-4f70-a1a7-b2f15c1fb7cf",
+      "requestId": "g48vh-1795360177202-45fb218aec58",
+      "totalMs": 1870,
+      "player": {
+        "focused": false,
+        "visibility": "hidden"
+      },
+      "alerts": [],
+      "browserNavigationMs": 237.76200000429526,
+      "platformMs": 217,
+      "status": 200,
+      "commitMs": 1790,
+      "ackMs": 1791,
+      "receiveMs": 1791,
+      "events": [
+        {
+          "source": "serverless-middleware",
+          "timestamp": "2026-11-22T15:09:37.228Z",
+          "durationMs": 5,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        },
+        {
+          "source": "serverless",
+          "timestamp": "2026-11-22T15:09:37.259Z",
+          "durationMs": 160,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        }
+      ],
+      "performance": [
+        {
+          "operation": "moderator-slide-mutation",
+          "access": 16.958459000001312,
+          "validation": 0.0011620000004768372,
+          "presentationMutation": 33.79032499999812,
+          "blockMutation": 0.003033000000868924,
+          "interactionMutation": 36.009556000000885,
+          "queryCount": 73,
+          "queryDurationMs": 205.2753399999965,
+          "total": 152.36926600000152
+        }
+      ],
+      "navigationRequests": 1
+    },
+    {
+      "run": 1,
+      "cid": "d3cd6770-0f56-407a-acd7-c3ae3cff4dd9",
+      "requestId": "qktpp-1795360180082-2ff4856f0c92",
+      "totalMs": 1240,
+      "player": {
+        "focused": false,
+        "visibility": "hidden"
+      },
+      "alerts": [],
+      "browserNavigationMs": 242.2190000070259,
+      "platformMs": 221,
+      "status": 200,
+      "commitMs": 1210,
+      "ackMs": 1212,
+      "receiveMs": 1213,
+      "events": [
+        {
+          "source": "serverless-middleware",
+          "timestamp": "2026-11-22T15:09:40.108Z",
+          "durationMs": 5,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        },
+        {
+          "source": "serverless",
+          "timestamp": "2026-11-22T15:09:40.140Z",
+          "durationMs": 162,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        }
+      ],
+      "performance": [
+        {
+          "operation": "moderator-slide-mutation",
+          "access": 17.923627999996825,
+          "validation": 0.0015370000000984874,
+          "presentationMutation": 37.47109400000045,
+          "blockMutation": 0.002961999998660758,
+          "interactionMutation": 34.42917099999977,
+          "queryCount": 73,
+          "queryDurationMs": 198.59637600000497,
+          "total": 156.24372500000027
+        }
+      ],
+      "navigationRequests": 1
+    },
+    {
+      "run": 2,
+      "cid": "aa065012-55f7-42d8-ad93-9a2c22b561c9",
+      "requestId": "jdqjh-1795360183091-dbfe41cf3cab",
+      "totalMs": 1998,
+      "player": {
+        "focused": false,
+        "visibility": "hidden"
+      },
+      "alerts": [],
+      "browserNavigationMs": 216.54900000430644,
+      "platformMs": 195,
+      "status": 200,
+      "commitMs": 1971,
+      "ackMs": 1973,
+      "receiveMs": 1974,
+      "events": [
+        {
+          "source": "serverless-middleware",
+          "timestamp": "2026-11-22T15:09:43.121Z",
+          "durationMs": 5,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        },
+        {
+          "source": "serverless",
+          "timestamp": "2026-11-22T15:09:43.153Z",
+          "durationMs": 133,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        }
+      ],
+      "performance": [
+        {
+          "operation": "moderator-slide-mutation",
+          "access": 11.932930999999371,
+          "validation": 0.001233000002685003,
+          "presentationMutation": 31.08686800000214,
+          "blockMutation": 0.00443499999892083,
+          "interactionMutation": 31.435496000001876,
+          "queryCount": 73,
+          "queryDurationMs": 163.35700000000725,
+          "total": 127.29287400000248
+        }
+      ],
+      "navigationRequests": 1
+    },
+    {
+      "run": 3,
+      "cid": "7b642e49-5947-412b-bd1a-a94056b333e4",
+      "requestId": "vjsql-1795360187203-c11a7679b866",
+      "totalMs": 1843,
+      "player": {
+        "focused": false,
+        "visibility": "hidden"
+      },
+      "alerts": [],
+      "browserNavigationMs": 253.060999995796,
+      "platformMs": 212,
+      "status": 200,
+      "commitMs": 1801,
+      "ackMs": 1802,
+      "receiveMs": 1802,
+      "events": [
+        {
+          "source": "serverless",
+          "timestamp": "2026-11-22T15:09:47.267Z",
+          "durationMs": 147,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        },
+        {
+          "source": "serverless-middleware",
+          "timestamp": "2026-11-22T15:09:47.235Z",
+          "durationMs": 5,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        }
+      ],
+      "performance": [
+        {
+          "operation": "moderator-slide-mutation",
+          "access": 16.88902699999744,
+          "validation": 0.0016959999993559904,
+          "presentationMutation": 30.61386599999969,
+          "blockMutation": 0.0032439999995403923,
+          "interactionMutation": 29.061588999997184,
+          "queryCount": 73,
+          "queryDurationMs": 184.45984199996747,
+          "total": 141.2841980000012
+        }
+      ],
+      "navigationRequests": 1
+    },
+    {
+      "run": 4,
+      "cid": "11214201-174c-44e4-b34e-fc7aaf145ed8",
+      "requestId": "nj5nf-1795360191150-e6ce49b46012",
+      "totalMs": 1893,
+      "player": {
+        "focused": false,
+        "visibility": "hidden"
+      },
+      "alerts": [],
+      "browserNavigationMs": 242.8749999962747,
+      "platformMs": 223,
+      "status": 200,
+      "commitMs": 1837,
+      "ackMs": 1838,
+      "receiveMs": 1838,
+      "events": [
+        {
+          "source": "serverless-middleware",
+          "timestamp": "2026-11-22T15:09:51.179Z",
+          "durationMs": 5,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        },
+        {
+          "source": "serverless",
+          "timestamp": "2026-11-22T15:09:51.221Z",
+          "durationMs": 151,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        }
+      ],
+      "performance": [
+        {
+          "operation": "moderator-slide-mutation",
+          "access": 15.753560999997717,
+          "validation": 0.0011690000028465874,
+          "presentationMutation": 37.1412049999999,
+          "blockMutation": 0.001091999998607207,
+          "interactionMutation": 33.34581899999466,
+          "queryCount": 73,
+          "queryDurationMs": 206.29866000000766,
+          "total": 145.55827199999476
+        }
+      ],
+      "navigationRequests": 1
+    },
+    {
+      "run": 5,
+      "cid": "ce2edde5-a053-4c11-b5d8-f55508b328db",
+      "requestId": "sbcmd-1795360194030-445cda4d07df",
+      "totalMs": 999,
+      "player": {
+        "focused": false,
+        "visibility": "hidden"
+      },
+      "alerts": [],
+      "browserNavigationMs": 243.64500000956468,
+      "platformMs": 224,
+      "status": 200,
+      "commitMs": 949,
+      "ackMs": 950,
+      "receiveMs": 950,
+      "events": [
+        {
+          "source": "serverless-middleware",
+          "timestamp": "2026-11-22T15:09:54.058Z",
+          "durationMs": 5,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        },
+        {
+          "source": "serverless",
+          "timestamp": "2026-11-22T15:09:54.100Z",
+          "durationMs": 154,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        }
+      ],
+      "performance": [
+        {
+          "operation": "moderator-slide-mutation",
+          "access": 16.540094999996654,
+          "validation": 0.0008610000004409812,
+          "presentationMutation": 33.61281299999973,
+          "blockMutation": 0.0012809999971068464,
+          "interactionMutation": 30.57704399999784,
+          "queryCount": 73,
+          "queryDurationMs": 171.71855700002925,
+          "total": 146.52479299999686
+        }
+      ],
+      "navigationRequests": 1
+    },
+    {
+      "run": 6,
+      "cid": "5dfcbdf6-4593-42a8-bdfe-4a451f1a5589",
+      "requestId": "sqjpl-1795360196062-aaaf05a4978c",
+      "totalMs": 1120,
+      "player": {
+        "focused": false,
+        "visibility": "hidden"
+      },
+      "alerts": [],
+      "browserNavigationMs": 230.97999999299645,
+      "platformMs": 211,
+      "status": 200,
+      "commitMs": 1068,
+      "ackMs": 1069,
+      "receiveMs": 1069,
+      "events": [
+        {
+          "source": "serverless-middleware",
+          "timestamp": "2026-11-22T15:09:56.093Z",
+          "durationMs": 6,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        },
+        {
+          "source": "serverless",
+          "timestamp": "2026-11-22T15:09:56.126Z",
+          "durationMs": 146,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        }
+      ],
+      "performance": [
+        {
+          "operation": "moderator-slide-mutation",
+          "access": 15.597202000004472,
+          "validation": 0.0010990000009769574,
+          "presentationMutation": 33.73053300000174,
+          "blockMutation": 0.0011159999994561076,
+          "interactionMutation": 31.340092999998888,
+          "queryCount": 73,
+          "queryDurationMs": 186.142380999976,
+          "total": 140.79283700000087
+        }
+      ],
+      "navigationRequests": 1
+    },
+    {
+      "run": 7,
+      "cid": "a664436b-52d6-476b-adfb-91eeca76ad0c",
+      "requestId": "9nnj2-1795360199031-55d0b74c3e8c",
+      "totalMs": 1003,
+      "player": {
+        "focused": false,
+        "visibility": "hidden"
+      },
+      "alerts": [],
+      "browserNavigationMs": 219.71299999859184,
+      "platformMs": 199,
+      "status": 200,
+      "commitMs": 968,
+      "ackMs": 969,
+      "receiveMs": 970,
+      "events": [
+        {
+          "source": "serverless",
+          "timestamp": "2026-11-22T15:09:59.095Z",
+          "durationMs": 134,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        },
+        {
+          "source": "serverless-middleware",
+          "timestamp": "2026-11-22T15:09:59.063Z",
+          "durationMs": 5,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        }
+      ],
+      "performance": [
+        {
+          "operation": "moderator-slide-mutation",
+          "access": 17.995497000003525,
+          "validation": 0.0008860000016284175,
+          "presentationMutation": 28.853345000003173,
+          "blockMutation": 0.0009829999980865978,
+          "interactionMutation": 29.0309830000042,
+          "queryCount": 73,
+          "queryDurationMs": 166.62453799997456,
+          "total": 128.7764440000028
+        }
+      ],
+      "navigationRequests": 1
+    },
+    {
+      "run": 8,
+      "cid": "f4e8a53b-405b-438a-a4b6-d6e3577e3d1b",
+      "requestId": "gbbcn-1795360201082-68ac537aaabf",
+      "totalMs": 1975,
+      "player": {
+        "focused": false,
+        "visibility": "hidden"
+      },
+      "alerts": [],
+      "browserNavigationMs": 224.6140000061132,
+      "platformMs": 205,
+      "status": 200,
+      "commitMs": 1932,
+      "ackMs": 1932,
+      "receiveMs": 1933,
+      "events": [
+        {
+          "source": "serverless-middleware",
+          "timestamp": "2026-11-22T15:10:01.110Z",
+          "durationMs": 6,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        },
+        {
+          "source": "serverless",
+          "timestamp": "2026-11-22T15:10:01.143Z",
+          "durationMs": 143,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        }
+      ],
+      "performance": [
+        {
+          "operation": "moderator-slide-mutation",
+          "access": 18.311431000001903,
+          "validation": 0.002130000000761356,
+          "presentationMutation": 39.68274399999791,
+          "blockMutation": 0.0010129999936907552,
+          "interactionMutation": 29.89382900000055,
+          "queryCount": 73,
+          "queryDurationMs": 187.42509300001257,
+          "total": 137.04516699999658
+        }
+      ],
+      "navigationRequests": 1
+    },
+    {
+      "run": 9,
+      "cid": "e8a05520-5923-4318-83ce-fb7408f7167e",
+      "requestId": "mxghs-1795360205109-634b0fb30255",
+      "totalMs": 1924,
+      "player": {
+        "focused": false,
+        "visibility": "hidden"
+      },
+      "alerts": [],
+      "browserNavigationMs": 233.7180000031367,
+      "platformMs": 214,
+      "status": 200,
+      "commitMs": 1893,
+      "ackMs": 1894,
+      "receiveMs": 1894,
+      "events": [
+        {
+          "source": "serverless",
+          "timestamp": "2026-11-22T15:10:05.183Z",
+          "durationMs": 139,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        },
+        {
+          "source": "serverless-middleware",
+          "timestamp": "2026-11-22T15:10:05.143Z",
+          "durationMs": 9,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        }
+      ],
+      "performance": [
+        {
+          "operation": "moderator-slide-mutation",
+          "access": 14.297341999998025,
+          "validation": 0.0008820000002742745,
+          "presentationMutation": 32.693781999994826,
+          "blockMutation": 0.0009780000036698766,
+          "interactionMutation": 33.042765999998664,
+          "queryCount": 73,
+          "queryDurationMs": 180.97887799998716,
+          "total": 133.58704800000123
+        }
+      ],
+      "navigationRequests": 1
+    },
+    {
+      "run": 10,
+      "cid": "6c7417a0-b118-417e-8fb9-b74ec851763c",
+      "requestId": "vj8vv-1795360209162-cbf6d02a2970",
+      "totalMs": 1893,
+      "player": {
+        "focused": false,
+        "visibility": "hidden"
+      },
+      "alerts": [],
+      "browserNavigationMs": 230.093999998644,
+      "platformMs": 211,
+      "status": 200,
+      "commitMs": 1834,
+      "ackMs": 1836,
+      "receiveMs": 1836,
+      "events": [
+        {
+          "source": "serverless-middleware",
+          "timestamp": "2026-11-22T15:10:09.189Z",
+          "durationMs": 8,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        },
+        {
+          "source": "serverless",
+          "timestamp": "2026-11-22T15:10:09.220Z",
+          "durationMs": 152,
+          "region": "fra1",
+          "functionStartType": "hot",
+          "functionColdStartDurationMs": -1,
+          "concurrency": 1
+        }
+      ],
+      "performance": [
+        {
+          "operation": "moderator-slide-mutation",
+          "access": 15.556322999997064,
+          "validation": 0.0008209999941755086,
+          "presentationMutation": 35.30189999999857,
+          "blockMutation": 0.0015730000013718382,
+          "interactionMutation": 35.11804599999596,
+          "queryCount": 73,
+          "queryDurationMs": 181.99356599998282,
+          "total": 145.65486899999814
+        }
+      ],
+      "navigationRequests": 1
+    }
+  ]
+}

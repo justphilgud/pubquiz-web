@@ -563,13 +563,13 @@ export default function QuizAuswertungClient({
 
               <label className="flex min-h-11 items-center gap-2 text-sm font-semibold text-slate-700">
                 <input className="size-4" type="checkbox" checked={pendingOnly} onChange={e => setPendingOnly(e.target.checked)} />
-                Noch zu prüfen (ohne manuell entschiedene Fälle)
+                Nur ungeklärte automatische Prüffälle
               </label>
               <label className="flex min-h-11 items-center gap-2 text-sm font-semibold text-slate-700">
                 <input className="size-4" type="checkbox" checked={hideClearClosedWrong} onChange={e => setHideClearClosedWrong(e.target.checked)} />
                 Eindeutig falsche geschlossene Antworten ausblenden
               </label>
-              <p className="text-xs text-slate-600">Meme- und Reihenfolgefragen bleiben in ihren eigenen Wertungen und der Matrix. Prüfhinweise vergleichen ohne Groß-/Kleinschreibung; sie ändern keine Punkte.</p>
+              <p className="text-xs text-slate-600">„Ungeklärte automatische Prüffälle“ zeigt berechnete Antworten mit Prüfbedarf, ohne manuelle Entscheidung. Fehlende Abgaben, noch ausstehende Berechnungen und bereits entschiedene Fälle sind dabei ausgeblendet. „Offene Fragen“ filtert den Antwortmodus; „falsche Antworten“ schließt automatisch richtige Fälle aus. Meme- und Reihenfolgefragen bleiben in ihren eigenen Wertungen und der Matrix. Schreibvarianten und vertauschte FaceMorph-Felder sind nur Prüfhinweise; sie ändern keine Bewertungen oder Punkte.</p>
               <div className="ml-auto text-sm font-semibold text-slate-500">
                 {sichtbareAntworten.length} Treffer
               </div>

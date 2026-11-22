@@ -50,6 +50,8 @@ export function getNextMemeAdvanceCommand(input: {
 
 export function getMemeAdvanceLabel(input: Parameters<typeof getNextMemeAdvanceCommand>[0]) {
   const command = getNextMemeAdvanceCommand(input);
+  if (command === "NEXT_CANDIDATE") return input.activeCandidateNumber === input.candidates.at(-1)?.number ? "Meme-Übersicht zeigen" : "Nächstes Meme vorstellen";
+  if (command === "NEXT_QUIZ_SLIDE") return "Zur nächsten Quizfolie";
   return ({ START_PRESENTATION: "Memes vorstellen", NEXT_CANDIDATE: "Nächstes Meme / Übersicht", NEXT_OVERVIEW_PAGE: "Nächste Meme-Übersicht", OPEN_VOTING: "Abstimmung starten", CLOSE_VOTING: "Abstimmung schließen", FINALIZE_RESULT: "Meme-Ergebnis finalisieren", NEXT_QUIZ_SLIDE: "Weiter" } as Partial<Record<MemeAdvanceCommand, string>>)[command] ?? "Weiter";
 }
 
