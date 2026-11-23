@@ -16,6 +16,9 @@ import { del as blobDel, list as blobList, presignUrl } from "@vercel/blob";
 import { expectProbeDenial, tamperedProbeUrl } from "./transport-probe-diagnostics";
 import { expectIdentityDenial, identityMutations, mutateIdentity, runIdentityProbe } from "./identity-probe";
 import { GithubOidcTokenProvider, GITHUB_OIDC_REFRESH_MARGIN_MS, MAX_GITHUB_OIDC_ATTEMPTS, type OidcRuntime } from "./oidc-token";
+import { MAX_PRIVATE_READBACK_ATTEMPTS } from "./readback-retry";
+import { PrivateArtifacts } from "./private-artifacts";
+import { backupFailureEvidence, backupPhase } from "./backup-diagnostics";
 
 test("readback diagnosis preserves HTTP stage/status without exposing signed URLs or provider details", async t => {
   const secret = "READBACK_SECRET_CANARY";
@@ -27,10 +30,10 @@ test("readback diagnosis preserves HTTP stage/status without exposing signed URL
     let requests = 0;
     const client = new BridgeClient(settings, "backup", key, async () => {
       requests++; return new Response(secret, { status, headers: { "x-provider-error": secret } });
-    });
+    }, { now: Date.now, random: () => 0, sleep: async () => undefined });
     client.grant = async () => ({ url: `https://${STORE_HOST}/${key}/probe.bin?secret=${secret}`, method: "GET", maximumSize: 100, expiresAt: Date.now() + 60000 });
     await assert.rejects(client.read("probe.bin"), /PRIVATE_READBACK_FAILED/);
-    assert.equal(requests, 1, "diagnosis must not introduce retries or change failures");
+    assert.equal(requests, status >= 500 || status === 429 ? MAX_PRIVATE_READBACK_ATTEMPTS : 1);
     assert.deepEqual(JSON.parse(String(log.mock.calls.at(-1)!.arguments[0])), { event: "private-readback-failed", stage: "GET", httpStatus: status });
   }
   const network = new BridgeClient(settings, "backup", key, async () => { throw new Error(secret); });
@@ -60,6 +63,79 @@ test("readback diagnosis preserves HTTP stage/status without exposing signed URL
     assert.deepEqual(JSON.parse(String(log.mock.calls.at(-1)!.arguments[0])), { event: "private-readback-failed", stage: "GRANT", httpStatus: null });
   }
   assert.doesNotMatch(JSON.stringify(log.mock.calls.map(call => call.arguments)), new RegExp(secret));
+});
+
+test("backup GET retries transient status with fresh grants, capped delay and redacted diagnostics", async t => {
+  const log = t.mock.method(console, "error", () => undefined);
+  const key = "synthetic/acceptance/run-123456-1", secret = "READBACK_SECRET_CANARY";
+  const settings = { AP94_BRIDGE_ORIGIN: "https://pubquiz-backup-operations.vercel.app", AP94_TRANSPORT_MODE: "synthetic",
+    GITHUB_RUN_ID: "123456", GITHUB_RUN_ATTEMPT: "1", BACKUP_PRIVATE_BLOB_HOST: STORE_HOST };
+  for (const transient of [429, 500, 503, 599]) {
+    let grants = 0, gets = 0, cancelled = 0; const waits: number[] = [];
+    const client = new BridgeClient(settings, "backup", key, async (url, init) => {
+      assert.equal(init?.redirect, "error"); assert.equal(init?.cache, "no-store");
+      assert.equal(new URL(String(url)).searchParams.get("grant"), String(gets + 1));
+      gets++;
+      return gets === 1 ? new Response(new ReadableStream({ cancel() { cancelled++; } }),
+        { status: transient, headers: { "retry-after": "9999", authorization: secret } }) : new Response("original");
+    }, { now: Date.now, random: () => 0, sleep: async ms => { waits.push(ms); } });
+    client.grant = async () => ({ url: `https://${STORE_HOST}/${key}/probe.bin?grant=${++grants}&secret=${secret}`,
+      method: "GET", maximumSize: 100, expiresAt: Date.now() + 60000 });
+    assert.equal((await client.read("probe.bin")).toString(), "original");
+    assert.equal(grants, 2); assert.equal(gets, 2); assert.equal(cancelled, 1); assert.deepEqual(waits, [60000]);
+  }
+  let grants = 0; const waits: number[] = [];
+  const exhausted = new BridgeClient(settings, "backup", key, async () => new Response(secret, {status: 500}),
+    { now: Date.now, random: () => 0, sleep: async ms => { waits.push(ms); } });
+  exhausted.grant = async () => { grants++; return {url: `https://${STORE_HOST}/${key}/probe.bin`, method: "GET", maximumSize: 100, expiresAt: Date.now() + 60000}; };
+  await assert.rejects(backupPhase("PRIVATE_READBACK", () => exhausted.read("probe.bin")), error => {
+    assert.equal(backupFailureEvidence(error).code, "PRIVATE_READBACK_FAILED"); return true;
+  });
+  assert.equal(grants, 4); assert.deepEqual(waits, [500, 1000, 2000]);
+  assert.doesNotMatch(JSON.stringify(log.mock.calls.map(c => c.arguments)), new RegExp(secret));
+});
+
+test("backup retries cannot bypass grants, body limits, integrity, redirects or restore policy", async t => {
+  t.mock.method(console, "error", () => undefined);
+  const key = "synthetic/acceptance/run-123456-1";
+  const settings = { AP94_BRIDGE_ORIGIN: "https://pubquiz-backup-operations.vercel.app", AP94_TRANSPORT_MODE: "synthetic",
+    GITHUB_RUN_ID: "123456", GITHUB_RUN_ATTEMPT: "1", BACKUP_PRIVATE_BLOB_HOST: STORE_HOST };
+  const grant = {url: `https://${STORE_HOST}/${key}/probe.bin`, method: "GET" as const, maximumSize: 8, expiresAt: Date.now() + 60000};
+  const runtime = {now: Date.now, random: () => 0, sleep: async () => undefined};
+  for (const status of [201, 206, 301, 302, 307, 400, 401, 403, 404, 409, 412]) {
+    let calls = 0;
+    const client = new BridgeClient(settings, "backup", key, async () => { calls++; return new Response(null, {status}); }, runtime);
+    client.grant = async () => grant;
+    await assert.rejects(client.read("probe.bin"), /PRIVATE_READBACK_FAILED/); assert.equal(calls, 1);
+  }
+  let grantCalls = 0, gets = 0;
+  const denied = new BridgeClient(settings, "backup", key, async () => { gets++; return new Response(null, {status: 500}); }, runtime);
+  denied.grant = async () => { if (++grantCalls === 2) throw new Error("secret grant failure"); return grant; };
+  await assert.rejects(denied.read("probe.bin"), /SIGNED_READ_FAILED_DETAILS_WITHHELD/);
+  assert.equal(grantCalls, 2); assert.equal(gets, 1);
+  for (const request of [async () => { throw new Error("secret network failure"); },
+    async () => new Response(new ReadableStream({start(c) {c.error(new Error("secret body failure"));}})),
+    async () => new Response("too many bytes")]) {
+    let calls = 0;
+    const client = new BridgeClient(settings, "backup", key, async () => { calls++; return request(); }, runtime);
+    client.grant = async () => grant;
+    await assert.rejects(client.read("probe.bin")); assert.equal(calls, 1);
+  }
+  let restoreGets = 0;
+  const restore = new BridgeClient(settings, "restore", key, async () => { restoreGets++; return new Response(null, {status: 500}); }, runtime);
+  restore.grant = async () => grant;
+  await assert.rejects(restore.read("probe.bin"), /PRIVATE_READBACK_FAILED/); assert.equal(restoreGets, 1);
+  for (const bytes of ["original", "corrupt!"]) {
+    let calls = 0;
+    const client = new BridgeClient(settings, "backup", key, async () => ++calls === 1 ? new Response(null, {status: 500}) : new Response(bytes), runtime);
+    client.grant = async () => grant;
+    const store = Object.create(PrivateArtifacts.prototype) as PrivateArtifacts;
+    Object.assign(store, {client}); client.upload = async () => undefined;
+    const result = store.upload("probe.bin", Buffer.from("original"));
+    if (bytes === "original") assert.equal((await result).bytes, 8);
+    else await assert.rejects(result, error => { assert.equal(backupFailureEvidence(error).phase, "ARTIFACT_INTEGRITY"); return true; });
+    assert.equal(calls, 2, "integrity failure must never trigger another read or upload");
+  }
 });
 
 test("upload denial preserves only artifact class, HTTP status and bounded provider category", async () => {

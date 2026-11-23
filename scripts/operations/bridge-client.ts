@@ -4,6 +4,7 @@ import { AUDIENCE, INVENTORY_MAX_PAGES, INVENTORY_PAGE_LIMIT, INVENTORY_TOTAL_LI
 import { OperationsError, requireCondition } from "./guards";
 import { defaultUploadRetryRuntime, safeUploadResponse, uploadWithBoundedRetry, type UploadRetryRuntime } from "./upload-retry";
 import { GithubOidcTokenProvider, type OidcDiagnostics } from "./oidc-token";
+import { isRetryablePrivateReadbackStatus, MAX_PRIVATE_READBACK_ATTEMPTS, privateReadbackRetryDelay } from "./readback-retry";
 type Env = Readonly<Record<string, string | undefined>>;
 export type UploadPosition = { index: number; total: number };
 
@@ -69,7 +70,7 @@ export class BridgeClient {
   readonly mode: Mode;
   private readonly oidc: GithubOidcTokenProvider;
   constructor(private env: Env, private role: "backup" | "restore", key: string, private request: typeof fetch = fetch,
-    private uploadRetryRuntime: UploadRetryRuntime = defaultUploadRetryRuntime, oidc?: GithubOidcTokenProvider) {
+    private transportRetryRuntime: UploadRetryRuntime = defaultUploadRetryRuntime, oidc?: GithubOidcTokenProvider) {
     this.origin = bridgeOrigin(env.AP94_BRIDGE_ORIGIN);
     requireCondition(env.AP94_TRANSPORT_MODE === "synthetic" || env.AP94_TRANSPORT_MODE === "acceptance", "BRIDGE_MODE_REQUIRED");
     this.mode = env.AP94_TRANSPORT_MODE;
@@ -109,13 +110,25 @@ export class BridgeClient {
     let stage: "GRANT" | "GET" | "BODY" = "GRANT";
     let httpStatus: number | null = null;
     try {
-      const grant = await this.grant(name);
-      stage = "GET";
-      const response = await this.request(grant.url, { redirect: "error", cache: "no-store", signal: AbortSignal.timeout(120000) });
-      httpStatus = response.status;
-      requireCondition(response.status === 200, "PRIVATE_READBACK_FAILED");
-      stage = "BODY";
-      return await limitedResponse(response, grant.maximumSize);
+      for (let attempt = 1; attempt <= MAX_PRIVATE_READBACK_ATTEMPTS; attempt++) {
+        stage = "GRANT"; httpStatus = null;
+        const grant = await this.grant(name);
+        stage = "GET";
+        const response = await this.request(grant.url, { redirect: "error", cache: "no-store", signal: AbortSignal.timeout(120000) });
+        httpStatus = response.status;
+        if (this.role === "backup" && isRetryablePrivateReadbackStatus(response.status) && attempt < MAX_PRIVATE_READBACK_ATTEMPTS) {
+          const delayMs = privateReadbackRetryDelay(response, attempt, this.transportRetryRuntime);
+          await response.body?.cancel().catch(() => undefined);
+          console.error(JSON.stringify({ event: "private-readback-retry", stage, httpStatus, attempt,
+            maximumAttempts: MAX_PRIVATE_READBACK_ATTEMPTS, delayMs }));
+          await this.transportRetryRuntime.sleep(delayMs);
+          continue;
+        }
+        requireCondition(response.status === 200, "PRIVATE_READBACK_FAILED");
+        stage = "BODY";
+        return await limitedResponse(response, grant.maximumSize);
+      }
+      throw new OperationsError("PRIVATE_READBACK_FAILED");
     } catch (error) {
       // Only a fixed stage and numeric status escape. Never log the URL, body,
       // headers, provider error, JWT or exception/cause.
@@ -195,7 +208,7 @@ export class BridgeClient {
       const metadata = { objectIndex: position?.index ?? null, totalObjects: position?.total ?? null, logicalType: rule.kind,
         bytes: bytes.length, contentType: rule.contentType, sha256: hash };
       const result = await uploadWithBoundedRetry({
-        runtime: this.uploadRetryRuntime,
+        runtime: this.transportRetryRuntime,
         send: async attempt => {
           console.error(JSON.stringify({ event: "private-upload-attempt", attempt, ...metadata }));
           const grant = await this.grant(name, bytes.length);
@@ -219,7 +232,7 @@ export class BridgeClient {
       if (!result.response) return;
       if (!result.response.ok) {
         console.error(JSON.stringify({ event: "private-upload-failed", attempts: result.attempts, ...metadata,
-          ...safeUploadResponse(result.response, this.uploadRetryRuntime.now()) }));
+          ...safeUploadResponse(result.response, this.transportRetryRuntime.now()) }));
         throw await privateUploadFailure(result.response, rule.kind);
       }
       const payload = JSON.parse((await limitedResponse(result.response, 20000)).toString()) as { url?: string };
