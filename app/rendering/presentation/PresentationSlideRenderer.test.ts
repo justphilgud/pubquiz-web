@@ -957,7 +957,7 @@ test("podium ceremony reveals 3-2-1 before the full final table", () => {
       id: "podium-test",
       type: "WINNER",
       label: "Siegerehrung",
-      config: { version: 1, title: "Das Podium", standingsSize: "TOP_3", showPoints: true },
+      config: { version: 1, title: "Unsere Siegerteams", body: "Danke fürs Miträtseln!", standingsSize: "TOP_3", showPoints: true },
     },
   };
   const scores = Array.from({ length: 12 }, (_, index) => ({
@@ -984,6 +984,8 @@ test("podium ceremony reveals 3-2-1 before the full final table", () => {
     }));
 
   const placeThree = render(podiumSlide, 1);
+  assert.match(placeThree, /Unsere Siegerteams/);
+  assert.match(placeThree, /Danke fürs Miträtseln!/);
   assert.match(placeThree, /Finalteam 3/);
   assert.doesNotMatch(placeThree, /Finalteam 1|Finalteam 2|Finalteam 4/);
   const placeTwo = render(podiumSlide, 2);

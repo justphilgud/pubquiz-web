@@ -76,7 +76,6 @@ import { TeamIdentityVisual } from "@/app/teams/TeamIdentityVisual";
 import { resolveTeamAvatarCode, type TeamAvatarCode } from "@/app/teams/teamProfile";
 import {
   rankScores,
-  resolvePodiumReveal,
   type IntermediateStandingsAudienceEntry,
   type IntermediateStandingsEntry,
 } from "./presentationRankingPolicy";
@@ -1374,7 +1373,7 @@ function renderZwischenstandSlide() {
 
 function renderEndstandSlide() {
   return <section className="presentation-flow-slide presentation-flow-ranking presentation-ranking-ceremony" data-flow-type="WINNER">
-    <p className="presentation-flow-kicker">Siegerehrung</p><h2>Das Podium</h2>
+    <h2 className="podium-scene-title">Das Podium</h2>
     <PodiumCeremony scores={punktestand} revealCount={endstandRevealCount} />
   </section>;
 }
@@ -2242,7 +2241,6 @@ function renderFlowStandingsSlide(
   }
 
   const sorted = rankScores(punktestand);
-  const podiumReveal = resolvePodiumReveal(sorted, endstandRevealCount);
   const hidden = config.standingsSize === "HIDDEN";
   const showPoints = config.showPoints !== false;
 
@@ -2293,17 +2291,9 @@ function renderFlowStandingsSlide(
       className="presentation-flow-slide presentation-flow-ranking presentation-ranking-ceremony"
       data-flow-type={type}
     >
-      <p className="presentation-flow-kicker">Siegerehrung</p>
-      <h2>{config.title ?? "Das Podium"}</h2>
-      {config.body && <p className="presentation-flow-lead">{config.body}</p>}
-
+      <h2 className="podium-scene-title">{config.title ?? "Das Podium"}</h2>
+      {config.body && <p className="podium-scene-description">{config.body}</p>}
       <PodiumCeremony scores={punktestand} revealCount={endstandRevealCount} showPoints={showPoints} />
-
-      {podiumReveal.visiblePodiumGroups.length < podiumReveal.podiumGroups.length && (
-        <p className="presentation-ranking-reveal-hint">
-          Das Podium wird von Platz 3 bis Platz 1 enthüllt.
-        </p>
-      )}
 
     </section>
   );

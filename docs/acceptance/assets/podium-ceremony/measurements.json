@@ -1,0 +1,174 @@
+{
+  "head": "9d699d373ef356616a94e573385cd30bdd3e5626",
+  "url": "https://pubquiz-i72ycikjp-just-phil-gud.vercel.app",
+  "checkedAt": "2026-11-22T19:34:30.044Z",
+  "phases": [
+    {
+      "phase": "rank3-reveal",
+      "reveal": 1,
+      "places": [
+        "3"
+      ],
+      "confetti": 56,
+      "nextEnabled": false
+    },
+    {
+      "phase": "rank2-reveal",
+      "reveal": 2,
+      "places": [
+        "3",
+        "2"
+      ],
+      "confetti": 74,
+      "nextEnabled": false
+    },
+    {
+      "phase": "winner",
+      "reveal": 3,
+      "places": [
+        "3",
+        "2",
+        "1"
+      ],
+      "confetti": 112,
+      "nextEnabled": false
+    }
+  ],
+  "layout": {
+    "frames": [
+      {
+        "width": 147.015625,
+        "height": 147.015625
+      },
+      {
+        "width": 147.015625,
+        "height": 147.015625
+      },
+      {
+        "width": 147.015625,
+        "height": 147.015625
+      }
+    ],
+    "cards": [
+      {
+        "top": 132.09375,
+        "bottom": 116.515625,
+        "place": "3",
+        "left": 834.265625,
+        "width": 245.390625
+      },
+      {
+        "top": 105.84375,
+        "bottom": 142.765625,
+        "place": "2",
+        "left": 233.046875,
+        "width": 257.65625
+      },
+      {
+        "top": 58.59375,
+        "bottom": 190.015625,
+        "place": "1",
+        "left": 502.984375,
+        "width": 319.015625
+      }
+    ],
+    "images": [
+      {
+        "loaded": true,
+        "fit": "contain"
+      },
+      {
+        "loaded": true,
+        "fit": "contain"
+      },
+      {
+        "loaded": true,
+        "fit": "contain"
+      }
+    ],
+    "identities": 3
+  },
+  "tie": {
+    "identities": 12,
+    "places": [
+      "1"
+    ],
+    "focusable": true,
+    "scrollable": true,
+    "inBounds": true,
+    "animations": 0,
+    "tail": "none",
+    "reducedMotion": true
+  },
+  "geometry": [
+    {
+      "width": 1280,
+      "height": 720,
+      "cards": [
+        {
+          "top": 123.640625,
+          "bottom": 110.1875
+        },
+        {
+          "top": 98.8125,
+          "bottom": 135.015625
+        },
+        {
+          "top": 54.140625,
+          "bottom": 179.6875
+        }
+      ],
+      "frames": [
+        {
+          "width": 138.96875,
+          "height": 138.96875
+        },
+        {
+          "width": 138.96875,
+          "height": 138.96875
+        },
+        {
+          "width": 138.96875,
+          "height": 138.96875
+        }
+      ]
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "cards": [
+        {
+          "top": 266.390625,
+          "bottom": 177.625
+        },
+        {
+          "top": 196.015625,
+          "bottom": 217.765625
+        },
+        {
+          "top": 123.75,
+          "bottom": 290.03125
+        }
+      ],
+      "frames": [
+        {
+          "width": 224.796875,
+          "height": 224.796875
+        },
+        {
+          "width": 224.796875,
+          "height": 224.796875
+        },
+        {
+          "width": 224.796875,
+          "height": 224.796875
+        }
+      ]
+    }
+  ],
+  "nextRegularSlide": true,
+  "reopenWithoutFinaleReplay": true,
+  "syntheticOnly": true,
+  "ratingsOrPointsEdited": false,
+  "productionTouched": false
+}

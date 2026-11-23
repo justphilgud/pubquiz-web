@@ -16,7 +16,10 @@ leerer ausdrücklich abgeschlossener Review überspringt nur die eigene Auflösu
 Die Hauptaktion unterscheidet letztes Meme/Übersicht sowie Ergebnis/nächste Folie.
 `PodiumCeremony` zeigt vorhandene `photoUrl` aus dem unveränderten Ranglisten-Snapshot
 groß und mit `object-fit: contain`, einschließlich einzelner Teamidentitäten bei
-Gleichstand. Ohne Foto entsteht kein leerer Rahmen. Podestposition und Reveal 3→2→1
+Gleichstand. Seit der separat beauftragten animierten Siegerehrung (PR177) bleibt
+die Bildfläche quadratisch und zeigt ohne Foto den vorhandenen Team-Avatar;
+`contain` schützt auch breite/hohe Fotos vor einem erzwungenen Zuschnitt.
+Podestposition und Reveal 3→2→1
 bleiben unverändert. Tests: Renderer, Meme-Voting, Snapshot und der echte
 `presentationWindowSync.browser.test.ts` mit zwei Fenstern und Fotoformaten.
 
@@ -37,11 +40,26 @@ die vollständige Rangliste einschließlich gültiger Stichentscheidplatzierunge
 Stand; Verlassen oder Durchlaufreset löscht ihn. Keine Punkte werden verändert.
 `PodiumCeremony` zeigt die drei leeren Stufen und enthüllt je vorhandener Ranggruppe
 3→2→1. Gleichstände bleiben gemeinsame Ranggruppen; fehlende Wettbewerbsränge
-werden nicht erfunden. Nur die neu gemountete Gruppe erscheint für eine Lesepause
-groß in der Mitte und wandert dann auf ihre Stufe. Frühere Gruppen bleiben stehen.
-Reduzierte Bewegung zeigt unmittelbar die Endposition. Die nächste reguläre Folie
+werden nicht erfunden. PR177 ersetzt die bisherige zentrale Kartenfahrt bewusst
+durch eine Bühnenchoreografie: Zähler 0 zeigt die tanzenden Figuren. Beim ersten
+Reveal sammeln sie sich für 2,2 Sekunden, danach erscheint die erste vorhandene
+Ranggruppe. Weitere Klicks enthüllen die nächsten Gruppen an ihren festen
+Positionen (2 links, 1 mittig, 3 rechts). Gudi und Konfetti begleiten die Reveals;
+das Gewinnerfinale endet nach spätestens 7,8 Sekunden in einem dezenten Wippen.
+Konfetti und Raketenschweif enden; keine Timer oder Animationen schreiben Daten
+oder verzögern Navigation/Quittungen. Schnelle Klicks ersetzen ältere lokale Timer.
+Erneutes Öffnen eines bereits enthüllten Stands startet kein neues Raketenfinale.
+Große Gleichstandsgruppen bleiben vollständig in einer begrenzten, fokussierbaren
+Scrollfläche erreichbar. Konfigurierte Folientitel und Beschreibung bleiben sichtbar.
+Reduzierte Bewegung zeigt unmittelbar die Endposition, ohne Konfetti, Schweif,
+Pseudo-Elementanimationen oder Fokuswartezeit. Die nächste reguläre Folie
 folgt nach allen vorhandenen Gruppen, ohne zusätzliche Tabellenphase auf derselben
 Folie. FINAL_STANDINGS bleibt eine separate reguläre Folie.
+
+Regressionen: `presentationWindowSync.browser.test.ts` (Phasen, schnelle Klicks,
+erneutes Öffnen, quadratische Fotos, große Gleichstände, reduzierte Bewegung,
+Quittung ohne Animationsframes), `PresentationSlideRenderer.test.ts`
+(Ranggruppen, Titel/Beschreibung), Rankingpolicy und `podiumSnapshot.test.ts`.
 
 Moderationsvorschau und öffentliche Präsentation teilen weiterhin den Renderer.
 Das Vorschaufeld verwendet konfigurierten Folientitel, danach Label/Typbezeichnung.
