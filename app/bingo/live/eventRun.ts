@@ -1,4 +1,5 @@
-import { type BingoCard, type Stage } from "../core/cards";
+import type { CardCheck } from './cardChecks';
+import { evaluateCard, type BingoCard, type Stage } from "../core/cards";
 import { addRound, closeRound, endRun, openRound, pauseRun, resumeRun, type BingoRun } from "../core/run";
 import { correctDraw, decideClaim, recordClaim } from "../core/round";
 import { applyLiveEvent, assertUuid, initialState, parseLiveCommand, type Call, type FrozenRound, type LiveCommand, type LiveEvent } from "./live";
@@ -6,9 +7,9 @@ import { applyLiveEvent, assertUuid, initialState, parseLiveCommand, type Call, 
 /** V2 is opt-in. AP3 replay and its one-round histories are deliberately unchanged. */
 export type EventCall = Call & { roundId: string; recordedAt: number };
 export type BingoPlayback = {id:string;drawId:string;action:'PLAY'|'PAUSE'|'REPLAY';at:number;sequence:number;restartId:string|null;position:number};
-export type EventRunState = { playback?:BingoPlayback; revealed?:readonly string[]; version: 2; contextRevision:number; run: BingoRun; calls: readonly EventCall[]; frozen: readonly FrozenRound[] };
+export type EventRunState = { checks?: readonly CardCheck[]; playback?:BingoPlayback; revealed?:readonly string[]; version: 2; contextRevision:number; run: BingoRun; calls: readonly EventCall[]; frozen: readonly FrozenRound[] };
 export type EventCommand = Exclude<LiveCommand, { kind: "call" } | { kind: "correct" }> |
-  { kind: "call"; stage: Stage; context: string } | {kind:"reveal";drawId:string} |
+  { kind: "call"; stage: Stage; context: string } | {kind:"check";cardId:string;context:string} | {kind:"decideCheck";checkId:string;action:"CONFIRM"|"REJECT"|"REVOKE";reason:string} | {kind:"reveal";drawId:string} |
   {kind:'playback';drawId:string;action:'PLAY'|'PAUSE'|'REPLAY'} |
   { kind: "correct"; drawId: string; number: number; reason: string } |
   { kind: "closeRound" } | { kind: "startRound"; roundId: string; preparationRevision:number } | {kind:"appendRound";label:string;target:number;preparationRevision:number};
@@ -16,6 +17,8 @@ export type EventRunEvent = Omit<LiveEvent, "command"> & { command: EventCommand
 export function parseEventCommand(value: unknown): EventCommand {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw Error("INVALID_COMMAND");
   const r = value as Record<string, unknown>;
+  if(r.kind==='decideCheck'){assertUuid(r.checkId);if(Object.keys(r).sort().join()!=='action,checkId,kind,reason')throw Error('INVALID_COMMAND');parseLiveCommand({kind:'decide',callId:r.checkId,action:r.action,reason:r.reason});return r as EventCommand;}
+  if(r.kind==='check') {assertUuid(r.cardId);if(Object.keys(r).sort().join()!=='cardId,context,kind'||typeof r.context!=='string'||! /^[a-f0-9]{64}$/.test(r.context))throw Error('INVALID_CALL_CONTEXT');return r as EventCommand;}
   if(r.kind==='playback'){assertUuid(r.drawId);if(Object.keys(r).sort().join()!=='action,drawId,kind'||!['PLAY','PAUSE','REPLAY'].includes(String(r.action)))throw Error('INVALID_COMMAND');return r as EventCommand;}
   if(r.kind==='reveal'){assertUuid(r.drawId);if(Object.keys(r).sort().join()!=='drawId,kind')throw Error('INVALID_COMMAND');return r as EventCommand;}
   if (r.kind === "closeRound") { if (Object.keys(r).join() !== "kind") throw Error("INVALID_COMMAND"); return {kind:"closeRound"}; }
@@ -75,6 +78,22 @@ function applyEventRunEventInner(state: EventRunState, event: EventRunEvent, car
   if(c.kind==='playback'){if(!state.frozen.find(f=>f.id===round.id)?.matching||round.draws.at(-1)?.id!==c.drawId)throw Error('MEDIA_CONTEXT_CHANGED');if(c.action!=='PAUSE'&&run.status!=='RUNNING')throw Error('RUN_NOT_RUNNING');const prior=state.playback,position=c.action==='REPLAY'?0:prior?prior.position+(prior.action==='PAUSE'?0:Math.max(0,event.at-prior.at)/1000):0;return {...state,playback:{id:event.id,drawId:c.drawId,action:c.action,at:event.at,sequence:(prior?.sequence??0)+1,restartId:c.action==='REPLAY'?event.id:prior?.restartId??null,position}};}
   if(c.kind==="resume" && !run.rounds.some(r=>r.status==="OPEN"))throw Error("ROUND_NOT_OPEN");
   if(c.kind==="draw"&&blockingCalls(state))throw Error("OPEN_CLAIMS");
+  if(c.kind==='decideCheck') {
+    const check=state.checks?.find(check=>check.id===c.checkId&&check.roundId===round.id),card=cards.find(card=>card.id===check?.cardId);
+    if(!check||!card)throw Error('CARD_OR_CALL_NOT_FOUND');
+    const evaluation=evaluateCard(card.cells,round.draws.slice(0,check.throughPosition).map(d=>d.number));
+    const stage=evaluation.stages.at(-1)??'BINGO';
+    const existing=round.claims.find(claim=>claim.id===check.id);
+    const withClaim=existing?round:recordClaim({...round,draws:check.draws},check.id,card,stage);
+    const next=decideClaim({...withClaim,draws:round.draws},check.id,card,{id:event.id,action:c.action,reason:c.reason});
+    return {...replace(next),calls:state.calls.some(call=>call.id===check.id)?state.calls:[...state.calls,{id:check.id,roundId:round.id,recordedAt:check.at,stage,throughPosition:check.throughPosition,draws:check.draws,cardId:card.id}]};
+  }
+  if(c.kind==='check') {
+    if(run.status!=='RUNNING')throw Error('RUN_NOT_RUNNING');
+    const card=cards.find(card=>card.id===c.cardId);
+    if(!card)throw Error('CARD_OR_CALL_NOT_FOUND');
+    return {...state,checks:[...(state.checks??[]),{id:event.id,roundId:round.id,cardId:card.id,at:event.at,throughPosition:round.draws.length,draws:round.draws,original:evaluateCard(card.cells,round.draws.map(d=>d.number))}]};
+  }
   if(c.kind==="call") {
     if(run.status!=="RUNNING")throw Error("RUN_NOT_RUNNING");
     if(state.calls.some(call=>call.id===event.id))throw Error("DUPLICATE_CLAIM_ID");
@@ -104,5 +123,5 @@ export function applyEventRunEvent(state:EventRunState,event:EventRunEvent,cards
  const next=applyEventRunEventInner(state,event,cards);
  const clear=['draw','closeRound','startRound','end'].includes(event.command.kind)||event.command.kind==='correct'&&currentEventRound(state).draws.at(-1)?.id===event.command.drawId;
  const paused=event.command.kind==='pause'&&state.playback?{playback:{...state.playback,id:event.id,action:'PAUSE' as const,at:event.at,sequence:state.playback.sequence+1,position:state.playback.position+(state.playback.action==='PAUSE'?0:Math.max(0,event.at-state.playback.at)/1000)}}:{};
- return {...next,...(clear?{playback:undefined}:paused),contextRevision:["call","identify","decide","reveal","playback"].includes(event.command.kind)?state.contextRevision:state.contextRevision+1};
+ return {...next,...(clear?{playback:undefined}:paused),contextRevision:["call","check","decideCheck","identify","decide","reveal","playback"].includes(event.command.kind)?state.contextRevision:state.contextRevision+1};
 }

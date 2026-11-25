@@ -20,7 +20,8 @@ export async function readMatchingEditor(userId:number,gameId:string,roundId:str
   return {gameId,title:game.titel,roundId,label:round.label,revision:(await tx.bingo_preparations.findUnique({where:{game_id:gameId},select:{revision:true}}))?.revision??0,current:round.term_snapshot?parseTermSet(round.term_snapshot):null,locked:used||series.ist_archiviert,sets:(await tx.bingo_term_sets.findMany({where:{game_id:gameId},select:{id:true,config:true,created_at:true},orderBy:{created_at:'desc'}})).map(s=>({id:s.id,config:parseTermSet(s.config),createdAt:s.created_at.toISOString()}))};
  },{isolationLevel:'RepeatableRead'});
 }
-export async function writeMatching(userId:number,input:{gameId:string;roundId:string;revision:number;config:unknown}){
+export async function writeMatching(userId:number,input:{gameId:string;roundId:string;revision:number;config:unknown;templateId?:string}){
+ if(input.templateId)assertUuid(input.templateId);
  const draft=parseMatchingSet(input.config);assertUuid(input.gameId);assertUuid(input.roundId);if(!Number.isSafeInteger(input.revision)||input.revision<0)throw new MatchingError('Ungültiger Bearbeitungsstand.');
  // Network IO before the game lock; authorization/source revision is checked again at commit.
  const pending=new Map<string,Awaited<ReturnType<typeof captureMatchingMedia>>>();
@@ -35,10 +36,15 @@ export async function writeMatching(userId:number,input:{gameId:string;roundId:s
  let total=0;for(const source of sources){if(pending.has(source.key))continue;const media=await captureMatchingMedia(source.url,source.kind);total+=media.bytes.length;if(total>200*1024*1024)throw new MatchingError('Die Auswahl überschreitet das technische Speicherbudget von 200 MB pro Speichervorgang. Bitte weniger große Aufnahmen verwenden.');pending.set(source.key,media);}
  return prisma.$transaction(async tx=>{
   const {game}=await preparationContext(tx,userId,input.gameId,true),prep=await tx.bingo_preparations.findUnique({where:{game_id:game.id}});
+  const template=input.templateId?(await tx.$queryRaw<{id:string;revision:number}[]>`SELECT id,revision FROM pubquiz.bingo_round_templates WHERE id=${input.templateId}::uuid AND source_game_id=${game.id}::uuid AND eventreihe_id=${game.eventreihe_id} FOR UPDATE`)[0]:null;
+  if(input.templateId&&(!template||template.revision!==input.revision))throw new MatchingError('Content inzwischen geändert oder kein Zugriff. Bitte neu laden.');
+  let round:{id:string;series:{series_id:string}[]}|null=null;
+  if(!input.templateId) {
   if(!prep||prep.revision!==input.revision)throw new MatchingError('Die Vorbereitung wurde inzwischen geändert. Bitte neu laden; deine Eingaben bleiben erhalten.');
-  const round=await tx.bingo_rounds.findFirst({where:{id:input.roundId,game_id:game.id},select:{id:true,series:{select:{series_id:true}}}});
+  round=await tx.bingo_rounds.findFirst({where:{id:input.roundId,game_id:game.id},select:{id:true,series:{select:{series_id:true}}}});
   if(!round)throw new MatchingError('Runde nicht gefunden oder kein Zugriff.');
   if(round.series.length||await tx.bingo_card_series.count({where:{origin_round_id:round.id}})||(await tx.$queryRaw<{id:string}[]>`SELECT f.round_id id FROM pubquiz.bingo_event_rounds f JOIN pubquiz.bingo_live_runs r ON r.id=f.run_id WHERE f.round_id=${round.id}::uuid AND r.status IN ('RUNNING','PAUSED') LIMIT 1`).length)throw new MatchingError('Die Runde hat bereits Karten oder wurde gestartet. Ihre Zuordnung bleibt unverändert; bitte eine neue Runde anlegen.');
+  }
   for(const e of draft.entries){if(e.presentation.kind!=='MEDIA'||!e.presentation.source)continue;const s=e.presentation.source;
    if(s.assetId){const old=await tx.$queryRaw<{id:string}[]>`SELECT id FROM pubquiz.bingo_matching_assets WHERE id=${s.assetId}::uuid AND game_id=${game.id}::uuid AND source_question_id=${s.questionId} AND source_media_id=${s.mediaId} AND source_revision=${s.revision} AND kind=${s.kind} AND variant=${s.variant}`;if(!old.length)throw new MatchingError('Gespeicherte Medienreferenz ist ungültig.');continue;}
    const q=await authorizedSource(tx,userId,game.eventreihe_id,s.questionId);if(q.view.revision!==s.revision)throw new MatchingError(`Kugel ${e.number}: Quelle während des Speicherns geändert. Bitte erneut auswählen.`);
@@ -47,8 +53,9 @@ export async function writeMatching(userId:number,input:{gameId:string;roundId:s
    await tx.$executeRaw`INSERT INTO pubquiz.bingo_matching_assets(id,game_id,source_question_id,source_media_id,source_revision,kind,variant,content_type,sha256,answers,content) VALUES(${id}::uuid,${game.id}::uuid,${s.questionId},${s.mediaId},${s.revision},${s.kind},${s.variant},${media.contentType},${media.sha256},${JSON.stringify(q.view.answers)}::jsonb,${media.bytes})`;s.assetId=id;
   }
   const config=parseMatchingSet(draft),hash=sha256(canonical(config));
+  if(input.templateId){await tx.$executeRaw`UPDATE pubquiz.bingo_round_templates SET name=${config.name},config=${JSON.stringify(config)}::jsonb,revision=revision+1 WHERE id=${input.templateId}::uuid`;return {success:true as const};}
   await tx.$executeRaw`INSERT INTO pubquiz.bingo_term_sets(id,game_id,config,config_hash) VALUES(${randomUUID()}::uuid,${game.id}::uuid,${JSON.stringify(config)}::jsonb,${hash})`;
-  await tx.bingo_rounds.update({where:{id:round.id},data:{term_snapshot:config as unknown as Prisma.InputJsonValue}});
+  await tx.bingo_rounds.update({where:{id:round!.id},data:{term_snapshot:config as unknown as Prisma.InputJsonValue}});
   await tx.bingo_preparations.update({where:{game_id:game.id},data:{revision:{increment:1}}});return {success:true as const};
  },{timeout:30000});
 }

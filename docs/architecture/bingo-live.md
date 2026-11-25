@@ -155,3 +155,10 @@ Statistikmodell oder Mehr-Runden-Komfort.
 ### Bingo-Matching (Vertragsversion 2)
 
 Die neue gezielte Erweiterung ist in [bingo-matching.md](./bingo-matching.md) beschrieben: unabhängige Medien-/Kartenantwort, unveränderliche spielgebundene Fassung, 90 Verwaltungszeilen bei unverändertem 75er-Regelkern und aktuelle Berechtigungsprüfung. Bestehende V1-Karten-/Laufzeitverträge bleiben erhalten. Vollständige Zuordnungen und Medienbytes gehören ausdrücklich nicht in regelmäßige Statusabfragen. Praktische Nachweise und Grenzen stehen im zugehörigen Matching-Abnahmebericht.
+
+
+## Bingoglöckchen-Erweiterung (25.11.2026)
+
+Der [ergänzende Bedienvertrag](bingo-bell-operation.md) dokumentiert die neue
+Zahlenanzeige, gespeicherte Kartenprüfungen, Content-Kopien und den Gesamtabenddruck.
+Historische AP1/AP3-Daten und bestehende Druckstände bleiben erhalten.

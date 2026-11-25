@@ -252,6 +252,7 @@ export type bingo_roundsWhereInput = {
   strategy?: Prisma.StringFilter<"bingo_rounds"> | string
   issued_count?: Prisma.IntNullableFilter<"bingo_rounds"> | number | null
   created_at?: Prisma.DateTimeFilter<"bingo_rounds"> | Date | string
+  bingo_print_job_items?: Prisma.Bingo_print_job_itemsListRelationFilter
   event_plan?: Prisma.Bingo_event_round_planListRelationFilter
   live_runs?: Prisma.Bingo_live_runsListRelationFilter
   game?: Prisma.XOR<Prisma.Game_draftsScalarRelationFilter, Prisma.game_draftsWhereInput>
@@ -270,6 +271,7 @@ export type bingo_roundsOrderByWithRelationInput = {
   strategy?: Prisma.SortOrder
   issued_count?: Prisma.SortOrderInput | Prisma.SortOrder
   created_at?: Prisma.SortOrder
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsOrderByRelationAggregateInput
   event_plan?: Prisma.bingo_event_round_planOrderByRelationAggregateInput
   live_runs?: Prisma.bingo_live_runsOrderByRelationAggregateInput
   game?: Prisma.game_draftsOrderByWithRelationInput
@@ -293,6 +295,7 @@ export type bingo_roundsWhereUniqueInput = Prisma.AtLeast<{
   strategy?: Prisma.StringFilter<"bingo_rounds"> | string
   issued_count?: Prisma.IntNullableFilter<"bingo_rounds"> | number | null
   created_at?: Prisma.DateTimeFilter<"bingo_rounds"> | Date | string
+  bingo_print_job_items?: Prisma.Bingo_print_job_itemsListRelationFilter
   event_plan?: Prisma.Bingo_event_round_planListRelationFilter
   live_runs?: Prisma.Bingo_live_runsListRelationFilter
   game?: Prisma.XOR<Prisma.Game_draftsScalarRelationFilter, Prisma.game_draftsWhereInput>
@@ -342,6 +345,7 @@ export type bingo_roundsCreateInput = {
   strategy?: string
   issued_count?: number | null
   created_at?: Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsCreateNestedManyWithoutRoundInput
   event_plan?: Prisma.bingo_event_round_planCreateNestedManyWithoutRoundInput
   live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutRoundInput
   game: Prisma.game_draftsCreateNestedOneWithoutBingo_roundsInput
@@ -360,6 +364,7 @@ export type bingo_roundsUncheckedCreateInput = {
   strategy?: string
   issued_count?: number | null
   created_at?: Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUncheckedCreateNestedManyWithoutRoundInput
   event_plan?: Prisma.bingo_event_round_planUncheckedCreateNestedManyWithoutRoundInput
   live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutRoundInput
   original_series?: Prisma.bingo_card_seriesUncheckedCreateNestedManyWithoutOrigin_roundInput
@@ -376,6 +381,7 @@ export type bingo_roundsUpdateInput = {
   strategy?: Prisma.StringFieldUpdateOperationsInput | string
   issued_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUpdateManyWithoutRoundNestedInput
   event_plan?: Prisma.bingo_event_round_planUpdateManyWithoutRoundNestedInput
   live_runs?: Prisma.bingo_live_runsUpdateManyWithoutRoundNestedInput
   game?: Prisma.game_draftsUpdateOneRequiredWithoutBingo_roundsNestedInput
@@ -394,6 +400,7 @@ export type bingo_roundsUncheckedUpdateInput = {
   strategy?: Prisma.StringFieldUpdateOperationsInput | string
   issued_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUncheckedUpdateManyWithoutRoundNestedInput
   event_plan?: Prisma.bingo_event_round_planUncheckedUpdateManyWithoutRoundNestedInput
   live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutRoundNestedInput
   original_series?: Prisma.bingo_card_seriesUncheckedUpdateManyWithoutOrigin_roundNestedInput
@@ -619,6 +626,20 @@ export type bingo_roundsUpdateOneRequiredWithoutEvent_planNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.bingo_roundsUpdateToOneWithWhereWithoutEvent_planInput, Prisma.bingo_roundsUpdateWithoutEvent_planInput>, Prisma.bingo_roundsUncheckedUpdateWithoutEvent_planInput>
 }
 
+export type bingo_roundsCreateNestedOneWithoutBingo_print_job_itemsInput = {
+  create?: Prisma.XOR<Prisma.bingo_roundsCreateWithoutBingo_print_job_itemsInput, Prisma.bingo_roundsUncheckedCreateWithoutBingo_print_job_itemsInput>
+  connectOrCreate?: Prisma.bingo_roundsCreateOrConnectWithoutBingo_print_job_itemsInput
+  connect?: Prisma.bingo_roundsWhereUniqueInput
+}
+
+export type bingo_roundsUpdateOneRequiredWithoutBingo_print_job_itemsNestedInput = {
+  create?: Prisma.XOR<Prisma.bingo_roundsCreateWithoutBingo_print_job_itemsInput, Prisma.bingo_roundsUncheckedCreateWithoutBingo_print_job_itemsInput>
+  connectOrCreate?: Prisma.bingo_roundsCreateOrConnectWithoutBingo_print_job_itemsInput
+  upsert?: Prisma.bingo_roundsUpsertWithoutBingo_print_job_itemsInput
+  connect?: Prisma.bingo_roundsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.bingo_roundsUpdateToOneWithWhereWithoutBingo_print_job_itemsInput, Prisma.bingo_roundsUpdateWithoutBingo_print_job_itemsInput>, Prisma.bingo_roundsUncheckedUpdateWithoutBingo_print_job_itemsInput>
+}
+
 export type bingo_roundsCreateWithoutGameInput = {
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
@@ -628,6 +649,7 @@ export type bingo_roundsCreateWithoutGameInput = {
   strategy?: string
   issued_count?: number | null
   created_at?: Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsCreateNestedManyWithoutRoundInput
   event_plan?: Prisma.bingo_event_round_planCreateNestedManyWithoutRoundInput
   live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutRoundInput
   original_series?: Prisma.bingo_card_seriesCreateNestedManyWithoutOrigin_roundInput
@@ -644,6 +666,7 @@ export type bingo_roundsUncheckedCreateWithoutGameInput = {
   strategy?: string
   issued_count?: number | null
   created_at?: Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUncheckedCreateNestedManyWithoutRoundInput
   event_plan?: Prisma.bingo_event_round_planUncheckedCreateNestedManyWithoutRoundInput
   live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutRoundInput
   original_series?: Prisma.bingo_card_seriesUncheckedCreateNestedManyWithoutOrigin_roundInput
@@ -701,6 +724,7 @@ export type bingo_roundsCreateWithoutOriginal_seriesInput = {
   strategy?: string
   issued_count?: number | null
   created_at?: Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsCreateNestedManyWithoutRoundInput
   event_plan?: Prisma.bingo_event_round_planCreateNestedManyWithoutRoundInput
   live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutRoundInput
   game: Prisma.game_draftsCreateNestedOneWithoutBingo_roundsInput
@@ -718,6 +742,7 @@ export type bingo_roundsUncheckedCreateWithoutOriginal_seriesInput = {
   strategy?: string
   issued_count?: number | null
   created_at?: Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUncheckedCreateNestedManyWithoutRoundInput
   event_plan?: Prisma.bingo_event_round_planUncheckedCreateNestedManyWithoutRoundInput
   live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutRoundInput
   series?: Prisma.bingo_round_seriesUncheckedCreateNestedManyWithoutRoundInput
@@ -749,6 +774,7 @@ export type bingo_roundsUpdateWithoutOriginal_seriesInput = {
   strategy?: Prisma.StringFieldUpdateOperationsInput | string
   issued_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUpdateManyWithoutRoundNestedInput
   event_plan?: Prisma.bingo_event_round_planUpdateManyWithoutRoundNestedInput
   live_runs?: Prisma.bingo_live_runsUpdateManyWithoutRoundNestedInput
   game?: Prisma.game_draftsUpdateOneRequiredWithoutBingo_roundsNestedInput
@@ -766,6 +792,7 @@ export type bingo_roundsUncheckedUpdateWithoutOriginal_seriesInput = {
   strategy?: Prisma.StringFieldUpdateOperationsInput | string
   issued_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUncheckedUpdateManyWithoutRoundNestedInput
   event_plan?: Prisma.bingo_event_round_planUncheckedUpdateManyWithoutRoundNestedInput
   live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutRoundNestedInput
   series?: Prisma.bingo_round_seriesUncheckedUpdateManyWithoutRoundNestedInput
@@ -781,6 +808,7 @@ export type bingo_roundsCreateWithoutSeriesInput = {
   strategy?: string
   issued_count?: number | null
   created_at?: Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsCreateNestedManyWithoutRoundInput
   event_plan?: Prisma.bingo_event_round_planCreateNestedManyWithoutRoundInput
   live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutRoundInput
   game: Prisma.game_draftsCreateNestedOneWithoutBingo_roundsInput
@@ -798,6 +826,7 @@ export type bingo_roundsUncheckedCreateWithoutSeriesInput = {
   strategy?: string
   issued_count?: number | null
   created_at?: Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUncheckedCreateNestedManyWithoutRoundInput
   event_plan?: Prisma.bingo_event_round_planUncheckedCreateNestedManyWithoutRoundInput
   live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutRoundInput
   original_series?: Prisma.bingo_card_seriesUncheckedCreateNestedManyWithoutOrigin_roundInput
@@ -829,6 +858,7 @@ export type bingo_roundsUpdateWithoutSeriesInput = {
   strategy?: Prisma.StringFieldUpdateOperationsInput | string
   issued_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUpdateManyWithoutRoundNestedInput
   event_plan?: Prisma.bingo_event_round_planUpdateManyWithoutRoundNestedInput
   live_runs?: Prisma.bingo_live_runsUpdateManyWithoutRoundNestedInput
   game?: Prisma.game_draftsUpdateOneRequiredWithoutBingo_roundsNestedInput
@@ -846,6 +876,7 @@ export type bingo_roundsUncheckedUpdateWithoutSeriesInput = {
   strategy?: Prisma.StringFieldUpdateOperationsInput | string
   issued_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUncheckedUpdateManyWithoutRoundNestedInput
   event_plan?: Prisma.bingo_event_round_planUncheckedUpdateManyWithoutRoundNestedInput
   live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutRoundNestedInput
   original_series?: Prisma.bingo_card_seriesUncheckedUpdateManyWithoutOrigin_roundNestedInput
@@ -861,6 +892,7 @@ export type bingo_roundsCreateWithoutIssuance_changesInput = {
   strategy?: string
   issued_count?: number | null
   created_at?: Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsCreateNestedManyWithoutRoundInput
   event_plan?: Prisma.bingo_event_round_planCreateNestedManyWithoutRoundInput
   live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutRoundInput
   game: Prisma.game_draftsCreateNestedOneWithoutBingo_roundsInput
@@ -878,6 +910,7 @@ export type bingo_roundsUncheckedCreateWithoutIssuance_changesInput = {
   strategy?: string
   issued_count?: number | null
   created_at?: Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUncheckedCreateNestedManyWithoutRoundInput
   event_plan?: Prisma.bingo_event_round_planUncheckedCreateNestedManyWithoutRoundInput
   live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutRoundInput
   original_series?: Prisma.bingo_card_seriesUncheckedCreateNestedManyWithoutOrigin_roundInput
@@ -909,6 +942,7 @@ export type bingo_roundsUpdateWithoutIssuance_changesInput = {
   strategy?: Prisma.StringFieldUpdateOperationsInput | string
   issued_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUpdateManyWithoutRoundNestedInput
   event_plan?: Prisma.bingo_event_round_planUpdateManyWithoutRoundNestedInput
   live_runs?: Prisma.bingo_live_runsUpdateManyWithoutRoundNestedInput
   game?: Prisma.game_draftsUpdateOneRequiredWithoutBingo_roundsNestedInput
@@ -926,6 +960,7 @@ export type bingo_roundsUncheckedUpdateWithoutIssuance_changesInput = {
   strategy?: Prisma.StringFieldUpdateOperationsInput | string
   issued_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUncheckedUpdateManyWithoutRoundNestedInput
   event_plan?: Prisma.bingo_event_round_planUncheckedUpdateManyWithoutRoundNestedInput
   live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutRoundNestedInput
   original_series?: Prisma.bingo_card_seriesUncheckedUpdateManyWithoutOrigin_roundNestedInput
@@ -941,6 +976,7 @@ export type bingo_roundsCreateWithoutLive_runsInput = {
   strategy?: string
   issued_count?: number | null
   created_at?: Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsCreateNestedManyWithoutRoundInput
   event_plan?: Prisma.bingo_event_round_planCreateNestedManyWithoutRoundInput
   game: Prisma.game_draftsCreateNestedOneWithoutBingo_roundsInput
   original_series?: Prisma.bingo_card_seriesCreateNestedManyWithoutOrigin_roundInput
@@ -958,6 +994,7 @@ export type bingo_roundsUncheckedCreateWithoutLive_runsInput = {
   strategy?: string
   issued_count?: number | null
   created_at?: Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUncheckedCreateNestedManyWithoutRoundInput
   event_plan?: Prisma.bingo_event_round_planUncheckedCreateNestedManyWithoutRoundInput
   original_series?: Prisma.bingo_card_seriesUncheckedCreateNestedManyWithoutOrigin_roundInput
   series?: Prisma.bingo_round_seriesUncheckedCreateNestedManyWithoutRoundInput
@@ -989,6 +1026,7 @@ export type bingo_roundsUpdateWithoutLive_runsInput = {
   strategy?: Prisma.StringFieldUpdateOperationsInput | string
   issued_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUpdateManyWithoutRoundNestedInput
   event_plan?: Prisma.bingo_event_round_planUpdateManyWithoutRoundNestedInput
   game?: Prisma.game_draftsUpdateOneRequiredWithoutBingo_roundsNestedInput
   original_series?: Prisma.bingo_card_seriesUpdateManyWithoutOrigin_roundNestedInput
@@ -1006,6 +1044,7 @@ export type bingo_roundsUncheckedUpdateWithoutLive_runsInput = {
   strategy?: Prisma.StringFieldUpdateOperationsInput | string
   issued_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUncheckedUpdateManyWithoutRoundNestedInput
   event_plan?: Prisma.bingo_event_round_planUncheckedUpdateManyWithoutRoundNestedInput
   original_series?: Prisma.bingo_card_seriesUncheckedUpdateManyWithoutOrigin_roundNestedInput
   series?: Prisma.bingo_round_seriesUncheckedUpdateManyWithoutRoundNestedInput
@@ -1021,6 +1060,7 @@ export type bingo_roundsCreateWithoutEvent_planInput = {
   strategy?: string
   issued_count?: number | null
   created_at?: Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsCreateNestedManyWithoutRoundInput
   live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutRoundInput
   game: Prisma.game_draftsCreateNestedOneWithoutBingo_roundsInput
   original_series?: Prisma.bingo_card_seriesCreateNestedManyWithoutOrigin_roundInput
@@ -1038,6 +1078,7 @@ export type bingo_roundsUncheckedCreateWithoutEvent_planInput = {
   strategy?: string
   issued_count?: number | null
   created_at?: Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUncheckedCreateNestedManyWithoutRoundInput
   live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutRoundInput
   original_series?: Prisma.bingo_card_seriesUncheckedCreateNestedManyWithoutOrigin_roundInput
   series?: Prisma.bingo_round_seriesUncheckedCreateNestedManyWithoutRoundInput
@@ -1069,6 +1110,7 @@ export type bingo_roundsUpdateWithoutEvent_planInput = {
   strategy?: Prisma.StringFieldUpdateOperationsInput | string
   issued_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUpdateManyWithoutRoundNestedInput
   live_runs?: Prisma.bingo_live_runsUpdateManyWithoutRoundNestedInput
   game?: Prisma.game_draftsUpdateOneRequiredWithoutBingo_roundsNestedInput
   original_series?: Prisma.bingo_card_seriesUpdateManyWithoutOrigin_roundNestedInput
@@ -1086,6 +1128,91 @@ export type bingo_roundsUncheckedUpdateWithoutEvent_planInput = {
   strategy?: Prisma.StringFieldUpdateOperationsInput | string
   issued_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUncheckedUpdateManyWithoutRoundNestedInput
+  live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutRoundNestedInput
+  original_series?: Prisma.bingo_card_seriesUncheckedUpdateManyWithoutOrigin_roundNestedInput
+  series?: Prisma.bingo_round_seriesUncheckedUpdateManyWithoutRoundNestedInput
+  issuance_changes?: Prisma.bingo_issuance_changesUncheckedUpdateManyWithoutRoundNestedInput
+}
+
+export type bingo_roundsCreateWithoutBingo_print_job_itemsInput = {
+  term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  id?: string
+  position: number
+  label: string
+  planned_draws?: number
+  strategy?: string
+  issued_count?: number | null
+  created_at?: Date | string
+  event_plan?: Prisma.bingo_event_round_planCreateNestedManyWithoutRoundInput
+  live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutRoundInput
+  game: Prisma.game_draftsCreateNestedOneWithoutBingo_roundsInput
+  original_series?: Prisma.bingo_card_seriesCreateNestedManyWithoutOrigin_roundInput
+  series?: Prisma.bingo_round_seriesCreateNestedManyWithoutRoundInput
+  issuance_changes?: Prisma.bingo_issuance_changesCreateNestedManyWithoutRoundInput
+}
+
+export type bingo_roundsUncheckedCreateWithoutBingo_print_job_itemsInput = {
+  term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  id?: string
+  game_id: string
+  position: number
+  label: string
+  planned_draws?: number
+  strategy?: string
+  issued_count?: number | null
+  created_at?: Date | string
+  event_plan?: Prisma.bingo_event_round_planUncheckedCreateNestedManyWithoutRoundInput
+  live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutRoundInput
+  original_series?: Prisma.bingo_card_seriesUncheckedCreateNestedManyWithoutOrigin_roundInput
+  series?: Prisma.bingo_round_seriesUncheckedCreateNestedManyWithoutRoundInput
+  issuance_changes?: Prisma.bingo_issuance_changesUncheckedCreateNestedManyWithoutRoundInput
+}
+
+export type bingo_roundsCreateOrConnectWithoutBingo_print_job_itemsInput = {
+  where: Prisma.bingo_roundsWhereUniqueInput
+  create: Prisma.XOR<Prisma.bingo_roundsCreateWithoutBingo_print_job_itemsInput, Prisma.bingo_roundsUncheckedCreateWithoutBingo_print_job_itemsInput>
+}
+
+export type bingo_roundsUpsertWithoutBingo_print_job_itemsInput = {
+  update: Prisma.XOR<Prisma.bingo_roundsUpdateWithoutBingo_print_job_itemsInput, Prisma.bingo_roundsUncheckedUpdateWithoutBingo_print_job_itemsInput>
+  create: Prisma.XOR<Prisma.bingo_roundsCreateWithoutBingo_print_job_itemsInput, Prisma.bingo_roundsUncheckedCreateWithoutBingo_print_job_itemsInput>
+  where?: Prisma.bingo_roundsWhereInput
+}
+
+export type bingo_roundsUpdateToOneWithWhereWithoutBingo_print_job_itemsInput = {
+  where?: Prisma.bingo_roundsWhereInput
+  data: Prisma.XOR<Prisma.bingo_roundsUpdateWithoutBingo_print_job_itemsInput, Prisma.bingo_roundsUncheckedUpdateWithoutBingo_print_job_itemsInput>
+}
+
+export type bingo_roundsUpdateWithoutBingo_print_job_itemsInput = {
+  term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  planned_draws?: Prisma.IntFieldUpdateOperationsInput | number
+  strategy?: Prisma.StringFieldUpdateOperationsInput | string
+  issued_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  event_plan?: Prisma.bingo_event_round_planUpdateManyWithoutRoundNestedInput
+  live_runs?: Prisma.bingo_live_runsUpdateManyWithoutRoundNestedInput
+  game?: Prisma.game_draftsUpdateOneRequiredWithoutBingo_roundsNestedInput
+  original_series?: Prisma.bingo_card_seriesUpdateManyWithoutOrigin_roundNestedInput
+  series?: Prisma.bingo_round_seriesUpdateManyWithoutRoundNestedInput
+  issuance_changes?: Prisma.bingo_issuance_changesUpdateManyWithoutRoundNestedInput
+}
+
+export type bingo_roundsUncheckedUpdateWithoutBingo_print_job_itemsInput = {
+  term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  game_id?: Prisma.StringFieldUpdateOperationsInput | string
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  planned_draws?: Prisma.IntFieldUpdateOperationsInput | number
+  strategy?: Prisma.StringFieldUpdateOperationsInput | string
+  issued_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  event_plan?: Prisma.bingo_event_round_planUncheckedUpdateManyWithoutRoundNestedInput
   live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutRoundNestedInput
   original_series?: Prisma.bingo_card_seriesUncheckedUpdateManyWithoutOrigin_roundNestedInput
   series?: Prisma.bingo_round_seriesUncheckedUpdateManyWithoutRoundNestedInput
@@ -1112,6 +1239,7 @@ export type bingo_roundsUpdateWithoutGameInput = {
   strategy?: Prisma.StringFieldUpdateOperationsInput | string
   issued_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUpdateManyWithoutRoundNestedInput
   event_plan?: Prisma.bingo_event_round_planUpdateManyWithoutRoundNestedInput
   live_runs?: Prisma.bingo_live_runsUpdateManyWithoutRoundNestedInput
   original_series?: Prisma.bingo_card_seriesUpdateManyWithoutOrigin_roundNestedInput
@@ -1128,6 +1256,7 @@ export type bingo_roundsUncheckedUpdateWithoutGameInput = {
   strategy?: Prisma.StringFieldUpdateOperationsInput | string
   issued_count?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_print_job_items?: Prisma.bingo_print_job_itemsUncheckedUpdateManyWithoutRoundNestedInput
   event_plan?: Prisma.bingo_event_round_planUncheckedUpdateManyWithoutRoundNestedInput
   live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutRoundNestedInput
   original_series?: Prisma.bingo_card_seriesUncheckedUpdateManyWithoutOrigin_roundNestedInput
@@ -1152,6 +1281,7 @@ export type bingo_roundsUncheckedUpdateManyWithoutGameInput = {
  */
 
 export type Bingo_roundsCountOutputType = {
+  bingo_print_job_items: number
   event_plan: number
   live_runs: number
   original_series: number
@@ -1160,6 +1290,7 @@ export type Bingo_roundsCountOutputType = {
 }
 
 export type Bingo_roundsCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  bingo_print_job_items?: boolean | Bingo_roundsCountOutputTypeCountBingo_print_job_itemsArgs
   event_plan?: boolean | Bingo_roundsCountOutputTypeCountEvent_planArgs
   live_runs?: boolean | Bingo_roundsCountOutputTypeCountLive_runsArgs
   original_series?: boolean | Bingo_roundsCountOutputTypeCountOriginal_seriesArgs
@@ -1175,6 +1306,13 @@ export type Bingo_roundsCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types
    * Select specific fields to fetch from the Bingo_roundsCountOutputType
    */
   select?: Prisma.Bingo_roundsCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * Bingo_roundsCountOutputType without action
+ */
+export type Bingo_roundsCountOutputTypeCountBingo_print_job_itemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.bingo_print_job_itemsWhereInput
 }
 
 /**
@@ -1223,6 +1361,7 @@ export type bingo_roundsSelect<ExtArgs extends runtime.Types.Extensions.Internal
   strategy?: boolean
   issued_count?: boolean
   created_at?: boolean
+  bingo_print_job_items?: boolean | Prisma.bingo_rounds$bingo_print_job_itemsArgs<ExtArgs>
   event_plan?: boolean | Prisma.bingo_rounds$event_planArgs<ExtArgs>
   live_runs?: boolean | Prisma.bingo_rounds$live_runsArgs<ExtArgs>
   game?: boolean | Prisma.game_draftsDefaultArgs<ExtArgs>
@@ -1272,6 +1411,7 @@ export type bingo_roundsSelectScalar = {
 
 export type bingo_roundsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"term_snapshot" | "id" | "game_id" | "position" | "label" | "planned_draws" | "strategy" | "issued_count" | "created_at", ExtArgs["result"]["bingo_rounds"]>
 export type bingo_roundsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  bingo_print_job_items?: boolean | Prisma.bingo_rounds$bingo_print_job_itemsArgs<ExtArgs>
   event_plan?: boolean | Prisma.bingo_rounds$event_planArgs<ExtArgs>
   live_runs?: boolean | Prisma.bingo_rounds$live_runsArgs<ExtArgs>
   game?: boolean | Prisma.game_draftsDefaultArgs<ExtArgs>
@@ -1290,6 +1430,7 @@ export type bingo_roundsIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types
 export type $bingo_roundsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "bingo_rounds"
   objects: {
+    bingo_print_job_items: Prisma.$bingo_print_job_itemsPayload<ExtArgs>[]
     event_plan: Prisma.$bingo_event_round_planPayload<ExtArgs>[]
     live_runs: Prisma.$bingo_live_runsPayload<ExtArgs>[]
     game: Prisma.$game_draftsPayload<ExtArgs>
@@ -1701,6 +1842,7 @@ readonly fields: bingo_roundsFieldRefs;
  */
 export interface Prisma__bingo_roundsClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  bingo_print_job_items<T extends Prisma.bingo_rounds$bingo_print_job_itemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.bingo_rounds$bingo_print_job_itemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$bingo_print_job_itemsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   event_plan<T extends Prisma.bingo_rounds$event_planArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.bingo_rounds$event_planArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$bingo_event_round_planPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   live_runs<T extends Prisma.bingo_rounds$live_runsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.bingo_rounds$live_runsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$bingo_live_runsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   game<T extends Prisma.game_draftsDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.game_draftsDefaultArgs<ExtArgs>>): Prisma.Prisma__game_draftsClient<runtime.Types.Result.GetResult<Prisma.$game_draftsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
@@ -2143,6 +2285,30 @@ export type bingo_roundsDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.
    * Limit how many bingo_rounds to delete.
    */
   limit?: number
+}
+
+/**
+ * bingo_rounds.bingo_print_job_items
+ */
+export type bingo_rounds$bingo_print_job_itemsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the bingo_print_job_items
+   */
+  select?: Prisma.bingo_print_job_itemsSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the bingo_print_job_items
+   */
+  omit?: Prisma.bingo_print_job_itemsOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.bingo_print_job_itemsInclude<ExtArgs> | null
+  where?: Prisma.bingo_print_job_itemsWhereInput
+  orderBy?: Prisma.bingo_print_job_itemsOrderByWithRelationInput | Prisma.bingo_print_job_itemsOrderByWithRelationInput[]
+  cursor?: Prisma.bingo_print_job_itemsWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Bingo_print_job_itemsScalarFieldEnum | Prisma.Bingo_print_job_itemsScalarFieldEnum[]
 }
 
 /**

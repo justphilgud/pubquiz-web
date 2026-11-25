@@ -18,7 +18,7 @@ import {readPreparation} from "../preparation/readPreparation.server";
 import {frozenMatching,readMatchingEntry,audienceMatching} from '../matching/repository.server';
 type Tx=Prisma.TransactionClient;
 type Row={id:string;game_id:string;round_id:string;eventreihe_id:number;status:string;revision:number;started_at:Date;round_snapshot:unknown;design_snapshot:SharedDesign;audience_key:string;start_request_hash:string};
-type CardRow={round_id:string;id:string;series_id:string;cells:unknown;layout_hash:string;printed_code:string;ordinal:number;prefix:number};
+type CardRow={terms?:unknown;round_id:string;id:string;series_id:string;cells:unknown;layout_hash:string;printed_code:string;ordinal:number;prefix:number};
 import {parseEventEnvelope,type Envelope} from "./eventEnvelope";
 const integer=(v:unknown)=>{if(!Number.isSafeInteger(v)||Number(v)<0)throw Error("INVALID_REVISION");};
 async function clock(tx:Tx){return (await tx.$queryRaw<{at:Date}[]>`SELECT clock_timestamp()::timestamptz(3) AS at`)[0].at.getTime();}
@@ -39,23 +39,27 @@ async function load(tx:Tx,row:Row){
  }));
  if(!frozenRows.length||frozenRows[0].opened_at.getTime()!==row.started_at.getTime()||canonical(frozenRows[0].round_snapshot)!==canonical(first))throw Error("INVALID_FROZEN_ROUND");
  const events=await tx.$queryRaw<{request_id:string;request_hash:string;revision:number;actor_id:number;occurred_at:Date;command:unknown;event_round_id:string}[]>`SELECT request_id,request_hash,revision,actor_id,occurred_at,command,event_round_id FROM pubquiz.bingo_live_events WHERE run_id=${row.id}::uuid ORDER BY revision`;
+ const checkedIds=[...new Set(events.flatMap(e=>{const c=parseEventEnvelope(e.command).input.command;return c.kind==='check'?[c.cardId]:[];}))];
+ const checkRows=checkedIds.length?await tx.$queryRaw<CardRow[]>`SELECT c.id,c.series_id,c.cells,c.layout_hash,c.printed_code,c.ordinal,l.prefix,s.print_snapshot->'terms' AS terms FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_series_labels l ON l.series_id=c.series_id JOIN pubquiz.bingo_card_series s ON s.id=c.series_id WHERE l.game_id=${row.game_id}::uuid AND c.id=ANY(${checkedIds}::uuid[])`:[];
+ const checkCards=checkRows.map(c=>({...storedCard(c),terms:c.terms==null?null:parseTermSet(c.terms),shortCode:shortCardCode(c.prefix,c.ordinal)}));
+ if(checkCards.length!==checkedIds.length)throw Error('INVALID_FROZEN_CARDS');
  if(events.length!==row.revision)throw Error("INVALID_EVENT_HISTORY");
  let state=initialEventRun(row.id,row.game_id,first,row.started_at.getTime()),previousAt=row.started_at.getTime();
  const starts=new Map([[first.id,0]]),durations=new Map<string,number>();
  for(const [i,e] of events.entries()){
   const envelope=parseEventEnvelope(e.command),c=envelope.input.command;
-  if(e.revision!==i+1||envelope.input.revision>i||(c.kind!=="call"&&envelope.input.revision!==i)||e.occurred_at.getTime()<previousAt)throw Error("INVALID_EVENT_HISTORY");
+  if(e.revision!==i+1||envelope.input.revision>i||(!["call","check"].includes(c.kind)&&envelope.input.revision!==i)||e.occurred_at.getTime()<previousAt)throw Error("INVALID_EVENT_HISTORY");
   if(e.request_hash!==sha256(canonical({gameId:row.game_id,runId:row.id,requestId:e.request_id,...envelope.input})))throw Error("INVALID_EVENT_HASH");
-  if(c.kind==="call"&&c.context!==sha256(canonical(callContextData(state))))throw Error("INVALID_EVENT_HISTORY");
+  if((c.kind==="call"||c.kind==="check")&&c.context!==sha256(canonical(callContextData(state))))throw Error("INVALID_EVENT_HISTORY");
   const previousRound=currentEventRound(state);
   if(e.event_round_id!==(c.kind==="startRound"?c.roundId:previousRound.id))throw Error("INVALID_EVENT_HISTORY");
   if(envelope.opened){const stored=frozenRows.find(f=>f.round_id===envelope.opened!.id);if(!stored||canonical(stored.round_snapshot)!==canonical(envelope.opened)||stored.opened_at.getTime()!==e.occurred_at.getTime())throw Error("INVALID_FROZEN_ROUND");starts.set(stored.round_id,activeElapsedMs(state.run,e.occurred_at.getTime()));}
-  state=applyEventRunEvent(state,{id:e.request_id,at:e.occurred_at.getTime(),actorId:e.actor_id,command:c,...(envelope.opened?{frozen:envelope.opened}:{})},cardsByRound.get(previousRound.id)??[]);
+  state=applyEventRunEvent(state,{id:e.request_id,at:e.occurred_at.getTime(),actorId:e.actor_id,command:c,...(envelope.opened?{frozen:envelope.opened}:{})},["check","decideCheck","correct"].includes(c.kind)?[...new Map([...(cardsByRound.get(previousRound.id)??[]),...checkCards].map(card=>[card.id,card])).values()]:cardsByRound.get(previousRound.id)??[]);
   if(c.kind==="closeRound"||c.kind==="end")durations.set(previousRound.id,activeElapsedMs(state.run,e.occurred_at.getTime())-(starts.get(previousRound.id)??0));
   previousAt=e.occurred_at.getTime();
  }
  if(state.run.status!==row.status||state.frozen.length!==frozenRows.length)throw Error("INVALID_PERSISTED_RUN");
- return {state,cardsByRound,events,starts,durations,previousAt};
+ return {state,cardsByRound,checkCards,events,starts,durations,previousAt};
 }
 async function freeze(tx:Tx,gameId:string,runId:string,roundId:string,at:number){
  const round=await tx.bingo_rounds.findFirst({where:{id:roundId,game_id:gameId},include:{series:true}});
@@ -102,7 +106,7 @@ export async function commandEventRun(userId:number,input:{gameId:string;runId:s
   const [old]=await tx.$queryRaw<{request_hash:string;revision:number}[]>`SELECT request_hash,revision FROM pubquiz.bingo_live_events WHERE run_id=${row.id}::uuid AND request_id=${input.requestId}::uuid`;
   if(old){if(old.request_hash!==hash)throw Error("REQUEST_REUSED");return {revision:old.revision};}
   const loaded=await load(tx,row),{state}=loaded;
-  if(command.kind==="call"){if(input.revision>row.revision||command.context!==sha256(canonical(callContextData(state))))throw Error("CALL_CONTEXT_CONFLICT");}
+  if(command.kind==="call"||command.kind==="check"){if(input.revision>row.revision||command.context!==sha256(canonical(callContextData(state))))throw Error("CALL_CONTEXT_CONFLICT");}
   else if(input.revision!==row.revision)throw Error("REVISION_CONFLICT");
   const at=Math.max(await clock(tx),loaded.previousAt),round=currentEventRound(state);let opened:FrozenRound|null=null;
   if(command.kind==='playback'){
@@ -124,7 +128,8 @@ export async function commandEventRun(userId:number,input:{gameId:string;runId:s
     if(!next||next.round_id!==command.roundId)throw Error("INVALID_NEXT_ROUND");opened=await freeze(tx,game.id,row.id,command.roundId,at);
    }
   }
-  const next=applyEventRunEvent(state,{id:input.requestId,at,actorId:userId,command,...(opened?{frozen:opened}:{})},loaded.cardsByRound.get(round.id)??[]);
+  const checkRows=command.kind==='check'?await tx.$queryRaw<CardRow[]>`SELECT c.id,c.series_id,c.cells,c.layout_hash,c.printed_code,c.ordinal,l.prefix FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_series_labels l ON l.series_id=c.series_id WHERE l.game_id=${game.id}::uuid AND c.id=${command.cardId}::uuid`:[];
+  const next=applyEventRunEvent(state,{id:input.requestId,at,actorId:userId,command,...(opened?{frozen:opened}:{})},["check","decideCheck","correct"].includes(command.kind)?[...new Map([...(loaded.cardsByRound.get(round.id)??[]),...loaded.checkCards,...checkRows.map(storedCard)].map(card=>[card.id,card])).values()]:loaded.cardsByRound.get(round.id)??[]);
   const envelope:Envelope={version:2,input:{revision:input.revision,command},opened};
   await tx.$executeRaw`INSERT INTO pubquiz.bingo_live_events(run_id,revision,request_id,request_hash,actor_id,occurred_at,command,event_round_id) VALUES(${row.id}::uuid,${row.revision+1},${input.requestId}::uuid,${hash},${userId},${new Date(at)},${JSON.stringify(envelope)}::jsonb,${command.kind==="startRound"?command.roundId:round.id}::uuid)`;
   await tx.$executeRaw`UPDATE pubquiz.bingo_live_runs SET revision=revision+1,status=${next.run.status} WHERE id=${row.id}::uuid AND revision=${row.revision}`;
@@ -153,7 +158,7 @@ export async function readEventModeration(userId:number,gameId:string,runId?:str
    rounds,plan,runs:rows.map(r=>({id:r.id,status:r.status,startedAt:r.started_at.toISOString()})),
    preparationPage:pageRound?Math.floor((pageRound.position-1)/25)+1:1,
    live:row&&loaded&&round?{events:loaded.events.map(e=>({id:e.request_id,at:e.occurred_at.getTime(),actorId:e.actor_id,command:parseEventEnvelope(e.command).input.command})),id:row.id,revision:row.revision,startedAt:row.started_at.getTime(),round:loaded.state.frozen.find(f=>f.id===round.id)!,state:loaded.state,
-    matchingEntry,cards:loaded.cardsByRound.get(round.id)??[],design:row.design_snapshot,audienceKey:row.audience_key,serverAt:at,elapsedMs:activeElapsedMs(loaded.state.run,at),
+    matchingEntry,checkCards:loaded.checkCards,cards:loaded.cardsByRound.get(round.id)??[],design:row.design_snapshot,audienceKey:row.audience_key,serverAt:at,elapsedMs:activeElapsedMs(loaded.state.run,at),
     roundElapsedMs:loaded.durations.get(round.id)??activeElapsedMs(loaded.state.run,at)-(loaded.starts.get(round.id)??0),
     blocked:blockingCalls(loaded.state),callContext:sha256(canonical(callContextData(loaded.state))),between:round.status==="CLOSED"&&loaded.state.run.status!=="ENDED",
     summary:loaded.state.run.rounds.map(r=>({id:r.id,label:loaded.state.frozen.find(f=>f.id===r.id)!.label,draws:r.draws.length,confirmed:r.claims.filter(c=>c.decisions.at(-1)?.action==="CONFIRM").length,activeMs:loaded.durations.get(r.id)??activeElapsedMs(loaded.state.run,at)-(loaded.starts.get(r.id)??0)}))}:null};
@@ -177,3 +182,21 @@ export async function readEventAudience(userId:number,key:string){
    claims:round.claims.map(c=>({id:c.id,stage:c.stage,action:c.decisions.at(-1)?.action??null,needsReview:c.needsReview}))};
  },{isolationLevel:"RepeatableRead"});
 }
+
+/** Only the currently authorized evening is searched; known old cards reveal no foreign metadata. */
+export async function resolveEveningCard(userId:number,gameId:string,code:string) {
+ assertUuid(gameId);
+ if(typeof code!=='string'||code.length>64||!code.trim())throw Error('CARD_NOT_FOUND');
+ const normalized=code.trim().toUpperCase();
+ return prisma.$transaction(async tx=>{
+  await tx.$executeRaw`SET TRANSACTION READ ONLY`;
+  const {game}=await preparationContext(tx,userId,gameId);
+  const rows=await tx.$queryRaw<{id:string;game_id:string;ordinal:number;prefix:number;printed_code:string}[]>`SELECT c.id,l.game_id,c.ordinal,l.prefix,c.printed_code FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_series_labels l ON l.series_id=c.series_id JOIN pubquiz.game_drafts g ON g.id=l.game_id WHERE g.eventreihe_id=${game.eventreihe_id} AND (upper(c.printed_code)=${normalized} OR c.id::text=${normalized.toLowerCase()} OR (l.prefix=${/^([A-Z]+)-/.test(normalized)?shortPrefix(normalized.split('-')[0]):0} AND c.ordinal=${/^[A-Z]+-\d+$/.test(normalized)?Number(normalized.split('-')[1]):0}))`;
+  const matches=rows.filter(c=>[c.id,c.printed_code,shortCardCode(c.prefix,c.ordinal)].some(v=>v.toUpperCase()===normalized));
+  const current=matches.filter(c=>c.game_id===gameId);
+  if(current.length>1)throw Error('AMBIGUOUS_CARD');
+  if(!current.length)throw Error(matches.length?'OLD_CARD':'CARD_NOT_FOUND');
+  return current[0].id;
+ });
+}
+function shortPrefix(letters:string) {let n=0;for(const letter of letters)n=n*26+letter.charCodeAt(0)-64;return Number.isSafeInteger(n)&&n<=2147483647?n:0;}

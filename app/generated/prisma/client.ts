@@ -445,3 +445,18 @@ export type bingo_term_sets = Prisma.bingo_term_setsModel
  *
  */
 export type excel_question_import_receipts = Prisma.excel_question_import_receiptsModel
+/**
+ * Model bingo_round_templates
+ *
+ */
+export type bingo_round_templates = Prisma.bingo_round_templatesModel
+/**
+ * Model bingo_print_jobs
+ *
+ */
+export type bingo_print_jobs = Prisma.bingo_print_jobsModel
+/**
+ * Model bingo_print_job_items
+ *
+ */
+export type bingo_print_job_items = Prisma.bingo_print_job_itemsModel

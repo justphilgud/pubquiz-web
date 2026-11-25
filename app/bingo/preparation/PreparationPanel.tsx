@@ -1,4 +1,5 @@
 "use client";
+import {publishContent} from '../content/actions';
 import PrintFormatFields from './PrintFormatFields';
 import type {PrintLayout} from './printFormats';
 import PdfDownloads from "./PdfDownloads";
@@ -17,6 +18,7 @@ export default function PreparationPanel({ data }: { data: PreparationView }) {
   const ready = useSyncExternalStore(subscribe, () => true, () => false);
   const [expanded,setExpanded]=useState<Set<string>>(new Set());
   const [message, setMessage] = useState("");
+  const [templateId,setTemplateId]=useState('');
   const [dirtyRounds, setDirtyRounds] = useState<Set<string>>(new Set());
   const [busyRounds, setBusyRounds] = useState<Set<string>>(new Set());
   const trackBusy = useCallback((id: string, busy: boolean) => setBusyRounds(current => {
@@ -37,7 +39,10 @@ export default function PreparationPanel({ data }: { data: PreparationView }) {
     <p className="text-sm text-slate-600">Vorbereitung · Durchläufe werden in der Moderation bewusst gestartet. Die geplante Ziehungszahl beendet keine Runde automatisch.</p>
     {data.archived && <p role="status">Archivierte Eventreihe: nur Lesen und PDF-Export möglich.</p>}
     {message && <p role="alert">{message}</p>}
-    <Button disabled={!ready || pending || data.archived || dirtyRounds.size > 0 || busyRounds.size > 0} onClick={() => run({ operation: "createRound" })}>Runde hinzufügen</Button>
+    <Button disabled={!ready || pending || data.archived || dirtyRounds.size > 0 || busyRounds.size > 0} onClick={() => run({ operation: "createRound", ...(templateId?{templateId}:{}) })}>Runde hinzufügen</Button>
+    <label className="block">Neue Runde aus Content<Select value={templateId} onChange={e=>setTemplateId(e.target.value)} disabled={pending||data.archived}><option value="">Standard · Zahlen-Bingo 75</option>{data.templates?.map(t=><option key={t.id} value={t.id}>{t.name} · {t.target} Ziehungen{t.special?' · Spezialkarten erforderlich':''}</option>)}</Select></label>
+    {data.templates?.find(t=>t.id===templateId)?.special&&<p role="note">Diese Vorlage benötigt passende Spezialkarten. Die Zuordnung wird unabhängig kopiert; vorhandene Karten werden nicht ersetzt.</p>}
+    <Link className="inline-flex min-h-11 items-center underline" href={`/bingo/${data.gameId}/karten`}>Karten und Druck für {data.title}</Link>
     {!data.rounds.length && <p>Noch keine Runden vorhanden.</p>}
     {data.rounds.map(r=><div key={r.id} data-round-id={r.id} className="rounded-xl border border-slate-300 bg-white p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-bold">{r.label}</h2><p className="text-sm text-slate-600">{r.terms?'Text-Bingo 75':'Zahlen-Bingo 75'} · {r.target} geplante Ziehungen · {r.cardCount} Karten · Ausgabe: {r.issued===null?"nicht erfasst":r.issued} · {r.locked?"Gestartet · unveränderlich":r.cardCount?"Bereit":"Karten fehlen"}</p></div><button className="min-h-11 rounded-lg border px-3" onClick={()=>{if(expanded.has(r.id)&&dirtyRounds.has(r.id)&&!window.confirm("Ungespeicherte Änderungen verwerfen?"))return;setExpanded(current=>{const next=new Set(current);if(next.has(r.id))next.delete(r.id);else next.add(r.id);return next;});}}>{expanded.has(r.id)?"Schließen":r.locked?"Ansehen":"Bearbeiten"}</button></div>{expanded.has(r.id)&&<RoundEditor key={r.id} round={r} data={data} onDirty={trackDirty} onBusy={trackBusy} externallyBlocked={pending||[...dirtyRounds,...busyRounds].some(id=>id!==r.id)}/>}</div>)}
     <nav aria-label="Rundenseiten" className="flex flex-wrap gap-4">{data.page > 1 && <Link href={`?page=${data.page - 1}&seriesPage=${data.seriesPage}`}>Vorherige Runden</Link>}{data.page * 25 < data.roundCount && <Link href={`?page=${data.page + 1}&seriesPage=${data.seriesPage}`}>Weitere Runden</Link>}</nav>
@@ -86,6 +91,9 @@ export function RoundEditor({ round, data, onDirty, onBusy, externallyBlocked }:
       {message && <p role={message.error ? "alert" : "status"} className={message.error ? "text-red-700" : "text-emerald-800"}>{message.text}</p>}
       <div className="flex flex-wrap gap-3"><Button type="submit" disabled={blocked}>{pending ? "Wird gespeichert …" : "Runde speichern"}</Button><Link className="inline-flex min-h-11 items-center underline" href={`/bingo/${data.gameId}`}>Abbrechen</Link></div>
     </form>
+    <Button disabled={data.archived||pending||dirty||termsDirty} onClick={()=>{start(async()=>{const result=await publishContent(data.gameId,round.id,data.revision);setMessage({text:result.success?'Unabhängige Rundenvorlage in Bingo-Content gespeichert.':result.message,error:!result.success});});}}>Als Rundenvorlage in Content übernehmen</Button>
+    {round.terms&&<p role="note">Diese Runde benötigt eigene Spezialkarten passend zu ihrer gespeicherten Matching-Tabelle.</p>}
+    {(round.locked||round.series.length>0||round.issued!==null||round.history.length>0)&&<p className="text-sm">Entfernen gesperrt: Runde hat Karten, Ausgabeangaben oder Laufhistorie. Gespeicherte Daten werden nicht gelöscht.</p>}
     <Link className="inline-flex min-h-11 items-center rounded border px-3" href={`/bingo/${data.gameId}/matching?round=${round.id}`}>Matching-Tabelle · Zahlen, Texte und Quizmedien</Link>
     {round.terms?.version!==2&&<TermSetPanel gameId={data.gameId} roundId={round.id} revision={data.revision} current={round.terms??null} sets={(data.termSets??[]).filter(s=>s.config.version===1)} onDirty={setTermsDirty} disabled={blocked||dirty||round.cardCount>0}/>}
     {(dirty||termsDirty) && <p className="text-sm">Bitte Änderungen an Runde oder Karteninhalt zuerst speichern. Weitere Kartenaktionen sind bis dahin gesperrt.</p>}

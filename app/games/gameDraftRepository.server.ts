@@ -56,6 +56,7 @@ export async function writeGameDraft(userId: number, type: GameType, input: unkn
     if (old && old.updated_at.toISOString() !== data.updatedAt) throw new GameDraftError("Dieses Spiel wurde inzwischen geändert. Bitte neu laden; deine Eingaben bleiben bis dahin erhalten.");
     if (old && old.eventreihe_id !== data.seriesId && await tx.game_team_assignments.count({ where: { game_id: old.id } }) > 0) throw new GameDraftError("Der Reihenwechsel ist bei bestehenden Teamzuordnungen gesperrt. Entferne zuerst ausdrücklich die Zuordnungen.");
     if (old && type === "BINGO" && old.eventreihe_id !== data.seriesId && await tx.bingo_card_series.count({ where: { game_id: old.id } }) > 0) throw new GameDraftError("Der Reihenwechsel ist bei bestehenden Bingo-Kartenserien gesperrt.");
+    if(old&&type==='BINGO'&&old.eventreihe_id!==data.seriesId&&await tx.bingo_round_templates.count({where:{source_game_id:old.id}})>0)throw new GameDraftError('Dieser Abend bewahrt Medien einer Content-Vorlage. Ein Reihenwechsel ist gesperrt; Vorlagen und Medien bleiben erhalten.');
     const fields = { eventreihe_id: data.seriesId, titel: data.title, datum: data.date ? new Date(`${data.date}T00:00:00.000Z`) : null, uhrzeit: data.time || null };
     const row = old ? await tx.game_drafts.update({ where: { id: old.id }, data: fields }) : await tx.game_drafts.create({ data: { ...fields, eventart: type } });
     return view(row);

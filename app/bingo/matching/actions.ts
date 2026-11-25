@@ -22,8 +22,8 @@ export async function findMatchingSources(gameId:string,input:{search:string;tem
  const {actor}=await requireActor();
  try{return {success:true as const,...await searchMatchingSources(actor.userId,gameId,input)};}catch{return {success:false as const,message:'Quellen konnten nicht geladen werden. Bitte aktuelle Rechte und Filter prüfen.'};}
 }
-export async function saveMatching(input:{gameId:string;roundId:string;revision:number;config:unknown}){
- const {actor}=await requireActor();try{const result=await writeMatching(actor.userId,input);revalidatePath(`/bingo/${input.gameId}`);revalidatePath(`/bingo/${input.gameId}/matching`);return result;}
+export async function saveMatching(input:{gameId:string;roundId:string;revision:number;config:unknown;templateId?:string}){
+ const {actor}=await requireActor();try{const result=await writeMatching(actor.userId,input);if(input.templateId)revalidatePath(`/bingo/content/${input.templateId}`);revalidatePath('/bingo/content');revalidatePath(`/bingo/${input.gameId}`);revalidatePath(`/bingo/${input.gameId}/matching`);return result;}
  catch(e){return {success:false as const,message:e instanceof MatchingError||e instanceof BingoPreparationError?e.message:'Nicht gespeichert. Bitte aktuelle Rechte, Medien und Angaben prüfen. Deine Eingaben bleiben erhalten.'};}
 }
 

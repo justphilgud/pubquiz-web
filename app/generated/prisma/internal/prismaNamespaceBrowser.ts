@@ -129,7 +129,10 @@ export const ModelName = {
   bingo_event_rounds: 'bingo_event_rounds',
   bingo_event_round_cards: 'bingo_event_round_cards',
   bingo_term_sets: 'bingo_term_sets',
-  excel_question_import_receipts: 'excel_question_import_receipts'
+  excel_question_import_receipts: 'excel_question_import_receipts',
+  bingo_round_templates: 'bingo_round_templates',
+  bingo_print_jobs: 'bingo_print_jobs',
+  bingo_print_job_items: 'bingo_print_job_items'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1381,6 +1384,45 @@ export const Excel_question_import_receiptsScalarFieldEnum = {
 } as const
 
 export type Excel_question_import_receiptsScalarFieldEnum = (typeof Excel_question_import_receiptsScalarFieldEnum)[keyof typeof Excel_question_import_receiptsScalarFieldEnum]
+
+
+export const Bingo_round_templatesScalarFieldEnum = {
+  id: 'id',
+  eventreihe_id: 'eventreihe_id',
+  name: 'name',
+  planned_draws: 'planned_draws',
+  config: 'config',
+  source_game_id: 'source_game_id',
+  revision: 'revision',
+  created_by: 'created_by',
+  created_at: 'created_at'
+} as const
+
+export type Bingo_round_templatesScalarFieldEnum = (typeof Bingo_round_templatesScalarFieldEnum)[keyof typeof Bingo_round_templatesScalarFieldEnum]
+
+
+export const Bingo_print_jobsScalarFieldEnum = {
+  id: 'id',
+  game_id: 'game_id',
+  request_hash: 'request_hash',
+  cards_per_round: 'cards_per_round',
+  created_by: 'created_by',
+  created_at: 'created_at'
+} as const
+
+export type Bingo_print_jobsScalarFieldEnum = (typeof Bingo_print_jobsScalarFieldEnum)[keyof typeof Bingo_print_jobsScalarFieldEnum]
+
+
+export const Bingo_print_job_itemsScalarFieldEnum = {
+  job_id: 'job_id',
+  game_id: 'game_id',
+  round_id: 'round_id',
+  series_id: 'series_id',
+  round_position: 'round_position',
+  round_label: 'round_label'
+} as const
+
+export type Bingo_print_job_itemsScalarFieldEnum = (typeof Bingo_print_job_itemsScalarFieldEnum)[keyof typeof Bingo_print_job_itemsScalarFieldEnum]
 
 
 export const SortOrder = {

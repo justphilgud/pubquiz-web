@@ -245,3 +245,10 @@ Next-Seite mit echtem AppHeader, realer Datenbank, frischen getrennten Rollensit
 nativem Abbruch/Tab/Escape, echtem Zwei-Fenster-CAS, Save/Reload und allen drei Viewports.
 Komponententests mit simulierten Actions sind getrennt von diesen lokalen echten
 Serveraktionen und der weiterhin offenen gehosteten Abnahme auszuweisen.
+
+
+## Bingoglöckchen-Erweiterung (25.11.2026)
+
+Der [ergänzende Bedienvertrag](bingo-bell-operation.md) dokumentiert die neue
+Zahlenanzeige, gespeicherte Kartenprüfungen, Content-Kopien und den Gesamtabenddruck.
+Historische AP1/AP3-Daten und bestehende Druckstände bleiben erhalten.

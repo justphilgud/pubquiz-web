@@ -421,6 +421,8 @@ model meme_archive_entries {
 }
 
 model eventreihen {
+  bingo_round_templates bingo_round_templates[]
+
   bingo_live_runs bingo_live_runs[]
   bingo_print_config Json?
   game_drafts game_drafts[]
@@ -1407,6 +1409,9 @@ enum LivePollPublicationMode {
 }
 
 model users {
+  bingo_round_templates bingo_round_templates[]
+  bingo_print_jobs bingo_print_jobs[]
+
   bingo_event_creations bingo_event_creation_requests[]
 
   bingo_live_runs bingo_live_runs[]
@@ -1585,6 +1590,9 @@ model benutzer_reihenrollen {
 
 /// Standalone non-playable game instances. No Quiz identity or live state.
 model game_drafts {
+  bingo_round_templates bingo_round_templates[]
+  bingo_print_jobs bingo_print_jobs[]
+
   event_creation bingo_event_creation_requests?
 
   bingo_live_runs bingo_live_runs[]
@@ -1637,6 +1645,8 @@ model bingo_matching_assets {
  @@schema("pubquiz")
 }
 model bingo_rounds {
+  bingo_print_job_items bingo_print_job_items[]
+
   term_snapshot Json?
   event_plan bingo_event_round_plan[]
 
@@ -1658,6 +1668,8 @@ model bingo_rounds {
   @@schema("pubquiz")
 }
 model bingo_card_series {
+  bingo_print_job_items bingo_print_job_items[]
+
   event_round_cards bingo_event_round_cards[]
 
   live_cards bingo_live_cards[]
@@ -1896,5 +1908,48 @@ model excel_question_import_receipts {
 
   @@id([actor_id, request_id])
   @@index([actor_id, content_digest])
+  @@schema("pubquiz")
+}
+
+model bingo_round_templates {
+  id String @id @db.Uuid
+  eventreihe_id Int
+  name String @db.VarChar(80)
+  planned_draws Int @default(30)
+  config Json?
+  source_game_id String? @db.Uuid
+  revision Int @default(0)
+  created_by Int
+  created_at DateTime @default(dbgenerated("clock_timestamp()")) @db.Timestamptz(3)
+  series eventreihen @relation(fields:[eventreihe_id],references:[eventreihe_id],onDelete:Restrict)
+  source game_drafts? @relation(fields:[source_game_id],references:[id],onDelete:Restrict)
+  actor users @relation(fields:[created_by],references:[id],onDelete:Restrict)
+  @@index([eventreihe_id,created_at,id],map:"bingo_round_templates_series")
+  @@schema("pubquiz")
+}
+model bingo_print_jobs {
+  id String @id @db.Uuid
+  game_id String @db.Uuid
+  request_hash String @db.Char(64)
+  cards_per_round Int
+  created_by Int
+  created_at DateTime @default(dbgenerated("clock_timestamp()")) @db.Timestamptz(3)
+  game game_drafts @relation(fields:[game_id],references:[id],onDelete:Restrict)
+  actor users @relation(fields:[created_by],references:[id],onDelete:Restrict)
+  items bingo_print_job_items[]
+  @@unique([id,game_id])
+  @@schema("pubquiz")
+}
+model bingo_print_job_items {
+  job_id String @db.Uuid
+  game_id String @db.Uuid
+  round_id String @db.Uuid
+  series_id String @db.Uuid
+  round_position Int
+  round_label String @db.VarChar(80)
+  job bingo_print_jobs @relation(fields:[job_id,game_id],references:[id,game_id],onDelete:Restrict)
+  round bingo_rounds @relation(fields:[round_id,game_id],references:[id,game_id],onDelete:Restrict)
+  series bingo_card_series @relation(fields:[series_id,game_id],references:[id,game_id],onDelete:Restrict)
+  @@id([job_id,series_id])
   @@schema("pubquiz")
 }

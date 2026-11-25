@@ -147,3 +147,10 @@ Historische Druckstände und numerische Laufdaten behalten ihren bisherigen Vert
 um explizite SQL-Projektionen und frisch autorisierte bedingte Statusabrufe.
 Fachdaten, Laufzustände und Speicherung bleiben unverändert; kein globaler
 Zustands-/Rechtecache und keine Migration.
+
+
+## Bingoglöckchen-Erweiterung (25.11.2026)
+
+Der [ergänzende Bedienvertrag](bingo-bell-operation.md) dokumentiert die neue
+Zahlenanzeige, gespeicherte Kartenprüfungen, Content-Kopien und den Gesamtabenddruck.
+Historische AP1/AP3-Daten und bestehende Druckstände bleiben erhalten.
