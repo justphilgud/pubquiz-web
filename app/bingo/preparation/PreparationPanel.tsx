@@ -56,6 +56,7 @@ export function RoundEditor({ round, data, onDirty, onBusy, externallyBlocked }:
   function changeFields(value:typeof initial){setEditRevision(current=>current??data.revision);setFields(value);}
   const [fields, setFields] = useState(initial), [message, setMessage] = useState<{ text: string; error: boolean; field?: string } | null>(null);
   const [termsDirty,setTermsDirty]=useState(false);
+  const [roundTemplate,setRoundTemplate]=useState('');
   const [count, setCount] = useState("100"), [selected, setSelected] = useState("");
   const [printLayout,setPrintLayout]=useState<PrintLayout>(data.printLayout??{format:'A4_FOUR'});
   const [layoutChanged,setLayoutChanged]=useState(false);
@@ -72,6 +73,7 @@ export function RoundEditor({ round, data, onDirty, onBusy, externallyBlocked }:
         const result = await savePreparation({ ...base, ...extra });
         if (!result.success) { setMessage({ text: result.message, error: true, field: result.field }); return; }
         if (saving) {markSaved();setEditRevision(null);}
+        if(extra.operation==='applyTemplate')setFields(old=>({...old,label:result.roundLabel??old.label,target:String(result.roundTarget??old.target)}));
         router.refresh(); setMessage({ text: "Gespeichert.", error: false });
       } catch { setMessage({ text: "Speichern fehlgeschlagen. Deine Eingaben bleiben erhalten. Bitte erneut versuchen.", error: true }); }
       finally { busy.current = false; onBusy(round.id, false); }
@@ -91,6 +93,7 @@ export function RoundEditor({ round, data, onDirty, onBusy, externallyBlocked }:
       {message && <p role={message.error ? "alert" : "status"} className={message.error ? "text-red-700" : "text-emerald-800"}>{message.text}</p>}
       <div className="flex flex-wrap gap-3"><Button type="submit" disabled={blocked}>{pending ? "Wird gespeichert …" : "Runde speichern"}</Button><Link className="inline-flex min-h-11 items-center underline" href={`/bingo/${data.gameId}`}>Abbrechen</Link></div>
     </form>
+    <fieldset disabled={blocked||dirty||termsDirty||round.cardCount>0||round.issued!==null||round.history.length>0} className="space-y-2 rounded border p-3"><legend>Content dieser unbenutzten Runde</legend><label>Standard oder Rundenvorlage<Select value={roundTemplate} onChange={e=>setRoundTemplate(e.target.value)}><option value="">Standard · Zahlen-Bingo 75</option>{data.templates?.map(t=><option key={t.id} value={t.id}>{t.name}{t.special?' · Spezialkarten erforderlich':''}</option>)}</Select></label><Button onClick={()=>{if(window.confirm('Ausgewählten Content unabhängig in diese unbenutzte Runde übernehmen? Bei einer Vorlage werden Name, Ziehungsziel und Zuordnung übernommen.'))run({operation:'applyTemplate',templateId:roundTemplate||null},true);}}>Content in Runde übernehmen</Button></fieldset>
     <Button disabled={data.archived||pending||dirty||termsDirty} onClick={()=>{start(async()=>{const result=await publishContent(data.gameId,round.id,data.revision);setMessage({text:result.success?'Unabhängige Rundenvorlage in Bingo-Content gespeichert.':result.message,error:!result.success});});}}>Als Rundenvorlage in Content übernehmen</Button>
     {round.terms&&<p role="note">Diese Runde benötigt eigene Spezialkarten passend zu ihrer gespeicherten Matching-Tabelle.</p>}
     {(round.locked||round.series.length>0||round.issued!==null||round.history.length>0)&&<p className="text-sm">Entfernen gesperrt: Runde hat Karten, Ausgabeangaben oder Laufhistorie. Gespeicherte Daten werden nicht gelöscht.</p>}

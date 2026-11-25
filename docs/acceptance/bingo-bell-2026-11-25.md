@@ -160,3 +160,10 @@ eigene Constraintzeilen; die ursprünglichen PK/FK/CHECK-Anzahlen werden getrenn
 von der unveränderten Spalten-/Nullabilityinventur geprüft. Beim Löschschutz ist
 zusätzlich der PostgreSQL-18-RESTRICT-Code zugelassen, gebunden an exakt dieselbe
 `fk_quiz_teams_teams`-Constraint. Rechte und Datenerhalt bleiben geprüft.
+
+
+Auch die direkte Auswahl Standard/Content im Editor einer bereits angelegten,
+noch unbenutzten Runde ist ergänzt. Übernahme kopiert den Inhalt ausdrücklich;
+bestehende Karten oder Ausgabehistorie sperren diesen Austausch. Der dazugehörige
+PostgreSQL-Test prüft Übernahme, spätere Entfernung einer unbenutzten Runde und
+Abweisung an einer Runde mit Karten.

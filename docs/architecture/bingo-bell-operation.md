@@ -91,6 +91,9 @@ die unveränderliche Medienablage. Es erzeugt kein künstliches Event und änder
 keinen Rundensnapshot des gewählten Abends. Der referenzierte Kontext bleibt für
 die Medien erhalten; Löschen/Reihenwechsel ist bei solchen Referenzen geschützt.
 
+In der Vorbereitung kann jede neue oder noch unbenutzte Runde ausdrücklich zwischen
+Standard und Content-Vorlage wechseln. Runden mit Karten-/Ausgabehistorie weisen
+diesen Austausch ab; vorhandene Entwürfe werden nicht durch Polling überschrieben.
 Übernahme einer Vorlage erzeugt eine eigene Rundenzuordnung und kopiert benötigte
 Medienbytes in den Zielabend, mit neuen Referenzen bzw. geprüfter Wiederverwendung
 identischer dort bereits gespeicherter Assets. Spätere Content-Änderungen ändern

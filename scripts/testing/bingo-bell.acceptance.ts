@@ -39,6 +39,8 @@ export async function exerciseBingoBell(db:Client,api:typeof Prep&{proof:typeof 
   // Empty removal succeeds; cards and existing references prevent removal.
   await api.writePreparation(1,{operation:'createRound',gameId:game.id,expectedSeriesId:10,revision:(await prep()).revision});
   const empty=(await prep()).rounds.at(-1)!;
+  await api.writePreparation(1,{operation:'applyTemplate',gameId:game.id,expectedSeriesId:10,revision:(await prep()).revision,roundId:empty.id,templateId:template.id});
+  assert.equal((await prep()).rounds.find(r=>r.id===empty.id)!.label,'Später geändert');
   await api.writePreparation(1,{operation:'removeRound',gameId:game.id,expectedSeriesId:10,revision:(await prep()).revision,roundId:empty.id});
   await assert.rejects(api.writePreparation(1,{operation:'removeRound',gameId:game.id,expectedSeriesId:10,revision:(await prep()).revision,roundId:copy.id}));
   const second=await api.writePreparation(1,{...request,revision:(await prep()).revision,count:14,requestId:randomUUID()});
@@ -57,12 +59,14 @@ export async function exerciseBingoBell(db:Client,api:typeof Prep&{proof:typeof 
   await api.matching.writeMatching(1,{gameId:editor.gameId,roundId:editor.roundId,templateId:editor.templateId,revision:editor.revision,config:{...editor.current,name:'Content geändert'}});
   assert.equal(JSON.stringify((await api.readPreparation(1,mediaCopyGame.id)).rounds[1].terms),copiedMapping);
   assert.notEqual(JSON.stringify((await api.content.readContentMatching(1,mediaTemplate.id)).current),original);
+  await assert.rejects(api.writePreparation(1,{operation:'applyTemplate',gameId:game.id,expectedSeriesId:10,revision:(await prep()).revision,roundId:copy.id,templateId:null}),/bereits Karten/);
   const start=await api.eventRun.startEventRun(1,{gameId:game.id,requestId:randomUUID(),expectedSeriesId:10,preparationRevision:(await prep()).revision});
   const view=()=>api.eventRun.readEventModeration(1,game.id,start.runId);
   const first=(await view()).live!,card=first.cards[0];
   assert.equal(await api.eventRun.resolveEveningCard(1,game.id,card.code.toLowerCase()),card.id);
   assert.equal(await api.eventRun.resolveEveningCard(1,game.id,card.shortCode!),card.id);
   await assert.rejects(api.eventRun.resolveEveningCard(1,game.id,'BG-UNKNOWN'),/CARD_NOT_FOUND/);
+  await assert.rejects(api.eventRun.resolveEveningCard(1,game.id,'A-'+'9'.repeat(40)),/CARD_NOT_FOUND/);
   const oldCard=before[0];if(oldCard)await assert.rejects(api.eventRun.resolveEveningCard(1,game.id,oldCard.printed_code),/OLD_CARD|CARD_NOT_FOUND/);
   const checkRequest={gameId:game.id,runId:start.runId,requestId:randomUUID(),revision:first.revision,command:{kind:'check' as const,cardId:card.id,context:first.callContext}};
   await api.eventRun.commandEventRun(1,checkRequest);await api.eventRun.commandEventRun(1,checkRequest);

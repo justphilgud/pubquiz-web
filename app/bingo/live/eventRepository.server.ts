@@ -191,7 +191,7 @@ export async function resolveEveningCard(userId:number,gameId:string,code:string
  return prisma.$transaction(async tx=>{
   await tx.$executeRaw`SET TRANSACTION READ ONLY`;
   const {game}=await preparationContext(tx,userId,gameId);
-  const rows=await tx.$queryRaw<{id:string;game_id:string;ordinal:number;prefix:number;printed_code:string}[]>`SELECT c.id,l.game_id,c.ordinal,l.prefix,c.printed_code FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_series_labels l ON l.series_id=c.series_id JOIN pubquiz.game_drafts g ON g.id=l.game_id WHERE g.eventreihe_id=${game.eventreihe_id} AND (upper(c.printed_code)=${normalized} OR c.id::text=${normalized.toLowerCase()} OR (l.prefix=${/^([A-Z]+)-/.test(normalized)?shortPrefix(normalized.split('-')[0]):0} AND c.ordinal=${/^[A-Z]+-\d+$/.test(normalized)?Number(normalized.split('-')[1]):0}))`;
+  const rows=await tx.$queryRaw<{id:string;game_id:string;ordinal:number;prefix:number;printed_code:string}[]>`SELECT c.id,l.game_id,c.ordinal,l.prefix,c.printed_code FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_series_labels l ON l.series_id=c.series_id JOIN pubquiz.game_drafts g ON g.id=l.game_id WHERE g.eventreihe_id=${game.eventreihe_id} AND (upper(c.printed_code)=${normalized} OR c.id::text=${normalized.toLowerCase()} OR (l.prefix=${/^([A-Z]+)-/.test(normalized)?shortPrefix(normalized.split('-')[0]):0} AND c.ordinal=${/^[A-Z]+-\d{1,3}$/.test(normalized)?Number(normalized.split('-')[1]):0}))`;
   const matches=rows.filter(c=>[c.id,c.printed_code,shortCardCode(c.prefix,c.ordinal)].some(v=>v.toUpperCase()===normalized));
   const current=matches.filter(c=>c.game_id===gameId);
   if(current.length>1)throw Error('AMBIGUOUS_CARD');

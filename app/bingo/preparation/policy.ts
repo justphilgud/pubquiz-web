@@ -15,6 +15,7 @@ export const denied = () => new BingoPreparationError("Bingo nicht gefunden oder
 type Base = { gameId: string; expectedSeriesId: number; revision: number };
 export type BingoCommand = Base & (
   | { operation: "createRound"; templateId?: string }
+  | { operation: "applyTemplate"; roundId:string; templateId:string|null }
   | { operation: "saveRound"; roundId: string; label: string; target: number; strategy: CardStrategy; issued: number | null }
   | { operation: "moveRound"; roundId: string; direction: -1 | 1 }
   | { operation: "removeRound"; roundId: string }
@@ -36,6 +37,7 @@ export function parseCommand(input: unknown): BingoCommand {
   let result: BingoCommand;
   switch (r.operation) {
     case "createRound": result = { ...base, operation: r.operation, ...(r.templateId===undefined?{}:{templateId:uuid(r.templateId)}) }; break;
+    case "applyTemplate": result={...base,operation:r.operation,roundId:uuid(r.roundId),templateId:r.templateId===null?null:uuid(r.templateId)};break;
     case "saveRound":
       if (typeof r.label !== "string" || !r.label.trim() || r.label.trim().length > 80) throw new BingoPreparationError("Bitte eine Bezeichnung mit 1 bis 80 Zeichen eingeben.", "label");
       if (r.strategy !== "NEW" && r.strategy !== "EXISTING") throw new BingoPreparationError("Bitte eine Kartenstrategie auswählen.", "strategy");

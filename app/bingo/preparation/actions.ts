@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { writePreparation } from "./repository.server";
 import { BingoPreparationError } from "./policy";
 
-export async function savePreparation(input: unknown): Promise<{ success: true; seriesId?: string } | { success: false; message: string; field?: string }> {
+export async function savePreparation(input: unknown): Promise<{ success: true; seriesId?: string; jobId?:string; roundLabel?:string; roundTarget?:number } | { success: false; message: string; field?: string }> {
   const { actor } = await requireActor();
   try {
     const result = await writePreparation(actor.userId, input);

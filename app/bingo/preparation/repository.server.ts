@@ -41,7 +41,7 @@ export async function writePreparation(userId: number, input: unknown) {
     if(round&&(await tx.$queryRaw<{present:string|null}[]>`SELECT to_regclass('pubquiz.bingo_event_rounds')::text present`)[0].present){
       if((await tx.$queryRaw<{round_id:string}[]>`SELECT f.round_id FROM pubquiz.bingo_event_rounds f JOIN pubquiz.bingo_live_runs r ON r.id=f.run_id WHERE f.round_id=${round.id}::uuid AND f.game_id=${game.id}::uuid AND r.status IN ('RUNNING','PAUSED') LIMIT 1`).length)throw new BingoPreparationError("Diese Runde wurde bereits gestartet. Karten, Planung und Historie bleiben unverändert.");
     }
-    let result: { seriesId?: string; jobId?:string; repeated?: boolean } = {};
+    let result: { seriesId?: string; jobId?:string;roundLabel?:string;roundTarget?:number; repeated?: boolean } = {};
     switch (command.operation) {
       case 'generateEvening': {
         const rounds=await tx.bingo_rounds.findMany({where:{game_id:game.id},orderBy:{position:'asc'},include:{series:{include:{series:{select:{id:true,code:true,card_count:true,origin_round_id:true}}}}}});
@@ -65,6 +65,13 @@ export async function writePreparation(userId: number, input: unknown) {
         const max = (await tx.bingo_rounds.aggregate({ where: { game_id: game.id }, _max: { position: true } }))._max.position ?? 0;
         const template=command.templateId?await instantiateRoundTemplate(tx,userId,game.id,command.templateId,game.eventreihe_id):null;
         await tx.bingo_rounds.create({ data: { id: randomUUID(), game_id: game.id, position: max + 1, label: template?.label??`Runde ${max + 1}`, planned_draws:template?.target??30, term_snapshot:template?.config as Prisma.InputJsonValue??undefined } }); break;
+      }
+      case 'applyTemplate': {
+        if(round!.series.length||round!.issued_count!==null||await tx.bingo_card_series.count({where:{origin_round_id:round!.id}})||await tx.bingo_issuance_changes.count({where:{round_id:round!.id}}))throw new BingoPreparationError('Diese Runde hat bereits Karten oder Ausgabehistorie. Zum Wechseln des Inhalts eine neue Runde anlegen.');
+        const template=command.templateId?await instantiateRoundTemplate(tx,userId,game.id,command.templateId,game.eventreihe_id):null;
+        const label=template?.label??round!.label,target=template?.target??round!.planned_draws;
+        await tx.$executeRaw`UPDATE pubquiz.bingo_rounds SET label=${label},planned_draws=${target},term_snapshot=${template?.config?JSON.stringify(template.config):null}::jsonb WHERE id=${round!.id}::uuid AND game_id=${game.id}::uuid`;
+        result={roundLabel:label,roundTarget:target};break;
       }
       case "saveRound": {
         if (command.strategy === "NEW" && round!.series.some(s => s.series.origin_round_id !== round!.id)) throw new BingoPreparationError("Für neue Karten zuerst die ausdrücklich zugeordneten fremden Serien entfernen.", "strategy");
