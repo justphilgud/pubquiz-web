@@ -54,6 +54,7 @@ test('Bingo checks: 7×4 grid/history, mobile containment, fresh input focus, ex
   socket.onmessage=e=>{const m=JSON.parse(String(e.data));if(!m.id)return;const p=pending.get(m.id);pending.delete(m.id);if(m.error)p?.reject(Error(m.error.message));else p?.resolve(m.result);};
   const call=(method:string,params:Record<string,unknown>,sessionId?:string)=>new Promise<Reply>((resolve,reject)=>{const n=++id;pending.set(n,{resolve,reject});socket!.send(JSON.stringify({id:n,method,params,sessionId}));});
   const {targetId}=await call('Target.createTarget',{url:`http://127.0.0.1:${address.port}`}),{sessionId}=await call('Target.attachToTarget',{targetId,flatten:true});
+  for(let attempt=0;attempt<200;attempt++){const ready=await call('Runtime.evaluate',{expression:'typeof window.run==="function"',returnByValue:true},sessionId);if(ready.result?.value)break;await new Promise(r=>setTimeout(r,25));}
   for(const [width,height] of [[1366,768],[390,844]]){
    await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<500},sessionId);
    const result=await call('Runtime.evaluate',{expression:'window.run()',awaitPromise:true,returnByValue:true},sessionId);assert.equal(result.exceptionDetails,undefined,JSON.stringify(result));assert.deepEqual(result.result?.value,{width,height,cards:32,columns:7,visibleRows:4,passed:true});
