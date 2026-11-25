@@ -42,7 +42,7 @@ Wesentliche Dateien:
 | TypeScript | `npm run typecheck` bestanden |
 | ESLint | Alle 39 damals neuen/geänderten Implementierungs- und Testdateien bestanden; zusätzliche gezielte Korrekturen werden erneut geprüft |
 | Fachlogik | Grenzen 1/15/16/30/31/45/46/60/61/75, ungültige Schreibweisen, alle vier Ergebnisse, Snapshotgrenzen, Wiederholungen und ausdrückliche Entscheidung/Korrektur bestanden |
-| Board | Bestehender echter Chromium-Test: 30 Fälle, beide Marken, 1280×600 / 1366×768 / 1920×1080, eigene Farben, Text, Skalierung, Vollbild, Fontladung und Polling bestanden |
+| Board | Echter Chromium-Test: 30 Grundfälle, beide Marken, 1280×600 / 1366×768 / 1920×1080, eigene Farben, Text, Skalierung, Vollbild, Fontladung und Polling bestanden. Zusätzlich großes Bild an allen drei Auflösungen: geladen, vollständig im Medienbereich, keine Überlagerung mit Zahlenanzeige/Board, aktuelle Zahl I20 weiterhin sichtbar. |
 | Karten/Druck-Bestand | `test:bingo-preparation`: 40 Tests bestanden, einschließlich SRA3, Originalfonts/-logos, Textkarten und historischen Exporten |
 | Neue Browserregression | 1366×768 und 390×844 tatsächlich gemessen: 32 Karten, sieben Spalten, achte Karte in Zeile zwei, vier Reihen, weitere Ergebnisse erhalten, kein Seitenüberlauf, Wiederholung/Fokus, explizite Entscheidung und Uhr/Pause bestanden |
 | PostgreSQL | Echter isolierter Gesamtlauf bestanden: additive leere/befüllte Migration, bestehende Rechte/CAS/Parallelfälle, Vorlagenkopien einschließlich Musikmedien, unabhängige Content-Bearbeitung, sichere Entfernung, atomarer Abendauftrag und Retry |

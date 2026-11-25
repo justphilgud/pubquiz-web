@@ -11,6 +11,9 @@ Linien und Gewinnstufen. `numberDisplay` validiert die Schreibweise der Eingabe
 und leitet B/I/N/G/O ab. `BingoBoard` besitzt weiterhin Messung, Darstellung,
 Originalassets und reduzierte Bewegung. Numerische Präsentation zeigt die aktuelle
 Zahl oben mittig; Matching behält seinen eigenständigen Medien-/Auflösungsvertrag.
+Bei Bild, Video und Audio liegen Zahlenanzeige, begrenzter Medienbereich und Board
+in getrennten Zeilen. Die Größenmessung verwendet den tatsächlich verbleibenden
+Boardbereich; große Medien dürfen Zahlenanzeige und Zahlenraster nicht überlagern.
 
 `EventModerationPanel` behält Polling, Verbindungssperre, CAS, technische Retries,
 explizite Bestätigung und Rundenzustände. `CardChecksPanel`, `DrawCorrection` und
