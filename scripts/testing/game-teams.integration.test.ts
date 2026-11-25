@@ -61,6 +61,7 @@ test("additive game-team migration and real Actions with isolated PostgreSQL on 
   // guard. Keep this isolated repository fixture at the current additive schema;
   // all existing team/migration preservation assertions below remain unchanged.
   await db.query(readFileSync("prisma/migrations/20261027180000_bingo_preparation/migration.sql", "utf8"));
+  await db.query(readFileSync("prisma/migrations/20261125120000_bingo_round_content/migration.sql", "utf8"));
 
   assert.deepEqual((await db.query("SELECT to_jsonb(q) data FROM pubquiz.quiz q WHERE quiz_id=11")).rows[0].data,before);
   assert.deepEqual((await db.query("SELECT * FROM pubquiz.benutzer_reihenrollen ORDER BY benutzer_id")).rows,rolesBefore);
@@ -157,12 +158,12 @@ test("additive game-team migration and real Actions with isolated PostgreSQL on 
   assert.equal((await api.readGameTeams(1,'BINGO',race.id)).assigned.length,raceRow.game.seriesId===10?1:0);
   const columns=(await db.query(COLUMN_SQL)).rows[0].coalesce as Column[]; auditColumns(columns);
   assert.equal(columns.filter(c=>c.table==='game_team_assignments'&&c.schema==='pubquiz').length,4);
-  const catalog=(await db.query(CATALOG_SQL)).rows[0].json_build_object as {constraints:{table:string}[]};
-  assert.equal(catalog.constraints.filter(c=>c.table==='game_team_assignments').length,3);
+  const catalog=(await db.query(CATALOG_SQL)).rows[0].json_build_object as {constraints:{table:string;type:string}[]};
+  assert.equal(catalog.constraints.filter(c=>c.table==='game_team_assignments'&&c.type!=='n').length,3);
   const row=(await db.query('SELECT to_jsonb(t) data FROM pubquiz.game_team_assignments t')).rows[0].data;
   assert.doesNotThrow(()=>inspectRow(row,new Set(),'pubquiz','game_team_assignments'));
   await assert.rejects(db.query('INSERT INTO pubquiz.game_team_assignments(id,game_id,team_id)VALUES(gen_random_uuid(),$1,1001)',[karaoke.id]),{code:'23505'});
-  await assert.rejects(db.query('DELETE FROM pubquiz.teams WHERE team_id=1001'),{code:'23503'});
+  await assert.rejects(db.query('DELETE FROM pubquiz.teams WHERE team_id=1001'),(error:unknown)=>{const e=error as {code?:string;constraint?:string};return ['23503','23001'].includes(e.code??'')&&e.constraint==='fk_quiz_teams_teams';});
   assert.deepEqual((await db.query('SELECT to_jsonb(t) data FROM pubquiz.teams t WHERE team_id=1001')).rows[0].data,profileBefore);
   assert.deepEqual((await db.query('SELECT jsonb_agg(to_jsonb(t) ORDER BY quiz_team_session_id) data FROM pubquiz.quiz_team_sessions t')).rows[0].data,sessionsBefore);
   assert.deepEqual((await db.query('SELECT jsonb_agg(to_jsonb(t)) data FROM pubquiz.quiz_teams t')).rows[0].data,quizTeamsBefore);

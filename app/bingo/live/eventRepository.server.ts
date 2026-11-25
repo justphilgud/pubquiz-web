@@ -18,7 +18,7 @@ import {readPreparation} from "../preparation/readPreparation.server";
 import {frozenMatching,readMatchingEntry,audienceMatching} from '../matching/repository.server';
 type Tx=Prisma.TransactionClient;
 type Row={id:string;game_id:string;round_id:string;eventreihe_id:number;status:string;revision:number;started_at:Date;round_snapshot:unknown;design_snapshot:SharedDesign;audience_key:string;start_request_hash:string};
-type CardRow={terms?:unknown;round_id:string;id:string;series_id:string;cells:unknown;layout_hash:string;printed_code:string;ordinal:number;prefix:number};
+type CardRow={round_id:string;id:string;series_id:string;cells:unknown;layout_hash:string;printed_code:string;ordinal:number;prefix:number};
 import {parseEventEnvelope,type Envelope} from "./eventEnvelope";
 const integer=(v:unknown)=>{if(!Number.isSafeInteger(v)||Number(v)<0)throw Error("INVALID_REVISION");};
 async function clock(tx:Tx){return (await tx.$queryRaw<{at:Date}[]>`SELECT clock_timestamp()::timestamptz(3) AS at`)[0].at.getTime();}
@@ -40,8 +40,8 @@ async function load(tx:Tx,row:Row){
  if(!frozenRows.length||frozenRows[0].opened_at.getTime()!==row.started_at.getTime()||canonical(frozenRows[0].round_snapshot)!==canonical(first))throw Error("INVALID_FROZEN_ROUND");
  const events=await tx.$queryRaw<{request_id:string;request_hash:string;revision:number;actor_id:number;occurred_at:Date;command:unknown;event_round_id:string}[]>`SELECT request_id,request_hash,revision,actor_id,occurred_at,command,event_round_id FROM pubquiz.bingo_live_events WHERE run_id=${row.id}::uuid ORDER BY revision`;
  const checkedIds=[...new Set(events.flatMap(e=>{const c=parseEventEnvelope(e.command).input.command;return c.kind==='check'?[c.cardId]:[];}))];
- const checkRows=checkedIds.length?await tx.$queryRaw<CardRow[]>`SELECT c.id,c.series_id,c.cells,c.layout_hash,c.printed_code,c.ordinal,l.prefix,s.print_snapshot->'terms' AS terms FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_series_labels l ON l.series_id=c.series_id JOIN pubquiz.bingo_card_series s ON s.id=c.series_id WHERE l.game_id=${row.game_id}::uuid AND c.id=ANY(${checkedIds}::uuid[])`:[];
- const checkCards=checkRows.map(c=>({...storedCard(c),terms:c.terms==null?null:parseTermSet(c.terms),shortCode:shortCardCode(c.prefix,c.ordinal)}));
+ const checkRows=checkedIds.length?await tx.$queryRaw<CardRow[]>`SELECT c.id,c.series_id,c.cells,c.layout_hash,c.printed_code,c.ordinal,l.prefix FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_series_labels l ON l.series_id=c.series_id WHERE l.game_id=${row.game_id}::uuid AND c.id=ANY(${checkedIds}::uuid[])`:[];
+ const checkCards=checkRows.map(c=>({...storedCard(c),shortCode:shortCardCode(c.prefix,c.ordinal)}));
  if(checkCards.length!==checkedIds.length)throw Error('INVALID_FROZEN_CARDS');
  if(events.length!==row.revision)throw Error("INVALID_EVENT_HISTORY");
  let state=initialEventRun(row.id,row.game_id,first,row.started_at.getTime()),previousAt=row.started_at.getTime();

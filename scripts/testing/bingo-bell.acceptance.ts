@@ -3,6 +3,7 @@ import {randomUUID} from 'node:crypto';
 import {mkdirSync,writeFileSync} from 'node:fs';
 import {PDFDocument} from 'pdf-lib';
 import type {Client} from 'pg';
+import type * as Proof from '@/app/bingo/live/readCheckedCard.server';
 import type * as Audit from '@/app/bingo/preparation/cardAudit.server';
 import type * as Content from '@/app/bingo/content/repository.server';
 import type * as Evening from '@/app/bingo/preparation/eveningPrint.server';
@@ -12,7 +13,7 @@ import type * as Matching from '@/app/bingo/matching/repository.server';
 import type * as Event from '@/app/bingo/live/eventRepository.server';
 import {validateCard} from '@/app/bingo/core/cards';
 
-export async function exerciseBingoBell(db:Client,api:typeof Prep&{audit:typeof Audit;content:typeof Content;evening:typeof Evening;creation:typeof Creation;eventRun:typeof Event;matching:typeof Matching}) {
+export async function exerciseBingoBell(db:Client,api:typeof Prep&{proof:typeof Proof;audit:typeof Audit;content:typeof Content;evening:typeof Evening;creation:typeof Creation;eventRun:typeof Event;matching:typeof Matching}) {
   const before=(await db.query('SELECT id,layout_hash,cells,printed_code FROM pubquiz.bingo_cards ORDER BY id')).rows;
   const config={version:1,name:'Buchstaben',publication:'DIRECT',entries:Array.from({length:75},(_,i)=>({number:i+1,text:`Wort ${i+1}`}))};
   const template=await api.content.saveRoundTemplate(1,{seriesId:10,name:'Spezialrunde',target:30,config});
@@ -69,6 +70,11 @@ export async function exerciseBingoBell(db:Client,api:typeof Prep&{audit:typeof 
   await api.eventRun.commandEventRun(1,{gameId:game.id,runId:start.runId,requestId:randomUUID(),revision:v.revision,command:{kind:'draw',number:1}});
   v=(await view()).live!;await assert.rejects(api.eventRun.commandEventRun(1,{...checkRequest,requestId:randomUUID(),revision:v.revision}),/CALL_CONTEXT_CONFLICT/);
   await assert.rejects(api.eventRun.commandEventRun(1,{...checkRequest,requestId:randomUUID(),revision:v.revision,command:{kind:'check',cardId:randomUUID(),context:v.callContext}}),/CARD_OR_CALL_NOT_FOUND/);
+  const special=(await db.query('SELECT c.id,c.printed_code FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_card_series s ON s.id=c.series_id WHERE s.game_id=$1 AND s.origin_round_id=$2 LIMIT 1',[game.id,copy.id])).rows[0];
+  assert.equal(await api.eventRun.resolveEveningCard(1,game.id,special.printed_code),special.id);
+  v=(await view()).live!;await api.eventRun.commandEventRun(1,{...checkRequest,requestId:randomUUID(),revision:v.revision,command:{kind:'check',cardId:special.id,context:v.callContext}});
+  assert.deepEqual(await api.proof.readCheckedCardContent(1,game.id,special.id),copy.terms);
+  assert.ok((await view()).live!.checkCards.every(card=>!('terms' in card)),'full labels must never enter regular status polling');
   const counts=(await db.query('SELECT count(*)::int AS n FROM pubquiz.bingo_cards')).rows[0].n;
   const invalid=(await db.query(`SELECT c.id,c.cells FROM pubquiz.bingo_cards c`)).rows.filter(c=>{try{validateCard(c.cells);return false;}catch{return true;}});
   assert.equal(invalid.length,0);

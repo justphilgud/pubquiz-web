@@ -52,7 +52,7 @@ test("shared design additive migration, real policies, inheritance and frozen ru
   `);
   // Current runtime has additive print/quiz-mode columns. Include them before recording
   // the baseline, preserving the original SharedDesign migration assertions.
-  for(const name of ['20261027180000_bingo_preparation','20261027210000_bingo_print_design','20261027213000_bingo_label_allocation','20261119120000_podium_snapshot','20261119150000_add_quiz_mode'])await db.query(readFileSync(`prisma/migrations/${name}/migration.sql`,'utf8'));
+  for(const name of ['20261027180000_bingo_preparation','20261027210000_bingo_print_design','20261027213000_bingo_label_allocation','20261125120000_bingo_round_content','20261119120000_podium_snapshot','20261119150000_add_quiz_mode'])await db.query(readFileSync(`prisma/migrations/${name}/migration.sql`,'utf8'));
   const quizBefore=(await db.query('SELECT to_jsonb(t) data FROM pubquiz.quiz t')).rows[0].data;
   const gameBefore=(await db.query('SELECT to_jsonb(t) data FROM pubquiz.game_drafts t ORDER BY id')).rows.map(r=>r.data);
   const linksBefore=(await db.query('SELECT to_jsonb(t) data FROM pubquiz.game_team_assignments t')).rows;

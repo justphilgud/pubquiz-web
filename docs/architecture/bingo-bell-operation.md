@@ -52,7 +52,8 @@ bleiben im Journal und durch Scrollen erreichbar. Kein/Ein/Doppel/Triple:
 Rot/Grün/Blau/Gelb plus Klartext/Symbole. Die ausdrücklich verlangten semantischen
 Ergebnisfarben erweitern bewusst die sonst reduzierte Moderationspalette.
 
-Jede Prüfung öffnet in einem neuen Tab den ursprünglichen Ziehungsstand, Zeitpunkt,
+Vollständige Beschriftungen werden nur beim Öffnen eines Kartennachweises geladen,
+nicht im Statuspolling. Jede Prüfung öffnet in einem neuen Tab den ursprünglichen Ziehungsstand, Zeitpunkt,
 Kennung, vollständige Karte einschließlich Textzuordnung und markierte Treffer.
 Die nach aktuellen Korrekturen neu berechnete Auswertung an derselben Prüfgrenze
 steht getrennt daneben. Spätere Ziehungen verändern keine frühere Prüfgrenze.

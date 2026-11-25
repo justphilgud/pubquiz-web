@@ -40,7 +40,7 @@ Wesentliche Dateien:
 | --- | --- |
 | Prisma | Client erzeugt, Schema validiert |
 | TypeScript | `npm run typecheck` bestanden |
-| ESLint | Neue/geänderte Implementierungs- und Testdateien geprüft; abschließender Gesamtstand wird beim PR ergänzt |
+| ESLint | Alle 39 damals neuen/geänderten Implementierungs- und Testdateien bestanden; zusätzliche gezielte Korrekturen werden erneut geprüft |
 | Fachlogik | Grenzen 1/15/16/30/31/45/46/60/61/75, ungültige Schreibweisen, alle vier Ergebnisse, Snapshotgrenzen, Wiederholungen und ausdrückliche Entscheidung/Korrektur bestanden |
 | Board | Bestehender echter Chromium-Test: 30 Fälle, beide Marken, 1280×600 / 1366×768 / 1920×1080, eigene Farben, Text, Skalierung, Vollbild, Fontladung und Polling bestanden |
 | Karten/Druck-Bestand | `test:bingo-preparation`: 40 Tests bestanden, einschließlich SRA3, Originalfonts/-logos, Textkarten und historischen Exporten |
@@ -136,3 +136,27 @@ Löschung von Historie.
 
 Kein Production-Backup, Production-Deployment, Eingriff in Quizdaten oder echte
 Bewertungen im Rahmen dieser Umsetzung.
+
+
+## CI-Korrektur am ersten PR-Stand
+
+Der erste Push `17789617` machte zwei notwendige Fixture-Erweiterungen sichtbar:
+Die historische **vor Bingo** liegende Restore-Probe muss auch die drei neuen
+Modelle ausdrücklich ausschließen; ihre bestehende Vollständigkeitsassertion
+bleibt erhalten. Aktuelle Game-Draft-/Team-/Shared-Design-Integration benötigt die
+neue additive Migration, bevor aktueller Anwendungscode seine Content-Referenzen
+prüft. Die alten Migrations-/Rechte-/Snapshotassertionen bleiben unverändert.
+Zusätzlich werden vollständige Textzuordnungen ausschließlich beim Öffnen eines
+Kartennachweises geladen, nicht pro geprüfter Karte in regelmäßigen Statusabrufen.
+
+Der zusätzliche lokale Posttest-Lauf traf im vorhandenen Content-Suchbrowsertest
+auf eine zeitabhängig fehlende Schaltfläche; der unveränderte Test besteht separat.
+Diese lokalen Wiederholungen ersetzen keine erfolgreiche CI am endgültigen Commit.
+
+
+Die drei aktuellen Game-/Team-/Shared-Design-Fixtures bestehen nach Aufnahme der
+Migration auch lokal (4/4). Der lokale PostgreSQL-18-Katalog führt NOT NULL als
+eigene Constraintzeilen; die ursprünglichen PK/FK/CHECK-Anzahlen werden getrennt
+von der unveränderten Spalten-/Nullabilityinventur geprüft. Beim Löschschutz ist
+zusätzlich der PostgreSQL-18-RESTRICT-Code zugelassen, gebunden an exakt dieselbe
+`fk_quiz_teams_teams`-Constraint. Rechte und Datenerhalt bleiben geprüft.
