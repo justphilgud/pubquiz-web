@@ -47,6 +47,9 @@ jobs:
             candidate: 72ea417c4857fedc3d1e59b443ddff5298c8665f
           - baseline: 93f074973c4bf73ed4bf6c489d375682f510ba82
             candidate: 2d1fce671ad7d670a015dd6f7abd91cfa231926f
+          - baseline: 93f074973c4bf73ed4bf6c489d375682f510ba82
+            candidate: 6fa37aa5114eabeb9fa6c58f6fd30bd6a295d67a
+            artifact_suffix: -6fa37aa5114eabeb9fa6c58f6fd30bd6a295d67a
     services:
       postgres:
         image: postgres:17
@@ -81,7 +84,7 @@ jobs:
           node --import tsx scripts/operations/production-preflight-schema-build.ts
       - uses: actions/upload-artifact@v4
         with:
-          name: schema-reference-proof-${{ matrix.baseline }}
+          name: schema-reference-proof-${{ matrix.baseline }}${{ matrix.artifact_suffix || '' }}
           path: |
             expected-schema.json
             delta-test.json

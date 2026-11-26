@@ -1,13 +1,13 @@
 import {execFileSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
-import {BINGO_EVENING_PLAN as plan,assertBingoEveningManifest} from './production-preflight-bingo-evening-plan';
+import {assertBingoEveningManifest} from './production-preflight-bingo-evening-plan';
 import {migrationFiles} from './production-preflight';
 import {compareFullSchema,DIAGNOSTIC_COLUMNS_SQL,DIAGNOSTIC_CATALOG_SQL,SCHEMA_OBJECTS_SQL,type SchemaEvidence} from './production-preflight-schema';
 
 /** The existing network-isolated PostgreSQL builder supplies SQL; no live credentials. */
 export function testBingoEveningDelta(sql:(v:string|Buffer)=>string,query:(v:string)=>unknown,baselineSha:string,candidateSha:string,manifest:SchemaEvidence['manifest'],columns:unknown,catalog:unknown,objects:unknown){
  const show=(sha:string,path:string)=>execFileSync('git',['show',`${sha}:${path}`],{encoding:'utf8'});
- assertBingoEveningManifest(baselineSha,candidateSha,manifest,migrationFiles(candidateSha),show(baselineSha,'prisma/schema.prisma'),show(candidateSha,'prisma/schema.prisma'));
+ const plan=assertBingoEveningManifest(baselineSha,candidateSha,manifest,migrationFiles(candidateSha),show(baselineSha,'prisma/schema.prisma'),show(candidateSha,'prisma/schema.prisma'));
  const migration=show(candidateSha,`prisma/migrations/${plan.migrations[0].name}/migration.sql`);
  const readSchema=()=>({major:17,columns:query(DIAGNOSTIC_COLUMNS_SQL),catalog:query(DIAGNOSTIC_CATALOG_SQL),objects:query(SCHEMA_OBJECTS_SQL)});
  const expected={baselineSha,manifest,major:17,columns,catalog,objects};
