@@ -1,3 +1,4 @@
+import {readCeremony} from "../ceremonyRepository.server";
 import "server-only";
 import {selectedRun,readEventModeration,readEventAudience,eventStorageAvailable} from "./eventRepository.server";
 import { randomUUID } from "node:crypto";
@@ -154,7 +155,7 @@ export async function readAudience(userId: number, key: string) {
 }
 export type ModerationView = Awaited<ReturnType<typeof readLegacyLive>>;
 export type AudienceContent={kind:'TEXT';text:string}|{kind:'AUDIO'|'VIDEO'|'IMAGE';url:string;answer?:string};
-export type AudienceView = {serverAt?:number;content?:AudienceContent;playback?:import('./eventRun').BingoPlayback;termMode?:boolean;labels?:Record<string,string|null>} & Omit<Awaited<ReturnType<typeof readAudience>>, "assetBase"> & { assetBase: string | null; phase?:"BETWEEN" };
+export type AudienceView = {ceremony?:import("@/app/rendering/ceremony/ceremony").CeremonyState;winner?:import("@/app/rendering/ceremony/CeremonySlide").CeremonyWinner|null;eventTitle?:string;roundNumber?:number;serverAt?:number;content?:AudienceContent;playback?:import('./eventRun').BingoPlayback;termMode?:boolean;labels?:Record<string,string|null>} & Omit<Awaited<ReturnType<typeof readAudience>>, "assetBase"> & { assetBase: string | null; phase?:"BETWEEN" };
 /** Stable authenticated entry can already be opened before the conscious start. */
 export async function readGameAudience(userId: number, gameId: string): Promise<AudienceView> {
   assertUuid(gameId);
@@ -163,11 +164,11 @@ export async function readGameAudience(userId: number, gameId: string): Promise<
     const [row] = await tx.$queryRaw<{ audience_key: string }[]>`SELECT audience_key FROM pubquiz.bingo_live_runs WHERE game_id=${gameId}::uuid ORDER BY started_at DESC,id DESC LIMIT 1`;
     if (row) return { key: row.audience_key };
     const design = (await resolveSharedDesign(tx, game.shared_design_template_id, series)).design;
-    return { design, title: game.titel };
+    return { ceremony:await readCeremony(tx,gameId),design, title: game.titel };
   }, { isolationLevel: "RepeatableRead" });
   if ("key" in result && result.key) return readAudience(userId, result.key);
   if (!("design" in result) || !result.design) fail("DESIGN_NOT_FOUND");
-  return { id: gameId, revision: 0, startedAt: 0, status: "PREPARED", label: result.title!, target: 30, draws: [], claims: [], design: result.design, assetBase: null };
+  return { ceremony:result.ceremony,id: gameId, revision: 0, startedAt: 0, status: "PREPARED", label: result.title!, target: 30, draws: [], claims: [], design: result.design, assetBase: null };
 }
 export async function readLiveAsset(userId: number, key: string, kind: string) {
   assertUuid(key);

@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import {isPrizeSlide} from '../ceremony/prizeSequence';
 import { readFileSync } from "node:fs";
 import { runInNewContext } from "node:vm";
 import ts from "typescript";
@@ -68,6 +69,7 @@ function navigationHarness(previousKey: string, previousIndex: number, expired =
     closeBlockInteractions: async (_: unknown, _quiz: number, block: number) => { closedBlocks.push(block); },
   });
   const dependencies: Record<string, unknown> = {
+    "@/app/rendering/ceremony/prizeSequence": {isPrizeSlide},
     "@/app/lib/prisma": { prisma: { $transaction: (work: (db: unknown) => unknown) => work(tx) } },
     "../../actions": { getQuizPraesentation: async () => quiz },
     "./buildPraesentationSlides": { buildPraesentationSlides, getPresentationSlideKey, isPodiumRevealSlide },

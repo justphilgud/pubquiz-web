@@ -1,5 +1,7 @@
 # Bingoglöckchen: Anzeige, Kartenprüfung, Content und Abenddruck
 
+Erweiterung 26.11.2026: [Bingoabend und Veranstaltungsdramaturgie](bingo-evening-dramaturgy.md) ersetzt für die neue Bedienung das Moderationsraster durch die sortierbare Historie, entkoppelt Ziehungen von offenen Rufen und ergänzt Rundenfarben, Wahrscheinlichkeit, Veranstaltungsrahmen und Lose. Die nachfolgenden Abschnitte beschreiben den bisherigen Ausgangsvertrag.
+
 Stand: 25.11.2026. Ergänzt die AP1-, Vorbereitungs-, V2-Event-, Matching- und
 Druckverträge. Production und Änderungen an vorhandenen produktiven Karten sind
 nicht Bestandteil der Implementierungsabnahme.

@@ -1,0 +1,21 @@
+{
+  "surface": "actual Next.js HTTP/server actions/PostgreSQL",
+  "origin": "http://localhost:3068",
+  "checks": [
+    "actual credential login",
+    "actual event creation",
+    "12 immutable generated cards",
+    "real card check/explicit confirmation/one ticket",
+    "repeat check without duplicate ticket",
+    "manual pause, independent check and resume",
+    "historical correction retains confirmation and flags ticket review",
+    "further real draw despite required claim review",
+    "explicit re-review restores the same ticket without renumbering",
+    "actual completed round/event and physical raffle with hidden/revealed winner and ceremony"
+  ],
+  "gameId": "3e35e67a-c299-49fc-a1bb-4e7437b60af8",
+  "runId": "b194c17d-0644-4262-82fe-abb5985fa892",
+  "finalRevision": 17,
+  "checkId": "1ef4ddc8-c20b-412e-aa5f-c9edf44d1235",
+  "passed": true
+}

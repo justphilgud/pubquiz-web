@@ -31,13 +31,13 @@ export async function exerciseBingoEvent(db:Client,api:typeof EventApi,creation:
  const atCall=(await view()).live!,a=await request({kind:"call",stage:"BINGO",context:atCall.callContext}),b={...a,requestId:randomUUID(),command:{kind:"call" as const,stage:"DOUBLE" as const,context:atCall.callContext}};
  await Promise.all([api.commandEventRun(1,a),api.commandEventRun(1,b)]);assert.equal((await view()).live!.state.calls.length,2);
  await api.commandEventRun(1,a);assert.equal((await view()).live!.state.calls.length,2);
- await assert.rejects(send({kind:"draw",number:75}),/OPEN_CLAIMS/);await assert.rejects(send({kind:"closeRound"}),/OPEN_CLAIMS/);
+ await send({kind:"draw",number:74});await assert.rejects(send({kind:"closeRound"}),/OPEN_CLAIMS/);
  for(const call of [a,b])await send({kind:"identify",callId:call.requestId,cardId:card.id});
  await send({kind:"decide",callId:a.requestId,action:"CONFIRM",reason:"Linie"});await send({kind:"decide",callId:b.requestId,action:"REJECT",reason:"Nur eine Linie"});
  const prior=(await view()).live!,draw=prior.state.run.rounds[0].draws[0];
  await send({kind:"correct",drawId:draw.id,number:Array.from({length:75},(_,i)=>i+1).find(n=>!prior.state.run.rounds[0].draws.some(d=>d.number===n))!,reason:"Frühere Ziehung korrigiert"});
  const corrected=(await view()).live!;assert.equal(corrected.state.run.rounds[0].draws[0].id,draw.id);assert.equal(corrected.state.run.rounds[0].draws.at(-1)?.number,prior.state.run.rounds[0].draws.at(-1)?.number);assert.equal(corrected.blocked,true);
- await assert.rejects(send({kind:"draw",number:74}),/OPEN_CLAIMS/);
+ await send({kind:"draw",number:73});
  await assert.rejects(api.commandEventRun(1,{...a,requestId:randomUUID()}),/CALL_CONTEXT_CONFLICT/);
  await send({kind:"decide",callId:a.requestId,action:"REVOKE",reason:"Nachprüfung"});
  await send({kind:"closeRound"});const history=JSON.stringify((await view()).live!.state.run.rounds[0]);

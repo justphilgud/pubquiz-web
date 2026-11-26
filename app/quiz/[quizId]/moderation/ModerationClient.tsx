@@ -1,5 +1,7 @@
 "use client";
 
+import {isPrizeSlide,prizeRevealOrder} from "@/app/rendering/ceremony/prizeSequence";
+import {parsePrizeSlots} from "@/app/quiz/fixedSlidesPolicy";
 import { getMemeAdvanceLabel } from "@/app/quiz/memeVoting";
 import { nextIndexAfterSkippedMeme } from "@/app/quiz/memeNavigationPolicy";
 import { NavigationTransition } from "@/app/quiz/navigationTransition";
@@ -593,6 +595,7 @@ export default function ModerationClient({
       return;
     }
 
+    if(isPrizeSlide(aktuellerSlide)&&endstandRevealCount<prizeRevealOrder(parsePrizeSlots(quiz.intro_preise)).length){await setEndstandRevealCount({quizId,revealCount:endstandRevealCount+1});return;}
     if (isPodiumRevealSlide(aktuellerSlide)) {
       const punktestand = await getPraesentationPunktestand(quizId);
       const reveal = resolvePodiumReveal(
@@ -1081,7 +1084,7 @@ export default function ModerationClient({
               {(aktuellerSlide?.typ === "frage" || aktuellerSlide?.typ === "aufloesung") && aktuellerSlide.frage.templateId === "meme_beschriften" && <MemeFlowGuide />}
               <ModerationToolbar
                 navigationPending={transitionPending}
-                nextLabel={aktuellerSlide?.typ === "frage" && aktuellerSlide.frage.templateId === "meme_beschriften"
+                nextLabel={isPrizeSlide(aktuellerSlide)&&endstandRevealCount<prizeRevealOrder(parsePrizeSlots(quiz.intro_preise)).length ? "Nächsten Preis aufdecken" : aktuellerSlide?.typ === "frage" && aktuellerSlide.frage.templateId === "meme_beschriften"
                   ? memePresentationState
                     ? getMemeAdvanceLabel({ ...memePresentationState, hasResult: Boolean(memePresentationState.result) })
                     : memeState?.state === "OPEN" || memeState?.state === "COUNTDOWN"

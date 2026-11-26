@@ -260,6 +260,7 @@ export type game_draftsWhereInput = {
   status?: Prisma.StringFilter<"game_drafts"> | string
   created_at?: Prisma.DateTimeFilter<"game_drafts"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"game_drafts"> | Date | string
+  ceremony?: Prisma.XOR<Prisma.Game_ceremoniesNullableScalarRelationFilter, Prisma.game_ceremoniesWhereInput> | null
   bingo_round_templates?: Prisma.Bingo_round_templatesListRelationFilter
   bingo_print_jobs?: Prisma.Bingo_print_jobsListRelationFilter
   event_creation?: Prisma.XOR<Prisma.Bingo_event_creation_requestsNullableScalarRelationFilter, Prisma.bingo_event_creation_requestsWhereInput> | null
@@ -284,6 +285,7 @@ export type game_draftsOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   created_at?: Prisma.SortOrder
   updated_at?: Prisma.SortOrder
+  ceremony?: Prisma.game_ceremoniesOrderByWithRelationInput
   bingo_round_templates?: Prisma.bingo_round_templatesOrderByRelationAggregateInput
   bingo_print_jobs?: Prisma.bingo_print_jobsOrderByRelationAggregateInput
   event_creation?: Prisma.bingo_event_creation_requestsOrderByWithRelationInput
@@ -311,6 +313,7 @@ export type game_draftsWhereUniqueInput = Prisma.AtLeast<{
   status?: Prisma.StringFilter<"game_drafts"> | string
   created_at?: Prisma.DateTimeFilter<"game_drafts"> | Date | string
   updated_at?: Prisma.DateTimeFilter<"game_drafts"> | Date | string
+  ceremony?: Prisma.XOR<Prisma.Game_ceremoniesNullableScalarRelationFilter, Prisma.game_ceremoniesWhereInput> | null
   bingo_round_templates?: Prisma.Bingo_round_templatesListRelationFilter
   bingo_print_jobs?: Prisma.Bingo_print_jobsListRelationFilter
   event_creation?: Prisma.XOR<Prisma.Bingo_event_creation_requestsNullableScalarRelationFilter, Prisma.bingo_event_creation_requestsWhereInput> | null
@@ -370,6 +373,7 @@ export type game_draftsCreateInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSourceInput
   bingo_print_jobs?: Prisma.bingo_print_jobsCreateNestedManyWithoutGameInput
   event_creation?: Prisma.bingo_event_creation_requestsCreateNestedOneWithoutGameInput
@@ -394,6 +398,7 @@ export type game_draftsUncheckedCreateInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSourceInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedCreateNestedManyWithoutGameInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedCreateNestedOneWithoutGameInput
@@ -416,6 +421,7 @@ export type game_draftsUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSourceNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUpdateManyWithoutGameNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUpdateOneWithoutGameNestedInput
@@ -440,6 +446,7 @@ export type game_draftsUncheckedUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSourceNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedUpdateManyWithoutGameNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedUpdateOneWithoutGameNestedInput
@@ -602,6 +609,20 @@ export type game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput = {
   deleteMany?: Prisma.game_draftsScalarWhereInput | Prisma.game_draftsScalarWhereInput[]
 }
 
+export type game_draftsCreateNestedOneWithoutCeremonyInput = {
+  create?: Prisma.XOR<Prisma.game_draftsCreateWithoutCeremonyInput, Prisma.game_draftsUncheckedCreateWithoutCeremonyInput>
+  connectOrCreate?: Prisma.game_draftsCreateOrConnectWithoutCeremonyInput
+  connect?: Prisma.game_draftsWhereUniqueInput
+}
+
+export type game_draftsUpdateOneRequiredWithoutCeremonyNestedInput = {
+  create?: Prisma.XOR<Prisma.game_draftsCreateWithoutCeremonyInput, Prisma.game_draftsUncheckedCreateWithoutCeremonyInput>
+  connectOrCreate?: Prisma.game_draftsCreateOrConnectWithoutCeremonyInput
+  upsert?: Prisma.game_draftsUpsertWithoutCeremonyInput
+  connect?: Prisma.game_draftsWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.game_draftsUpdateToOneWithWhereWithoutCeremonyInput, Prisma.game_draftsUpdateWithoutCeremonyInput>, Prisma.game_draftsUncheckedUpdateWithoutCeremonyInput>
+}
+
 export type game_draftsCreateNestedOneWithoutBingo_preparationInput = {
   create?: Prisma.XOR<Prisma.game_draftsCreateWithoutBingo_preparationInput, Prisma.game_draftsUncheckedCreateWithoutBingo_preparationInput>
   connectOrCreate?: Prisma.game_draftsCreateOrConnectWithoutBingo_preparationInput
@@ -741,6 +762,7 @@ export type game_draftsCreateWithoutEventreiheInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSourceInput
   bingo_print_jobs?: Prisma.bingo_print_jobsCreateNestedManyWithoutGameInput
   event_creation?: Prisma.bingo_event_creation_requestsCreateNestedOneWithoutGameInput
@@ -763,6 +785,7 @@ export type game_draftsUncheckedCreateWithoutEventreiheInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSourceInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedCreateNestedManyWithoutGameInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedCreateNestedOneWithoutGameInput
@@ -817,6 +840,114 @@ export type game_draftsScalarWhereInput = {
   updated_at?: Prisma.DateTimeFilter<"game_drafts"> | Date | string
 }
 
+export type game_draftsCreateWithoutCeremonyInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: string | null
+  id?: string
+  eventart: string
+  titel: string
+  datum?: Date | string | null
+  uhrzeit?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSourceInput
+  bingo_print_jobs?: Prisma.bingo_print_jobsCreateNestedManyWithoutGameInput
+  event_creation?: Prisma.bingo_event_creation_requestsCreateNestedOneWithoutGameInput
+  bingo_live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutGameInput
+  bingo_series_labels?: Prisma.bingo_series_labelsCreateNestedManyWithoutGameInput
+  bingo_preparation?: Prisma.bingo_preparationsCreateNestedOneWithoutGameInput
+  bingo_rounds?: Prisma.bingo_roundsCreateNestedManyWithoutGameInput
+  bingo_card_series?: Prisma.bingo_card_seriesCreateNestedManyWithoutGameInput
+  team_assignments?: Prisma.game_team_assignmentsCreateNestedManyWithoutGameInput
+  eventreihe: Prisma.eventreihenCreateNestedOneWithoutGame_draftsInput
+}
+
+export type game_draftsUncheckedCreateWithoutCeremonyInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: string | null
+  id?: string
+  eventart: string
+  eventreihe_id: number
+  titel: string
+  datum?: Date | string | null
+  uhrzeit?: string | null
+  status?: string
+  created_at?: Date | string
+  updated_at?: Date | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSourceInput
+  bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedCreateNestedManyWithoutGameInput
+  event_creation?: Prisma.bingo_event_creation_requestsUncheckedCreateNestedOneWithoutGameInput
+  bingo_live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutGameInput
+  bingo_series_labels?: Prisma.bingo_series_labelsUncheckedCreateNestedManyWithoutGameInput
+  bingo_preparation?: Prisma.bingo_preparationsUncheckedCreateNestedOneWithoutGameInput
+  bingo_rounds?: Prisma.bingo_roundsUncheckedCreateNestedManyWithoutGameInput
+  bingo_card_series?: Prisma.bingo_card_seriesUncheckedCreateNestedManyWithoutGameInput
+  team_assignments?: Prisma.game_team_assignmentsUncheckedCreateNestedManyWithoutGameInput
+}
+
+export type game_draftsCreateOrConnectWithoutCeremonyInput = {
+  where: Prisma.game_draftsWhereUniqueInput
+  create: Prisma.XOR<Prisma.game_draftsCreateWithoutCeremonyInput, Prisma.game_draftsUncheckedCreateWithoutCeremonyInput>
+}
+
+export type game_draftsUpsertWithoutCeremonyInput = {
+  update: Prisma.XOR<Prisma.game_draftsUpdateWithoutCeremonyInput, Prisma.game_draftsUncheckedUpdateWithoutCeremonyInput>
+  create: Prisma.XOR<Prisma.game_draftsCreateWithoutCeremonyInput, Prisma.game_draftsUncheckedCreateWithoutCeremonyInput>
+  where?: Prisma.game_draftsWhereInput
+}
+
+export type game_draftsUpdateToOneWithWhereWithoutCeremonyInput = {
+  where?: Prisma.game_draftsWhereInput
+  data: Prisma.XOR<Prisma.game_draftsUpdateWithoutCeremonyInput, Prisma.game_draftsUncheckedUpdateWithoutCeremonyInput>
+}
+
+export type game_draftsUpdateWithoutCeremonyInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  eventart?: Prisma.StringFieldUpdateOperationsInput | string
+  titel?: Prisma.StringFieldUpdateOperationsInput | string
+  datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uhrzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSourceNestedInput
+  bingo_print_jobs?: Prisma.bingo_print_jobsUpdateManyWithoutGameNestedInput
+  event_creation?: Prisma.bingo_event_creation_requestsUpdateOneWithoutGameNestedInput
+  bingo_live_runs?: Prisma.bingo_live_runsUpdateManyWithoutGameNestedInput
+  bingo_series_labels?: Prisma.bingo_series_labelsUpdateManyWithoutGameNestedInput
+  bingo_preparation?: Prisma.bingo_preparationsUpdateOneWithoutGameNestedInput
+  bingo_rounds?: Prisma.bingo_roundsUpdateManyWithoutGameNestedInput
+  bingo_card_series?: Prisma.bingo_card_seriesUpdateManyWithoutGameNestedInput
+  team_assignments?: Prisma.game_team_assignmentsUpdateManyWithoutGameNestedInput
+  eventreihe?: Prisma.eventreihenUpdateOneRequiredWithoutGame_draftsNestedInput
+}
+
+export type game_draftsUncheckedUpdateWithoutCeremonyInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  eventart?: Prisma.StringFieldUpdateOperationsInput | string
+  eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
+  titel?: Prisma.StringFieldUpdateOperationsInput | string
+  datum?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  uhrzeit?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSourceNestedInput
+  bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedUpdateManyWithoutGameNestedInput
+  event_creation?: Prisma.bingo_event_creation_requestsUncheckedUpdateOneWithoutGameNestedInput
+  bingo_live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutGameNestedInput
+  bingo_series_labels?: Prisma.bingo_series_labelsUncheckedUpdateManyWithoutGameNestedInput
+  bingo_preparation?: Prisma.bingo_preparationsUncheckedUpdateOneWithoutGameNestedInput
+  bingo_rounds?: Prisma.bingo_roundsUncheckedUpdateManyWithoutGameNestedInput
+  bingo_card_series?: Prisma.bingo_card_seriesUncheckedUpdateManyWithoutGameNestedInput
+  team_assignments?: Prisma.game_team_assignmentsUncheckedUpdateManyWithoutGameNestedInput
+}
+
 export type game_draftsCreateWithoutBingo_preparationInput = {
   bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   shared_design_template_id?: string | null
@@ -828,6 +959,7 @@ export type game_draftsCreateWithoutBingo_preparationInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSourceInput
   bingo_print_jobs?: Prisma.bingo_print_jobsCreateNestedManyWithoutGameInput
   event_creation?: Prisma.bingo_event_creation_requestsCreateNestedOneWithoutGameInput
@@ -851,6 +983,7 @@ export type game_draftsUncheckedCreateWithoutBingo_preparationInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSourceInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedCreateNestedManyWithoutGameInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedCreateNestedOneWithoutGameInput
@@ -888,6 +1021,7 @@ export type game_draftsUpdateWithoutBingo_preparationInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSourceNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUpdateManyWithoutGameNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUpdateOneWithoutGameNestedInput
@@ -911,6 +1045,7 @@ export type game_draftsUncheckedUpdateWithoutBingo_preparationInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSourceNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedUpdateManyWithoutGameNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedUpdateOneWithoutGameNestedInput
@@ -932,6 +1067,7 @@ export type game_draftsCreateWithoutBingo_roundsInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSourceInput
   bingo_print_jobs?: Prisma.bingo_print_jobsCreateNestedManyWithoutGameInput
   event_creation?: Prisma.bingo_event_creation_requestsCreateNestedOneWithoutGameInput
@@ -955,6 +1091,7 @@ export type game_draftsUncheckedCreateWithoutBingo_roundsInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSourceInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedCreateNestedManyWithoutGameInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedCreateNestedOneWithoutGameInput
@@ -992,6 +1129,7 @@ export type game_draftsUpdateWithoutBingo_roundsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSourceNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUpdateManyWithoutGameNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUpdateOneWithoutGameNestedInput
@@ -1015,6 +1153,7 @@ export type game_draftsUncheckedUpdateWithoutBingo_roundsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSourceNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedUpdateManyWithoutGameNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedUpdateOneWithoutGameNestedInput
@@ -1036,6 +1175,7 @@ export type game_draftsCreateWithoutBingo_card_seriesInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSourceInput
   bingo_print_jobs?: Prisma.bingo_print_jobsCreateNestedManyWithoutGameInput
   event_creation?: Prisma.bingo_event_creation_requestsCreateNestedOneWithoutGameInput
@@ -1059,6 +1199,7 @@ export type game_draftsUncheckedCreateWithoutBingo_card_seriesInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSourceInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedCreateNestedManyWithoutGameInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedCreateNestedOneWithoutGameInput
@@ -1096,6 +1237,7 @@ export type game_draftsUpdateWithoutBingo_card_seriesInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSourceNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUpdateManyWithoutGameNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUpdateOneWithoutGameNestedInput
@@ -1119,6 +1261,7 @@ export type game_draftsUncheckedUpdateWithoutBingo_card_seriesInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSourceNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedUpdateManyWithoutGameNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedUpdateOneWithoutGameNestedInput
@@ -1140,6 +1283,7 @@ export type game_draftsCreateWithoutBingo_series_labelsInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSourceInput
   bingo_print_jobs?: Prisma.bingo_print_jobsCreateNestedManyWithoutGameInput
   event_creation?: Prisma.bingo_event_creation_requestsCreateNestedOneWithoutGameInput
@@ -1163,6 +1307,7 @@ export type game_draftsUncheckedCreateWithoutBingo_series_labelsInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSourceInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedCreateNestedManyWithoutGameInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedCreateNestedOneWithoutGameInput
@@ -1200,6 +1345,7 @@ export type game_draftsUpdateWithoutBingo_series_labelsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSourceNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUpdateManyWithoutGameNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUpdateOneWithoutGameNestedInput
@@ -1223,6 +1369,7 @@ export type game_draftsUncheckedUpdateWithoutBingo_series_labelsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSourceNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedUpdateManyWithoutGameNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedUpdateOneWithoutGameNestedInput
@@ -1244,6 +1391,7 @@ export type game_draftsCreateWithoutTeam_assignmentsInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSourceInput
   bingo_print_jobs?: Prisma.bingo_print_jobsCreateNestedManyWithoutGameInput
   event_creation?: Prisma.bingo_event_creation_requestsCreateNestedOneWithoutGameInput
@@ -1267,6 +1415,7 @@ export type game_draftsUncheckedCreateWithoutTeam_assignmentsInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSourceInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedCreateNestedManyWithoutGameInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedCreateNestedOneWithoutGameInput
@@ -1304,6 +1453,7 @@ export type game_draftsUpdateWithoutTeam_assignmentsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSourceNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUpdateManyWithoutGameNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUpdateOneWithoutGameNestedInput
@@ -1327,6 +1477,7 @@ export type game_draftsUncheckedUpdateWithoutTeam_assignmentsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSourceNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedUpdateManyWithoutGameNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedUpdateOneWithoutGameNestedInput
@@ -1348,6 +1499,7 @@ export type game_draftsCreateWithoutBingo_live_runsInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSourceInput
   bingo_print_jobs?: Prisma.bingo_print_jobsCreateNestedManyWithoutGameInput
   event_creation?: Prisma.bingo_event_creation_requestsCreateNestedOneWithoutGameInput
@@ -1371,6 +1523,7 @@ export type game_draftsUncheckedCreateWithoutBingo_live_runsInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSourceInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedCreateNestedManyWithoutGameInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedCreateNestedOneWithoutGameInput
@@ -1408,6 +1561,7 @@ export type game_draftsUpdateWithoutBingo_live_runsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSourceNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUpdateManyWithoutGameNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUpdateOneWithoutGameNestedInput
@@ -1431,6 +1585,7 @@ export type game_draftsUncheckedUpdateWithoutBingo_live_runsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSourceNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedUpdateManyWithoutGameNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedUpdateOneWithoutGameNestedInput
@@ -1452,6 +1607,7 @@ export type game_draftsCreateWithoutEvent_creationInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSourceInput
   bingo_print_jobs?: Prisma.bingo_print_jobsCreateNestedManyWithoutGameInput
   bingo_live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutGameInput
@@ -1475,6 +1631,7 @@ export type game_draftsUncheckedCreateWithoutEvent_creationInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSourceInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedCreateNestedManyWithoutGameInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutGameInput
@@ -1512,6 +1669,7 @@ export type game_draftsUpdateWithoutEvent_creationInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSourceNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUpdateManyWithoutGameNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUpdateManyWithoutGameNestedInput
@@ -1535,6 +1693,7 @@ export type game_draftsUncheckedUpdateWithoutEvent_creationInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSourceNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedUpdateManyWithoutGameNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutGameNestedInput
@@ -1556,6 +1715,7 @@ export type game_draftsCreateWithoutBingo_round_templatesInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesCreateNestedOneWithoutGameInput
   bingo_print_jobs?: Prisma.bingo_print_jobsCreateNestedManyWithoutGameInput
   event_creation?: Prisma.bingo_event_creation_requestsCreateNestedOneWithoutGameInput
   bingo_live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutGameInput
@@ -1579,6 +1739,7 @@ export type game_draftsUncheckedCreateWithoutBingo_round_templatesInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedCreateNestedOneWithoutGameInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedCreateNestedManyWithoutGameInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedCreateNestedOneWithoutGameInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutGameInput
@@ -1616,6 +1777,7 @@ export type game_draftsUpdateWithoutBingo_round_templatesInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUpdateOneWithoutGameNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUpdateManyWithoutGameNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUpdateOneWithoutGameNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUpdateManyWithoutGameNestedInput
@@ -1639,6 +1801,7 @@ export type game_draftsUncheckedUpdateWithoutBingo_round_templatesInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedUpdateOneWithoutGameNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedUpdateManyWithoutGameNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedUpdateOneWithoutGameNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutGameNestedInput
@@ -1660,6 +1823,7 @@ export type game_draftsCreateWithoutBingo_print_jobsInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSourceInput
   event_creation?: Prisma.bingo_event_creation_requestsCreateNestedOneWithoutGameInput
   bingo_live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutGameInput
@@ -1683,6 +1847,7 @@ export type game_draftsUncheckedCreateWithoutBingo_print_jobsInput = {
   status?: string
   created_at?: Date | string
   updated_at?: Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedCreateNestedOneWithoutGameInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSourceInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedCreateNestedOneWithoutGameInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutGameInput
@@ -1720,6 +1885,7 @@ export type game_draftsUpdateWithoutBingo_print_jobsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSourceNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUpdateOneWithoutGameNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUpdateManyWithoutGameNestedInput
@@ -1743,6 +1909,7 @@ export type game_draftsUncheckedUpdateWithoutBingo_print_jobsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSourceNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedUpdateOneWithoutGameNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutGameNestedInput
@@ -1777,6 +1944,7 @@ export type game_draftsUpdateWithoutEventreiheInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSourceNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUpdateManyWithoutGameNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUpdateOneWithoutGameNestedInput
@@ -1799,6 +1967,7 @@ export type game_draftsUncheckedUpdateWithoutEventreiheInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ceremony?: Prisma.game_ceremoniesUncheckedUpdateOneWithoutGameNestedInput
   bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSourceNestedInput
   bingo_print_jobs?: Prisma.bingo_print_jobsUncheckedUpdateManyWithoutGameNestedInput
   event_creation?: Prisma.bingo_event_creation_requestsUncheckedUpdateOneWithoutGameNestedInput
@@ -1920,6 +2089,7 @@ export type game_draftsSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   status?: boolean
   created_at?: boolean
   updated_at?: boolean
+  ceremony?: boolean | Prisma.game_drafts$ceremonyArgs<ExtArgs>
   bingo_round_templates?: boolean | Prisma.game_drafts$bingo_round_templatesArgs<ExtArgs>
   bingo_print_jobs?: boolean | Prisma.game_drafts$bingo_print_jobsArgs<ExtArgs>
   event_creation?: boolean | Prisma.game_drafts$event_creationArgs<ExtArgs>
@@ -1979,6 +2149,7 @@ export type game_draftsSelectScalar = {
 
 export type game_draftsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"bingo_print_config" | "shared_design_template_id" | "id" | "eventart" | "eventreihe_id" | "titel" | "datum" | "uhrzeit" | "status" | "created_at" | "updated_at", ExtArgs["result"]["game_drafts"]>
 export type game_draftsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  ceremony?: boolean | Prisma.game_drafts$ceremonyArgs<ExtArgs>
   bingo_round_templates?: boolean | Prisma.game_drafts$bingo_round_templatesArgs<ExtArgs>
   bingo_print_jobs?: boolean | Prisma.game_drafts$bingo_print_jobsArgs<ExtArgs>
   event_creation?: boolean | Prisma.game_drafts$event_creationArgs<ExtArgs>
@@ -2001,6 +2172,7 @@ export type game_draftsIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.
 export type $game_draftsPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "game_drafts"
   objects: {
+    ceremony: Prisma.$game_ceremoniesPayload<ExtArgs> | null
     bingo_round_templates: Prisma.$bingo_round_templatesPayload<ExtArgs>[]
     bingo_print_jobs: Prisma.$bingo_print_jobsPayload<ExtArgs>[]
     event_creation: Prisma.$bingo_event_creation_requestsPayload<ExtArgs> | null
@@ -2418,6 +2590,7 @@ readonly fields: game_draftsFieldRefs;
  */
 export interface Prisma__game_draftsClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  ceremony<T extends Prisma.game_drafts$ceremonyArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.game_drafts$ceremonyArgs<ExtArgs>>): Prisma.Prisma__game_ceremoniesClient<runtime.Types.Result.GetResult<Prisma.$game_ceremoniesPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   bingo_round_templates<T extends Prisma.game_drafts$bingo_round_templatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.game_drafts$bingo_round_templatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$bingo_round_templatesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   bingo_print_jobs<T extends Prisma.game_drafts$bingo_print_jobsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.game_drafts$bingo_print_jobsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$bingo_print_jobsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   event_creation<T extends Prisma.game_drafts$event_creationArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.game_drafts$event_creationArgs<ExtArgs>>): Prisma.Prisma__bingo_event_creation_requestsClient<runtime.Types.Result.GetResult<Prisma.$bingo_event_creation_requestsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -2866,6 +3039,25 @@ export type game_draftsDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many game_drafts to delete.
    */
   limit?: number
+}
+
+/**
+ * game_drafts.ceremony
+ */
+export type game_drafts$ceremonyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the game_ceremonies
+   */
+  select?: Prisma.game_ceremoniesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the game_ceremonies
+   */
+  omit?: Prisma.game_ceremoniesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.game_ceremoniesInclude<ExtArgs> | null
+  where?: Prisma.game_ceremoniesWhereInput
 }
 
 /**

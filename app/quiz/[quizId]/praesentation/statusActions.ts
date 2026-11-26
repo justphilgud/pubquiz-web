@@ -1,4 +1,5 @@
 "use server";
+import {isPrizeSlide} from "@/app/rendering/ceremony/prizeSequence";
 import { freezeQuizDesign } from "@/app/rendering/sharedDesign/sharedDesignRepository.server";
 import { startRequestNavigationTrace } from "@/app/lib/navigationTrace.server";
 import { assertMemeArchiveResetSafe } from "../../memeArchive/archive.server";
@@ -259,7 +260,7 @@ export async function setPraesentationSlideIndex(
         slide_index: slideIndex,
         slide_key: slideKey,
         slide_started_at: new Date(),
-        endstand_reveal_count: isPodiumRevealSlide(slides[slideIndex]) ? 0 : 1,
+        endstand_reveal_count: isPodiumRevealSlide(slides[slideIndex]) || isPrizeSlide(slides[slideIndex]) ? 0 : 1,
         medium_overlay_aktiv: false,
         audio_aktion: "stop",
         audio_aktion_id: { increment: 1 },
@@ -274,7 +275,7 @@ export async function setPraesentationSlideIndex(
         slide_index: slideIndex,
         slide_key: slideKey,
         slide_started_at: new Date(),
-        endstand_reveal_count: isPodiumRevealSlide(slides[slideIndex]) ? 0 : 1,
+        endstand_reveal_count: isPodiumRevealSlide(slides[slideIndex]) || isPrizeSlide(slides[slideIndex]) ? 0 : 1,
         medium_overlay_aktiv: false,
         audio_aktion: "stop",
         audio_aktion_id: 1,

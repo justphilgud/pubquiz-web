@@ -1,0 +1,54 @@
+
+> pubquiz-web@0.2.0 test:bingo-preparation
+> node --import tsx --test app/bingo/preparation/policy.test.ts app/bingo/preparation/pdf.test.ts app/bingo/preparation/exportBoundary.test.ts app/bingo/preparation/printDesign.test.ts app/bingo/preparation/printFormats.test.ts app/bingo/preparation/sra3Pdf.test.ts app/bingo/preparation/lovdPrint.test.ts app/bingo/preparation/termSet.test.ts app/bingo/preparation/matching.test.ts app/bingo/preparation/matchingPdf.test.ts app/bingo/preparation/pdfModern.test.ts app/bingo/preparation/printTemplates.test.ts app/games/bingoOverviewPolicy.test.ts app/events/EventActionLink.test.ts app/bingo/live/termPublication.test.ts app/bingo/matching/sourceOptions.test.ts app/bingo/matching/sourceRequests.test.ts app/bingo/matching/sourceQuery.test.ts app/bingo/matching/MatchingTemplateSelect.browser.test.ts app/bingo/matching/SourcePicker.browser.test.ts
+
+✔ hidden terms freeze with the round, reveal is explicit and historical correction conceals the replacement again (4.8351ms)
+✔ old numeric round snapshots remain exactly compatible, unknown extra fields and malformed term sets fail (0.6396ms)
+✔ matching template combobox searches and selects without dismissing its media dialog (1746.6738ms)
+✔ Matching source dialog handles failures, rapid filters, stale results and fresh apply authorization (3762.7716ms)
+✔ template options use fresh permissions, page metadata and preserve source-template identity (378.4287ms)
+✔ approved-source SQL scope matches canonical policy, including Bingo-only and multi-series sources (1.716ms)
+✔ media search respects existing slot scopes, correct-answer images and name classification priority (1.5647ms)
+✔ Matching source requests serialize, discard obsolete results and coalesce queued filters (7.1316ms)
+✔ filter change and dialog close invalidate late success and error; reopened dialog can retry (1.8814ms)
+✔ actual PDF route excludes generation and source-asset IO from its application import graph (262.2707ms)
+✔ card overview reads do not import the generation asset loader (124.9215ms)
+✔ new inherited LOVD settings correct branding while preserving explicit colors/fonts and Phil Gud (3.5827ms)
+✔ new V3 LOVD keeps the old front typography on every profile, freezes code face and exports old snapshots unchanged (21998.584ms)
+✔ all six media/answer combinations are independent and print exact selected text (6.8875ms)
+✔ variant switch preserves answer, own text works; no false or excluded answer defaults (0.3101ms)
+✔ range updates retain hidden rows; 76–90 do not enter the 75er print/draw contract (0.7102ms)
+✔ duplicates, missing media, empty values and unexpected fields are rejected with row messages (1.9165ms)
+✔ legacy 75 terms remain byte-for-byte identical and retain publication rules (1.4991ms)
+✔ media byte ranges are bounded, support suffix reads and reject malformed requests (0.4315ms)
+✔ legacy static matching IO is restricted to the current deployment and safe media paths (0.5108ms)
+✔ externally selected long or invalid answers produce the same row validation as the server (1.3982ms)
+✔ mixed numeric/text matching PDFs retain frozen fonts/identity/duplex and six independent combinations in every format (19622.0933ms)
+✔ actual Phil Gud and LOVD PDF export embeds original frozen fonts/logo, paginates and reexports (9857.4576ms)
+✔ V3 renderer embeds original Phil Gud digits, separates IDs onto backs and renders all formats without changing V2 (8586.2381ms)
+✔ commands reject forged scope, extra fields, invalid integers and invalid card strategies (2.7913ms)
+✔ range packages cover every card exactly once and reject silent truncation (2.0849ms)
+✔ persisted cards use AP1 validation and stable canonical hashes (3.9032ms)
+✔ strict versioned print settings, inheritance, contrast and stable game-scoped labels (6.3806ms)
+Duplex maximum phil-gud { cards: 200, pages: 100, bytes: 1132470, durationMs: 2039 }
+Duplex maximum lovd-ungegoogelt { cards: 200, pages: 100, bytes: 2031800, durationMs: 2316 }
+✔ real square front/duplex PDFs, original fonts 1–75, all positions and incomplete sheets (21468.3049ms)
+✔ SRA3 retains every existing profile and mirrors the complete three-column grid (3.2652ms)
+✔ V3 physical formats retain safe margins, square cells and long-edge front/back ownership (0.572ms)
+✔ 1,000 distinct cards produce five complete explicitly bounded downloads, including partial tails (0.5808ms)
+✔ Print templates have distinct identities, strict selection, and cannot become live templates (9.7389ms)
+✔ V4 actual PDFs: both brands, numbers/text, all formats, immutable IDs, embedded font checksums and minimum 10pt (16365.0596ms)
+✔ SRA3 actual PDFs preserve V3/V4 drawings, profiles and complete/partial duplex sheets (54095.146ms)
+✔ term sets require complete unambiguous 75-ball assignments and produce a detached stable snapshot (2.7995ms)
+✔ music answers stay absent from audience data until explicit reveal; approval and direct modes differ (0.6287ms)
+✔ shared Quiz action extraction preserves the actual released complete markup, icons, labels and destinations (160.2493ms)
+✔ local Bingo filters retain validated return context without redirects or new runtime status (4.1704ms)
+✔ physical cards reused in rounds are distinct from recorded round issuance; unknown is not zero (1.9334ms)
+ℹ tests 40
+ℹ suites 0
+ℹ pass 40
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 55908.1639

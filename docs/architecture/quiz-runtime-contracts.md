@@ -343,6 +343,10 @@ Persistenztests; Ursache und öffentliche Terminwerte stehen in
 
 ## Presentation Template Contract
 
+### Dramaturgische Preisvorstellung (26.11.2026)
+
+Preisfolien verwenden den vorhandenen persistierten Reveal-Zähler. Beim Betreten beginnt er bei 0. Jede reguläre Weiter-Aktion deckt die nächste belegte Platzierung von hinten nach vorne auf; bereits aufgedeckte Preise bleiben sichtbar. Nach der letzten Platzierung folgt die normale Navigation. `app/rendering/ceremony/prizeSequence.ts` und `PrizeReveal` werden auch von Bingo verwendet. Die bestehende Drei-Platz-Konfiguration, NavigationTransition und alle Intro-/Outro-/Podiumsverträge bleiben erhalten. Regressionen: `evening.test.ts`, `sponsorNavigation.test.ts` und `bingo-evening.browser.test.ts`.
+
 ### Teamidentität nach Audience und Phase
 
 Audience und Moderationsvorschau verwenden für den Zwischenstand dasselbe

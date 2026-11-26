@@ -129,7 +129,8 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
     }
     await evaluate("window.show('phil-gud',20,'RUNNING',false,{background:'#ffffff',surface:'#faf8f2',text:'#171717',textMuted:'#625d55',primary:'#6a241c',secondary:'#f6c4dc'})");
     assert.equal(await evaluate('document.querySelector("[data-bingo-brand]")'),null,"customized Phil Gud palette must not inherit default brand fills");
-    assert.deepEqual(await evaluate('(()=>{const s=getComputedStyle(document.querySelector("[data-number]"));return[s.backgroundColor,s.color]})()'),["rgb(250, 248, 242)","rgb(23, 23, 23)"],"customized palette values remain effective");
+    assert.deepEqual(await evaluate('(()=>{const s=getComputedStyle(document.querySelector("[data-number]"));return[s.backgroundColor,s.color]})()'),["rgb(106, 36, 28)","rgb(255, 255, 255)"],"custom primary fills drawn numbers with contrasting ink");
+    assert.deepEqual(await evaluate('(()=>{const s=getComputedStyle(document.querySelectorAll("[data-number]")[74]);return[s.backgroundColor,s.color]})()'),["rgb(250, 248, 242)","rgb(98, 93, 85)"],"unseen numbers retain the custom neutral surface and muted ink");
     await evaluate("window.show('phil-gud',20,'RUNNING',true)"); await new Promise(r => setTimeout(r, 150));
     assert.deepEqual((await evaluate("window.measure()") as { issues: string[] }).issues, []);
     await evaluate("window.show('phil-gud',20)");

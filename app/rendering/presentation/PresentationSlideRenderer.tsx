@@ -26,6 +26,7 @@ import {
   buildPublicCalendarSubscriptionUrl,
 } from "@/app/calendar/publicCalendar";
 import { buildQuestionTemplateRuntimeModel } from "@/app/fragen/editor/templates/questionTemplateRuntime";
+import {PrizeReveal} from "../ceremony/PrizeReveal";
 import { parsePrizeSlots } from "@/app/quiz/fixedSlidesPolicy";
 import type { QuizPraesentationResult } from "../../quiz/actions";
 import { formatQuizPoints } from "../../quiz/formatQuizPoints";
@@ -2002,22 +2003,7 @@ function renderBlockSlide(slide: Extract<Slide, { typ: "block" }>) {
           Heute gibt es was zu gewinnen
         </h2>
 
-        <div className="mt-10 grid gap-4">
-          {preise.length > 0 ? (
-            preise.map((preis, index) => (
-              <div
-                key={`${preis}-${index}`}
-                className="rounded-2xl border-4 border-cyan-300 bg-slate-950/70 px-8 py-4 text-3xl font-black text-white shadow-[5px_5px_0_#ff00aa]"
-              >
-                Platz {index + 1}: {preis}
-              </div>
-            ))
-          ) : (
-            <div className="rounded-2xl border-4 border-cyan-300 bg-slate-950/70 px-8 py-4 text-3xl font-black text-white shadow-[5px_5px_0_#ff00aa]">
-              Die Preise werden gleich live vorgestellt.
-            </div>
-          )}
-        </div>
+        <PrizeReveal prizes={preise} revealCount={endstandRevealCount}/>
       </div>
     );
   }

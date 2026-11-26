@@ -110,6 +110,7 @@ export const ModelName = {
   eventreihe_verwaltung: 'eventreihe_verwaltung',
   benutzer_reihenrollen: 'benutzer_reihenrollen',
   game_drafts: 'game_drafts',
+  game_ceremonies: 'game_ceremonies',
   bingo_preparations: 'bingo_preparations',
   bingo_matching_assets: 'bingo_matching_assets',
   bingo_rounds: 'bingo_rounds',
@@ -1145,6 +1146,15 @@ export const Game_draftsScalarFieldEnum = {
 } as const
 
 export type Game_draftsScalarFieldEnum = (typeof Game_draftsScalarFieldEnum)[keyof typeof Game_draftsScalarFieldEnum]
+
+
+export const Game_ceremoniesScalarFieldEnum = {
+  game_id: 'game_id',
+  state: 'state',
+  updated_at: 'updated_at'
+} as const
+
+export type Game_ceremoniesScalarFieldEnum = (typeof Game_ceremoniesScalarFieldEnum)[keyof typeof Game_ceremoniesScalarFieldEnum]
 
 
 export const Bingo_preparationsScalarFieldEnum = {

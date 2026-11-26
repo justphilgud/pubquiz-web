@@ -80,6 +80,7 @@ export async function createModernCardsPdf(input:PrintSnapshot,cards:readonly St
           else draw(page,String(card.cells[row-1][col]),numbers,22,cx+3,cy+(cell-22)/2+4,cell-6,ink(colors.numbers));
         }
       }
+      if(back&&snap.roundNumber){const label=`Runde ${snap.roundNumber}`;const labelFont=code??words;draw(page,label,labelFont,8,x+14,y+side-19,side-28,ink('#FFFFFF'));}
       if(!singleCard)for(const dx of [0,side])for(const dy of [0,side]){const sx=dx?1:-1,sy=dy?1:-1;page.drawLine({start:{x:x+dx+sx*2,y:y+dy},end:{x:x+dx+sx*5,y:y+dy},thickness:.3,color:rgb(.5,.5,.5)});page.drawLine({start:{x:x+dx,y:y+dy+sy*2},end:{x:x+dx,y:y+dy+sy*5},thickness:.3,color:rgb(.5,.5,.5)});}
     }
   }

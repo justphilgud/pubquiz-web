@@ -76,7 +76,7 @@ export async function exerciseBingoBell(db:Client,api:typeof Prep&{proof:typeof 
   await assert.rejects(api.eventRun.commandEventRun(1,{...checkRequest,requestId:randomUUID(),revision:v.revision,command:{kind:'check',cardId:randomUUID(),context:v.callContext}}),/CARD_OR_CALL_NOT_FOUND/);
   const special=(await db.query('SELECT c.id,c.printed_code FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_card_series s ON s.id=c.series_id WHERE s.game_id=$1 AND s.origin_round_id=$2 LIMIT 1',[game.id,copy.id])).rows[0];
   assert.equal(await api.eventRun.resolveEveningCard(1,game.id,special.printed_code),special.id);
-  v=(await view()).live!;await api.eventRun.commandEventRun(1,{...checkRequest,requestId:randomUUID(),revision:v.revision,command:{kind:'check',cardId:special.id,context:v.callContext}});
+  v=(await view()).live!;await assert.rejects(api.eventRun.commandEventRun(1,{...checkRequest,requestId:randomUUID(),revision:v.revision,command:{kind:'check',cardId:special.id,context:v.callContext}}),/WRONG_ROUND/);
   assert.deepEqual(await api.proof.readCheckedCardContent(1,game.id,special.id),copy.terms);
   assert.ok((await view()).live!.checkCards.every(card=>!('terms' in card)),'full labels must never enter regular status polling');
   const counts=(await db.query('SELECT count(*)::int AS n FROM pubquiz.bingo_cards')).rows[0].n;

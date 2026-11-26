@@ -1,3 +1,4 @@
+import {roundColor} from "../roundColors";
 import "server-only";
 import { readFile, realpath, stat } from "node:fs/promises";
 import { join, resolve, sep } from "node:path";
@@ -57,6 +58,8 @@ export async function capturePrintSnapshot(input: SharedDesign, title: string, r
 }
 
 /** Only called by new-card generation or an explicitly selected redesign, never by old exports. */
-export function captureNewPrintSnapshot(input:SharedDesign,title:string,roundLabel:string,settings:BingoPrint,templateSource?:{id:string;name:string}){
- return capturePrintSnapshot(input,title,roundLabel,prepareLovdPrint(settings.layout?settings:{...settings,layout:{version:3,format:'A4_FOUR',textFont:'ARIMO'}}),templateSource);
+export function captureNewPrintSnapshot(input:SharedDesign,title:string,roundLabel:string,settings:BingoPrint,templateSource?:{id:string;name:string},roundNumber?:number){
+ const prepared=prepareLovdPrint(settings.layout?settings:{...settings,layout:{version:3,format:'A4_FOUR',textFont:'ARIMO'}});
+ if(roundNumber){prepared.colors.back=roundColor(roundNumber).background;prepared.backLogos=['/branding/lovd/lovd-stelp-creme-rgb.png','/branding/bingo-print/phil-gud.png'];prepared.partnerBack=1;}
+ return capturePrintSnapshot(input,title,roundLabel,prepared,templateSource).then(snapshot=>roundNumber?parsePrintSnapshot({...snapshot,roundNumber}):snapshot);
 }
