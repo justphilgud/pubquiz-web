@@ -20,7 +20,7 @@ test("repair accepts only original config or the exact observed editor transform
 
 test("fixed repair workflow remains Preview-only, exact-CI-gated and mutually exclusive with deployment", () => {
   const workflow = readFileSync(".github/workflows/deploy-preview.yml","utf8");
-  const job = workflow.slice(workflow.indexOf("  editorial-test-repair:"));
+  const job = workflow.slice(workflow.indexOf("  editorial-test-repair:")).split(/\r?\n  (?=[a-z][a-z0-9-]*:)/, 1)[0];
   assert.match(job,/environment: preview/);
   assert.match(job,/github.ref == 'refs\/heads\/codex\/editorial-safe-import'/);
   assert.match(job,/verify-preview-ci.ts/);
