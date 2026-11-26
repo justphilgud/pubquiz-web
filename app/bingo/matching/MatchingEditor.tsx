@@ -10,7 +10,7 @@ import type {readMatchingEditor} from './repository.server';
 import {getMatchingSource,saveMatching} from './actions';
 import SourcePicker,{MatchingPreview} from './SourcePicker';
 import styles from './MatchingEditor.module.css';
-type Data=Awaited<ReturnType<typeof readMatchingEditor>>;
+type Data=Awaited<ReturnType<typeof readMatchingEditor>>&{templateId?:string};
 
 export default function MatchingEditor({data}:{data:Data}){
  const router=useRouter(),initial={name:data.current?.name??'Zuordnung 1',publication:data.current?.publication??'DIRECT',entries:initialMatchingEntries(data.current)};
@@ -29,7 +29,7 @@ export default function MatchingEditor({data}:{data:Data}){
  const validRange=/^\d+$/.test(from)&&/^\d+$/.test(to)&&Number(from)>=1&&Number(to)<=90&&Number(from)<=Number(to),visible=validRange?draft.entries.filter(e=>e.number>=Number(from)&&e.number<=Number(to)):[];
  const changedCount=draft.entries.filter(e=>e.number<=75&&!e.keepNumber).length;
  return <div className={styles.editor}>
-  <form onSubmit={e=>{e.preventDefault();start(async()=>{const result=await saveMatching({gameId:data.gameId,roundId:data.roundId,revision:data.revision,config:{version:2,...draft}});if(!result.success){setMessage(result.message);return;}markSaved();setBaseline(JSON.stringify(draft));setMessage('Neue Zuordnungsfassung gespeichert.');router.refresh();});}}>
+  <form onSubmit={e=>{e.preventDefault();start(async()=>{const result=await saveMatching({gameId:data.gameId,roundId:data.roundId,revision:data.revision,config:{version:2,...draft},...(data.templateId?{templateId:data.templateId}:{})});if(!result.success){setMessage(result.message);return;}markSaved();setBaseline(JSON.stringify(draft));setMessage('Neue Zuordnungsfassung gespeichert.');router.refresh();});}}>
    {data.locked&&<p className={styles.notice}>Diese Runde ist schreibgeschützt: Bereits verwendete Karten und Durchläufe bleiben unverändert. Zum Ändern eine neue Runde anlegen.</p>}
    <section className={styles.settings} aria-labelledby="matching-settings-title">
     <div className={styles.sectionTitle}><h2 id="matching-settings-title">Deine Zuordnung</h2><span>{data.label} · 75er-Bingo</span></div>
@@ -78,7 +78,7 @@ export default function MatchingEditor({data}:{data:Data}){
    {data.locked&&<p className={styles.notice}>Bereits verwendete Karten und Durchläufe bleiben unverändert. Zum Ändern eine neue Runde anlegen.</p>}
    <div className={styles.saveBar}>
     <div className={styles.saveState}><CheckIcon aria-hidden="true"/><span>{pending?'Wird gespeichert …':dirty?'Ungespeicherte Änderungen':'Keine ungespeicherten Änderungen'}{message&&<small role="status">{message}</small>}{errors.size>0&&<small role="alert">{errors.size} Zeilen prüfen – auch außerhalb des sichtbaren Bereichs.</small>}</span></div>
-    <div className={styles.saveActions}><Link href={`/bingo/${data.gameId}/vorbereitung`}>Abbrechen</Link><Button className={styles.saveButton} type="submit" disabled={blocked||!dirty||errors.size>0}><ArrowDownTrayIcon aria-hidden="true"/>Zuordnungssatz speichern</Button></div>
+    <div className={styles.saveActions}><Link href={data.templateId?'/bingo/content':`/bingo/${data.gameId}/vorbereitung`}>Abbrechen</Link><Button className={styles.saveButton} type="submit" disabled={blocked||!dirty||errors.size>0}><ArrowDownTrayIcon aria-hidden="true"/>Zuordnungssatz speichern</Button></div>
    </div>
   </form>
   {sourceNumber!==null&&<SourcePicker gameId={data.gameId} entry={draft.entries[sourceNumber-1]} onClose={()=>setSourceNumber(null)} onApply={(entry,items)=>{update(entry.number,entry);setAnswers(a=>({...a,[entry.number]:items}));setSourceNumber(null);}}/>}

@@ -4,6 +4,8 @@ import { build } from "esbuild";
 
 test("actual PDF route excludes generation and source-asset IO from its application import graph", async () => {
   const bundle = await build({ entryPoints: ["app/bingo/[gameId]/karten/[seriesId]/pdf/route.ts"], bundle: true, write: false, metafile: true, platform: "node", format: "esm", packages: "external", plugins: [{ name: "boundary-only", setup(b) {
+    b.onResolve({filter:/EveningPrintPanel$/},a=>({path:a.path,namespace:'client-boundary'}));
+    b.onLoad({filter:/.*/,namespace:'client-boundary'},()=>({contents:'export default function ClientBoundary(){}'}));
     b.onResolve({ filter: /^(server-only|@\/app\/lib\/prisma|@\/app\/lib\/permissions)$/ }, a => ({ path: a.path, namespace: "fixture" }));
     b.onLoad({ filter: /.*/, namespace: "fixture" }, a => ({ contents: a.path === "server-only" ? "" : a.path.endsWith("permissions") ? "export async function requireActor(){throw Error('Not executed in boundary test')}" : "export const prisma={}" }));
   } }] });
@@ -16,6 +18,8 @@ test("actual PDF route excludes generation and source-asset IO from its applicat
 
 test("card overview reads do not import the generation asset loader", async () => {
   const bundle = await build({ entryPoints: ["app/bingo/[gameId]/karten/page.tsx"], bundle: true, write: false, metafile: true, platform: "node", format: "esm", packages: "external", plugins: [{ name: "overview-boundary", setup(b) {
+    b.onResolve({filter:/EveningPrintPanel$/},a=>({path:a.path,namespace:'client-boundary'}));
+    b.onLoad({filter:/.*/,namespace:'client-boundary'},()=>({contents:'export default function ClientBoundary(){}'}));
     b.onResolve({ filter: /^(server-only|@\/app\/lib\/prisma|@\/app\/lib\/permissions|@\/app\/generated\/prisma\/client|@\/app\/components\/AppHeader|@\/components\/ui|next\/link|next\/navigation)$/ }, a => ({ path: a.path, namespace: "fixture" }));
     b.onLoad({ filter: /.*/, namespace: "fixture" }, a => ({ contents: a.path === "server-only" ? "" : a.path.endsWith("permissions") ? "export async function requireActor(){throw Error('Not executed')}" : a.path.endsWith("prisma") ? "export const prisma={}" : a.path.endsWith("client") ? "export const Prisma={}" : a.path.endsWith("ui") ? "export function Button(){};export function Input(){}" : a.path.endsWith("navigation") ? "export function notFound(){}" : "export default function Component(){}" }));
   } }] });

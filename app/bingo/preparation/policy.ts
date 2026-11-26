@@ -14,10 +14,12 @@ export class BingoPreparationError extends Error {
 export const denied = () => new BingoPreparationError("Bingo nicht gefunden oder kein Zugriff. Bitte Rechte und Freischaltung prüfen.");
 type Base = { gameId: string; expectedSeriesId: number; revision: number };
 export type BingoCommand = Base & (
-  | { operation: "createRound" }
+  | { operation: "createRound"; templateId?: string }
+  | { operation: "applyTemplate"; roundId:string; templateId:string|null }
   | { operation: "saveRound"; roundId: string; label: string; target: number; strategy: CardStrategy; issued: number | null }
   | { operation: "moveRound"; roundId: string; direction: -1 | 1 }
   | { operation: "removeRound"; roundId: string }
+  | { operation: "generateEvening"; count:number; requestId:string; printLayout?:PrintLayout }
   | { operation: "generate"; roundId: string; count: number; requestId: string; printLayout?: PrintLayout }
   | { operation: "attach" | "detach"; roundId: string; seriesId: string }
 );
@@ -34,7 +36,8 @@ export function parseCommand(input: unknown): BingoCommand {
   const base: Base = { gameId: uuid(r.gameId), expectedSeriesId: integer(r.expectedSeriesId, 1, 2147483647, "series"), revision: integer(r.revision, 0, 2147483646, "revision") };
   let result: BingoCommand;
   switch (r.operation) {
-    case "createRound": result = { ...base, operation: r.operation }; break;
+    case "createRound": result = { ...base, operation: r.operation, ...(r.templateId===undefined?{}:{templateId:uuid(r.templateId)}) }; break;
+    case "applyTemplate": result={...base,operation:r.operation,roundId:uuid(r.roundId),templateId:r.templateId===null?null:uuid(r.templateId)};break;
     case "saveRound":
       if (typeof r.label !== "string" || !r.label.trim() || r.label.trim().length > 80) throw new BingoPreparationError("Bitte eine Bezeichnung mit 1 bis 80 Zeichen eingeben.", "label");
       if (r.strategy !== "NEW" && r.strategy !== "EXISTING") throw new BingoPreparationError("Bitte eine Kartenstrategie auswählen.", "strategy");
@@ -43,6 +46,7 @@ export function parseCommand(input: unknown): BingoCommand {
       if (r.direction !== -1 && r.direction !== 1) throw denied();
       result = { ...base, operation: r.operation, roundId: uuid(r.roundId), direction: r.direction }; break;
     case "removeRound": result = { ...base, operation: r.operation, roundId: uuid(r.roundId) }; break;
+    case "generateEvening": result = {...base,operation:r.operation,count:integer(r.count,1,MAX_GENERATE,'count'),requestId:uuid(r.requestId),...(r.printLayout===undefined?{}:{printLayout:parsePrintLayout(r.printLayout)})};break;
     case "generate": result = { ...base, operation: r.operation, roundId: uuid(r.roundId), count: integer(r.count, 1, MAX_GENERATE, "count"), requestId: uuid(r.requestId), ...(r.printLayout===undefined?{}:{printLayout:parsePrintLayout(r.printLayout)}) }; break;
     case "attach": case "detach": result = { ...base, operation: r.operation, roundId: uuid(r.roundId), seriesId: uuid(r.seriesId) }; break;
     default: throw denied();
@@ -71,5 +75,5 @@ export function decodeCard(value: unknown): CardLayout {
 }
 export type RoundView = { terms?:TermSet|null; locked?:boolean; id: string; position: number; label: string; target: number; strategy: CardStrategy; issued: number | null; cardCount: number; series: { id: string; code: string; count: number;duplex?:boolean }[]; history: { actor: string; at: string; before: number | null; after: number | null }[] };
 export type SeriesView = { id: string; code: string; count: number; originRoundId: string; createdAt: string; designName: string; olderDesign: boolean };
-export type PreparationView = { printLayout?:PrintLayout; termSets?:{id:string;config:TermSet;createdAt?:string}[]; gameId: string; title: string; seriesId: number; revision: number; archived: boolean; rounds: RoundView[]; roundCount: number; page: number; available: SeriesView[]; seriesPage: number; seriesCount: number };
+export type PreparationView = { templates?:{id:string;name:string;special:boolean;target:number}[]; printLayout?:PrintLayout; termSets?:{id:string;config:TermSet;createdAt?:string}[]; gameId: string; title: string; seriesId: number; revision: number; archived: boolean; rounds: RoundView[]; roundCount: number; page: number; available: SeriesView[]; seriesPage: number; seriesCount: number };
 export type StoredCard = { id: string; code: string; shortCode?: string; ordinal: number; cells: CardLayout };

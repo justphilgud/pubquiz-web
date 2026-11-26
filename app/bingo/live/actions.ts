@@ -4,6 +4,9 @@ import { startLive, commandLive } from "./repository.server";
 import type { LiveCommand } from "./live";
 
 const messages: Record<string, string> = {
+  OLD_CARD: "Alte Bingokarte – gehört nicht zum aktuellen Bingo-Abend",
+  CARD_NOT_FOUND: "Karte im aktuellen Bingo-Abend nicht gefunden",
+  AMBIGUOUS_CARD: "Kartenkennung ist nicht eindeutig. Bitte die vollständige Kennung verwenden.",
   INVALID_NUMBER: "Bitte eine ganze Zahl von 1 bis 75 eingeben.",
   DUPLICATE_DRAW_NUMBER: "Diese Zahl wurde bereits veröffentlicht.",
   REVISION_CONFLICT: "Ein anderes Fenster hat den Stand geändert. Bitte aktuellen Stand laden; deine Eingaben bleiben erhalten.",
@@ -38,4 +41,10 @@ export async function saveEventRun(input:
  const {actor}=await requireActor();
  try{if(input.operation!=="start"&&input.operation!=="command")throw Error("INVALID_COMMAND");const api=await import("./eventRepository.server");return {success:true as const,...(input.operation==="start"?await api.startEventRun(actor.userId,input):await api.commandEventRun(actor.userId,input))};}
  catch(error){const code=error instanceof Error?error.message:"";return {success:false as const,code,message:code==="CALL_CONTEXT_CONFLICT"?"Der Ziehungsstand hat sich geändert. Der Ruf wurde nicht umgedeutet. Bitte den aktuellen Stand prüfen und den Konflikt klären.":code==="OPEN_CLAIMS"?"Bitte offene Rufe und erforderliche Nachprüfungen zuerst klären. Weitere Rufe können erfasst werden.":code==="ROUND_NOT_OPEN"?"Diese Runde ist geschlossen und kann nicht verändert werden.":messages[code]??"Nicht gespeichert. Bitte aktuellen Stand, Rechte und Karten prüfen. Deine Eingaben bleiben erhalten."};}
+}
+
+export async function resolveCardCode(gameId:string,code:string) {
+ const {actor}=await requireActor();
+ try {const {resolveEveningCard}=await import('./eventRepository.server');return {success:true as const,cardId:await resolveEveningCard(actor.userId,gameId,code)};}
+ catch(error){return {success:false as const,message:messages[error instanceof Error?error.message:'']??'Karte nicht gefunden oder kein Zugriff.'};}
 }

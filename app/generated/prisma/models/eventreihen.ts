@@ -308,6 +308,7 @@ export type eventreihenWhereInput = {
   shared_design_template_id?: Prisma.StringNullableFilter<"eventreihen"> | string | null
   default_presentation_template_id?: Prisma.StringFilter<"eventreihen"> | string
   default_answer_form_template_id?: Prisma.StringFilter<"eventreihen"> | string
+  bingo_round_templates?: Prisma.Bingo_round_templatesListRelationFilter
   bingo_live_runs?: Prisma.Bingo_live_runsListRelationFilter
   game_drafts?: Prisma.Game_draftsListRelationFilter
   reihenrollen?: Prisma.Benutzer_reihenrollenListRelationFilter
@@ -340,6 +341,7 @@ export type eventreihenOrderByWithRelationInput = {
   shared_design_template_id?: Prisma.SortOrderInput | Prisma.SortOrder
   default_presentation_template_id?: Prisma.SortOrder
   default_answer_form_template_id?: Prisma.SortOrder
+  bingo_round_templates?: Prisma.bingo_round_templatesOrderByRelationAggregateInput
   bingo_live_runs?: Prisma.bingo_live_runsOrderByRelationAggregateInput
   game_drafts?: Prisma.game_draftsOrderByRelationAggregateInput
   reihenrollen?: Prisma.benutzer_reihenrollenOrderByRelationAggregateInput
@@ -375,6 +377,7 @@ export type eventreihenWhereUniqueInput = Prisma.AtLeast<{
   shared_design_template_id?: Prisma.StringNullableFilter<"eventreihen"> | string | null
   default_presentation_template_id?: Prisma.StringFilter<"eventreihen"> | string
   default_answer_form_template_id?: Prisma.StringFilter<"eventreihen"> | string
+  bingo_round_templates?: Prisma.Bingo_round_templatesListRelationFilter
   bingo_live_runs?: Prisma.Bingo_live_runsListRelationFilter
   game_drafts?: Prisma.Game_draftsListRelationFilter
   reihenrollen?: Prisma.Benutzer_reihenrollenListRelationFilter
@@ -454,6 +457,7 @@ export type eventreihenCreateInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenCreateNestedManyWithoutEventreiheInput
@@ -486,6 +490,7 @@ export type eventreihenUncheckedCreateInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedCreateNestedManyWithoutEventreiheInput
@@ -517,6 +522,7 @@ export type eventreihenUpdateInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUpdateManyWithoutEventreiheNestedInput
@@ -549,6 +555,7 @@ export type eventreihenUncheckedUpdateInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -872,6 +879,20 @@ export type eventreihenUpdateOneRequiredWithoutBingo_live_runsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.eventreihenUpdateToOneWithWhereWithoutBingo_live_runsInput, Prisma.eventreihenUpdateWithoutBingo_live_runsInput>, Prisma.eventreihenUncheckedUpdateWithoutBingo_live_runsInput>
 }
 
+export type eventreihenCreateNestedOneWithoutBingo_round_templatesInput = {
+  create?: Prisma.XOR<Prisma.eventreihenCreateWithoutBingo_round_templatesInput, Prisma.eventreihenUncheckedCreateWithoutBingo_round_templatesInput>
+  connectOrCreate?: Prisma.eventreihenCreateOrConnectWithoutBingo_round_templatesInput
+  connect?: Prisma.eventreihenWhereUniqueInput
+}
+
+export type eventreihenUpdateOneRequiredWithoutBingo_round_templatesNestedInput = {
+  create?: Prisma.XOR<Prisma.eventreihenCreateWithoutBingo_round_templatesInput, Prisma.eventreihenUncheckedCreateWithoutBingo_round_templatesInput>
+  connectOrCreate?: Prisma.eventreihenCreateOrConnectWithoutBingo_round_templatesInput
+  upsert?: Prisma.eventreihenUpsertWithoutBingo_round_templatesInput
+  connect?: Prisma.eventreihenWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.eventreihenUpdateToOneWithWhereWithoutBingo_round_templatesInput, Prisma.eventreihenUpdateWithoutBingo_round_templatesInput>, Prisma.eventreihenUncheckedUpdateWithoutBingo_round_templatesInput>
+}
+
 export type eventreihenCreateWithoutQuizInput = {
   bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   reservierungs_url?: string | null
@@ -889,6 +910,7 @@ export type eventreihenCreateWithoutQuizInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenCreateNestedManyWithoutEventreiheInput
@@ -920,6 +942,7 @@ export type eventreihenUncheckedCreateWithoutQuizInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedCreateNestedManyWithoutEventreiheInput
@@ -966,6 +989,7 @@ export type eventreihenUpdateWithoutQuizInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUpdateManyWithoutEventreiheNestedInput
@@ -997,6 +1021,7 @@ export type eventreihenUncheckedUpdateWithoutQuizInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -1027,6 +1052,7 @@ export type eventreihenCreateWithoutStory_elementeInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenCreateNestedManyWithoutEventreiheInput
@@ -1058,6 +1084,7 @@ export type eventreihenUncheckedCreateWithoutStory_elementeInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedCreateNestedManyWithoutEventreiheInput
@@ -1104,6 +1131,7 @@ export type eventreihenUpdateWithoutStory_elementeInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUpdateManyWithoutEventreiheNestedInput
@@ -1135,6 +1163,7 @@ export type eventreihenUncheckedUpdateWithoutStory_elementeInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -1165,6 +1194,7 @@ export type eventreihenCreateWithoutLive_pollsInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenCreateNestedManyWithoutEventreiheInput
@@ -1196,6 +1226,7 @@ export type eventreihenUncheckedCreateWithoutLive_pollsInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedCreateNestedManyWithoutEventreiheInput
@@ -1242,6 +1273,7 @@ export type eventreihenUpdateWithoutLive_pollsInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUpdateManyWithoutEventreiheNestedInput
@@ -1273,6 +1305,7 @@ export type eventreihenUncheckedUpdateWithoutLive_pollsInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -1303,6 +1336,7 @@ export type eventreihenCreateWithoutRollenzuweisungenInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenCreateNestedManyWithoutEventreiheInput
@@ -1334,6 +1368,7 @@ export type eventreihenUncheckedCreateWithoutRollenzuweisungenInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedCreateNestedManyWithoutEventreiheInput
@@ -1380,6 +1415,7 @@ export type eventreihenUpdateWithoutRollenzuweisungenInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUpdateManyWithoutEventreiheNestedInput
@@ -1411,6 +1447,7 @@ export type eventreihenUncheckedUpdateWithoutRollenzuweisungenInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -1441,6 +1478,7 @@ export type eventreihenCreateWithoutBenutzerrollenInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenCreateNestedManyWithoutEventreiheInput
@@ -1472,6 +1510,7 @@ export type eventreihenUncheckedCreateWithoutBenutzerrollenInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedCreateNestedManyWithoutEventreiheInput
@@ -1518,6 +1557,7 @@ export type eventreihenUpdateWithoutBenutzerrollenInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUpdateManyWithoutEventreiheNestedInput
@@ -1549,6 +1589,7 @@ export type eventreihenUncheckedUpdateWithoutBenutzerrollenInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -1579,6 +1620,7 @@ export type eventreihenCreateWithoutFragenInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenCreateNestedManyWithoutEventreiheInput
@@ -1610,6 +1652,7 @@ export type eventreihenUncheckedCreateWithoutFragenInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedCreateNestedManyWithoutEventreiheInput
@@ -1656,6 +1699,7 @@ export type eventreihenUpdateWithoutFragenInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUpdateManyWithoutEventreiheNestedInput
@@ -1687,6 +1731,7 @@ export type eventreihenUncheckedUpdateWithoutFragenInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -1717,6 +1762,7 @@ export type eventreihenCreateWithoutEventartenInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenCreateNestedManyWithoutEventreiheInput
@@ -1748,6 +1794,7 @@ export type eventreihenUncheckedCreateWithoutEventartenInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedCreateNestedManyWithoutEventreiheInput
@@ -1794,6 +1841,7 @@ export type eventreihenUpdateWithoutEventartenInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUpdateManyWithoutEventreiheNestedInput
@@ -1825,6 +1873,7 @@ export type eventreihenUncheckedUpdateWithoutEventartenInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -1855,6 +1904,7 @@ export type eventreihenCreateWithoutEventartrollenInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenCreateNestedManyWithoutEventreiheInput
@@ -1886,6 +1936,7 @@ export type eventreihenUncheckedCreateWithoutEventartrollenInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedCreateNestedManyWithoutEventreiheInput
@@ -1932,6 +1983,7 @@ export type eventreihenUpdateWithoutEventartrollenInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUpdateManyWithoutEventreiheNestedInput
@@ -1963,6 +2015,7 @@ export type eventreihenUncheckedUpdateWithoutEventartrollenInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -1993,6 +2046,7 @@ export type eventreihenCreateWithoutVerwalterInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenCreateNestedManyWithoutEventreiheInput
@@ -2024,6 +2078,7 @@ export type eventreihenUncheckedCreateWithoutVerwalterInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedCreateNestedManyWithoutEventreiheInput
@@ -2070,6 +2125,7 @@ export type eventreihenUpdateWithoutVerwalterInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUpdateManyWithoutEventreiheNestedInput
@@ -2101,6 +2157,7 @@ export type eventreihenUncheckedUpdateWithoutVerwalterInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -2131,6 +2188,7 @@ export type eventreihenCreateWithoutReihenrollenInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
   eventarten?: Prisma.eventreihe_eventartenCreateNestedManyWithoutEventreiheInput
@@ -2162,6 +2220,7 @@ export type eventreihenUncheckedCreateWithoutReihenrollenInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutEventreiheInput
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
   eventarten?: Prisma.eventreihe_eventartenUncheckedCreateNestedManyWithoutEventreiheInput
@@ -2208,6 +2267,7 @@ export type eventreihenUpdateWithoutReihenrollenInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
   eventarten?: Prisma.eventreihe_eventartenUpdateManyWithoutEventreiheNestedInput
@@ -2239,6 +2299,7 @@ export type eventreihenUncheckedUpdateWithoutReihenrollenInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
   eventarten?: Prisma.eventreihe_eventartenUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -2269,6 +2330,7 @@ export type eventreihenCreateWithoutGame_draftsInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenCreateNestedManyWithoutEventreiheInput
   eventarten?: Prisma.eventreihe_eventartenCreateNestedManyWithoutEventreiheInput
@@ -2300,6 +2362,7 @@ export type eventreihenUncheckedCreateWithoutGame_draftsInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSeriesInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedCreateNestedManyWithoutEventreiheInput
   eventarten?: Prisma.eventreihe_eventartenUncheckedCreateNestedManyWithoutEventreiheInput
@@ -2346,6 +2409,7 @@ export type eventreihenUpdateWithoutGame_draftsInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUpdateManyWithoutEventreiheNestedInput
   eventarten?: Prisma.eventreihe_eventartenUpdateManyWithoutEventreiheNestedInput
@@ -2377,6 +2441,7 @@ export type eventreihenUncheckedUpdateWithoutGame_draftsInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSeriesNestedInput
   bingo_live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedUpdateManyWithoutEventreiheNestedInput
   eventarten?: Prisma.eventreihe_eventartenUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -2407,6 +2472,7 @@ export type eventreihenCreateWithoutBingo_live_runsInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesCreateNestedManyWithoutSeriesInput
   game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenCreateNestedManyWithoutEventreiheInput
   eventarten?: Prisma.eventreihe_eventartenCreateNestedManyWithoutEventreiheInput
@@ -2438,6 +2504,7 @@ export type eventreihenUncheckedCreateWithoutBingo_live_runsInput = {
   shared_design_template_id?: string | null
   default_presentation_template_id?: string
   default_answer_form_template_id?: string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedCreateNestedManyWithoutSeriesInput
   game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedCreateNestedManyWithoutEventreiheInput
   eventarten?: Prisma.eventreihe_eventartenUncheckedCreateNestedManyWithoutEventreiheInput
@@ -2484,6 +2551,7 @@ export type eventreihenUpdateWithoutBingo_live_runsInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUpdateManyWithoutSeriesNestedInput
   game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUpdateManyWithoutEventreiheNestedInput
   eventarten?: Prisma.eventreihe_eventartenUpdateManyWithoutEventreiheNestedInput
@@ -2515,6 +2583,149 @@ export type eventreihenUncheckedUpdateWithoutBingo_live_runsInput = {
   shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
   default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_round_templates?: Prisma.bingo_round_templatesUncheckedUpdateManyWithoutSeriesNestedInput
+  game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
+  reihenrollen?: Prisma.benutzer_reihenrollenUncheckedUpdateManyWithoutEventreiheNestedInput
+  eventarten?: Prisma.eventreihe_eventartenUncheckedUpdateManyWithoutEventreiheNestedInput
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedUpdateManyWithoutEventreiheNestedInput
+  verwalter?: Prisma.eventreihe_verwaltungUncheckedUpdateManyWithoutEventreiheNestedInput
+  quiz?: Prisma.quizUncheckedUpdateManyWithoutEventreiheNestedInput
+  benutzerrollen?: Prisma.eventreihe_benutzerrollenUncheckedUpdateManyWithoutEventreiheNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedUpdateManyWithoutEventreiheNestedInput
+  fragen?: Prisma.fragen_eventreihenUncheckedUpdateManyWithoutEventreiheNestedInput
+  story_elemente?: Prisma.story_elementeUncheckedUpdateManyWithoutEventreiheNestedInput
+  live_polls?: Prisma.live_pollsUncheckedUpdateManyWithoutEventreiheNestedInput
+}
+
+export type eventreihenCreateWithoutBingo_round_templatesInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  reservierungs_url?: string | null
+  logo_url?: string | null
+  name: string
+  slug: string
+  oeffentlicher_name?: string | null
+  beschreibung?: string | null
+  interne_bemerkung?: string | null
+  ist_oeffentlich?: boolean
+  ist_archiviert?: boolean
+  archiviert_am?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  shared_design_template_id?: string | null
+  default_presentation_template_id?: string
+  default_answer_form_template_id?: string
+  bingo_live_runs?: Prisma.bingo_live_runsCreateNestedManyWithoutEventreiheInput
+  game_drafts?: Prisma.game_draftsCreateNestedManyWithoutEventreiheInput
+  reihenrollen?: Prisma.benutzer_reihenrollenCreateNestedManyWithoutEventreiheInput
+  eventarten?: Prisma.eventreihe_eventartenCreateNestedManyWithoutEventreiheInput
+  eventartrollen?: Prisma.benutzer_eventartrollenCreateNestedManyWithoutEventreiheInput
+  verwalter?: Prisma.eventreihe_verwaltungCreateNestedManyWithoutEventreiheInput
+  quiz?: Prisma.quizCreateNestedManyWithoutEventreiheInput
+  benutzerrollen?: Prisma.eventreihe_benutzerrollenCreateNestedManyWithoutEventreiheInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenCreateNestedManyWithoutEventreiheInput
+  fragen?: Prisma.fragen_eventreihenCreateNestedManyWithoutEventreiheInput
+  story_elemente?: Prisma.story_elementeCreateNestedManyWithoutEventreiheInput
+  live_polls?: Prisma.live_pollsCreateNestedManyWithoutEventreiheInput
+}
+
+export type eventreihenUncheckedCreateWithoutBingo_round_templatesInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  reservierungs_url?: string | null
+  logo_url?: string | null
+  eventreihe_id?: number
+  name: string
+  slug: string
+  oeffentlicher_name?: string | null
+  beschreibung?: string | null
+  interne_bemerkung?: string | null
+  ist_oeffentlich?: boolean
+  ist_archiviert?: boolean
+  archiviert_am?: Date | string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  shared_design_template_id?: string | null
+  default_presentation_template_id?: string
+  default_answer_form_template_id?: string
+  bingo_live_runs?: Prisma.bingo_live_runsUncheckedCreateNestedManyWithoutEventreiheInput
+  game_drafts?: Prisma.game_draftsUncheckedCreateNestedManyWithoutEventreiheInput
+  reihenrollen?: Prisma.benutzer_reihenrollenUncheckedCreateNestedManyWithoutEventreiheInput
+  eventarten?: Prisma.eventreihe_eventartenUncheckedCreateNestedManyWithoutEventreiheInput
+  eventartrollen?: Prisma.benutzer_eventartrollenUncheckedCreateNestedManyWithoutEventreiheInput
+  verwalter?: Prisma.eventreihe_verwaltungUncheckedCreateNestedManyWithoutEventreiheInput
+  quiz?: Prisma.quizUncheckedCreateNestedManyWithoutEventreiheInput
+  benutzerrollen?: Prisma.eventreihe_benutzerrollenUncheckedCreateNestedManyWithoutEventreiheInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUncheckedCreateNestedManyWithoutEventreiheInput
+  fragen?: Prisma.fragen_eventreihenUncheckedCreateNestedManyWithoutEventreiheInput
+  story_elemente?: Prisma.story_elementeUncheckedCreateNestedManyWithoutEventreiheInput
+  live_polls?: Prisma.live_pollsUncheckedCreateNestedManyWithoutEventreiheInput
+}
+
+export type eventreihenCreateOrConnectWithoutBingo_round_templatesInput = {
+  where: Prisma.eventreihenWhereUniqueInput
+  create: Prisma.XOR<Prisma.eventreihenCreateWithoutBingo_round_templatesInput, Prisma.eventreihenUncheckedCreateWithoutBingo_round_templatesInput>
+}
+
+export type eventreihenUpsertWithoutBingo_round_templatesInput = {
+  update: Prisma.XOR<Prisma.eventreihenUpdateWithoutBingo_round_templatesInput, Prisma.eventreihenUncheckedUpdateWithoutBingo_round_templatesInput>
+  create: Prisma.XOR<Prisma.eventreihenCreateWithoutBingo_round_templatesInput, Prisma.eventreihenUncheckedCreateWithoutBingo_round_templatesInput>
+  where?: Prisma.eventreihenWhereInput
+}
+
+export type eventreihenUpdateToOneWithWhereWithoutBingo_round_templatesInput = {
+  where?: Prisma.eventreihenWhereInput
+  data: Prisma.XOR<Prisma.eventreihenUpdateWithoutBingo_round_templatesInput, Prisma.eventreihenUncheckedUpdateWithoutBingo_round_templatesInput>
+}
+
+export type eventreihenUpdateWithoutBingo_round_templatesInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  reservierungs_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  oeffentlicher_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interne_bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ist_oeffentlich?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_live_runs?: Prisma.bingo_live_runsUpdateManyWithoutEventreiheNestedInput
+  game_drafts?: Prisma.game_draftsUpdateManyWithoutEventreiheNestedInput
+  reihenrollen?: Prisma.benutzer_reihenrollenUpdateManyWithoutEventreiheNestedInput
+  eventarten?: Prisma.eventreihe_eventartenUpdateManyWithoutEventreiheNestedInput
+  eventartrollen?: Prisma.benutzer_eventartrollenUpdateManyWithoutEventreiheNestedInput
+  verwalter?: Prisma.eventreihe_verwaltungUpdateManyWithoutEventreiheNestedInput
+  quiz?: Prisma.quizUpdateManyWithoutEventreiheNestedInput
+  benutzerrollen?: Prisma.eventreihe_benutzerrollenUpdateManyWithoutEventreiheNestedInput
+  rollenzuweisungen?: Prisma.benutzer_rollenzuweisungenUpdateManyWithoutEventreiheNestedInput
+  fragen?: Prisma.fragen_eventreihenUpdateManyWithoutEventreiheNestedInput
+  story_elemente?: Prisma.story_elementeUpdateManyWithoutEventreiheNestedInput
+  live_polls?: Prisma.live_pollsUpdateManyWithoutEventreiheNestedInput
+}
+
+export type eventreihenUncheckedUpdateWithoutBingo_round_templatesInput = {
+  bingo_print_config?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  reservierungs_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  logo_url?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eventreihe_id?: Prisma.IntFieldUpdateOperationsInput | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  oeffentlicher_name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  beschreibung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  interne_bemerkung?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ist_oeffentlich?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ist_archiviert?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  archiviert_am?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  shared_design_template_id?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  default_presentation_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  default_answer_form_template_id?: Prisma.StringFieldUpdateOperationsInput | string
+  bingo_live_runs?: Prisma.bingo_live_runsUncheckedUpdateManyWithoutEventreiheNestedInput
   game_drafts?: Prisma.game_draftsUncheckedUpdateManyWithoutEventreiheNestedInput
   reihenrollen?: Prisma.benutzer_reihenrollenUncheckedUpdateManyWithoutEventreiheNestedInput
   eventarten?: Prisma.eventreihe_eventartenUncheckedUpdateManyWithoutEventreiheNestedInput
@@ -2534,6 +2745,7 @@ export type eventreihenUncheckedUpdateWithoutBingo_live_runsInput = {
  */
 
 export type EventreihenCountOutputType = {
+  bingo_round_templates: number
   bingo_live_runs: number
   game_drafts: number
   reihenrollen: number
@@ -2549,6 +2761,7 @@ export type EventreihenCountOutputType = {
 }
 
 export type EventreihenCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  bingo_round_templates?: boolean | EventreihenCountOutputTypeCountBingo_round_templatesArgs
   bingo_live_runs?: boolean | EventreihenCountOutputTypeCountBingo_live_runsArgs
   game_drafts?: boolean | EventreihenCountOutputTypeCountGame_draftsArgs
   reihenrollen?: boolean | EventreihenCountOutputTypeCountReihenrollenArgs
@@ -2571,6 +2784,13 @@ export type EventreihenCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.
    * Select specific fields to fetch from the EventreihenCountOutputType
    */
   select?: Prisma.EventreihenCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * EventreihenCountOutputType without action
+ */
+export type EventreihenCountOutputTypeCountBingo_round_templatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.bingo_round_templatesWhereInput
 }
 
 /**
@@ -2676,6 +2896,7 @@ export type eventreihenSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   shared_design_template_id?: boolean
   default_presentation_template_id?: boolean
   default_answer_form_template_id?: boolean
+  bingo_round_templates?: boolean | Prisma.eventreihen$bingo_round_templatesArgs<ExtArgs>
   bingo_live_runs?: boolean | Prisma.eventreihen$bingo_live_runsArgs<ExtArgs>
   game_drafts?: boolean | Prisma.eventreihen$game_draftsArgs<ExtArgs>
   reihenrollen?: boolean | Prisma.eventreihen$reihenrollenArgs<ExtArgs>
@@ -2753,6 +2974,7 @@ export type eventreihenSelectScalar = {
 
 export type eventreihenOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"bingo_print_config" | "reservierungs_url" | "logo_url" | "eventreihe_id" | "name" | "slug" | "oeffentlicher_name" | "beschreibung" | "interne_bemerkung" | "ist_oeffentlich" | "ist_archiviert" | "archiviert_am" | "created_at" | "updated_at" | "shared_design_template_id" | "default_presentation_template_id" | "default_answer_form_template_id", ExtArgs["result"]["eventreihen"]>
 export type eventreihenInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  bingo_round_templates?: boolean | Prisma.eventreihen$bingo_round_templatesArgs<ExtArgs>
   bingo_live_runs?: boolean | Prisma.eventreihen$bingo_live_runsArgs<ExtArgs>
   game_drafts?: boolean | Prisma.eventreihen$game_draftsArgs<ExtArgs>
   reihenrollen?: boolean | Prisma.eventreihen$reihenrollenArgs<ExtArgs>
@@ -2773,6 +2995,7 @@ export type eventreihenIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.
 export type $eventreihenPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "eventreihen"
   objects: {
+    bingo_round_templates: Prisma.$bingo_round_templatesPayload<ExtArgs>[]
     bingo_live_runs: Prisma.$bingo_live_runsPayload<ExtArgs>[]
     game_drafts: Prisma.$game_draftsPayload<ExtArgs>[]
     reihenrollen: Prisma.$benutzer_reihenrollenPayload<ExtArgs>[]
@@ -3198,6 +3421,7 @@ readonly fields: eventreihenFieldRefs;
  */
 export interface Prisma__eventreihenClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  bingo_round_templates<T extends Prisma.eventreihen$bingo_round_templatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.eventreihen$bingo_round_templatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$bingo_round_templatesPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   bingo_live_runs<T extends Prisma.eventreihen$bingo_live_runsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.eventreihen$bingo_live_runsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$bingo_live_runsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   game_drafts<T extends Prisma.eventreihen$game_draftsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.eventreihen$game_draftsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$game_draftsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reihenrollen<T extends Prisma.eventreihen$reihenrollenArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.eventreihen$reihenrollenArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$benutzer_reihenrollenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3646,6 +3870,30 @@ export type eventreihenDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many eventreihens to delete.
    */
   limit?: number
+}
+
+/**
+ * eventreihen.bingo_round_templates
+ */
+export type eventreihen$bingo_round_templatesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the bingo_round_templates
+   */
+  select?: Prisma.bingo_round_templatesSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the bingo_round_templates
+   */
+  omit?: Prisma.bingo_round_templatesOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.bingo_round_templatesInclude<ExtArgs> | null
+  where?: Prisma.bingo_round_templatesWhereInput
+  orderBy?: Prisma.bingo_round_templatesOrderByWithRelationInput | Prisma.bingo_round_templatesOrderByWithRelationInput[]
+  cursor?: Prisma.bingo_round_templatesWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.Bingo_round_templatesScalarFieldEnum | Prisma.Bingo_round_templatesScalarFieldEnum[]
 }
 
 /**

@@ -26,6 +26,7 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
       window.currentData=data;
       flushSync(()=>root.render(<div style={scaled?{width:1280,height:720,transform:'scale(.4)',transformOrigin:'top left'}:{height:'100dvh'}}><Board data={data}/></div>));
     };
+    window.showImage=()=>{window.show('lovd-ungegoogelt',20);const data={...window.currentData,content:{kind:'IMAGE',url:'/large-image.svg',answer:'Gespeicherte Bildauflösung'}};flushSync(()=>root.render(<div style={{height:'100dvh'}}><Board data={data}/></div>));};
     window.showTerms=(term)=>{window.show('phil-gud',1);const data={...window.currentData,termMode:true,labels:term===null?{}:{1:term}};flushSync(()=>root.render(<div style={{height:'100dvh'}}><Board data={data}/></div>));};
     window.mountPolling=()=>flushSync(()=>root.render(<Audience initial={{...window.currentData,id:'polling',revision:0,draws:[]}} audienceKey="fixture"/>));
     window.slowFonts=()=>{
@@ -49,6 +50,7 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
   let pollRequests = 0;
   const server = createServer((req, res) => {
     const path = req.url ?? "/";
+    if(path==='/large-image.svg'){res.setHeader('Content-Type','image/svg+xml');res.end('<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000"><rect width="1000" height="1000" fill="#f6c4dc"/><circle cx="500" cy="500" r="300" fill="#171717"/></svg>');return;}
     if (path === "/hanging") { return; }
     if (path === "/api/bingo/presentation/fixture") {
       pollRequests++;
@@ -108,6 +110,13 @@ test("actual Bingo board fits both dimensions, stable positions, fonts, states, 
           writeFileSync(join(process.env.BINGO_ARTIFACT_DIR, `board-${brand}-${width}x${height}.png`), Buffer.from(shot.data!, "base64"));
         }
       }
+    }
+    for(const [width,height] of [[1280,600],[1366,768],[1920,1080]]){
+      await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},sessionId);
+      await evaluate('window.showImage()');await new Promise(r=>setTimeout(r,150));
+      const imageShape=await evaluate(`(()=>{const current=document.querySelector('[data-current-panel]').getBoundingClientRect(),slot=document.querySelector('[data-media-slot]').getBoundingClientRect(),image=document.querySelector('[alt="Bingo-Bild"]').getBoundingClientRect(),board=document.querySelector('ol').getBoundingClientRect();return{ready:document.querySelector('[alt="Bingo-Bild"]').naturalWidth>0,separated:current.bottom<=slot.top&&slot.bottom<=board.top,imageFits:image.top>=slot.top-1&&image.bottom<=slot.bottom+1&&image.left>=slot.left-1&&image.right<=slot.right+1,number:document.querySelector('[data-current-number]').textContent};})()`);
+      assert.deepEqual(imageShape,{ready:true,separated:true,imageFits:true,number:'I 20'},`media and number/board separation ${width}x${height}`);
+      assert.deepEqual((await evaluate('window.measure()') as {issues:string[]}).issues,[]);
     }
     for(const [width,height] of [[1280,600],[1920,1080]]){
       await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},sessionId);

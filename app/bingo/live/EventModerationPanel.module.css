@@ -12,3 +12,19 @@
 .root .danger:not(:disabled){color:#fecaca;border-color:#f87171}
 
 .root .card .hit{background:var(--bingo-pink);color:var(--bingo-ink)}
+
+/* Fixed letter rows, large entry and chronological check history. */
+.root{font-size:17px}.root label{font-size:16px}.root button{font-size:16px}
+.layout{grid-template-columns:minmax(0,1fr) 300px}.publish label{width:180px}
+.root .publish input{font-size:52px;font-weight:800;min-height:88px;text-align:center}
+.board{grid-template-columns:32px repeat(15,minmax(0,1fr));gap:4px}.board .rowLetter{background:transparent;color:var(--bingo-paper);font-weight:900;border:0}
+.legend{display:flex;gap:8px;flex-wrap:wrap}.legend span{padding:4px 8px;border-radius:4px}
+.checkScroll{max-height:610px;overflow:auto}.checkGrid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(7,minmax(110px,1fr));grid-auto-rows:145px;gap:10px;min-width:830px}
+.checkGrid>li{border:2px solid currentColor;border-radius:6px;padding:8px;overflow-wrap:anywhere;overflow:hidden}
+.checkGrid a{color:inherit;display:flex;flex-direction:column;align-items:start;gap:5px}.checkGrid small{font-size:12px}
+.root [data-result="0"]{background:#fee2e2;color:#7f1d1d}.root [data-result="1"]{background:#dcfce7;color:#14532d}.root [data-result="2"]{background:#dbeafe;color:#1e3a8a}.root [data-result="3"]{background:var(--bingo-yellow);color:var(--bingo-ink)}
+.drawHistory{list-style:none;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px}.drawHistory button{width:100%;display:flex;flex-direction:column;gap:4px}.drawHistory strong{font-size:24px}
+@media(max-width:1100px){.layout{display:flex;flex-direction:column;overflow:auto}.workspace,.sidebar{overflow:visible;min-height:auto;flex:none}.board>span{font-size:12px}.board{grid-template-columns:22px repeat(15,minmax(0,1fr));gap:2px}.sidebar{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}}
+@media(max-width:600px){.root .publish input{font-size:48px}.publish label{width:150px}.board>span{min-height:25px;font-size:11px}.board{grid-template-columns:18px repeat(15,minmax(0,1fr));gap:1px}.sidebar{display:block}.numberRow{gap:20px}.current strong{font-size:64px}}
+
+.checkHeading{display:flex;align-items:center;justify-content:space-between;gap:3px;min-height:44px}.checkHeading strong{font-size:14px}.root .checkHeading button{padding:0;background:transparent;color:inherit;border:1px solid currentColor;flex-shrink:0}.checkGrid>li>a{min-height:54px;justify-content:start;gap:3px}.checkGrid>li>small{display:block;font-size:11px}

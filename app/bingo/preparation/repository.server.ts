@@ -1,3 +1,4 @@
+import {instantiateRoundTemplate} from '../content/repository.server';
 import { validateReferenceTerms } from './pdfReference.server';
 import { validateModernTerms } from './pdfModern.server';
 import { parseTermSet } from './termSet';
@@ -22,6 +23,10 @@ export async function writePreparation(userId: number, input: unknown) {
     const { game, series } = await context(tx, userId, command.gameId, true);
     if (game.eventreihe_id !== command.expectedSeriesId) throw new BingoPreparationError("Die Eventreihe wurde inzwischen geändert. Bitte neu laden; deine Eingaben bleiben erhalten.");
     const requestHash = sha256(canonical(command));
+    if(command.operation==='generateEvening') {
+      const [old]=await tx.$queryRaw<{request_hash:string}[]>`SELECT request_hash FROM pubquiz.bingo_print_jobs WHERE id=${command.requestId}::uuid AND game_id=${game.id}::uuid`;
+      if(old){if(old.request_hash!==requestHash)throw new BingoPreparationError('Diese Druckanfrage wurde bereits mit anderen Angaben verwendet.');return {jobId:command.requestId,repeated:true};}
+    }
     if (command.operation === "generate") {
       const existing = await tx.bingo_card_series.findUnique({ where: { game_id_request_id: { game_id: game.id, request_id: command.requestId } } });
       if (existing) {
@@ -36,11 +41,37 @@ export async function writePreparation(userId: number, input: unknown) {
     if(round&&(await tx.$queryRaw<{present:string|null}[]>`SELECT to_regclass('pubquiz.bingo_event_rounds')::text present`)[0].present){
       if((await tx.$queryRaw<{round_id:string}[]>`SELECT f.round_id FROM pubquiz.bingo_event_rounds f JOIN pubquiz.bingo_live_runs r ON r.id=f.run_id WHERE f.round_id=${round.id}::uuid AND f.game_id=${game.id}::uuid AND r.status IN ('RUNNING','PAUSED') LIMIT 1`).length)throw new BingoPreparationError("Diese Runde wurde bereits gestartet. Karten, Planung und Historie bleiben unverändert.");
     }
-    let result: { seriesId?: string; repeated?: boolean } = {};
+    let result: { seriesId?: string; jobId?:string;roundLabel?:string;roundTarget?:number; repeated?: boolean } = {};
     switch (command.operation) {
+      case 'generateEvening': {
+        const rounds=await tx.bingo_rounds.findMany({where:{game_id:game.id},orderBy:{position:'asc'},include:{series:{include:{series:{select:{id:true,code:true,card_count:true,origin_round_id:true}}}}}});
+        if(!rounds.length)throw new BingoPreparationError('Bitte zuerst Runden konfigurieren.');
+        const [active]=await tx.$queryRaw<{n:number}[]>`SELECT count(*)::int n FROM pubquiz.bingo_live_runs WHERE game_id=${game.id}::uuid AND status IN ('RUNNING','PAUSED')`;
+        if(active.n)throw new BingoPreparationError('Während eines laufenden oder pausierten Abends keine Sammelerzeugung. Bestehende Karten bleiben erhalten.');
+        if(rounds.some(r=>r.strategy!=='NEW'))throw new BingoPreparationError('Für Sammelerzeugung müssen alle Runden ausdrücklich „Neue Karten je Runde“ verwenden. Vorhandene Zuordnungen bleiben erhalten.');
+        await tx.$executeRaw`INSERT INTO pubquiz.bingo_print_jobs(id,game_id,request_hash,cards_per_round,created_by) VALUES(${command.requestId}::uuid,${game.id}::uuid,${requestHash},${command.count},${userId})`;
+        for(const r of rounds) {
+          const key=sha256(command.requestId+':'+r.id),requestId=`${key.slice(0,8)}-${key.slice(8,12)}-4${key.slice(13,16)}-a${key.slice(17,20)}-${key.slice(20,32)}`;
+          const c={...command,operation:'generate' as const,roundId:r.id,requestId};
+          const generated=await generateRound(tx,userId,game,series,r,c,sha256(canonical(c)));
+          void generated;
+          // All chunks share the root command hash; select by origin/hash, not timestamps.
+          const chunks=await tx.bingo_card_series.findMany({where:{game_id:game.id,origin_round_id:r.id,request_hash:sha256(canonical(c))},select:{id:true},orderBy:{code:'asc'}});
+          for(const chunk of chunks)await tx.$executeRaw`INSERT INTO pubquiz.bingo_print_job_items(job_id,game_id,round_id,series_id,round_position,round_label) VALUES(${command.requestId}::uuid,${game.id}::uuid,${r.id}::uuid,${chunk.id}::uuid,${r.position},${r.label})`;
+        }
+        result={jobId:command.requestId};break;
+      }
       case "createRound": {
         const max = (await tx.bingo_rounds.aggregate({ where: { game_id: game.id }, _max: { position: true } }))._max.position ?? 0;
-        await tx.bingo_rounds.create({ data: { id: randomUUID(), game_id: game.id, position: max + 1, label: `Runde ${max + 1}` } }); break;
+        const template=command.templateId?await instantiateRoundTemplate(tx,userId,game.id,command.templateId,game.eventreihe_id):null;
+        await tx.bingo_rounds.create({ data: { id: randomUUID(), game_id: game.id, position: max + 1, label: template?.label??`Runde ${max + 1}`, planned_draws:template?.target??30, term_snapshot:template?.config as Prisma.InputJsonValue??undefined } }); break;
+      }
+      case 'applyTemplate': {
+        if(round!.series.length||round!.issued_count!==null||await tx.bingo_card_series.count({where:{origin_round_id:round!.id}})||await tx.bingo_issuance_changes.count({where:{round_id:round!.id}}))throw new BingoPreparationError('Diese Runde hat bereits Karten oder Ausgabehistorie. Zum Wechseln des Inhalts eine neue Runde anlegen.');
+        const template=command.templateId?await instantiateRoundTemplate(tx,userId,game.id,command.templateId,game.eventreihe_id):null;
+        const label=template?.label??round!.label,target=template?.target??round!.planned_draws;
+        await tx.$executeRaw`UPDATE pubquiz.bingo_rounds SET label=${label},planned_draws=${target},term_snapshot=${template?.config?JSON.stringify(template.config):null}::jsonb WHERE id=${round!.id}::uuid AND game_id=${game.id}::uuid`;
+        result={roundLabel:label,roundTarget:target};break;
       }
       case "saveRound": {
         if (command.strategy === "NEW" && round!.series.some(s => s.series.origin_round_id !== round!.id)) throw new BingoPreparationError("Für neue Karten zuerst die ausdrücklich zugeordneten fremden Serien entfernen.", "strategy");
@@ -59,6 +90,9 @@ export async function writePreparation(userId: number, input: unknown) {
         await tx.bingo_rounds.update({ where: { id: round!.id }, data: { position: adjacent.position } }); break;
       }
       case "removeRound": {
+        const hasEvents=(await tx.$queryRaw<{present:string|null}[]>`SELECT to_regclass('pubquiz.bingo_event_round_plan')::text present`)[0].present;
+        const references=hasEvents?(await tx.$queryRaw<{n:number}[]>`SELECT ((SELECT count(*) FROM pubquiz.bingo_event_round_plan WHERE round_id=${round!.id}::uuid)+(SELECT count(*) FROM pubquiz.bingo_live_runs WHERE round_id=${round!.id}::uuid))::int AS n`)[0].n:0;
+        if(references)throw new BingoPreparationError('Die Runde ist in einem Durchlauf oder seiner Planung referenziert. Historie bleibt erhalten; Entfernen ist gesperrt.');
         if (round!.series.length || round!.issued_count !== null || await tx.bingo_card_series.count({ where: { origin_round_id: round!.id } }) || await tx.bingo_issuance_changes.count({ where: { round_id: round!.id } })) throw new BingoPreparationError("Runden mit Karten, Ausgabeangaben oder Historie können nicht gelöscht werden.");
         await tx.bingo_rounds.delete({ where: { id: round!.id } }); break;
       }
@@ -77,12 +111,22 @@ export async function writePreparation(userId: number, input: unknown) {
         } break;
       }
       case "generate": {
-        if (round!.strategy !== "NEW") throw new BingoPreparationError("Diese Runde verwendet vorhandene Karten. Bitte eine Serie ausdrücklich zuordnen.");
+        result=await generateRound(tx,userId,game,series,round!,command,requestHash);break;
+      }
+    }
+    await tx.bingo_preparations.update({ where: { game_id: game.id }, data: { revision: { increment: 1 } } });
+    return result;
+  }, { timeout: 30000 });
+}
+
+
+async function generateRound(tx:Prisma.TransactionClient,userId:number,game:Prisma.game_draftsGetPayload<object>,series:Prisma.eventreihenGetPayload<object>,round:Prisma.bingo_roundsGetPayload<{include:{series:{include:{series:{select:{id:true;code:true;card_count:true;origin_round_id:true}}}}}}>,command:Extract<import('./policy').BingoCommand,{operation:'generate'}>,requestHash:string) {
+        if (round.strategy !== "NEW") throw new BingoPreparationError("Diese Runde verwendet vorhandene Karten. Bitte eine Serie ausdrücklich zuordnen.");
         const design = (await resolveSharedDesign(tx, game.shared_design_template_id, series)).design;
         const settings=await resolveSelectedPrint(tx,design,series.bingo_print_config,game.bingo_print_config);
         if(command.printLayout)settings.layout={version:settings.layout?.version??3,textFont:settings.layout?.textFont??'ARIMO',...command.printLayout};
-        let snapshot = await captureNewPrintSnapshot(design, game.titel, round!.label,settings,await selectedPrintSource(tx,game.bingo_print_config??series.bingo_print_config));
-        if(round!.term_snapshot!==null){if(snapshot.version!==3&&snapshot.version!==4)throw new BingoPreparationError('Für Textkarten bitte ein neues V3-Druckformat auswählen.');snapshot=parsePrintSnapshot({...snapshot,terms:parseTermSet(round!.term_snapshot)});}
+        let snapshot = await captureNewPrintSnapshot(design, game.titel, round.label,settings,await selectedPrintSource(tx,game.bingo_print_config??series.bingo_print_config));
+        if(round.term_snapshot!==null){if(snapshot.version!==3&&snapshot.version!==4)throw new BingoPreparationError('Für Textkarten bitte ein neues V3-Druckformat auswählen.');snapshot=parsePrintSnapshot({...snapshot,terms:parseTermSet(round.term_snapshot)});}
         validateModernTerms(snapshot);validateReferenceTerms(snapshot);
         // Game lock serializes generation. Include existing game layouts, not just this request.
         const hashes=new Set((await tx.bingo_cards.findMany({where:{series:{game_id:game.id}},select:{layout_hash:true}})).map(card=>card.layout_hash));
@@ -99,16 +143,10 @@ export async function writePreparation(userId: number, input: unknown) {
           // Root request is sufficient for atomic idempotence; derived IDs never escape this transaction.
           const suffix=sha256(command.requestId+':'+offset);
           const requestId=offset===0?command.requestId:`${suffix.slice(0,8)}-${suffix.slice(8,12)}-4${suffix.slice(13,16)}-a${suffix.slice(17,20)}-${suffix.slice(20,32)}`;
-          await tx.bingo_card_series.create({data:{id:seriesId,game_id:game.id,origin_round_id:round!.id,code,card_count:count,request_id:requestId,request_hash:requestHash,print_snapshot:snapshot as unknown as Prisma.InputJsonValue,created_by:userId}});
+          await tx.bingo_card_series.create({data:{id:seriesId,game_id:game.id,origin_round_id:round.id,code,card_count:count,request_id:requestId,request_hash:requestHash,print_snapshot:snapshot as unknown as Prisma.InputJsonValue,created_by:userId}});
           await tx.bingo_cards.createMany({data:cards});
-          await tx.bingo_round_series.create({data:{game_id:game.id,round_id:round!.id,series_id:seriesId}});
+          await tx.bingo_round_series.create({data:{game_id:game.id,round_id:round.id,series_id:seriesId}});
           firstSeriesId??=seriesId;
         }
-        result={seriesId:firstSeriesId,repeated:false};break;
-      }
-    }
-    await tx.bingo_preparations.update({ where: { game_id: game.id }, data: { revision: { increment: 1 } } });
-    return result;
-  }, { timeout: 30000 });
+        return {seriesId:firstSeriesId!,repeated:false};
 }
-
