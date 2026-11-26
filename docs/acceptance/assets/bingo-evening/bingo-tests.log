@@ -1,0 +1,64 @@
+
+> pubquiz-web@0.2.0 test:bingo
+> node --import tsx --test app/bingo/core/cards.test.ts app/bingo/core/round.test.ts app/bingo/core/run.test.ts app/rendering/ceremony/prizeReveal.test.tsx app/bingo/live/evening.test.ts app/bingo/live/live.test.ts app/bingo/live/liveViewReader.test.ts app/bingo/live/matchingPlayback.test.ts app/bingo/live/matchingPlayback.browser.test.ts app/bingo/live/eventRun.test.ts app/bingo/live/cardChecks.test.ts app/bingo/live/bellControls.browser.test.ts app/bingo/eventCreation.test.ts app/eventreihen/settingsRevision.test.ts app/events/eventOperationArchitecture.test.ts scripts/testing/bingo-event-harness.test.ts app/bingo/live/board.browser.test.ts scripts/testing/bingo-evening.browser.test.ts
+
+✔ deterministic generation, independent identity and all 75-column constraints (7.0069ms)
+✔ complete validation rejects dimensions, sparse cells, values, ranges, duplicates and free fields (0.8259ms)
+✔ each of the twelve lines is individually identifiable, with free center marked (1.0761ms)
+✔ overlapping lines count independently; stages belong to one card (0.5284ms)
+✔ empty/full draw sets, invalid draws and immutable frozen inputs (0.5447ms)
+✔ draw validation and stable current number including empty/full sets (2.6625ms)
+✔ beginning, middle and last correction preserves identities, positions, input and ordered history (1.3077ms)
+✔ claim cutoff excludes later draws, but includes corrections within that cutoff (1.364ms)
+✔ confirmed correction flags review, retains decisions; review/revoke/reconfirm is possible (0.5961ms)
+✔ confirmation uniqueness is card × round × stage, permits multiple winners and later reversal (1.1447ms)
+✔ later correction outside cutoff leaves confirmation unchanged; missing cards fail closed (4.3721ms)
+✔ target is a hint only and cannot fall below draw count (0.873ms)
+✔ rejection, duplicate audit IDs and sticky review do not overwrite history (1.4466ms)
+✔ versioned run anchored to existing game UUID; valid transitions and multiple pauses (2.3647ms)
+✔ invalid transitions, timestamps, identities and drawing during pause are rejected (1.2582ms)
+✔ one active or paused run per game in supplied set, other games unaffected (0.531ms)
+✔ new round starts empty while old draw history remains; no reopening closed round (1.066ms)
+✔ creation is explicit, bounded by ten rounds per evening and never silently changes dates or rounds (2.6441ms)
+✔ Bingo checks: compact responsive grid/history, mobile containment, fresh input focus, explicit decisions and independent clocks (5685.8037ms)
+{"boardCases":30,"results":[{"brand":"phil-gud","width":1280,"height":600,"count":0,"status":"PREPARED","fontSize":"26.334px"},{"brand":"phil-gud","width":1280,"height":600,"count":0,"status":"RUNNING","fontSize":"26.334px"},{"brand":"phil-gud","width":1280,"height":600,"count":20,"status":"RUNNING","fontSize":"26.334px"},{"brand":"phil-gud","width":1280,"height":600,"count":75,"status":"PAUSED","fontSize":"26.334px"},{"brand":"phil-gud","width":1280,"height":600,"count":20,"status":"ENDED","fontSize":"26.334px"},{"brand":"phil-gud","width":1366,"height":768,"count":0,"status":"PREPARED","fontSize":"37.962px"},{"brand":"phil-gud","width":1366,"height":768,"count":0,"status":"RUNNING","fontSize":"37.962px"},{"brand":"phil-gud","width":1366,"height":768,"count":20,"status":"RUNNING","fontSize":"37.962px"},{"brand":"phil-gud","width":1366,"height":768,"count":75,"status":"PAUSED","fontSize":"37.962px"},{"brand":"phil-gud","width":1366,"height":768,"count":20,"status":"ENDED","fontSize":"37.962px"},{"brand":"phil-gud","width":1920,"height":1080,"count":0,"status":"PREPARED","fontSize":"59.508px"},{"brand":"phil-gud","width":1920,"height":1080,"count":0,"status":"RUNNING","fontSize":"59.508px"},{"brand":"phil-gud","width":1920,"height":1080,"count":20,"status":"RUNNING","fontSize":"59.508px"},{"brand":"phil-gud","width":1920,"height":1080,"count":75,"status":"PAUSED","fontSize":"59.508px"},{"brand":"phil-gud","width":1920,"height":1080,"count":20,"status":"ENDED","fontSize":"59.508px"},{"brand":"lovd-ungegoogelt","width":1280,"height":600,"count":0,"status":"PREPARED","fontSize":"26.334px"},{"brand":"lovd-ungegoogelt","width":1280,"height":600,"count":0,"status":"RUNNING","fontSize":"26.334px"},{"brand":"lovd-ungegoogelt","width":1280,"height":600,"count":20,"status":"RUNNING","fontSize":"26.334px"},{"brand":"lovd-ungegoogelt","width":1280,"height":600,"count":75,"status":"PAUSED","fontSize":"26.334px"},{"brand":"lovd-ungegoogelt","width":1280,"height":600,"count":20,"status":"ENDED","fontSize":"26.334px"},{"brand":"lovd-ungegoogelt","width":1366,"height":768,"count":0,"status":"PREPARED","fontSize":"37.962px"},{"brand":"lovd-ungegoogelt","width":1366,"height":768,"count":0,"status":"RUNNING","fontSize":"37.962px"},{"brand":"lovd-ungegoogelt","width":1366,"height":768,"count":20,"status":"RUNNING","fontSize":"37.962px"},{"brand":"lovd-ungegoogelt","width":1366,"height":768,"count":75,"status":"PAUSED","fontSize":"37.962px"},{"brand":"lovd-ungegoogelt","width":1366,"height":768,"count":20,"status":"ENDED","fontSize":"37.962px"},{"brand":"lovd-ungegoogelt","width":1920,"height":1080,"count":0,"status":"PREPARED","fontSize":"59.508px"},{"brand":"lovd-ungegoogelt","width":1920,"height":1080,"count":0,"status":"RUNNING","fontSize":"59.508px"},{"brand":"lovd-ungegoogelt","width":1920,"height":1080,"count":20,"status":"RUNNING","fontSize":"59.508px"},{"brand":"lovd-ungegoogelt","width":1920,"height":1080,"count":75,"status":"PAUSED","fontSize":"59.508px"},{"brand":"lovd-ungegoogelt","width":1920,"height":1080,"count":20,"status":"ENDED","fontSize":"59.508px"}]}
+✔ actual Bingo board fits both dimensions, stable positions, fonts, states, resizing and scaled preview (28506.7128ms)
+✔ all number/letter boundaries and strict input validation (1.3162ms)
+✔ auto result uses existing geometrical rules for zero/single/double/triple (0.6966ms)
+✔ checks append immutable evidence, group repeated cards, never confirm or block, corrections stay separate (6.8317ms)
+✔ statistics: zero, all remaining numbers win, overlaps deduplicated and completed patterns excluded (5.7839ms)
+✔ all four history sorts retain immutable drawing identity and position (1.5154ms)
+✔ ten print/projector schemes have at least 4.5:1 text contrast, original LOVD red first (1.0619ms)
+✔ confirmed single/double/triple register 1/2/3 tickets, checks never allocate, retries cannot duplicate; rounds accumulate (5.009ms)
+✔ raffle: 90 permitted; 91 blocked early; missing/void/invalid tickets never win (0.7984ms)
+✔ shared prizes reveal last placement first, keep already visible prizes and support arbitrary counts (1.0639ms)
+✔ ceremony media keeps old configurations compatible and rejects executable references (0.6844ms)
+✔ six and ten rounds of 100 standard/music cards use the same numeric geometry (807.1406ms)
+✔ independent calls keep identity, boundary, original card evidence; pending and review permit draws; finishing still requires resolution (5.8399ms)
+✔ three rounds and an extra use empty independent draws; closed history and pause time remain stable (1.1051ms)
+✔ V2 rejects forged context, round identifiers and legacy last-draw correction syntax (0.2767ms)
+✔ context cannot return to an old boundary after pause/resume or target backtracking (0.3752ms)
+✔ capturing a call before lookup preserves its cutoff despite later draws (8.8352ms)
+✔ pause, server time, immutable end and validation (1.0379ms)
+✔ one queue serializes polling and post-command refresh, preserves validator and bodies (72.6527ms)
+✔ aborted queued/unmounted work does not start a request; connection recovery requires full state (2.6052ms)
+✔ cleanup aborts active fetch and timeout bounds stalled fetch (1.5116ms)
+✔ unchanged moderation status advances database display time only while running (0.3159ms)
+✔ effect cleanup cancels active and queued manual refreshes; remount can restart the same reader (2.5188ms)
+✔ Bingo actual browser media activation, stable polling, pause/replay, reload and stale source stop (3535.8486ms)
+✔ matching reference and media journal preserve numeric rules and call boundaries (5.7039ms)
+✔ CAS includes legacy product-only updates and logo changes without hiding uneditable values (16.7099ms)
+✔ shared event entries keep distinct runtime/date and ordered opt-in view links (2.9313ms)
+✔ new moderation is separately scoped, retains direct calls and no embedded public preview (1.3284ms)
+✔ Quiz and Bingo retain icon-only view links with accessible names and existing destinations (21.2245ms)
+✔ the actual Pubquiz renderer reveals prizes in order on both existing presentation surfaces (114.2256ms)
+✔ Bingo workstation, editable history, ten Full-HD colour schemes and shared prize/raffle scenes (5843.2289ms)
+✔ actual browser acceptance expressions remain valid JavaScript after selector escaping (184.3311ms)
+ℹ tests 51
+ℹ suites 0
+ℹ pass 51
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 28967.7599

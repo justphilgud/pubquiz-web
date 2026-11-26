@@ -1,5 +1,7 @@
 # Bingo V3.1 – Umsetzung und Abnahmevertrag
 
+Aktualisierung 26.11.2026: Der [Bingoabend-Vertrag](bingo-evening-dramaturgy.md) hebt die frühere Ziehungssperre bei offenen Rufen ausdrücklich auf und begrenzt neue Abende auf zehn Runden. Historische Journale, Nachweise und Karten bleiben erhalten.
+
 Arbeitsbranch `codex/bingo-event-operation`, Basis Main `8fa60b68`.
 Die menschliche Freigabe gilt exakt diesem Branch für die isolierte Preview.
 Kein Merge/Production. Die generische Preview-Migrationsroute ist für diesen

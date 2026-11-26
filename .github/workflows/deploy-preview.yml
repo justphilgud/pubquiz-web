@@ -8,6 +8,14 @@ on:
       - completed
   workflow_dispatch:
     inputs:
+      isolated_bingo_evening:
+        description: 'Use only the exact isolated PR182 Bingo evening Preview'
+        type: boolean
+        default: false
+      configure_bingo_database:
+        description: 'Administratively configure four exact PR182 database overrides'
+        type: boolean
+        default: false
       isolated_shared_design:
         description: 'Use only the synthetic shared-design review database (approved AP3 branch required)'
         type: boolean
@@ -63,6 +71,8 @@ jobs:
       github.ref != 'refs/heads/codex/bingo-print-templates-ui' &&
       github.ref != 'refs/heads/codex/bingo-matching-table' &&
       github.ref != 'refs/heads/codex/bingo-matching-ux-polish' &&
+      github.ref != 'refs/heads/codex/bingo-evening-dramaturgy' &&
+      !inputs.isolated_bingo_evening && !inputs.configure_bingo_database &&
       !inputs.editorial_dry_run_only && !inputs.editorial_repair_test_questions &&
       (github.ref != 'refs/heads/codex/shared-game-design' || inputs.isolated_shared_design) &&
       (!inputs.isolated_shared_design || github.ref == 'refs/heads/codex/shared-game-design') &&
@@ -286,3 +296,70 @@ jobs:
           path: editorial-test-question-repair.json
           if-no-files-found: error
           retention-days: 14
+
+  isolated-preview:
+    if: >-
+      vars.ACTIONS_DEPLOYMENTS_ENABLED == 'true' &&
+      inputs.isolated_bingo_evening &&
+      github.event_name == 'workflow_dispatch' &&
+      github.repository == 'justphilgud/pubquiz-web' &&
+      github.ref == 'refs/heads/codex/bingo-evening-dramaturgy'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: preview
+    env:
+      DEPLOYMENT_ENV: preview
+      DEPLOYMENT_EVENT: workflow_dispatch
+      DEPLOYMENT_BRANCH: codex/bingo-evening-dramaturgy
+      DEPLOYMENT_REF: ${{ github.ref }}
+      DEPLOYMENT_SHA: ${{ github.sha }}
+      DEPLOYMENT_REPOSITORY: ${{ github.repository }}
+      DEPLOYMENT_REPOSITORY_ID: ${{ github.repository_id }}
+      TRUSTED_PREVIEW_BRANCHES: ${{ vars.TRUSTED_PREVIEW_BRANCHES }}
+      DATABASE_URL: ${{ secrets.BINGO_EVENING_DATABASE_URL }}
+      EXPECTED_DATABASE_HOST: ep-holy-term-baa881iq-pooler.c-8.eu-central-1.aws.neon.tech
+      EXPECTED_DATABASE_NAME: bingo_evening_review
+      EXPECTED_DATABASE_BRANCH: ep-holy-term-baa881iq
+      VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.DEPLOYMENT_SHA }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Verify successful trusted push CI for the exact revision
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/verify-preview-ci.ts
+      - run: npm ci
+      - name: Validate isolated database identity
+        run: npm run deployment:validate
+      - name: Administrative exact branch database configuration
+        if: inputs.configure_bingo_database
+        run: node --import tsx scripts/operations/configure-bingo-evening-preview.ts
+      - name: Check inherited central Preview media configuration
+        run: node --import tsx scripts/deploy-vercel-git-preview.ts --check-only
+      - name: Deploy exact trusted Git revision
+        id: deploy
+        run: node --import tsx scripts/deploy-vercel-git-preview.ts
+      - name: Hosted HTTP browser acceptance
+        env:
+          BINGO_EVENING_PREVIEW_URL: ${{ steps.deploy.outputs.url }}
+          BINGO_EVENING_ACCOUNTS: ${{ secrets.BINGO_EVENING_ACCOUNTS }}
+        run: node scripts/testing/bingo-evening.http.browser.mjs --hosted
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bingo-evening-hosted-acceptance
+          path: .artifacts/bingo-evening-hosted
+          if-no-files-found: ignore
+      - name: Write Preview summary
+        env:
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.url }}
+        run: |
+          echo "Preview: $DEPLOYMENT_URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "Commit: $DEPLOYMENT_SHA" >> "$GITHUB_STEP_SUMMARY"

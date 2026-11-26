@@ -1,13 +1,14 @@
+import {registerTickets,type RaffleTicket} from "./raffle";
 import type { CardCheck } from './cardChecks';
 import { evaluateCard, type BingoCard, type Stage } from "../core/cards";
 import { addRound, closeRound, endRun, openRound, pauseRun, resumeRun, type BingoRun } from "../core/run";
-import { correctDraw, decideClaim, recordClaim } from "../core/round";
+import { correctDraw, decideClaim, recordClaim, evaluateClaim, isConfirmed } from "../core/round";
 import { applyLiveEvent, assertUuid, initialState, parseLiveCommand, type Call, type FrozenRound, type LiveCommand, type LiveEvent } from "./live";
 
 /** V2 is opt-in. AP3 replay and its one-round histories are deliberately unchanged. */
 export type EventCall = Call & { roundId: string; recordedAt: number };
 export type BingoPlayback = {id:string;drawId:string;action:'PLAY'|'PAUSE'|'REPLAY';at:number;sequence:number;restartId:string|null;position:number};
-export type EventRunState = { checks?: readonly CardCheck[]; playback?:BingoPlayback; revealed?:readonly string[]; version: 2; contextRevision:number; run: BingoRun; calls: readonly EventCall[]; frozen: readonly FrozenRound[] };
+export type EventRunState = { tickets?:readonly RaffleTicket[]; checks?: readonly CardCheck[]; playback?:BingoPlayback; revealed?:readonly string[]; version: 2; contextRevision:number; run: BingoRun; calls: readonly EventCall[]; frozen: readonly FrozenRound[] };
 export type EventCommand = Exclude<LiveCommand, { kind: "call" } | { kind: "correct" }> |
   { kind: "call"; stage: Stage; context: string } | {kind:"check";cardId:string;context:string} | {kind:"decideCheck";checkId:string;action:"CONFIRM"|"REJECT"|"REVOKE";reason:string} | {kind:"reveal";drawId:string} |
   {kind:'playback';drawId:string;action:'PLAY'|'PAUSE'|'REPLAY'} |
@@ -77,7 +78,7 @@ function applyEventRunEventInner(state: EventRunState, event: EventRunEvent, car
   if(c.kind==='reveal'){const frozen=state.frozen.find(f=>f.id===round.id);if(!round.draws.some(d=>d.id===c.drawId)||!frozen?.terms&&!frozen?.matching)throw Error('DRAW_NOT_FOUND');if(state.revealed?.includes(c.drawId))throw Error('ALREADY_REVEALED');return {...state,revealed:[...(state.revealed??[]),c.drawId]};}
   if(c.kind==='playback'){if(!state.frozen.find(f=>f.id===round.id)?.matching||round.draws.at(-1)?.id!==c.drawId)throw Error('MEDIA_CONTEXT_CHANGED');if(c.action!=='PAUSE'&&run.status!=='RUNNING')throw Error('RUN_NOT_RUNNING');const prior=state.playback,position=c.action==='REPLAY'?0:prior?prior.position+(prior.action==='PAUSE'?0:Math.max(0,event.at-prior.at)/1000):0;return {...state,playback:{id:event.id,drawId:c.drawId,action:c.action,at:event.at,sequence:(prior?.sequence??0)+1,restartId:c.action==='REPLAY'?event.id:prior?.restartId??null,position}};}
   if(c.kind==="resume" && !run.rounds.some(r=>r.status==="OPEN"))throw Error("ROUND_NOT_OPEN");
-  if(c.kind==="draw"&&blockingCalls(state))throw Error("OPEN_CLAIMS");
+
   if(c.kind==='decideCheck') {
     const check=state.checks?.find(check=>check.id===c.checkId&&check.roundId===round.id),card=cards.find(card=>card.id===check?.cardId);
     if(!check||!card)throw Error('CARD_OR_CALL_NOT_FOUND');
@@ -89,7 +90,7 @@ function applyEventRunEventInner(state: EventRunState, event: EventRunEvent, car
     return {...replace(next),calls:state.calls.some(call=>call.id===check.id)?state.calls:[...state.calls,{id:check.id,roundId:round.id,recordedAt:check.at,stage,throughPosition:check.throughPosition,draws:check.draws,cardId:card.id}]};
   }
   if(c.kind==='check') {
-    if(run.status!=='RUNNING')throw Error('RUN_NOT_RUNNING');
+    if(run.status!=='RUNNING'&&run.status!=='PAUSED')throw Error('RUN_NOT_RUNNING');
     const card=cards.find(card=>card.id===c.cardId);
     if(!card)throw Error('CARD_OR_CALL_NOT_FOUND');
     return {...state,checks:[...(state.checks??[]),{id:event.id,roundId:round.id,cardId:card.id,at:event.at,throughPosition:round.draws.length,draws:round.draws,original:evaluateCard(card.cells,round.draws.map(d=>d.number))}]};
@@ -112,7 +113,13 @@ function applyEventRunEventInner(state: EventRunState, event: EventRunEvent, car
   }
   if(c.kind==="correct") {
     if(run.status!=="RUNNING"&&run.status!=="PAUSED")throw Error("RUN_NOT_ACTIVE");
-    return {...replace(correctDraw(round,c.drawId,c.number,{id:event.id,reason:c.reason},cards).round),...(state.revealed?{revealed:state.revealed.filter(id=>id!==c.drawId)}:{})};
+    const corrected=correctDraw(round,c.drawId,c.number,{id:event.id,reason:c.reason},cards).round;
+    const claims=corrected.claims.map(claim=>{
+      const card=cards.find(card=>card.id===claim.cardId);
+      const lost=card&&isConfirmed(claim)&&(state.tickets??[]).some(ticket=>ticket.roundId===round.id&&ticket.claimIds.includes(claim.id)&&!evaluateClaim(corrected,claim,card).lines.includes(ticket.line));
+      return lost?{...claim,needsReview:true}:claim;
+    });
+    return {...replace({...corrected,claims}),...(state.revealed?{revealed:state.revealed.filter(id=>id!==c.drawId)}:{})};
   }
   // Existing AP3 adapter is reused only for single-current-round arithmetic/clock commands.
   const partial=applyLiveEvent({run:{...run,rounds:[round]},calls:[]},{...event,command:c},cards);
@@ -121,7 +128,9 @@ function applyEventRunEventInner(state: EventRunState, event: EventRunEvent, car
 
 export function applyEventRunEvent(state:EventRunState,event:EventRunEvent,cards:readonly BingoCard[]):EventRunState {
  const next=applyEventRunEventInner(state,event,cards);
+ let tickets=next.tickets;
+ if((event.command.kind==="decideCheck"||event.command.kind==="decide")&&event.command.action==="CONFIRM"){const id=event.command.kind==="decideCheck"?event.command.checkId:event.command.callId;const round=currentEventRound(next),claim=round.claims.find(c=>c.id===id),card=cards.find(c=>c.id===claim?.cardId);if(card)tickets=registerTickets(tickets??[],round,id,card);}
  const clear=['draw','closeRound','startRound','end'].includes(event.command.kind)||event.command.kind==='correct'&&currentEventRound(state).draws.at(-1)?.id===event.command.drawId;
  const paused=event.command.kind==='pause'&&state.playback?{playback:{...state.playback,id:event.id,action:'PAUSE' as const,at:event.at,sequence:state.playback.sequence+1,position:state.playback.position+(state.playback.action==='PAUSE'?0:Math.max(0,event.at-state.playback.at)/1000)}}:{};
- return {...next,...(clear?{playback:undefined}:paused),contextRevision:["call","check","decideCheck","identify","decide","reveal","playback"].includes(event.command.kind)?state.contextRevision:state.contextRevision+1};
+ return {...next,...(tickets?{tickets}:{}),...(clear?{playback:undefined}:paused),contextRevision:["call","check","decideCheck","identify","decide","reveal","playback"].includes(event.command.kind)?state.contextRevision:state.contextRevision+1};
 }

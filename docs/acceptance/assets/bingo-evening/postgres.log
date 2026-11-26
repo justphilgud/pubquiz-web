@@ -1,0 +1,49 @@
+Loaded Prisma config from prisma.config.ts.
+
+Full real collectSnapshot, all eight populated Bingo tables, frozen assets and integrity: PASS
+AP3 real PostgreSQL lifecycle, call cutoffs, decisions, retries, fresh authorization and immutable AP2 cards: PASS
+AP3 full real collectSnapshot including populated runtime, AP2 print snapshots/fonts/logo and integrity: PASS
+AP3 full disposable dump/restore, catalog/rows/assets/references and complete collectSnapshot comparison: PASS
+Rollenänderung {
+  event: 'event_type_changed',
+  eventSeriesId: 90,
+  eventType: 'BINGO',
+  enabled: false,
+  assignedById: 1
+}
+Rollenänderung {
+  event: 'event_type_changed',
+  eventSeriesId: 90,
+  eventType: 'BINGO',
+  enabled: true,
+  assignedById: 1
+}
+V3.1 PostgreSQL series CAS, management-only product denial, atomic rollback and start/deactivation race: PASS
+V3.1 PostgreSQL atomic creation, independent calls/retries, stale contexts, historical correction, four rounds and immutable bindings: PASS
+Bingo SQL polling regression: four runs with >1MB real assets each, minimal initial refresh, unchanged 304 without frozen details, revision invalidation and fresh authorization PASS
+V3: 1,000 unique text cards in two atomic immutable series, retry, frozen terms and role checks PASS
+AP3 full disposable dump/restore, catalog/rows/assets/references and complete collectSnapshot comparison: PASS
+V3.1 populated legacy/new snapshot and full isolated dump/restore: PASS
+V4 migration on a complete empty disposable schema-only database: PASS
+LOVD real inherited V3 generation, corrected RGB, frozen regular code face and backup integrity PASS
+SRA3 inherited profile, explicit generation, idempotence/reload, immutable historical and additional print versions: PASS
+V4 populated additive migration, strict template selection, role/product gates, immutable redesign, historical export and frozen integrity: PASS
+AP3 full disposable dump/restore, catalog/rows/assets/references and complete collectSnapshot comparison: PASS
+Matching migration on a complete empty disposable schema-only database: PASS
+(node:37788) DeprecationWarning: Calling client.query() when the client is already executing a query is deprecated and will be removed in pg@9.0. Use async/await or an external async flow control mechanism instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Matching: six independent music combinations, actual media retention, source lifecycle, ranges/90, concurrency, PDF, immutable cards, lean polling, playback/correction/pause/end and authorization PASS
+Bingoglöckchen: template copy/CAS/rights, atomic multi-round generation/retry, 26 cards/20 PDF pages, safe removal, code lookup, check journal/CAS PASS; saved-card audit {"cards":1716,"invalid":0,"scope":"isolated synthetic database"}
+Bingo evening: six × 100 cards, ten round colours/SRA3 backs, original data integrity, claims/draw independence, paused checks, CAS and persisted raffle reveal PASS
+AP3 full disposable dump/restore, catalog/rows/assets/references and complete collectSnapshot comparison: PASS
+Matching full populated snapshot and isolated restore integrity PASS
+AP2 isolated PostgreSQL acceptance passed: bingo_ap2_qa_1795689097106
+✔ AP2 additive empty/populated migration and actual PostgreSQL policies, concurrency and immutable cards (84725.6013ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 86582.8918

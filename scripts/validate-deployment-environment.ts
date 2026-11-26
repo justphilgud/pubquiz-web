@@ -26,6 +26,13 @@ export const BINGO_MATCHING_UX_REVIEW_DATABASE = {
   name:'bingo_matching_ux_review',
 } as const;
 
+// PR182: isolated synthetic database on the existing Bingo Nonprod compute.
+export const BINGO_EVENING_REVIEW_DATABASE = {
+  ...BINGO_MATCHING_REVIEW_DATABASE,
+  branch: "codex/bingo-evening-dramaturgy",
+  name: "bingo_evening_review",
+} as const;
+
 export type DeploymentEnvironment = "preview" | "production";
 
 export type DeploymentValidationInput = Readonly<{
@@ -231,7 +238,12 @@ export function validateDeploymentEnvironment(
   const isReviewHost = database.host === review.host || database.host === review.pooledHost;
   const matching=BINGO_MATCHING_REVIEW_DATABASE;
   const matchingUx=BINGO_MATCHING_UX_REVIEW_DATABASE;
-  if(environment==='preview'&&context.ref==='refs/heads/'+matchingUx.branch){
+  const evening = BINGO_EVENING_REVIEW_DATABASE;
+  if (environment === 'preview' && context.ref === 'refs/heads/' + evening.branch) {
+    if (!isReviewHost || database.name !== evening.name || expectedBranch !== evening.endpoint) {
+      throw new DeploymentValidationError('BINGO_EVENING_REVIEW_IDENTITY_MISMATCH', 'Dieser Bingoabend-Branch benötigt ausschließlich seine eigene isolierte Testdatenbank.');
+    }
+  } else if(environment==='preview'&&context.ref==='refs/heads/'+matchingUx.branch){
     if(!isReviewHost||database.name!==matchingUx.name||expectedBranch!==matchingUx.endpoint)throw new DeploymentValidationError('BINGO_MATCHING_UX_REVIEW_IDENTITY_MISMATCH','Dieser Matching-UX-Branch benötigt ausschließlich seine eigene isolierte Testdatenbank.');
   } else if(environment==='preview'&&context.ref==='refs/heads/'+matching.branch){
     if(!isReviewHost||database.name!==matching.name||expectedBranch!==matching.endpoint)throw new DeploymentValidationError('BINGO_MATCHING_REVIEW_IDENTITY_MISMATCH','Dieser Matching-Branch benötigt ausschließlich seine eigene isolierte Testdatenbank.');

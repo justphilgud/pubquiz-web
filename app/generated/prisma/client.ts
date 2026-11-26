@@ -346,6 +346,11 @@ export type benutzer_reihenrollen = Prisma.benutzer_reihenrollenModel
  */
 export type game_drafts = Prisma.game_draftsModel
 /**
+ * Model game_ceremonies
+ * Explicit event framing; separate from quiz runtime and immutable Bingo journals.
+ */
+export type game_ceremonies = Prisma.game_ceremoniesModel
+/**
  * Model bingo_preparations
  *
  */

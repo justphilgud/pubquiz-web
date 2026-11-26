@@ -1,3 +1,4 @@
+import {MAX_BINGO_ROUNDS,roundColor} from "../roundColors";
 import {instantiateRoundTemplate} from '../content/repository.server';
 import { validateReferenceTerms } from './pdfReference.server';
 import { validateModernTerms } from './pdfModern.server';
@@ -62,6 +63,7 @@ export async function writePreparation(userId: number, input: unknown) {
         result={jobId:command.requestId};break;
       }
       case "createRound": {
+        if(await tx.bingo_rounds.count({where:{game_id:game.id}})>=MAX_BINGO_ROUNDS)throw new BingoPreparationError("Höchstens zehn Runden pro Bingoabend.");
         const max = (await tx.bingo_rounds.aggregate({ where: { game_id: game.id }, _max: { position: true } }))._max.position ?? 0;
         const template=command.templateId?await instantiateRoundTemplate(tx,userId,game.id,command.templateId,game.eventreihe_id):null;
         await tx.bingo_rounds.create({ data: { id: randomUUID(), game_id: game.id, position: max + 1, label: template?.label??`Runde ${max + 1}`, planned_draws:template?.target??30, term_snapshot:template?.config as Prisma.InputJsonValue??undefined } }); break;
@@ -125,7 +127,11 @@ async function generateRound(tx:Prisma.TransactionClient,userId:number,game:Pris
         const design = (await resolveSharedDesign(tx, game.shared_design_template_id, series)).design;
         const settings=await resolveSelectedPrint(tx,design,series.bingo_print_config,game.bingo_print_config);
         if(command.printLayout)settings.layout={version:settings.layout?.version??3,textFont:settings.layout?.textFont??'ARIMO',...command.printLayout};
-        let snapshot = await captureNewPrintSnapshot(design, game.titel, round.label,settings,await selectedPrintSource(tx,game.bingo_print_config??series.bingo_print_config));
+        const roundNumber=await tx.bingo_rounds.count({where:{game_id:game.id,position:{lte:round.position}}});
+        const theme=roundColor(roundNumber);
+        settings.colors={...settings.colors,back:theme.background};
+        settings.backLogos=['/branding/bingo-print/lovd-small-creme.png','/branding/bingo-print/phil-gud.png'];
+        let snapshot = await captureNewPrintSnapshot(design, game.titel, round.label,settings,await selectedPrintSource(tx,game.bingo_print_config??series.bingo_print_config),roundNumber);
         if(round.term_snapshot!==null){if(snapshot.version!==3&&snapshot.version!==4)throw new BingoPreparationError('Für Textkarten bitte ein neues V3-Druckformat auswählen.');snapshot=parsePrintSnapshot({...snapshot,terms:parseTermSet(round.term_snapshot)});}
         validateModernTerms(snapshot);validateReferenceTerms(snapshot);
         // Game lock serializes generation. Include existing game layouts, not just this request.

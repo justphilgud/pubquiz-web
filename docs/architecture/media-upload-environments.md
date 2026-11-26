@@ -222,3 +222,25 @@ nur nach Identitätsprüfung in der neuen leeren Datenbank eingerichtet. Das ist
 kein behaupteter vollständiger historischer Bootstrap-Replay und keine Baseline/
 Reparatur einer bestehenden Prisma-Historie. Keine neue Anwendungsmigration.
 Bereitstellung und gehostete Abnahme werden getrennt in PR160 nachgewiesen.
+
+## Isolierte Bingoabend-Preview / PR182
+
+Am 26. November 2026 ausdrücklich freigegebener Branch `codex/bingo-evening-dramaturgy`.
+Exakte externe Allowlist und Environment-Branch-Policy; keine Wildcards oder Änderung
+anderer Freigaben. Eigene leere Datenbank `bingo_evening_review` auf dem bestehenden
+Nonprod-Projekt `falling-sky-48140800`, Endpunkt `ep-holy-term-baa881iq`.
+Schema ausschließlich aus lokaler synthetischer Basis, anschließend genaue
+Ceremony-Migration und synthetischer Admin/Testreihen; kein historischer
+Bootstrap-Replay, keine bestehenden Datenbanken oder Daten migriert.
+
+Der gemeinsame Migrationsjob schließt diesen Branch aus. Ein gesonderter manueller
+administrativer Job im vorhandenen Preview-Workflow verwendet dieselbe Preview-
+Environment, Concurrency, genaue Push-CI, externe Vertrauensliste und Git-/Medien-
+Prüfungen. Seine explizite Konfigurationsoption verwaltet ausschließlich vier genaue
+Branch-Overrides für `DATABASE_URL` und `EXPECTED_DATABASE_*` im bestehenden Projekt.
+Der Konfigurationshelfer prüft die Identität vor Schreibzugriffen und vergleicht alle
+übrigen Environment-Metadaten. Das ist ein abgegrenzter administrativer Schritt;
+die allgemeinen Deployment-Scripts und Production-Pipeline verwalten weiterhin
+keine Environment-Variablen. Zentrale Nonprod-Medien bleiben geerbt. Deployment-
+Payloads enthalten weiterhin keine Environment-Overrides. Gehostete Abnahme und
+finaler Runtime-SHA werden in PR182 und dessen Abnahmebericht nachgewiesen.

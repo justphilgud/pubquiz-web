@@ -1,4 +1,9 @@
 /* AP5: geometry and type roles only. Branding remains in the resolved theme. */
+.presentation-prizes-slide .ceremony-prizes{display:grid;gap:16px;max-height:65%;overflow:auto;width:min(100%,1100px);margin-top:24px}
+.presentation-prizes-slide .ceremony-prize{display:flex;align-items:center;gap:24px;border:2px solid var(--quiz-border,#fff9e9);border-radius:12px;padding:20px 28px;font-size:clamp(22px,2.5cqw,44px);text-align:left}
+.presentation-prizes-slide .ceremony-prize strong{flex-shrink:0}
+.presentation-prizes-slide .ceremony-prize[data-revealed=false]{border-style:dashed;color:var(--quiz-text-muted,#d4d4d8)}
+.presentation-prizes-slide .ceremony-prize[data-revealed=true]{background:var(--quiz-surface,#18181b);color:var(--quiz-text,#fff9e9)}
 .presentation-start-sequence-backdrop {
   background:
     radial-gradient(circle at center, color-mix(in srgb, var(--quiz-primary) 20%, transparent), transparent 42%),

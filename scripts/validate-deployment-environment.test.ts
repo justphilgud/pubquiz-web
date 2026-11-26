@@ -190,3 +190,15 @@ test('Matching UX Preview requires its separately approved exact database and ca
  assertValidationCode({...ux,deploymentRef:'refs/heads/codex/bingo-matching-table'},'BINGO_MATCHING_REVIEW_IDENTITY_MISMATCH');
  assertValidationCode({...ux,deploymentRef:'refs/heads/codex/bingo-print-templates-ui'},'BINGO_PRINT_REVIEW_IDENTITY_MISMATCH');
 });
+
+test('Bingo evening Preview binds exact isolated identity and preserves other branch isolation', () => {
+  const evening = { ...previewInput, deploymentRef: 'refs/heads/codex/bingo-evening-dramaturgy', expectedDatabaseHost: 'ep-holy-term-baa881iq-pooler.c-8.eu-central-1.aws.neon.tech', expectedDatabaseName: 'bingo_evening_review', expectedDatabaseBranch: 'ep-holy-term-baa881iq', databaseUrl: 'postgresql://synthetic:fixture@ep-holy-term-baa881iq-pooler.c-8.eu-central-1.aws.neon.tech/bingo_evening_review?sslmode=verify-full' };
+  assert.equal(validateDeploymentEnvironment(evening).databaseBranchVerified, true);
+  assert.equal(validateDeploymentEnvironment({ ...evening, expectedDatabaseHost: evening.expectedDatabaseHost.replace('-pooler.', '.'), databaseUrl: evening.databaseUrl.replace('-pooler.', '.') }).databaseBranchVerified, true);
+  for (const name of ['bingo_matching_review', 'bingo_print_v4_review', 'neondb', 'foreign']) assertValidationCode({ ...evening, expectedDatabaseName: name, databaseUrl: evening.databaseUrl.replace('bingo_evening_review', name) }, 'BINGO_EVENING_REVIEW_IDENTITY_MISMATCH');
+  assertValidationCode({ ...evening, expectedDatabaseBranch: undefined }, 'BINGO_EVENING_REVIEW_IDENTITY_MISMATCH');
+  assertValidationCode({ ...previewInput, deploymentRef: evening.deploymentRef }, 'BINGO_EVENING_REVIEW_IDENTITY_MISMATCH');
+  assertValidationCode({ ...evening, deploymentEnvironment: 'production', deploymentRef: 'refs/heads/main' }, 'ISOLATED_PREVIEW_SCOPE_MISMATCH');
+  assertValidationCode({ ...evening, deploymentRef: 'refs/heads/foreign' }, 'ISOLATED_PREVIEW_SCOPE_MISMATCH');
+  assertValidationCode({ ...evening, deploymentRef: 'refs/heads/codex/bingo-matching-ux-polish' }, 'BINGO_MATCHING_UX_REVIEW_IDENTITY_MISMATCH');
+});

@@ -37,6 +37,14 @@
 
 .board .rowLetter{background:transparent;color:inherit;border:0;font-weight:900}
 
+.board li[data-state="drawn"]{background:var(--bingo-primary);color:var(--bingo-highlight-ink);font-weight:800;border:2px solid currentColor}
+.stage[data-round-number] .board li[data-state="drawn"],.stage[data-round-number] .board li[data-state="current"]{background:var(--bingo-round-color);color:var(--bingo-round-ink);border:2px solid var(--bingo-round-color)}
+.stage[data-round-number] .board li[data-state="current"]{border:4px double var(--bingo-round-ink);outline:3px solid var(--bingo-round-ink);outline-offset:1px;transform:scale(1.04)}
+.stage[data-round-number] .current strong,.stage[data-round-number] .board{font-family:"Bingo Card Display",sans-serif;font-weight:400;font-synthesis:none}
+.stage[data-round-number] .current strong{color:var(--bingo-round-ink);background:var(--bingo-round-color);border-radius:12px;padding:0 24px;line-height:1.2}
+.partnerLogos{display:flex;gap:20px;align-items:center;flex-shrink:0;background:#14181C;border-radius:6px;padding:6px 12px}.partnerLogos img{width:90px;height:42px;object-fit:contain}
+.stage[data-round-number] .header strong{flex:1;min-width:0}.stage[data-round-number] .header span{font-size:clamp(14px,1.2vw,22px)}
+
 /* Media has its own bounded row; number, media and board cannot overlap. */
 .stage[data-media-mode="true"] .content{grid-template-rows:minmax(85px,.5fr) minmax(80px,.75fr) minmax(0,1fr)}
 .mediaSlot{container-type:size;display:flex;align-items:center;justify-content:center;min-height:0;min-width:0}

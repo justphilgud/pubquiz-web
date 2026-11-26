@@ -4,6 +4,9 @@ import { startLive, commandLive } from "./repository.server";
 import type { LiveCommand } from "./live";
 
 const messages: Record<string, string> = {
+  WRONG_ROUND: "Diese Karte gehört zu einer anderen Bingorunde. Bitte Rundennummer und Kartenkennung prüfen.",
+  ROUND_LIMIT: "Höchstens zehn Runden pro Bingoabend.",
+  ALREADY_CONFIRMED: "Diese Gewinnstufe wurde für diese Karte bereits bestätigt. Es werden keine doppelten Lose vergeben.",
   OLD_CARD: "Alte Bingokarte – gehört nicht zum aktuellen Bingo-Abend",
   CARD_NOT_FOUND: "Karte im aktuellen Bingo-Abend nicht gefunden",
   AMBIGUOUS_CARD: "Kartenkennung ist nicht eindeutig. Bitte die vollständige Kennung verwenden.",

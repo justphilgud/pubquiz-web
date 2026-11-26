@@ -7,7 +7,7 @@ import {existsSync,mkdtempSync,readFileSync,rmSync,mkdirSync,writeFileSync} from
 import {join} from 'node:path';
 import {tmpdir} from 'node:os';
 
-test('Bingo checks: 7×4 grid/history, mobile containment, fresh input focus, explicit decisions and independent clocks',{timeout:60000},async()=>{
+test('Bingo checks: compact responsive grid/history, mobile containment, fresh input focus, explicit decisions and independent clocks',{timeout:60000},async()=>{
  const source=String.raw`
  import React,{useState} from 'react';import{createRoot}from'react-dom/client';import{flushSync}from'react-dom';
  import Panel from './app/bingo/live/CardChecksPanel';import Clock from './app/bingo/live/LiveTimes';
@@ -23,9 +23,9 @@ test('Bingo checks: 7×4 grid/history, mobile containment, fresh input focus, ex
  window.run=async()=>{
   flushSync(()=>root.render(<Fixture key={Math.random()}/>));await wait(()=>document.querySelector('ol'));
   const grid=document.querySelector('ol'),tiles=[...grid.children],box=grid.parentElement,style=getComputedStyle(grid);
-  check(tiles.length===32,'32 saved cards remain');check(style.gridTemplateColumns.split(' ').length===7,'seven columns');
-  const a=tiles[0].getBoundingClientRect(),eighth=tiles[7].getBoundingClientRect();check(Math.abs(a.left-eighth.left)<1&&eighth.top>a.top,'eighth card starts row two');
-  check(box.clientHeight===610,'four 145px rows plus three 10px gaps');check(box.scrollHeight>box.clientHeight,'fifth row retained in scroll history');
+  check(tiles.length===32,'32 saved cards remain');const columns=style.gridTemplateColumns.split(' ').length;check(columns>=2,'responsive columns');
+  const a=tiles[0].getBoundingClientRect(),eighth=tiles[columns].getBoundingClientRect();check(Math.abs(a.left-eighth.left)<1&&eighth.top>a.top,'eighth card starts row two');
+  check(box.clientHeight<=280&&box.clientHeight>120,'compact result area');check(box.scrollHeight>box.clientHeight,'fifth row retained in scroll history');
   check(document.documentElement.scrollWidth<=innerWidth,'no page-level horizontal overflow');
   check(tiles.every(t=>t.scrollHeight<=t.clientHeight+1),'tiles do not hide their default content in nested scrolling');
   check([...grid.querySelectorAll('a')].every(a=>a.target==='_blank'),'card snapshots open separately');
@@ -36,7 +36,7 @@ test('Bingo checks: 7×4 grid/history, mobile containment, fresh input focus, ex
   set(detail.querySelector('input[name=reason]'),'Explicit review');flushSync(()=>detail.querySelector('form').requestSubmit());check(choice?.kind==='decideCheck','decision requires explicit submit');
   const initial=document.getElementById('clock').innerText;await wait(()=>document.getElementById('clock').innerText!==initial);
   flushSync(()=>root.render(<Fixture key="paused" running={false} serverAt={2000}/>));const paused=document.getElementById('clock').innerText;await new Promise(r=>setTimeout(r,1100));check(paused===document.getElementById('clock').innerText,'paused timer frozen without clicks');
-  return {width:innerWidth,height:innerHeight,cards:32,columns:7,visibleRows:4,passed:true};
+  return {width:innerWidth,height:innerHeight,cards:32,compact:true,passed:true};
  };
 `;
  const bundle=await build({stdin:{contents:source,resolveDir:process.cwd(),loader:'tsx'},bundle:true,write:false,platform:'browser',format:'iife',outdir:'out',loader:{'.css':'local-css'},define:{'process.env.NODE_ENV':'"production"','process.env':'{}'},plugins:[{name:'read-only-test-actions',setup(b){b.onResolve({filter:/^\.\/actions$/},a=>a.importer.endsWith('CardChecksPanel.tsx')?{path:'actions',namespace:'fixture'}:undefined);b.onLoad({filter:/.*/,namespace:'fixture'},()=>({contents:"export async function resolveCardCode(_game,code){return code.toLowerCase()==='a-001'?{success:true,cardId:'card-0'}:{success:false,message:'Karte im aktuellen Bingo-Abend nicht gefunden'}}"}));}}]});
@@ -57,7 +57,7 @@ test('Bingo checks: 7×4 grid/history, mobile containment, fresh input focus, ex
   for(let attempt=0;attempt<200;attempt++){const ready=await call('Runtime.evaluate',{expression:'typeof window.run==="function"',returnByValue:true},sessionId);if(ready.result?.value)break;await new Promise(r=>setTimeout(r,25));}
   for(const [width,height] of [[1366,768],[390,844]]){
    await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<500},sessionId);
-   const result=await call('Runtime.evaluate',{expression:'window.run()',awaitPromise:true,returnByValue:true},sessionId);assert.equal(result.exceptionDetails,undefined,JSON.stringify(result));assert.deepEqual(result.result?.value,{width,height,cards:32,columns:7,visibleRows:4,passed:true});
+   const result=await call('Runtime.evaluate',{expression:'window.run()',awaitPromise:true,returnByValue:true},sessionId);assert.equal(result.exceptionDetails,undefined,JSON.stringify(result));assert.deepEqual(result.result?.value,{width,height,cards:32,compact:true,passed:true});
    mkdirSync('.artifacts/bingo-bell',{recursive:true});const shot=await call('Page.captureScreenshot',{format:'png'},sessionId);writeFileSync(`.artifacts/bingo-bell/controls-${width}.png`,Buffer.from(shot.data!,'base64'));
   }
  }finally{

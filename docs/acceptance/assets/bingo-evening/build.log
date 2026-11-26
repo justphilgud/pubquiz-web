@@ -1,0 +1,168 @@
+
+> pubquiz-web@0.2.0 prebuild
+> npm run db:generate
+
+
+> pubquiz-web@0.2.0 db:generate
+> prisma generate
+
+Prisma DATABASE_URL-Quelle: explizite Prozessvariable
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma\schema.prisma.
+
+✔ Generated Prisma Client (7.9.0) to .\app\generated\prisma in 473ms
+
+
+> pubquiz-web@0.2.0 build
+> next build
+
+▲ Next.js 16.2.5 (Turbopack)
+- Experiments (use with caution):
+  · serverActions
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 17.9s
+  Running TypeScript ...
+  Finished TypeScript in 19.8s ...
+  Collecting page data using 15 workers ...
+  Generating static pages using 15 workers (0/61) ...
+  Generating static pages using 15 workers (15/61) 
+  Generating static pages using 15 workers (30/61) 
+  Generating static pages using 15 workers (45/61) 
+✓ Generating static pages using 15 workers (61/61) in 419ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ƒ /admin/eventreihen
+├ ƒ /admin/eventreihen/[eventSeriesId]
+├ ƒ /admin/eventreihen/[eventSeriesId]/design
+├ ƒ /admin/eventreihen/[eventSeriesId]/design/druck
+├ ƒ /admin/fragenvorlagen
+├ ƒ /admin/kategorien
+├ ƒ /admin/live-text-replacements
+├ ƒ /admin/monitoring
+├ ƒ /admin/question-import
+├ ƒ /admin/styleguide
+├ ƒ /admin/teams
+├ ƒ /admin/teams/[teamId]
+├ ƒ /admin/users
+├ ƒ /admin/users/roles
+├ ƒ /api/[...nextauth]
+├ ƒ /api/admin/monitoring
+├ ƒ /api/admin/question-import/[batchId]/plan
+├ ƒ /api/bingo/live/[gameId]
+├ ƒ /api/bingo/matching/[gameId]/assets/[assetId]
+├ ƒ /api/bingo/matching/[gameId]/content
+├ ƒ /api/bingo/matching/[gameId]/source/[questionId]/[mediaId]
+├ ƒ /api/bingo/presentation-game/[gameId]
+├ ƒ /api/bingo/presentation/[key]
+├ ƒ /api/bingo/presentation/[key]/assets/[kind]
+├ ƒ /api/medien-ordner
+├ ƒ /api/public/events
+├ ƒ /api/question-generator
+├ ƒ /api/question-media-upload
+├ ƒ /api/question-rewrite
+├ ƒ /api/quiz/live-snapshot
+├ ƒ /api/quiz/meme-archive
+├ ƒ /api/quiz/team-answer-draft
+├ ƒ /api/quiz/team-live-snapshot
+├ ƒ /api/quiz/team-session
+├ ƒ /api/team-profile-photo
+├ ƒ /api/upload-medium
+├ ○ /apple-icon.png
+├ ƒ /berichte/lovd-november-ap5
+├ ƒ /bingo
+├ ƒ /bingo/[gameId]
+├ ƒ /bingo/[gameId]/design
+├ ƒ /bingo/[gameId]/design/druck
+├ ƒ /bingo/[gameId]/karten
+├ ƒ /bingo/[gameId]/karten/[seriesId]/druckgestaltung
+├ ƒ /bingo/[gameId]/karten/[seriesId]/pdf
+├ ƒ /bingo/[gameId]/karten/abend-pdf
+├ ƒ /bingo/[gameId]/matching
+├ ƒ /bingo/[gameId]/moderation
+├ ƒ /bingo/[gameId]/praesentation
+├ ƒ /bingo/[gameId]/pruefungen/[checkId]
+├ ƒ /bingo/[gameId]/vorbereitung
+├ ƒ /bingo/content
+├ ƒ /bingo/content/[templateId]
+├ ƒ /bingo/new
+├ ƒ /bingo/pdf-worker/[version]
+├ ƒ /bingo/praesentation/[key]
+├ ƒ /calendar/event-series/[feed]
+├ ƒ /calendar/public.ics
+├ ƒ /calendar/subscribe
+├ ƒ /content
+├ ƒ /content/new
+├ ƒ /content/polls
+├ ƒ /content/polls/[pollId]
+├ ƒ /content/polls/new
+├ ƒ /content/questions/[questionId]
+├ ƒ /content/questions/new
+├ ƒ /content/story-elements/[storyElementId]
+├ ƒ /content/story-elements/new
+├ ƒ /events
+├ ○ /frage-einreichen
+├ ƒ /fragen
+├ ƒ /fragen/editor
+├ ƒ /fragen/editor/[questionId]
+├ ƒ /fragen/import
+├ ƒ /fragen/import/excel
+├ ƒ /fragen/import/excel/download
+├ ƒ /fragen/neu
+├ ƒ /hilfe
+├ ƒ /hilfe/screenshots/[name]
+├ ○ /icon.png
+├ ƒ /kalender
+├ ƒ /karaoke
+├ ƒ /karaoke/[gameId]
+├ ƒ /karaoke/[gameId]/design
+├ ƒ /karaoke/new
+├ ƒ /login
+├ ○ /logout
+├ ○ /manifest.webmanifest
+├ ƒ /profil/passwort
+├ ƒ /quiz
+├ ƒ /quiz/[quizId]
+├ ƒ /quiz/[quizId]/ablauf
+├ ƒ /quiz/[quizId]/antworten
+├ ƒ /quiz/[quizId]/auswertung
+├ ƒ /quiz/[quizId]/design
+├ ƒ /quiz/[quizId]/diagnose
+├ ƒ /quiz/[quizId]/meme-archiv
+├ ƒ /quiz/[quizId]/moderation
+├ ƒ /quiz/[quizId]/praesentation
+├ ƒ /quiz/[quizId]/show/begruessung
+├ ƒ /quiz/[quizId]/show/bekanntmachungen
+├ ƒ /quiz/[quizId]/show/preise
+├ ƒ /quiz/[quizId]/show/regeln
+├ ƒ /quiz/[quizId]/show/startsequenz
+├ ƒ /quiz/[quizId]/show/vor-dem-start
+├ ƒ /quiz/[quizId]/slides/begruessung
+├ ƒ /quiz/[quizId]/slides/bekanntmachungen
+├ ƒ /quiz/[quizId]/slides/intro
+├ ƒ /quiz/[quizId]/slides/outro
+├ ƒ /quiz/[quizId]/slides/preise
+├ ƒ /quiz/[quizId]/slides/regeln
+├ ƒ /quiz/[quizId]/slides/startsequenz
+├ ƒ /quiz/[quizId]/slides/vor-dem-start
+├ ƒ /quiz/[quizId]/test
+├ ƒ /story-elemente
+├ ƒ /story-elemente/[storyElementId]
+├ ƒ /story-elemente/new
+├ ƒ /templates
+├ ƒ /templates/[templateId]
+├ ƒ /templates/new
+├ ƒ /templates/presentation-quality
+├ ƒ /templates/storybook-experience
+└ ƒ /workspaces/[seriesId]/[eventType]/[[...area]]
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

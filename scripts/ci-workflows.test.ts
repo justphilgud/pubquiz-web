@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 import "./prisma-cli-connection.test";
+import "./operations/configure-bingo-evening-preview.test";
 
 function readRepositoryFile(path: string) {
   return readFileSync(path, "utf8");
@@ -177,6 +178,15 @@ test("Deployment workflows never manage Vercel environment variables", () => {
   for (const workflow of [preview, production]) {
     assert.doesNotMatch(workflow, /vercel@56\.3\.2 env (?:add|update|rm)/);
   }
+});
+
+test('isolated Bingo evening Preview preserves exact branch, trust, environment and inherited media gates', () => {
+  const shared = preview.slice(preview.indexOf('  deploy-preview:'), preview.indexOf('  editorial-dry-run:'));
+  assert.match(shared, /github.ref != 'refs\/heads\/codex\/bingo-evening-dramaturgy'/);
+  const isolated = preview.slice(preview.indexOf('  isolated-preview:'));
+  for (const required of ["inputs.isolated_bingo_evening", "environment: preview", "github.ref == 'refs/heads/codex/bingo-evening-dramaturgy'", "scripts/verify-preview-ci.ts", "npm run deployment:validate", "scripts/deploy-vercel-git-preview.ts --check-only", "BINGO_EVENING_DATABASE_URL", "bingo-evening.http.browser.mjs --hosted"]) assert.ok(isolated.includes(required), required);
+  assert.ok(isolated.indexOf('scripts/verify-preview-ci.ts') < isolated.indexOf('configure-bingo-evening-preview.ts'));
+  assert.doesNotMatch(isolated, /db:deploy|--prod|migrate (?:reset|resolve)|db push/);
 });
 
 test("Deployment workflows contain no destructive Prisma commands", () => {
