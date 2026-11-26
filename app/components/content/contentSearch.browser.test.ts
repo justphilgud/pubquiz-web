@@ -24,7 +24,12 @@ test("content UI: paging, inline approval/assignment, return anchor, rejection a
       show('status=NOT_APPROVED'); await wait(()=>document.querySelectorAll('[data-content-key]').length===50 && !button('Weitere Treffer laden')?.disabled);
       phase='load more';button('Weitere Treffer laden').click();await wait(()=>document.querySelectorAll('[data-content-key]').length===100 && !document.querySelector('[aria-busy=true]'));
       const target=row(80), index=[...document.querySelectorAll('[data-content-key]')].indexOf(target);
-      phase='approve';button('Freigeben',target).click();await wait(()=>target.textContent.includes('Gerade freigegeben') && !target.querySelector('select').disabled);
+      // Approval feedback may commit before the transition reveals assignment again.
+      // A missing select is still pending, never evidence of an enabled control.
+      phase='approve';button('Freigeben',target).click();await wait(()=>{
+        const assignment=target.querySelector('select');
+        return target.textContent.includes('Gerade freigegeben') && assignment!==null && !assignment.disabled;
+      });
       check(document.querySelectorAll('[data-content-key]').length===100,'approval collapsed loaded pages');
       check([...document.querySelectorAll('[data-content-key]')].indexOf(target)===index,'approved row moved');
       const assignment=target.querySelector('select');check(!assignment.options[1].disabled,'quiz eligibility was not refreshed');

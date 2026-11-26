@@ -6,6 +6,32 @@ kandidat bleibt unverändert; der Plan allein führt weder Migration noch Deploy
 
 ## Unveränderliche Eingaben
 
+### Content-Search-Testfix und unveränderter Deploymentkandidat
+
+Die zusätzliche Operations-main-CI `45899589441` scheiterte nach erfolgreichem
+PostgreSQL-Integrationstest am Browser-Harness (`null.disabled` in der Wartebedingung
+nach Inline-Freigabe). Der separate Fix wartet auf eine vorhandene, aktivierte
+Quizauswahl; er ändert ausschließlich Testcode und Spezifikation. Die vollständig
+grüne CI seines integrierten main-Standes ist vor dem Backup zusätzlich erforderlich.
+Keine Wiederholung fehlgeschlagener Prüfungen ohne Ursachenbehebung.
+
+Der exakt registrierte Anwendungsrelease bleibt bewusst `6fa37aa5...` mit seiner
+erfolgreichen main-CI `45896537378`; Operations- und Browser-Harness-Nachfolger
+werden nicht als neue Anwendungsreleasekandidaten ausgegeben. Vor Fortsetzung ist
+die Git-Differenz seit diesem Kandidaten zu prüfen: nur die separat geprüften
+Operationsdateien, dieser Browsertest und seine Spezifikation sind zulässig, keine
+Änderung an Laufzeitcode, Assets, Abhängigkeiten oder Prisma. Die exakte Registry,
+SQL-Prüfsumme, Kandidaten-CI und alle Owner-Gates bleiben unverändert.
+
+Der frische geschützte Live-Preflight `45899659523` für genau `93f07497... →
+6fa37aa5...` ist erfolgreich: Alias/SHA, Leserrechte, Historie und Baseline-Katalog
+sowie isoliertes Delta PASS, keine fehlgeschlagenen Migrationen/Drift, ausschließlich
+`event_ceremony` ausstehend. Nach grüner aktueller main-CI folgt das frische
+geschützte Backup; vor dem gezielten Wiederanlauf des vorhandenen 6fa-Workflows
+werden aktueller Alias/SHA und die Zuordnung zum exakten Kandidaten erneut geprüft.
+Ein neues Production-Owner-Review bleibt zwingend. Kein Deployment der neueren
+Test-/Operationscommits und kein SHA-Override.
+
 ### Exakte Release-Nachfolge nach dem CI-Fixturefix (26.11.2026)
 
 PR182 wurde als `5bfcb5fd0c5788c520fb0602a1c1f5f41f316bdf` regulär integriert.
