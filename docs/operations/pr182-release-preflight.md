@@ -6,10 +6,62 @@ kandidat bleibt unverändert; der Plan allein führt weder Migration noch Deploy
 
 ## Unveränderliche Eingaben
 
+### Exakte Release-Nachfolge nach dem CI-Fixturefix (26.11.2026)
+
+PR182 wurde als `5bfcb5fd0c5788c520fb0602a1c1f5f41f316bdf` regulär integriert.
+Dessen main-CI `45839456456` scheiterte im echten Bingo-Integrationstest an
+`DUPLICATE_DRAW_NUMBER`. Deploy Production #1430 (`45840829931`) war deshalb
+SKIPPED, einschließlich beider Jobs; kein Production-Release.
+
+Der separat geprüfte Testfix PR184 wurde regulär als
+`6fa37aa5114eabeb9fa6c58f6fd30bd6a295d67a` integriert. Seine vollständigen
+Push-/PR-CI-Läufe `45895300870` und `45895340228` sind erfolgreich.
+Nur `scripts/testing/bingo-event.acceptance.ts` und die zugehörige Living
+Specification ändern sich gegenüber dem PR182-Merge. Feste Zusatzziehungen 73/74
+werden durch tatsächlich ungezogene Zahlen ersetzt. Eine ausdrückliche echte
+PostgreSQL-Dublettenprobe erhält Revision/Ziehungen unverändert. Keine
+Produktionsregel, Timeoutgrenze oder Pflichtprüfung wird abgeschwächt.
+
+Der neue **exakte Releasekandidat ist der Fix-Merge `6fa37aa5...`**. Gegen den
+gehostet geprüften Preview-Head bleiben `app`, `public`, `prisma`, `package.json`
+und Lockfile bytegleich. Die neue Planregression beweist dies aus unveränderlichen
+Git-Objekten und begrenzt den Fixdiff auf genau die zwei geprüften Dateien.
+Die lokale vollständige PostgreSQL-Abnahme besteht einschließlich Druck,
+Bestandsdatenerhalt und Dump/Restore (147,8 s). Ein vorheriger lokaler Timeout in
+unverändertem PR182-Code wird getrennt geführt, nicht durch neue Limits verdeckt.
+
+Die ursprüngliche Preview-Paarregistrierung bleibt unverändert erhalten. Der neue
+Datensatz erlaubt ausschließlich `93f07497... → 6fa37aa5...`; der rote ursprüngliche
+Merge `5bfcb5f...`, der Fix-PR-Head und andere Nachfolger bleiben abgewiesen.
+Manifest, Schemas, einziges SQL-Delta und vollständiger isolierter Deltatest sind
+unverändert gebunden. Die zusätzliche PostgreSQL17-Matrixzeile erhält wegen der
+gleichen Baseline einen Kandidaten-Suffix im Artefaktnamen; alte Artefaktnamen und
+alle bisherigen Matrixzeilen bleiben erhalten.
+
+Preflight #35 (`45839837797`) prüfte tatsächlich `93f07497... → 2d1fce...`, nicht
+den neuen Releasekandidaten. Er wird ausdrücklich **nicht** wiederverwendet.
+Nach Integration dieses Operations-Standes ist ein frischer geschützter main-only
+Preflight für `93f07497... → 6fa37aa5...` erforderlich. Erst nach dessen vollständigem
+PASS folgt ein frisches geschütztes Backup einschließlich Manifest, privatem
+Readback und Integrität; kein Restore, keine Reparatur produktiver Daten.
+
+Preflight und Deployment teilen die Concurrency-Gruppe `production-deployment`.
+Falls der automatische Production-Lauf des Fix-Merges bereits vor diesen Gates
+auf Owner-Review wartet, wird ausschließlich dieser **noch unfreigegebene** Lauf
+nach Prüfung seiner SHA und nicht gestarteten Production-Schritte regulär
+abgebrochen. Logs bleiben erhalten. Das löst keine Migration/Deployment aus und
+ändert keine Schutzregel. Nach Planprüfung, grüner exakter main-CI, frischem
+Preflight und verifiziertem Backup kann genau dieser Workflowkontext mit
+`workflow_run.head_sha=6fa37aa5...` gezielt erneut ausgeführt werden. Er benötigt
+weiterhin einen neuen regulären GitHub-Environment-Owner-Review. Keine blinde
+Wiederholung von #1430, kein manuelles Vercel-Deployment und kein SHA-Override.
+Aktuelle Lauf-IDs und Ergebnisse werden am Operations-PR dokumentiert.
+
 | Feld | Wert |
 | --- | --- |
 | Erwartete laufende Production-Basis | `93f074973c4bf73ed4bf6c489d375682f510ba82` |
-| Geprüfter PR182-Kandidat | `2d1fce671ad7d670a015dd6f7abd91cfa231926f` |
+| Ursprünglicher geprüfter Preview-Head | `2d1fce671ad7d670a015dd6f7abd91cfa231926f` |
+| Exakter Releasekandidat nach PR184 | `6fa37aa5114eabeb9fa6c58f6fd30bd6a295d67a` |
 | Anzahl Migrationen vorher / nachher | 80 / 81 |
 | Baseline-Manifest SHA256 | `54a307058df8a29a9ab214cb4b76f57e04112be631cfbc308514e9074d8df6a4` |
 | Baseline-Schema SHA256 | `53ce29a7a086bca7d22e9b46657b1b112190cf03404942a53093e85ffc5e484d` |
@@ -70,14 +122,17 @@ nicht als erfolgreiche Neuinstallation ausgegeben.
 1. Den Operations-Stand technisch prüfen, dessen vollständige CI einschließlich
    isoliertem PostgreSQL17 abwarten und regulär integrieren. Scope-only darf kein
    Anwendungsdeployment auslösen.
-2. Geschützten main-only Read-only-Preflight für das obige Paar ausführen.
+2. Geschützten main-only Read-only-Preflight für die neue exakte Release-Nachfolge
+   `93f07497... → 6fa37aa5...` ausführen, nicht den alten Preview-Head.
    Alle Alias-/SHA-, Historien- und Kataloggates müssen PASS sein. Bestehende
    GitHub-Environment-Reviews bleiben erhalten.
 3. Frisches AP9.4-Backup im Modus `acceptance`, Typ `pre-deployment`, geschützt,
    `restore_after_backup=false`. Manifest, privates Readback und Integrität prüfen.
    Aktuellen Alias/SHA und Migrationsplan vor Deployment erneut bestätigen.
-4. Erst dann PR182 regulär integrieren, Main-CI für den tatsächlichen Merge-Commit
-   abwarten und den bestehenden geschützten Migration-/Productionworkflow nutzen.
+4. PR182 und PR184 sind bereits regulär integriert. Die vollständige main-CI für
+   den exakten Release-Merge muss grün sein. Erst nach den vorherigen Gates den
+   bestehenden geschützten Migration-/Productionworkflow gezielt für diesen Commit
+   fortsetzen; siehe die oben dokumentierte Concurrency- und Owner-Review-Folge.
 5. Migrationsstatus, READY, tatsächlichen Runtime-SHA und Production-Aliasse sowie
    ausschließlich lesende Smoke-Tests prüfen. Keine Testkarten, Ziehungen,
    Gewinnerentscheidungen oder Bewertungen in Production anlegen.

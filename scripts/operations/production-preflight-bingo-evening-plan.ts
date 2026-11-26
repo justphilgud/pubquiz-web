@@ -8,7 +8,12 @@ export const BINGO_EVENING_PLAN=Object.freeze({
  candidateSchema:"26cc4d670ef3c954731a14250b580c33667e51869c9edc176b238cbf7f6127b1",
  migrations:[{name:"20261126120000_event_ceremony",checksum:"d352c4b66ed8b031fe6d678709ee4c6c0f65fd24c9705eb5e6525a52867a1da1"}],
 });
-export function approvedBingoEveningPlan(baseline:string,candidate:string){return baseline===BINGO_EVENING_PLAN.baselineSha&&candidate===BINGO_EVENING_PLAN.candidateSha?BINGO_EVENING_PLAN:undefined;}
+// Separate exact registration: PR184 changes only its fixture and specification.
+// Keep the original Preview-head plan immutable; no same-schema/wildcard fallback.
+export const BINGO_EVENING_RELEASE_PLAN=Object.freeze({
+ ...BINGO_EVENING_PLAN,candidateSha:'6fa37aa5114eabeb9fa6c58f6fd30bd6a295d67a',
+});
+export function approvedBingoEveningPlan(baseline:string,candidate:string){return [BINGO_EVENING_PLAN,BINGO_EVENING_RELEASE_PLAN].find(p=>baseline===p.baselineSha&&candidate===p.candidateSha);}
 const hash=(v:string)=>createHash("sha256").update(v).digest("hex");
 export function assertBingoEveningManifest(baseline:string,candidate:string,before:readonly File[],after:readonly File[],beforeSchema:string,afterSchema:string){
  const p=approvedBingoEveningPlan(baseline,candidate),files=(v:readonly File[])=>v.map(({name,checksum})=>({name,checksum}));
@@ -18,8 +23,9 @@ export function assertBingoEveningManifest(baseline:string,candidate:string,befo
  return p;
 }
 export function bingoEveningDeltaEvidence(baseline:string,candidate:string,value:unknown){
- if(!approvedBingoEveningPlan(baseline,candidate)||!value||typeof value!=="object")return false;
+ const plan=approvedBingoEveningPlan(baseline,candidate);
+ if(!plan||!value||typeof value!=="object")return false;
  const v=value as Record<string,unknown>;
- return v.status==="PASS"&&v.baselineSha===baseline&&v.candidateSha===candidate&&JSON.stringify(v.migrations)===JSON.stringify(BINGO_EVENING_PLAN.migrations)&&
+ return v.status==="PASS"&&v.baselineSha===baseline&&v.candidateSha===candidate&&JSON.stringify(v.migrations)===JSON.stringify(plan.migrations)&&
  ["rowsUnchanged","onlyExpectedSchemaChanges","oldColumnProjectionCompatible","constraintsEnforced","immutableHistory","legacyRunPreserved","noBackfill","newCeremonyObjectVerified","rollbackProbe"].every(k=>v[k]===true);
 }
