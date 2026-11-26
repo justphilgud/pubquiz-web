@@ -54,6 +54,15 @@ Das anschließende Renderingpaket muss einen versionierten gemeinsamen Grunddesi
 
 ## Verifikation und Betrieb
 
+Die Content-Browserregression prüft Freigabe und direkte Quizzuordnung erst nach
+Abschluss des tatsächlichen UI-Übergangs. `ContentActions` behält die Freigabe-
+Transition; `ContentQuizAssignment` blendet seine Auswahl während Pending aus.
+Der Hinweis „Gerade freigegeben“ kann vor der wieder sichtbaren Auswahl committen.
+Der Test behandelt eine noch fehlende Auswahl deshalb als nicht bereit und wartet
+auf deren Existenz und aktivierten Zustand. Danach prüft er weiterhin aktualisierte
+Quizberechtigung, Zuordnung, stabile Position/Seiten und Ablehnung/veraltete Antworten.
+Keine zusätzliche Pause, neue Timeoutgrenze oder Änderung am Produktverhalten.
+
 Gezielte Regressionen liegen in `workspacePolicy.test.ts` und `contentLibrary.test.ts`: Union der Berechtigungen, reine Verwaltung, Bingo-only ohne Quizteamzugriff, aktiver Bereich alter Objektlinks, aufgabengetreue Filterziele, sichere Rückwege und Zurückhalten alter Suchtreffer. Bestehende Team-/Content-/Header-/Mobiltests bleiben erhalten.
 
 Browserabnahme ausschließlich mit synthetischen Konten/Reihen in `pr130_review_20261025`. Die bestehende Preview-Branchfreigabe und alle CI-/Environment-/Medien-/Datenbankgates gelten unverändert. Runtime- und Migrationslogin bleiben getrennt. Keine neue Migration und keine Änderungen an Production, Antworten, Punkten oder laufenden Sessions. Die frühere Backup-Readback-Ursache und der echte Wochenlauf bleiben separate Betriebspunkte.
