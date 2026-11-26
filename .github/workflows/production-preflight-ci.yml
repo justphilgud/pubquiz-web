@@ -43,6 +43,8 @@ jobs:
             candidate: 948b164de02bf3ec0edd3ab98352528a09b8905f
           - baseline: e75c47cb4a2167a09303dad2540a252ea6860b1f
             candidate: ec8a9fe0c73cb9fc17ffba69e73fc6c94d6f740c
+          - baseline: 8f049b8182cf498079d7ad26aec3fc64dcf842d7
+            candidate: 72ea417c4857fedc3d1e59b443ddff5298c8665f
     services:
       postgres:
         image: postgres:17
@@ -61,10 +63,13 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: node --import tsx --test --test-concurrency=1 scripts/operations/production-preflight.test.ts scripts/operations/production-preflight-plan.test.ts scripts/operations/production-preflight-bingo.test.ts scripts/operations/production-preflight-bingo-live.test.ts scripts/operations/production-preflight-bingo-event.test.ts scripts/operations/production-preflight-bingo-card.test.ts scripts/operations/production-preflight-bingo-print-v4.test.ts scripts/operations/production-preflight-bingo-matching.test.ts scripts/operations/production-preflight.integration.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/production-preflight-schema.integration.test.ts
+      - run: node --import tsx --test --test-concurrency=1 scripts/operations/production-preflight.test.ts scripts/operations/production-preflight-plan.test.ts scripts/operations/production-preflight-bingo.test.ts scripts/operations/production-preflight-bingo-live.test.ts scripts/operations/production-preflight-bingo-event.test.ts scripts/operations/production-preflight-bingo-card.test.ts scripts/operations/production-preflight-bingo-print-v4.test.ts scripts/operations/production-preflight-bingo-matching.test.ts scripts/operations/production-preflight-bingo-bell.test.ts scripts/operations/pr180-music-acceptance.test.ts scripts/operations/production-preflight.integration.test.ts scripts/operations/deployment-scope.test.ts scripts/operations/production-preflight-schema.integration.test.ts
         env:
           CI: 'true'
           PREFLIGHT_TEST_DATABASE_URL: postgresql://preflight_ci:isolated-only@127.0.0.1:5432/preflight_ci
+      - name: PR180 immutable correction form browser acceptance
+        if: matrix.candidate == '72ea417c4857fedc3d1e59b443ddff5298c8665f'
+        run: node --import tsx --test scripts/operations/pr180-correction.browser.test.ts
       - name: Build independent schema reference, delta proof and separate new-install result in network-isolated PostgreSQL
         env:
           EXPECTED_PRODUCTION_SHA: ${{ matrix.baseline }}
