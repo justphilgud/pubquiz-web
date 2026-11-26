@@ -25,19 +25,31 @@ export async function exerciseBingoEvent(db:Client,api:typeof EventApi,creation:
  const view=()=>api.readEventModeration(1,game.id,runId);
  const request=async(command:EventCommand)=>({gameId:game.id,runId,requestId:randomUUID(),revision:(await view()).live!.revision,command});
  const send=async(command:EventCommand)=>{const r=await request(command);await api.commandEventRun(1,r);return r.requestId;};
+ // Generated cards are random: a fixed 73/74 may already be in their first row.
+ const drawUnused=async()=>{
+  const drawn=(await view()).live!.state.run.rounds[0].draws;
+  const number=Array.from({length:75},(_,i)=>i+1).find(n=>!drawn.some(d=>d.number===n));
+  assert.ok(number!==undefined,'The fixture requires an unused number');
+  await send({kind:'draw',number});
+ };
  const original=(await view()).live!,card=original.cards[0];
  for(const userId of [2,4,5,6]){await assert.rejects(api.readEventModeration(userId,game.id,runId));await assert.rejects(api.commandEventRun(userId,await request({kind:"pause"})));}
  for(const n of card.cells[0])await send({kind:"draw",number:n!});
+ const beforeDuplicate=(await view()).live!;
+ await assert.rejects(send({kind:'draw',number:card.cells[0][0]!}),/DUPLICATE_DRAW_NUMBER/);
+ const afterDuplicate=(await view()).live!;
+ assert.equal(afterDuplicate.revision,beforeDuplicate.revision);
+ assert.deepEqual(afterDuplicate.state.run.rounds[0].draws,beforeDuplicate.state.run.rounds[0].draws);
  const atCall=(await view()).live!,a=await request({kind:"call",stage:"BINGO",context:atCall.callContext}),b={...a,requestId:randomUUID(),command:{kind:"call" as const,stage:"DOUBLE" as const,context:atCall.callContext}};
  await Promise.all([api.commandEventRun(1,a),api.commandEventRun(1,b)]);assert.equal((await view()).live!.state.calls.length,2);
  await api.commandEventRun(1,a);assert.equal((await view()).live!.state.calls.length,2);
- await send({kind:"draw",number:74});await assert.rejects(send({kind:"closeRound"}),/OPEN_CLAIMS/);
+ await drawUnused();await assert.rejects(send({kind:"closeRound"}),/OPEN_CLAIMS/);
  for(const call of [a,b])await send({kind:"identify",callId:call.requestId,cardId:card.id});
  await send({kind:"decide",callId:a.requestId,action:"CONFIRM",reason:"Linie"});await send({kind:"decide",callId:b.requestId,action:"REJECT",reason:"Nur eine Linie"});
  const prior=(await view()).live!,draw=prior.state.run.rounds[0].draws[0];
  await send({kind:"correct",drawId:draw.id,number:Array.from({length:75},(_,i)=>i+1).find(n=>!prior.state.run.rounds[0].draws.some(d=>d.number===n))!,reason:"Frühere Ziehung korrigiert"});
  const corrected=(await view()).live!;assert.equal(corrected.state.run.rounds[0].draws[0].id,draw.id);assert.equal(corrected.state.run.rounds[0].draws.at(-1)?.number,prior.state.run.rounds[0].draws.at(-1)?.number);assert.equal(corrected.blocked,true);
- await send({kind:"draw",number:73});
+ await drawUnused();
  await assert.rejects(api.commandEventRun(1,{...a,requestId:randomUUID()}),/CALL_CONTEXT_CONFLICT/);
  await send({kind:"decide",callId:a.requestId,action:"REVOKE",reason:"Nachprüfung"});
  await send({kind:"closeRound"});const history=JSON.stringify((await view()).live!.state.run.rounds[0]);

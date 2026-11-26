@@ -16,6 +16,12 @@ Korrekturen verändern den effektiven Lauf, Präsentation, Statistik und Prüfun
 
 **Bewusste Änderung des V3.1-Vertrags:** Offene Rufe und Nachprüfungen sperren keine weiteren Ziehungen. Ausschließlich die manuelle Pause und vorhandene Verbindungs-/Rechte-/CAS-Sperren halten Zahleneingaben an. Kartenprüfungen funktionieren auch während einer manuellen Pause. Rundenabschluss und Eventabschluss erfordern weiterhin die ausdrückliche Klärung offener Rufe/Nachprüfungen; dieser Schutz wird nicht aufgehoben.
 
+Die echte PostgreSQL-Regression `bingo-event.acceptance.ts` wählt zusätzliche
+gültige Ziehungen aus den aktuell ungezogenen Zahlen. Feste Werte wie 73/74 sind
+bei zufällig erzeugten Karten keine sichere Fixtureannahme. Eine zusätzliche
+ausdrückliche Dublettenprobe muss weiterhin `DUPLICATE_DRAW_NUMBER` liefern und
+Revision sowie Ziehungen unverändert lassen. Dies ändert keine Produktionsregel.
+
 Die Kennungsauflösung erkennt fremde/alte Karten weiterhin ohne fremde Metadaten offenzulegen. Neue Prüfungen und Bestätigungen verlangen die tatsächliche Zuordnung zur aktiven Runde. Historische Nachweise aus älteren Implementierungsständen bleiben lesbar. Vier Ergebnisstufen behalten Klartext, Zeichen und semantische Ergebnisfarben.
 
 ## Live-Wahrscheinlichkeit
