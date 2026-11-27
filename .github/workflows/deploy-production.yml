@@ -102,15 +102,15 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: validated-production-release
-          path: .release-guard
+          path: .artifacts/release-guard
       - name: Verify fresh Production alias, baseline and exact green candidate before migrations
         env:
-          RELEASE_EVIDENCE_DIR: .release-guard
+          RELEASE_EVIDENCE_DIR: .artifacts/release-guard
           GH_TOKEN: ${{ github.token }}
           RELEASE_CANDIDATE_SHA: ${{ inputs.release_candidate_sha }}
           PREFLIGHT_RUN_ID: ${{ inputs.preflight_run_id }}
           PRODUCTION_ALIAS: ${{ vars.PRODUCTION_ALIAS }}
-        run: node .release-guard/release-guard.cjs fresh
+        run: node .artifacts/release-guard/release-guard.cjs fresh
 
       - name: Validate GitHub Production database identity
         run: npm run deployment:validate

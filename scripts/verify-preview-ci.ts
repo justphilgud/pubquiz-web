@@ -1,7 +1,10 @@
+import {readFileSync,writeFileSync,appendFileSync} from "node:fs";
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 
 type Run = {
+  id?:number;
+  run_attempt?:number;
   head_sha?: string;
   head_branch?: string;
   event?: string;
@@ -27,6 +30,11 @@ export function hasSuccessfulPreviewCi(runs: Run[], sha: string, branch: string)
     run.head_sha === sha && run.head_branch === branch &&
     (run.event === "push" || run.event === "pull_request" && run.path === '.github/workflows/ci.yml' && run.pull_requests?.some(pr=>pr.head?.sha===sha&&pr.head.repo?.full_name==='justphilgud/pubquiz-web')) && run.conclusion === "success" &&
     run.head_repository?.full_name === "justphilgud/pubquiz-web");
+}
+
+export function verifyPreviewCheckout(value:unknown,sha:string,runId:number,runAttempt:number){
+  const v=value as {version?:number;repository?:string;runId?:number;runAttempt?:number;sha?:string}|null;
+  if(!v||v.version!==1||v.repository!=='justphilgud/pubquiz-web'||v.sha!==sha||v.runId!==runId||v.runAttempt!==runAttempt||!Number.isSafeInteger(runId)||!Number.isSafeInteger(runAttempt)||runId<1||runAttempt<1)throw new Error('Exact tested Preview checkout unverified');
 }
 
 async function main() {
@@ -61,7 +69,21 @@ async function main() {
   if (!hasSuccessfulPreviewCi(body.workflow_runs ?? [], sha, branch)) {
     throw new Error("Preview-CI-Prüfung: keine erfolgreiche vertrauenswürdige CI für diesen Branch und SHA.");
   }
-  console.log("Erfolgreiche vertrauenswürdige CI für die genaue Preview-Revision bestätigt.");
+  const eligible=(body.workflow_runs??[]).filter(run=>hasSuccessfulPreviewCi([run],sha,branch)).sort((a,b)=>(b.id??0)-(a.id??0));
+  const selected=eligible[0];
+  if(!selected||typeof selected.id!=='number'||typeof selected.run_attempt!=='number'||!Number.isSafeInteger(selected.id)||!Number.isSafeInteger(selected.run_attempt)||selected.id<1||selected.run_attempt<1)throw new Error('Preview CI run identity unavailable');
+  if(process.argv[2]==='resolve'){
+    writeFileSync('.preview-ci-selection.json',JSON.stringify({id:selected.id,attempt:selected.run_attempt,event:selected.event}));
+    if(!process.env.GITHUB_OUTPUT)throw new Error('Preview output context missing');
+    appendFileSync(process.env.GITHUB_OUTPUT,`run_id=${selected.id}\nevent=${selected.event}\n`);
+    return;
+  }
+  if(selected.event==='pull_request'){
+    const selection=JSON.parse(readFileSync('.preview-ci-selection.json','utf8')) as {id:number;attempt:number};
+    if(selection.id!==selected.id||selection.attempt!==selected.run_attempt)throw new Error('Preview CI selection changed');
+    verifyPreviewCheckout(JSON.parse(readFileSync('.ci-tested-revision/ci-tested-revision.json','utf8')),sha,selected.id,selected.run_attempt);
+  }
+  console.log("Erfolgreiche vertrauenswürdige CI und genauer getesteter Checkout bestätigt.");
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

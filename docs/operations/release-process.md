@@ -72,7 +72,11 @@ bereits isolierten Datenbanken/Medienstores. Ein erfolgreicher PR-CI-Lauf reicht
 nur mit geprüftem Workflowpfad, passendem Branch und SHA sowie separat über die
 GitHub-PR-API bestätigter Herkunft aus diesem Repository. Fork-PRs und bloß gleiche
 Branch-Namen reichen nicht. Bestehende erfolgreiche Push-Nachweise bleiben für
-ältere Previews kompatibel. Production akzeptiert keinen PR-Ausführungskontext.
+ältere Previews kompatibel. Zusätzlich muss ein unveränderliches Artefakt aus genau diesem erfolgreichen
+CI-Lauf und Laufversuch den tatsächlich ausgecheckten Git-SHA bestätigen. Ältere
+PR-CI ohne dieses Artefakt oder mit getestetem GitHub-Mergebaum reicht nicht;
+dafür den Branch auf den neuen Ablauf aktualisieren und regulär prüfen lassen.
+Production akzeptiert keinen PR-Ausführungskontext.
 
 ## Release Schritt für Schritt
 
@@ -158,7 +162,7 @@ Tatsächlich ausgeführte Ergebnisse und CI-Läufe werden im zugehörigen PR dok
 Ein echter Production-Release mit dem neuen Ablauf benötigt nach Review eine
 separate Freigabe; er wird hier nicht zum Testen gestartet.
 
-Lokale Ergebnisse dieses Umbaus: 60/60 gezielte Schutz-/Workflowtests und 40/40
+Lokale Ergebnisse dieses Umbaus: 61/61 gezielte Schutz-/Workflowtests und 40/40
 historische Plan-/Scope-/Release-Regressionen bestanden (getrennte Suiten mit
 Überschneidungen, keine Behauptung von 100 verschiedenen Tests). Typecheck und
 ESLint des gesamten Operationsbereichs sowie der geänderten CI-/Previewdateien

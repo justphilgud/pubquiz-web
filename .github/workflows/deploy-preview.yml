@@ -133,9 +133,22 @@ jobs:
           cache: npm
 
       - name: Verify successful trusted CI for the exact revision
+        id: preview-ci
         env:
           GH_TOKEN: ${{ github.token }}
-        run: node scripts/verify-preview-ci.ts
+        run: node scripts/verify-preview-ci.ts resolve
+      - name: Download the immutable exact tested PR checkout
+        if: steps.preview-ci.outputs.event == 'pull_request'
+        uses: actions/download-artifact@v4
+        with:
+          name: ci-tested-revision
+          run-id: ${{ steps.preview-ci.outputs.run_id }}
+          github-token: ${{ github.token }}
+          path: .ci-tested-revision
+      - name: Verify the actual tested PR checkout before any Preview action
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/verify-preview-ci.ts verify-evidence
 
       - name: Install dependencies
         run: npm ci
@@ -333,9 +346,22 @@ jobs:
           node-version: 24
           cache: npm
       - name: Verify successful trusted CI for the exact revision
+        id: preview-ci
         env:
           GH_TOKEN: ${{ github.token }}
-        run: node scripts/verify-preview-ci.ts
+        run: node scripts/verify-preview-ci.ts resolve
+      - name: Download the immutable exact tested PR checkout
+        if: steps.preview-ci.outputs.event == 'pull_request'
+        uses: actions/download-artifact@v4
+        with:
+          name: ci-tested-revision
+          run-id: ${{ steps.preview-ci.outputs.run_id }}
+          github-token: ${{ github.token }}
+          path: .ci-tested-revision
+      - name: Verify the actual tested PR checkout before any Preview action
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/verify-preview-ci.ts verify-evidence
       - run: npm ci
       - name: Validate isolated database identity
         run: npm run deployment:validate

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { hasSuccessfulPreviewCi, isTrustedPreviewBranch } from "./verify-preview-ci";
+import { hasSuccessfulPreviewCi, isTrustedPreviewBranch, verifyPreviewCheckout } from "./verify-preview-ci";
 
 test("only successful push CI from the approved repository, branch and SHA permits Preview", () => {
   const sha = "a".repeat(40);
@@ -32,4 +32,10 @@ test('Preview accepts exact tested PR heads only with explicit same-repository P
  const run={head_sha:sha,head_branch:branch,event:'pull_request',path:'.github/workflows/ci.yml',conclusion:'success',head_repository:{full_name:'justphilgud/pubquiz-web'},pull_requests:[{head:{sha,repo:{full_name:'justphilgud/pubquiz-web'}}}]};
  assert.equal(hasSuccessfulPreviewCi([run],sha,branch),true);
  for(const changed of [{path:'.github/workflows/other.yml'},{pull_requests:[]},{pull_requests:[{head:{sha:'b'.repeat(40),repo:{full_name:'justphilgud/pubquiz-web'}}}]},{pull_requests:[{head:{sha,repo:{full_name:'fork/pubquiz-web'}}}]}])assert.equal(hasSuccessfulPreviewCi([{...run,...changed}],sha,branch),false);
+});
+
+test('Preview rejects legacy merge-tree CI, missing artifacts and evidence from other runs or attempts',()=>{
+ const sha='a'.repeat(40),proof={version:1,repository:'justphilgud/pubquiz-web',runId:5,runAttempt:1,sha};
+ verifyPreviewCheckout(proof,sha,5,1);
+ for(const wrong of [null,{}, {...proof,sha:'b'.repeat(40)},{...proof,runId:6},{...proof,runAttempt:2},{...proof,repository:'fork/pubquiz-web'},{...proof,version:2}])assert.throws(()=>verifyPreviewCheckout(wrong,sha,5,1));
 });
