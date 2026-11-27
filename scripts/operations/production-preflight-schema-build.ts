@@ -1,3 +1,4 @@
+import {featureReleaseProof} from './feature-release-plan';
 import {approvedBingoEveningPlan} from "./production-preflight-bingo-evening-plan";
 import {testBingoEveningDelta} from "./production-preflight-bingo-evening-delta";
 import {approvedBingoBellPlan} from "./production-preflight-bingo-bell-plan";
@@ -25,6 +26,13 @@ async function main(){
  const sha=process.env.EXPECTED_PRODUCTION_SHA??'';
  if(process.env.GITHUB_ACTIONS!=='true'||process.env.GITHUB_REPOSITORY!=='justphilgud/pubquiz-web'||!/^[a-f0-9]{40}$/.test(sha))throw new Error('CONTEXT');
  const candidate=process.env.RELEASE_CANDIDATE_SHA??'';
+ const feature=await featureReleaseProof(sha,candidate);
+ if(feature){
+  writeFileSync('expected-schema.json',JSON.stringify(feature,null,2),{flag:'wx'});
+  writeFileSync('delta-test.json',JSON.stringify({status:'PASS',code:'NO_SCHEMA_MIGRATION_DELTA',baselineSha:sha,candidateSha:candidate}),{flag:'wx'});
+  writeFileSync('new-install-replay.json',JSON.stringify({status:'NOT_RUN',code:'HISTORICAL_BOOTSTRAP_LIMITATION_UNCHANGED'}),{flag:'wx'});
+  return;
+ }
  if(approvedNoDeltaPreflightPlan(sha,candidate)){
   const schema=(revision:string)=>execFileSync('git',['show',`${revision}:prisma/schema.prisma`],{encoding:'utf8'});
   const proof=assertNoDeltaManifest(sha,candidate,migrationFiles(sha),migrationFiles(candidate),schema(sha),schema(candidate));

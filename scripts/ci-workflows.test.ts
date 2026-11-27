@@ -112,7 +112,7 @@ test("Preview is gated, serialized and deploys a targeted Git SHA after migratio
   assert.match(preview, /head_branch == 'preview\/content-and-quiz-flow'/);
   assert.match(preview, /startsWith\(github\.ref, 'refs\/heads\/'\)/);
   assert.match(preview, /github\.ref != 'refs\/heads\/main'/);
-  assert.match(preview, /Verify successful trusted push CI for the exact revision/);
+  assert.match(preview, /Verify successful trusted CI for the exact revision/);
   assert.ok(preview.indexOf('scripts/verify-preview-ci.ts') < preview.indexOf('npm ci'));
   assert.ok(preview.indexOf('--check-only') < preview.indexOf('npm run db:deploy'));
   assert.ok(
@@ -151,7 +151,11 @@ test("Production is gated, serialized, main-only and explicitly uses --prod", ()
   assert.match(production, /group: production-deployment/);
   assert.match(production, /cancel-in-progress: false/);
   assert.match(production, /ACTIONS_DEPLOYMENTS_ENABLED/);
-  assert.match(production, /head_branch == 'main'/);
+  assert.doesNotMatch(production, /workflow_run:/);
+  assert.match(production, /preflight_run_id:/);
+  assert.match(production, /release_candidate_sha:/);
+  assert.match(production, /needs: release-evidence/);
+  assert.ok(production.indexOf('release-guard.cjs fresh') < production.indexOf('npm run db:deploy'));
   assert.match(production, /github\.ref == 'refs\/heads\/main'/);
   assert.ok(
     production.indexOf("Validate GitHub Production database identity") <

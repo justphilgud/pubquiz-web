@@ -162,7 +162,7 @@ function validateExecutionContext(
     );
   }
 
-  if (event !== "push" && event !== "workflow_dispatch") {
+  if (event !== "push" && event !== "workflow_dispatch" && !(environment === "preview" && event === "pull_request")) {
     throw new DeploymentValidationError(
       "DEPLOYMENT_EVENT_INVALID",
       "Deployments sind nur nach einem Push oder einem autorisierten manuellen Start erlaubt.",

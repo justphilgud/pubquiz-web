@@ -12,6 +12,8 @@ on:
         required: true
 permissions:
   contents: read
+  actions: read
+  pull-requests: read
 concurrency:
   group: production-deployment
   cancel-in-progress: false
@@ -23,6 +25,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -31,6 +35,7 @@ jobs:
       - name: Verify current Production target and alias using GET only
         env:
           PREFLIGHT_ENVIRONMENT: production
+          GH_TOKEN: ${{ github.token }}
           EXPECTED_PRODUCTION_SHA: ${{ inputs.expected_production_sha }}
           RELEASE_CANDIDATE_SHA: ${{ inputs.release_candidate_sha }}
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -66,6 +71,7 @@ jobs:
           git fetch --no-tags origin 912cd86e70ec51f15a8028c3f34fbe3e86f5fc69 b7666e1a3e4fcbe1aec4e7884a30b3603e25b151 "$CANDIDATE"
       - name: Build independent schema reference, isolated delta and explicit new-install result in disposable network-isolated PostgreSQL
         env:
+          GH_TOKEN: ${{ github.token }}
           EXPECTED_PRODUCTION_SHA: ${{ inputs.expected_production_sha }}
           RELEASE_CANDIDATE_SHA: ${{ inputs.release_candidate_sha }}
         # Only the immutable reviewed release pairs in the code are accepted.
@@ -107,6 +113,7 @@ jobs:
       - name: Read database identity and migration history in READ ONLY transaction
         env:
           PREFLIGHT_ENVIRONMENT: operations-backup
+          GH_TOKEN: ${{ github.token }}
           EXPECTED_PRODUCTION_SHA: ${{ inputs.expected_production_sha }}
           RELEASE_CANDIDATE_SHA: ${{ inputs.release_candidate_sha }}
           PRODUCTION_BACKUP_DATABASE_URL: ${{ secrets.PRODUCTION_BACKUP_DATABASE_URL }}

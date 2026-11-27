@@ -1,0 +1,11 @@
+import {execFileSync} from 'node:child_process';
+import {mkdirSync,writeFileSync} from 'node:fs';
+import {FEATURE_PLAN_PATH,featurePlanFor} from './feature-release-plan';
+import {migrationFiles} from './production-preflight';
+const baseline=process.argv[2];
+if(!/^[a-f0-9]{40}$/.test(baseline??''))throw Error('Provide independently verified full Production SHA');
+const schema=execFileSync('git',['show',`${baseline}:prisma/schema.prisma`],{encoding:'utf8'});
+const plan=featurePlanFor(baseline,migrationFiles(baseline),schema);
+mkdirSync('release',{recursive:true});
+writeFileSync(FEATURE_PLAN_PATH,JSON.stringify(plan,null,2)+'\n');
+console.log('Prepared release/plan.json; review and commit it in the feature PR. No Production access.');

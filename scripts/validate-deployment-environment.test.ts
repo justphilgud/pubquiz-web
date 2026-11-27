@@ -110,9 +110,9 @@ test("rejects production outside main", () => {
   );
 });
 
-test("rejects pull request deployment contexts", () => {
+test("rejects pull request Production deployment contexts", () => {
   assertValidationCode(
-    { ...previewInput, deploymentEvent: "pull_request" },
+    { ...productionInput, deploymentEvent: "pull_request" },
     "DEPLOYMENT_EVENT_INVALID",
   );
 });

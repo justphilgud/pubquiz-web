@@ -1,5 +1,11 @@
 # Production – Read-only Preflight
 
+Aktueller Standard fuer neue Feature-Releases: [Release-Ablauf](release-process.md).
+Gepruefte Plaene liegen im Feature-PR; genaue Merge-SHAs werden zur Laufzeit an
+GitHub-Provenienz und gruene main-CI gebunden. Historische exakte Paare bleiben
+unveraendert verfuegbar. Production startet ausdruecklich nach erfolgreichem
+Preflight, nicht automatisch nach jedem main-Push.
+
 Dieser eigenständige Operations-Workflow prüft Production vor einer Releasefreigabe.
 Er startet weder Backup noch Migration, Reparatur, Import, Build oder Deployment.
 `deploy-production.yml` und die vorhandenen Backup-/Restoreworkflows bleiben unverändert.

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
@@ -10,6 +10,7 @@ import { pairColumns } from "@/app/fragen/editor/templates/pairsTemplate";
 import { issueTeamSessionToken } from "@/app/quiz/teamSessionToken";
 import { formatQuizDuration } from "@/app/quiz/quizPlanning";
 import { fixtureEmail, fixturePassword, fixtureSecret, fixtureWorkbook, openExcelFixture, testDatabase } from "./excelImportFixture";
+import { waitForChromeEndpoint } from "./chrome-endpoint";
 
 type Reply = {
   targetId?: string;
@@ -45,7 +46,12 @@ test("real Next.js and Chromium: XLSX, template duplicates, quiz planning and qu
   server.stdout.on("data", chunk => { serverOutput += String(chunk); });
   server.stderr.on("data", chunk => { serverOutput += String(chunk); });
   const browser = spawn(chrome, ["--headless=new", "--no-sandbox", "--disable-gpu", "--disable-background-networking",
-    "--no-first-run", `--user-data-dir=${profile}`, "--remote-debugging-port=0", "about:blank"], { stdio: "ignore" });
+    "--disable-dev-shm-usage", "--no-first-run", `--user-data-dir=${profile}`, "--remote-debugging-port=0", "about:blank"],
+  { stdio: ["ignore", "ignore", "pipe"] });
+  let browserDiagnostic = "";
+  let browserError: Error | undefined;
+  browser.stderr.on("data", chunk => { browserDiagnostic = (browserDiagnostic + String(chunk)).slice(-4000); });
+  browser.on("error", error => { browserError = error; });
   let socket: WebSocket | undefined;
   const artifacts = process.env.QUIZ_PLANNING_SCREENSHOT_DIR;
   try {
@@ -54,9 +60,11 @@ test("real Next.js and Chromium: XLSX, template duplicates, quiz planning and qu
       return serverOutput.match(/http:\/\/127\.0\.0\.1:\d+/)?.[0];
     }, "lokaler Next.js-Server");
     const portFile = join(profile, "DevToolsActivePort");
-    await eventually(() => existsSync(portFile), "Chrome DevTools");
-    const [port, endpoint] = readFileSync(portFile, "utf8").trim().split(/\r?\n/);
-    const ws = new WebSocket(`ws://127.0.0.1:${port}${endpoint}`);
+    const endpoint = await waitForChromeEndpoint(portFile, {
+      timeoutMs: 45_000,
+      exited: () => Boolean(browserError) || browser.exitCode !== null || browser.signalCode !== null,
+    });
+    const ws = new WebSocket(endpoint);
     socket = ws;
     await new Promise<void>((resolve, reject) => {
       ws.onopen = () => resolve();
@@ -432,7 +440,7 @@ test("real Next.js and Chromium: XLSX, template duplicates, quiz planning and qu
       await contains(solution);
     }
   } catch (error) {
-    throw new Error(`${error instanceof Error ? error.message : error}\nNext.js:\n${serverOutput.slice(-6000)}`, { cause: error });
+    throw new Error(`${error instanceof Error ? error.message : error}\nChrome: exit=${browser.exitCode}, signal=${browser.signalCode}, spawn=${browserError?.message ?? "none"}\n${browserDiagnostic}\nNext.js:\n${serverOutput.slice(-6000)}`, { cause: error });
   } finally {
     socket?.close();
     browser.kill();

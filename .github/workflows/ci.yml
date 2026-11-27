@@ -1,7 +1,8 @@
 name: CI
 
 on:
-  push: {}
+  push:
+    branches: [main]
   pull_request: {}
 
 permissions:
@@ -25,6 +26,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
 
       - name: Use Node.js 24
@@ -83,6 +85,24 @@ jobs:
       - name: Real HTTP question rewrite authentication and disabled flag
         run: npm run test:question-rewrite:http
 
+      - name: Record the exact tested checkout for trusted Preview consumers
+        env:
+          CI_REPOSITORY: ${{ github.repository }}
+          CI_RUN_ID: ${{ github.run_id }}
+          CI_RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          node --input-type=module <<'NODE'
+          import {execFileSync} from 'node:child_process';
+          import {writeFileSync} from 'node:fs';
+          writeFileSync('ci-tested-revision.json',JSON.stringify({version:1,repository:process.env.CI_REPOSITORY,runId:Number(process.env.CI_RUN_ID),runAttempt:Number(process.env.CI_RUN_ATTEMPT),sha:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()}));
+          NODE
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ci-tested-revision
+          path: ci-tested-revision.json
+          if-no-files-found: error
+          retention-days: 14
+
   repository-lint-information:
     name: Informational only — full repository ESLint debt
     runs-on: ubuntu-latest
@@ -91,6 +111,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Use Node.js 24
         uses: actions/setup-node@v4
@@ -152,6 +174,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
