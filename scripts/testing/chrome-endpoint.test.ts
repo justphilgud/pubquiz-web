@@ -22,3 +22,13 @@ test('Chrome startup waits through absent, empty and partial files; timeout and 
   await assert.rejects(waitForChromeEndpoint(directory),error=>(error as NodeJS.ErrnoException).code==='EISDIR');
  }finally{await rm(directory,{recursive:true,force:true});}
 });
+
+test('Chrome readiness tolerates delayed process startup within its explicit budget',async()=>{
+ const directory=await mkdtemp(join(tmpdir(),'pubquiz-chrome-delayed-')),file=join(directory,'DevToolsActivePort');
+ try{
+  const ready=waitForChromeEndpoint(file,{timeoutMs:2000,pollMs:5});
+  await new Promise(resolve=>setTimeout(resolve,120));
+  await writeFile(file,'4321\n/devtools/browser/delayed-start\n');
+  assert.equal(await ready,'ws://127.0.0.1:4321/devtools/browser/delayed-start');
+ }finally{await rm(directory,{recursive:true,force:true});}
+});

@@ -9,7 +9,7 @@ import type * as Event from '@/app/bingo/live/eventRepository.server';
 import type * as Ceremony from '@/app/bingo/ceremonyRepository.server';
 import type * as Evening from '@/app/bingo/preparation/eveningPrint.server';
 import {defaultCeremony} from '@/app/rendering/ceremony/ceremony';
-import type {EventCommand} from '@/app/bingo/live/eventRun';
+import {currentEventRound,type EventCommand} from '@/app/bingo/live/eventRun';
 import {roundColor} from '@/app/bingo/roundColors';
 
 export async function exerciseBingoEvening(db:Client,api:typeof Prep&{creation:typeof Creation;eventRun:typeof Event;ceremony:typeof Ceremony;live:typeof import('@/app/bingo/live/repository.server');evening:typeof Evening;createCardsPdf:typeof import('@/app/bingo/preparation/pdf.server').createCardsPdf}){
@@ -49,6 +49,11 @@ export async function exerciseBingoEvening(db:Client,api:typeof Prep&{creation:t
  assert.equal((await api.eventRun.readEventAudience(1,(await view()).live!.audienceKey)).roundNumber,2);
  await send({kind:'navigateRound',roundId:firstId,preparationRevision:(await prep()).revision});
  assert.equal(JSON.stringify((await view()).live!.state.run.rounds[0].draws),oldDraws);
+ // Regression: selected first round differs from the most recently opened round.
+ const returned=(await view()).live!;
+ assert.notEqual(returned.state.run.rounds.at(-1)!.id,returned.round.id);
+ await send({kind:'draw',number:1});
+ assert.equal(currentEventRound((await view()).live!.state).draws[0].number,1);
  const rootState=(await view()).ceremony;
  const insertion={...defaultCeremony().config,enabled:['welcome'] as const,welcome:'Nur nach Runde 1'};
  await api.ceremony.writeCeremony(1,full.id,rootState.revision,{kind:'configure',config:{...rootState.config,insertions:{[firstId]:insertion},outro:{...defaultCeremony().config,enabled:['announcements','raffle'],announcements:'Nach allen sechs Runden'}}});
@@ -58,9 +63,13 @@ export async function exerciseBingoEvening(db:Client,api:typeof Prep&{creation:t
   const [snapshot]=(await db.query('SELECT print_snapshot FROM pubquiz.bingo_card_series WHERE game_id=$1 AND origin_round_id=$2 LIMIT 1',[full.id,v.round.id])).rows;
   assert.equal(snapshot.print_snapshot.settings.colors.back,roundColor(i+1).background);
   if(i===0){const other=(await db.query('SELECT c.id FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_card_series s ON s.id=c.series_id WHERE s.game_id=$1 AND s.origin_round_id<>$2 LIMIT 1',[full.id,v.round.id])).rows[0];await assert.rejects(send({kind:'check',cardId:other.id,context:v.callContext}),/WRONG_ROUND/);}
-  for(const number of card.cells[0])await send({kind:'draw',number:number!});
+  const drawn=new Set(currentEventRound(v.state).draws.map(draw=>draw.number));
+  for(const number of card.cells[0])if(!drawn.has(number!))await send({kind:'draw',number:number!});
   v=(await view()).live!;const call=await send({kind:'check',cardId:card.id,context:v.callContext});
-  const nextNumber=Array.from({length:75},(_,n)=>n+1).find(n=>!v.state.run.rounds.at(-1)!.draws.some(d=>d.number===n))!;
+  const selected=currentEventRound(v.state);assert.equal(selected.id,v.round.id);
+  const nextNumber=Array.from({length:75},(_,n)=>n+1).find(n=>!selected.draws.some(d=>d.number===n));
+  assert.ok(nextNumber!==undefined,'a free draw belongs to the selected round');
+  if(i===0)assert.notEqual(nextNumber,1,'regression: do not reuse first-round draw after navigating back');
   await send({kind:'draw',number:nextNumber});
   await send({kind:'decideCheck',checkId:call.requestId,action:'CONFIRM',reason:'Erste Linie'});
   assert.equal((await view()).live!.raffle.count,i+1);
