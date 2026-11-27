@@ -15,7 +15,7 @@ import {parseSharedDesign,type SharedDesign} from "@/app/rendering/sharedDesign/
 import {captureLiveAssets} from "./visualAssets.server";
 import {assertUuid,type FrozenRound} from "./live";
 import {activeElapsedMs} from "../core/run";
-import {applyEventRunEvent,blockingCalls,callContextData,currentEventRound,initialEventRun,parseEventCommand,type EventCommand} from "./eventRun";
+import {applyEventRunEvent,assertCurrentEventCommand,blockingCalls,callContextData,currentEventRound,initialEventRun,parseEventCommand,type EventCommand} from "./eventRun";
 import {parseRoundSnapshot} from "./roundSnapshot";
 import {readPreparation} from "../preparation/readPreparation.server";
 import {frozenMatching,readMatchingEntry,audienceMatching} from '../matching/repository.server';
@@ -111,6 +111,7 @@ export async function commandEventRun(userId:number,input:{gameId:string;runId:s
   if(!row||row.eventreihe_id!==game.eventreihe_id)throw Error("RUN_NOT_FOUND");
   const [old]=await tx.$queryRaw<{request_hash:string;revision:number}[]>`SELECT request_hash,revision FROM pubquiz.bingo_live_events WHERE run_id=${row.id}::uuid AND request_id=${input.requestId}::uuid`;
   if(old){if(old.request_hash!==hash)throw Error("REQUEST_REUSED");return {revision:old.revision};}
+  assertCurrentEventCommand(command);
   const loaded=await load(tx,row),{state}=loaded;
   if(command.kind==="call"||command.kind==="check"){if(input.revision>row.revision||command.context!==sha256(canonical(callContextData(state))))throw Error("CALL_CONTEXT_CONFLICT");}
   else if(input.revision!==row.revision)throw Error("REVISION_CONFLICT");
@@ -159,16 +160,17 @@ export async function readEventModeration(userId:number,gameId:string,runId?:str
   const at=Math.max(await clock(tx),loaded?.previousAt??0);
   const plan=row?await tx.$queryRaw<{round_id:string;position:number}[]>`SELECT round_id,position FROM pubquiz.bingo_event_round_plan WHERE run_id=${row.id}::uuid ORDER BY position`:[];
   const rounds=await tx.bingo_rounds.findMany({where:{game_id:gameId},orderBy:{position:"asc"},select:{id:true,position:true,label:true,series:{select:{series_id:true,series:{select:{code:true,card_count:true}}}}}});
+  const frozenDecks=row?await tx.$queryRaw<{roundId:string;id:string;code:string;count:number}[]>`SELECT rc.round_id AS "roundId",s.id,s.code,count(*)::int AS count FROM pubquiz.bingo_event_round_cards rc JOIN pubquiz.bingo_card_series s ON s.id=rc.series_id WHERE rc.run_id=${row.id}::uuid AND rc.game_id=${gameId}::uuid GROUP BY rc.round_id,s.id,s.code ORDER BY rc.round_id,s.code`:[];
   const next=plan.find(p=>!loaded?.state.frozen.some(r=>r.id===p.round_id));
   const matching=round&&loaded?.state.frozen.find(f=>f.id===round.id)?.matching,last=round?.draws.at(-1);
   const matchingEntry=matching&&last?await readMatchingEntry(tx,gameId,matching,last.number):null;
   const pageRound=rounds.find(r=>r.id===next?.round_id)??rounds.find(r=>!loaded?.state.frozen.some(f=>f.id===r.id));
   const ceremony=await readCeremony(tx,gameId);
-  const raffle=loaded?raffleEntries(loaded.state.tickets??[],loaded.state.run.rounds,[...loaded.cardsByRound.values()].flat()):[];
+  const raffle=loaded?raffleEntries(loaded.state.tickets??[],loaded.state.run.rounds,[...loaded.cardsByRound.values()].flat(),loaded.state.checks?.map(c=>c.id)??[]):[];
   const raffleCards=[...loaded?.cardsByRound.values()??[]].flat();
   return {ceremony,protocol:2 as const,prepareNew,gameId,title:game.titel,seriesId:game.eventreihe_id,archived:series.ist_archiviert,
    preparationRevision:(await tx.bingo_preparations.findUnique({where:{game_id:gameId}}))?.revision??0,
-   rounds,plan,runs:rows.map(r=>({id:r.id,status:r.status,startedAt:r.started_at.toISOString()})),
+   rounds,plan,frozenDecks,runs:rows.map(r=>({id:r.id,status:r.status,startedAt:r.started_at.toISOString()})),
    preparationPage:pageRound?Math.floor((pageRound.position-1)/25)+1:1,
    live:row&&loaded&&round?{events:loaded.events.map(e=>({id:e.request_id,at:e.occurred_at.getTime(),actorId:e.actor_id,command:parseEventEnvelope(e.command).input.command})),id:row.id,revision:row.revision,startedAt:row.started_at.getTime(),round:loaded.state.frozen.find(f=>f.id===round.id)!,state:loaded.state,
     raffle:{...raffleSummary(raffle),entries:raffle.map(e=>({...e,cardCode:raffleCards.find(c=>c.id===e.cardId)?.shortCode??e.cardId,roundLabel:loaded.state.frozen.find(r=>r.id===e.roundId)?.label??e.roundId}))},matchingEntry,checkCards:loaded.checkCards,cards:loaded.cardsByRound.get(round.id)??[],design:row.design_snapshot,audienceKey:row.audience_key,serverAt:at,elapsedMs:activeElapsedMs(loaded.state.run,at),
@@ -188,7 +190,7 @@ export async function readEventAudience(userId:number,key:string){
   const loaded=await load(tx,row),{state}=loaded,round=currentEventRound(state);
   const framing=await readCeremony(tx,row.game_id),ceremony=framing.revision===0?{...framing,slide:null}:framing;
   const eventTitle=(await tx.game_drafts.findUniqueOrThrow({where:{id:row.game_id},select:{titel:true}})).titel;
-  const ticket=ceremony.runId===row.id&&ceremony.revealCount>=2?raffleEntries(state.tickets??[],state.run.rounds,[...loaded.cardsByRound.values()].flat()).find(t=>t.number===ceremony.raffleNumber&&t.valid):undefined;
+  const ticket=ceremony.runId===row.id&&ceremony.revealCount>=2?raffleEntries(state.tickets??[],state.run.rounds,[...loaded.cardsByRound.values()].flat(),state.checks?.map(c=>c.id)??[]).find(t=>t.number===ceremony.raffleNumber&&t.valid):undefined;
   const winner=ticket?{number:ticket.number,cardCode:[...loaded.cardsByRound.values()].flat().find(c=>c.id===ticket.cardId)?.shortCode??ticket.cardId,roundLabel:state.frozen.find(r=>r.id===ticket.roundId)?.label??ticket.roundId}:null;
   const frozen=state.frozen.find(f=>f.id===round.id)!,last=round.draws.at(-1),matching=frozen.matching;
   const content=matching&&last?audienceMatching(await readMatchingEntry(tx,row.game_id,matching,last.number),state.revealed?.includes(last.id)??false,matching.publication,row.game_id):undefined;
@@ -196,7 +198,7 @@ export async function readEventAudience(userId:number,key:string){
    termMode:Boolean(state.frozen.find(f=>f.id===round.id)?.terms),labels:Object.fromEntries(round.draws.map(draw=>{const terms=state.frozen.find(f=>f.id===round.id)?.terms;return [draw.number,terms?publishedTerm(terms,draw.number,true,state.revealed?.includes(draw.id)??false):null];}).filter(([,text])=>text!==null)),
    ...(content?{content}:{}),serverAt:Math.max(await clock(tx),state.playback?.at??0),playback:state.playback,target:round.plannedDraws,draws:round.draws,design:row.design_snapshot,assetBase:`/api/bingo/presentation/${key}/assets`,
    phase:round.status==="CLOSED"&&state.run.status!=="ENDED"?"BETWEEN" as const:undefined,
-   claims:round.claims.map(c=>({id:c.id,stage:c.stage,action:c.decisions.at(-1)?.action??null,needsReview:c.needsReview}))};
+   claims:round.claims.filter(c=>state.checks?.some(check=>check.id===c.id)).map(c=>({id:c.id,stage:c.stage,action:c.decisions.at(-1)?.action??null,needsReview:c.needsReview}))};
  },{isolationLevel:"RepeatableRead"});
 }
 
@@ -220,5 +222,5 @@ function shortPrefix(letters:string) {let n=0;for(const letter of letters)n=n*26
 
 export async function raffleForCeremony(tx:Tx,gameId:string,runId:string){
  assertUuid(runId);const [row]=await tx.$queryRaw<Row[]>`SELECT r.* FROM pubquiz.bingo_live_runs r JOIN pubquiz.bingo_event_runs e ON e.run_id=r.id WHERE r.id=${runId}::uuid AND r.game_id=${gameId}::uuid AND r.id=(SELECT id FROM pubquiz.bingo_live_runs WHERE game_id=${gameId}::uuid ORDER BY started_at DESC,id DESC LIMIT 1) FOR UPDATE OF r`;
- if(!row||row.status!=="ENDED")throw Error("RAFFLE_NOT_READY");const loaded=await load(tx,row);return raffleEntries(loaded.state.tickets??[],loaded.state.run.rounds,[...loaded.cardsByRound.values()].flat());
+ if(!row||row.status!=="ENDED")throw Error("RAFFLE_NOT_READY");const loaded=await load(tx,row);return raffleEntries(loaded.state.tickets??[],loaded.state.run.rounds,[...loaded.cardsByRound.values()].flat(),loaded.state.checks?.map(c=>c.id)??[]);
 }

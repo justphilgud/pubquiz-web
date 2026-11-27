@@ -1,6 +1,6 @@
 import {registerTickets,type RaffleTicket} from "./raffle";
 import type { CardCheck } from './cardChecks';
-import { evaluateCard, type BingoCard, type Stage } from "../core/cards";
+import { evaluateCard, requireNumber, type BingoCard, type Stage } from "../core/cards";
 import { addRound, closeRound, endRun, openRound, pauseRun, resumeRun, type BingoRun } from "../core/run";
 import { correctDraw, decideClaim, recordClaim, evaluateClaim, isConfirmed } from "../core/round";
 import { applyLiveEvent, assertUuid, initialState, parseLiveCommand, type Call, type FrozenRound, type LiveCommand, type LiveEvent } from "./live";
@@ -31,7 +31,9 @@ export function parseEventCommand(value: unknown): EventCommand {
   }
   if (r.kind === "correct") {
     assertUuid(r.drawId); if(Object.keys(r).sort().join()!=="drawId,kind,number,reason")throw Error("INVALID_COMMAND");
-    parseLiveCommand({kind:"correct",number:r.number,reason:r.reason}); return r as EventCommand;
+    if(r.reason==='') requireNumber(r.number as number);
+    else parseLiveCommand({kind:"correct",number:r.number,reason:r.reason});
+    return r as EventCommand;
   }
   return parseLiveCommand(value) as EventCommand;
 }
@@ -41,10 +43,14 @@ export function initialEventRun(runId: string, gameId: string, round: FrozenRoun
 export function currentEventRound(state: EventRunState) { return state.run.rounds.find(r=>r.status==="OPEN") ?? state.run.rounds.at(-1)!; }
 export function blockingCalls(state: EventRunState): boolean {
   const round=currentEventRound(state);
-  return state.calls.filter(c=>c.roundId===round.id).some(call=>{
+  return state.calls.filter(c=>c.roundId===round.id&&state.checks?.some(check=>check.id===c.id)).some(call=>{
     const claim=round.claims.find(c=>c.id===call.id);
     return !claim || !claim.decisions.length || claim.needsReview;
   });
+}
+/** Applied only to new writes, never to journal parsing/replay or old retries. */
+export function assertCurrentEventCommand(command: EventCommand): void {
+  if (['call','identify','decide'].includes(command.kind)) throw Error('LEGACY_CALL_READ_ONLY');
 }
 /** Pure context, subsequently hashed by the service. Calls/identifications/decisions do not move a draw boundary. */
 export function callContextData(state: EventRunState) {
@@ -84,10 +90,13 @@ function applyEventRunEventInner(state: EventRunState, event: EventRunEvent, car
     if(!check||!card)throw Error('CARD_OR_CALL_NOT_FOUND');
     const evaluation=evaluateCard(card.cells,round.draws.slice(0,check.throughPosition).map(d=>d.number));
     const stage=evaluation.stages.at(-1)??'BINGO';
-    const existing=round.claims.find(claim=>claim.id===check.id);
-    const withClaim=existing?round:recordClaim({...round,draws:check.draws},check.id,card,stage);
+    const directIds=new Set(state.checks?.map(item=>item.id));
+    const directRound={...round,claims:round.claims.filter(claim=>directIds.has(claim.id))};
+    const existing=directRound.claims.find(claim=>claim.id===check.id);
+    const withClaim=existing?directRound:recordClaim({...directRound,draws:check.draws},check.id,card,stage);
     const next=decideClaim({...withClaim,draws:round.draws},check.id,card,{id:event.id,action:c.action,reason:c.reason});
-    return {...replace(next),calls:state.calls.some(call=>call.id===check.id)?state.calls:[...state.calls,{id:check.id,roundId:round.id,recordedAt:check.at,stage,throughPosition:check.throughPosition,draws:check.draws,cardId:card.id}]};
+    const merged={...next,claims:[...round.claims.map(claim=>next.claims.find(item=>item.id===claim.id)??claim),...next.claims.filter(claim=>!round.claims.some(item=>item.id===claim.id))]};
+    return {...replace(merged),calls:state.calls.some(call=>call.id===check.id)?state.calls:[...state.calls,{id:check.id,roundId:round.id,recordedAt:check.at,stage,throughPosition:check.throughPosition,draws:check.draws,cardId:card.id}]};
   }
   if(c.kind==='check') {
     if(run.status!=='RUNNING'&&run.status!=='PAUSED')throw Error('RUN_NOT_RUNNING');
@@ -113,7 +122,7 @@ function applyEventRunEventInner(state: EventRunState, event: EventRunEvent, car
   }
   if(c.kind==="correct") {
     if(run.status!=="RUNNING"&&run.status!=="PAUSED")throw Error("RUN_NOT_ACTIVE");
-    const corrected=correctDraw(round,c.drawId,c.number,{id:event.id,reason:c.reason},cards).round;
+    const corrected=correctDraw(round,c.drawId,c.number,{id:event.id,reason:c.reason},cards,{allowEmptyReason:true}).round;
     const claims=corrected.claims.map(claim=>{
       const card=cards.find(card=>card.id===claim.cardId);
       const lost=card&&isConfirmed(claim)&&(state.tickets??[]).some(ticket=>ticket.roundId===round.id&&ticket.claimIds.includes(claim.id)&&!evaluateClaim(corrected,claim,card).lines.includes(ticket.line));

@@ -87,10 +87,13 @@ export function decideClaim(round: BingoRound, claimId: string, card: BingoCard,
 /** Correction retains identity/order. Existing confirmations are retained and flagged, never silently revoked. */
 export function correctDraw(
   round: BingoRound, drawId: string, number: number, change: Readonly<{ id: string; reason: string }>, cards: readonly BingoCard[],
+  options: Readonly<{ allowEmptyReason?: boolean }> = {},
 ): Readonly<{ round: BingoRound; change: Correction }> {
   requireNumber(number);
   requireId(change.id);
-  requireId(change.reason);
+  // AP3 remains strict by default. The current V2 correction explicitly allows
+  // an honest empty reason; never synthesize an explanation for the actor.
+  if (!(options.allowEmptyReason && change.reason === "")) requireId(change.reason);
   if (round.corrections.some(c => c.id === change.id)) throw new Error("DUPLICATE_CORRECTION_ID");
   const draw = round.draws.find(d => d.id === drawId);
   if (!draw) throw new Error("DRAW_NOT_FOUND");

@@ -90,3 +90,15 @@ test('six and ten rounds of 100 standard/music cards use the same numeric geomet
   assert.equal(stats.probability,candidates.length/35*100);assert.ok(stats.waitingCards<=100);
  }
 });
+
+
+test('historical review tickets stay invalid without blocking unrelated current raffle entries',()=>{
+ const entries:RaffleEntry[]=[
+  {number:1,roundId:id(3),cardId:card.id,line:'ROW_1',claimIds:[id(10)],valid:false,needsReview:true,blocksDraw:false},
+  {number:2,roundId:id(3),cardId:card.id,line:'ROW_2',claimIds:[id(11)],valid:true,needsReview:false,blocksDraw:false},
+ ];
+ assert.equal(raffleSummary(entries).needsReview,false);
+ assert.equal(selectRaffleWinner(entries,2).number,2);
+ assert.throws(()=>selectRaffleWinner(entries,1),/INVALID_RAFFLE_NUMBER/);
+ assert.throws(()=>selectRaffleWinner([{...entries[0],blocksDraw:true},entries[1]],2),/RAFFLE_REVIEW_REQUIRED/);
+});

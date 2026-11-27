@@ -44,10 +44,10 @@ export async function exerciseBingoEvening(db:Client,api:typeof Prep&{creation:t
   assert.equal(snapshot.print_snapshot.settings.colors.back,roundColor(i+1).background);
   if(i===0){const other=(await db.query('SELECT c.id FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_card_series s ON s.id=c.series_id WHERE s.game_id=$1 AND s.origin_round_id<>$2 LIMIT 1',[full.id,v.round.id])).rows[0];await assert.rejects(send({kind:'check',cardId:other.id,context:v.callContext}),/WRONG_ROUND/);}
   for(const number of card.cells[0])await send({kind:'draw',number:number!});
-  v=(await view()).live!;const call=await send({kind:'call',stage:'BINGO',context:v.callContext});
+  v=(await view()).live!;const call=await send({kind:'check',cardId:card.id,context:v.callContext});
   const nextNumber=Array.from({length:75},(_,n)=>n+1).find(n=>!v.state.run.rounds.at(-1)!.draws.some(d=>d.number===n))!;
-  await send({kind:'draw',number:nextNumber});await send({kind:'identify',callId:call.requestId,cardId:card.id});
-  await send({kind:'decide',callId:call.requestId,action:'CONFIRM',reason:'Erste Linie'});
+  await send({kind:'draw',number:nextNumber});
+  await send({kind:'decideCheck',checkId:call.requestId,action:'CONFIRM',reason:'Erste Linie'});
   assert.equal((await view()).live!.raffle.count,i+1);
   // Pause remains an explicit barrier for draws; checks still work during a pause.
   await send({kind:'pause'});await assert.rejects(send({kind:'draw',number:75}),/RUN_NOT_RUNNING/);

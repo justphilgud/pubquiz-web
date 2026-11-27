@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {randomUUID} from "node:crypto";
 import type {Client} from "pg";
+import {canonical,sha256} from "../../app/bingo/preparation/printSnapshot";
 import type * as EventApi from "../../app/bingo/live/eventRepository.server";
 import type * as Creation from "../../app/bingo/eventCreation.server";
 import type * as Prep from "../../app/bingo/preparation/repository.server";
@@ -23,6 +24,20 @@ export async function exerciseBingoEvent(db:Client,api:typeof EventApi,creation:
  pv=await prep.readPreparation(1,game.id);const start={gameId:game.id,requestId:randomUUID(),expectedSeriesId:10,preparationRevision:pv.revision};
  const starts=await Promise.all([api.startEventRun(1,start),api.startEventRun(1,start)]);assert.equal(starts[0].runId,starts[1].runId);const runId=starts[0].runId;
  const view=()=>api.readEventModeration(1,game.id,runId);
+ // Restore one pre-upgrade manual journal entry in this disposable fixture only.
+ // Current writes must reject it, but replay and original bytes must survive.
+ const beforeLegacy=(await view()).live!,legacyId=randomUUID();
+ const legacyCommand={kind:'call' as const,stage:'BINGO' as const,context:beforeLegacy.callContext};
+ const legacyInput={revision:beforeLegacy.revision,command:legacyCommand};
+ await db.query(`INSERT INTO pubquiz.bingo_live_events(run_id,revision,request_id,request_hash,actor_id,occurred_at,command,event_round_id)
+ VALUES($1,$2,$3,$4,1,clock_timestamp(),$5,$6)`,[runId,beforeLegacy.revision+1,legacyId,sha256(canonical({gameId:game.id,runId,requestId:legacyId,...legacyInput})),JSON.stringify({version:2,input:legacyInput,opened:null}),first]);
+ await db.query('UPDATE pubquiz.bingo_live_runs SET revision=revision+1 WHERE id=$1',[runId]);
+ const legacyBytes=(await db.query('SELECT to_jsonb(e)::text AS bytes FROM pubquiz.bingo_live_events e WHERE run_id=$1 AND request_id=$2',[runId,legacyId])).rows[0].bytes;
+ assert.equal((await view()).live!.blocked,false);
+ assert.equal((await view()).frozenDecks.find(d=>d.roundId===first)!.count,3);
+ await api.commandEventRun(1,{gameId:game.id,runId,requestId:legacyId,...legacyInput}); // historical retry remains idempotent
+ await assert.rejects(api.commandEventRun(1,{gameId:game.id,runId,requestId:randomUUID(),revision:(await view()).live!.revision,command:legacyCommand}),/LEGACY_CALL_READ_ONLY/);
+
  const request=async(command:EventCommand)=>({gameId:game.id,runId,requestId:randomUUID(),revision:(await view()).live!.revision,command});
  const send=async(command:EventCommand)=>{const r=await request(command);await api.commandEventRun(1,r);return r.requestId;};
  // Generated cards are random: a fixed 73/74 may already be in their first row.
@@ -40,18 +55,17 @@ export async function exerciseBingoEvent(db:Client,api:typeof EventApi,creation:
  const afterDuplicate=(await view()).live!;
  assert.equal(afterDuplicate.revision,beforeDuplicate.revision);
  assert.deepEqual(afterDuplicate.state.run.rounds[0].draws,beforeDuplicate.state.run.rounds[0].draws);
- const atCall=(await view()).live!,a=await request({kind:"call",stage:"BINGO",context:atCall.callContext}),b={...a,requestId:randomUUID(),command:{kind:"call" as const,stage:"DOUBLE" as const,context:atCall.callContext}};
- await Promise.all([api.commandEventRun(1,a),api.commandEventRun(1,b)]);assert.equal((await view()).live!.state.calls.length,2);
- await api.commandEventRun(1,a);assert.equal((await view()).live!.state.calls.length,2);
- await drawUnused();await assert.rejects(send({kind:"closeRound"}),/OPEN_CLAIMS/);
- for(const call of [a,b])await send({kind:"identify",callId:call.requestId,cardId:card.id});
- await send({kind:"decide",callId:a.requestId,action:"CONFIRM",reason:"Linie"});await send({kind:"decide",callId:b.requestId,action:"REJECT",reason:"Nur eine Linie"});
+ const atCall=(await view()).live!,a=await request({kind:"check",cardId:card.id,context:atCall.callContext}),b={...a,requestId:randomUUID(),command:{kind:"check" as const,cardId:card.id,context:atCall.callContext}};
+ await Promise.all([api.commandEventRun(1,a),api.commandEventRun(1,b)]);assert.equal((await view()).live!.state.checks!.length,2);
+ await api.commandEventRun(1,a);assert.equal((await view()).live!.state.checks!.length,2);
+ await drawUnused();
+ await send({kind:"decideCheck",checkId:a.requestId,action:"CONFIRM",reason:"Linie"});await send({kind:"decideCheck",checkId:b.requestId,action:"REJECT",reason:"Nur eine Linie"});
  const prior=(await view()).live!,draw=prior.state.run.rounds[0].draws[0];
- await send({kind:"correct",drawId:draw.id,number:Array.from({length:75},(_,i)=>i+1).find(n=>!prior.state.run.rounds[0].draws.some(d=>d.number===n))!,reason:"Frühere Ziehung korrigiert"});
+ await send({kind:"correct",drawId:draw.id,number:Array.from({length:75},(_,i)=>i+1).find(n=>!prior.state.run.rounds[0].draws.some(d=>d.number===n))!,reason:""});
  const corrected=(await view()).live!;assert.equal(corrected.state.run.rounds[0].draws[0].id,draw.id);assert.equal(corrected.state.run.rounds[0].draws.at(-1)?.number,prior.state.run.rounds[0].draws.at(-1)?.number);assert.equal(corrected.blocked,true);
  await drawUnused();
  await assert.rejects(api.commandEventRun(1,{...a,requestId:randomUUID()}),/CALL_CONTEXT_CONFLICT/);
- await send({kind:"decide",callId:a.requestId,action:"REVOKE",reason:"Nachprüfung"});
+ await send({kind:"decideCheck",checkId:a.requestId,action:"REVOKE",reason:"Nachprüfung"});
  await send({kind:"closeRound"});const history=JSON.stringify((await view()).live!.state.run.rounds[0]);
  await assert.rejects(send({kind:"correct",drawId:draw.id,number:74,reason:"Geschlossen"}),/ROUND_NOT_OPEN/);
  for(const round of pv.rounds.slice(1)){
@@ -64,6 +78,9 @@ export async function exerciseBingoEvent(db:Client,api:typeof EventApi,creation:
  await assert.rejects(send({kind:"startRound",roundId:extra.id,preparationRevision:current.preparationRevision}),/NO_ASSIGNED_CARDS/);
  pv=await prep.readPreparation(1,game.id);await prep.writePreparation(1,{gameId:game.id,expectedSeriesId:10,revision:pv.revision,operation:"generate",roundId:extra.id,count:2,requestId:randomUUID()});
  current=await view();await send({kind:"startRound",roundId:extra.id,preparationRevision:current.preparationRevision});await send({kind:"pause"});assert.equal((await view()).live!.state.run.status,"PAUSED");await send({kind:"resume"});await send({kind:"closeRound"});await send({kind:"end"});
+ assert.equal((await db.query('SELECT to_jsonb(e)::text AS bytes FROM pubquiz.bingo_live_events e WHERE run_id=$1 AND request_id=$2',[runId,legacyId])).rows[0].bytes,legacyBytes);
+ assert.equal((await view()).live!.state.calls.find(c=>c.id===legacyId)?.cardId,null);
+
  assert.equal((await view()).live!.summary.length,4);assert.equal((await view()).live!.state.run.status,"ENDED");assert.equal(JSON.stringify((await view()).live!.state.run.rounds[0]),history);
  await assert.rejects(send({kind:"resume"}),/RUN_ENDED/);
  const newPreparation=await api.readEventModeration(1,game.id,undefined,true);assert.equal(newPreparation.live,null);assert.equal(newPreparation.runs.length,1);

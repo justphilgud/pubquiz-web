@@ -53,3 +53,13 @@
 .mediaSlot .matchingCountdown{font-size:min(15.5cqw,30cqh)!important}
 .mediaSlot .matchingAnswer{font-size:clamp(16px,2vw,24px);margin:0;flex-shrink:0}
 .mediaSlot .matchingMedia>p{margin:0;flex-shrink:0}
+
+/* One round colour is the stage, rather than a permanent black surround. */
+.stage[data-round-number]{grid-template-rows:108px minmax(0,1fr) 44px;font-synthesis:none}
+.stage[data-round-number] .header strong{font-weight:400;font-synthesis:none}
+.stage[data-round-number] .header span,.stage[data-round-number] .footer,.stage[data-round-number] .current>span{font-family:"Bingo Card Display",sans-serif;font-weight:400;font-synthesis:none}
+.stage[data-round-number] .partnerLogos{background:#14181C;padding:8px 14px;gap:20px}
+.stage[data-round-number] .partnerLogos img{width:180px;height:84px}
+.stage[data-round-number] .board li[data-state="drawn"]{border-color:var(--bingo-round-ink)}
+.stage[data-round-number] .board li[data-state="current"]{background:var(--bingo-round-ink);color:var(--bingo-round-color);border-color:var(--bingo-round-color);outline-color:var(--bingo-round-ink)}
+@media(max-width:900px){.stage[data-round-number]{grid-template-rows:auto minmax(0,1fr) 44px;padding:12px}.stage[data-round-number] .header{flex-wrap:wrap;gap:10px}.stage[data-round-number] .header strong{flex-basis:100%}.stage[data-round-number] .header span{margin-left:0;white-space:normal}.stage[data-round-number] .partnerLogos{margin-left:auto}.stage[data-round-number] .partnerLogos img{width:110px;height:54px}.stage[data-round-number] .partnerLogos{gap:8px;padding:6px}}
