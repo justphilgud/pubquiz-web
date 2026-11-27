@@ -54,6 +54,8 @@ jobs:
             candidate: 3b8fc6f1f1427504e1191004ffc8e37e94410a2e
           - baseline: 3b8fc6f1f1427504e1191004ffc8e37e94410a2e
             candidate: e144cfc931c695423c28f20e1a3dd83409732c1c
+          - baseline: e144cfc931c695423c28f20e1a3dd83409732c1c
+            candidate: cd074a985aa3e91c0c917b8a96bb19768e337657
     services:
       postgres:
         image: postgres:17
