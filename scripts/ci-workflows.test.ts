@@ -286,3 +286,12 @@ test('Matching UX Preview cannot run the shared migration job and retains all ex
  assert.ok(preview.includes('node --import tsx scripts/deploy-vercel-git-preview.ts'));
  assert.match(preview,/TRUSTED_PREVIEW_BRANCHES/);
 });
+
+ test('Bingo colors uses only its approved isolated migration and exact branch', () => {
+  const job = preview.slice(preview.indexOf('  isolated-preview:'));
+  assert.ok(job.includes("(github.ref == 'refs/heads/codex/bingo-evening-dramaturgy' || github.ref == 'refs/heads/codex/bingo-presentation-colors')"));
+  assert.ok(preview.includes("github.ref != 'refs/heads/codex/bingo-presentation-colors' &&"));
+  assert.ok(job.indexOf('scripts/verify-preview-ci.ts') < job.indexOf('scripts/operations/apply-bingo-color-preview.ts'));
+  assert.ok(job.includes("if: github.ref == 'refs/heads/codex/bingo-presentation-colors'"));
+  assert.ok(job.indexOf('scripts/operations/apply-bingo-color-preview.ts') < job.indexOf('scripts/deploy-vercel-git-preview.ts'));
+ });

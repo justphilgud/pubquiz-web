@@ -318,7 +318,7 @@ jobs:
       inputs.isolated_bingo_evening &&
       github.event_name == 'workflow_dispatch' &&
       github.repository == 'justphilgud/pubquiz-web' &&
-      github.ref == 'refs/heads/codex/bingo-evening-dramaturgy'
+      (github.ref == 'refs/heads/codex/bingo-evening-dramaturgy' || github.ref == 'refs/heads/codex/bingo-presentation-colors')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: preview
