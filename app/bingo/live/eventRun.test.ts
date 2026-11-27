@@ -6,18 +6,18 @@ import {applyEventRunEvent,blockingCalls,callContextData,currentEventRound,initi
 const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,"0")}`;
 const card=generateCard(id(9),()=>0),frozen={id:id(3),label:"Runde 1",target:30,issued:null,seriesIds:[id(4)]};
 function fixture(){let state=initialEventRun(id(1),id(2),frozen,1000),n=20;return {get state(){return state},send(command:EventCommand,at=2000,next?:typeof frozen){const event={id:id(n++),at,actorId:1,command,...(next?{frozen:next}:{})};state=applyEventRunEvent(state,event,[card]);return event.id}}}
-test("independent calls keep identity, boundary, original card evidence; pending and review permit draws; finishing still requires resolution",()=>{
+test("independent calls keep identity, boundary, original card evidence; legacy manual history stays intact and never blocks current finishing",()=>{
  const f=fixture();for(const number of card.cells[0])f.send({kind:"draw",number:number!});
  const before=callContextData(f.state),a=f.send({kind:"call",stage:"BINGO",context:"a".repeat(64)}),b=f.send({kind:"call",stage:"DOUBLE",context:"a".repeat(64)});
  assert.notEqual(a,b);assert.deepEqual(callContextData(f.state),before);assert.equal(f.state.calls[0].throughPosition,5);assert.equal(f.state.calls[1].throughPosition,5);
- f.send({kind:"draw",number:74});assert.throws(()=>f.send({kind:"end"}),/OPEN_CLAIMS/);
+ f.send({kind:"draw",number:74});assert.doesNotThrow(()=>applyEventRunEvent(f.state,{id:id(999),at:2000,actorId:1,command:{kind:"end"}},[card]));
  f.send({kind:"identify",callId:a,cardId:card.id});f.send({kind:"identify",callId:b,cardId:card.id});
  f.send({kind:"decide",callId:a,action:"CONFIRM",reason:"Linie"});f.send({kind:"decide",callId:b,action:"REJECT",reason:"Nur eine Linie"});
  assert.equal(blockingCalls(f.state),false);const first=currentEventRound(f.state).draws[0];
  f.send({kind:"correct",drawId:first.id,number:75,reason:"Frühere Ziehung"});
  assert.equal(currentEventRound(f.state).draws[0].id,first.id);assert.equal(currentEventRound(f.state).draws.at(-1)?.number,74);
  assert.equal(currentEventRound(f.state).claims[0].decisions.at(-1)?.action,"CONFIRM");assert.equal(currentEventRound(f.state).claims[0].needsReview,true);
- assert.equal(blockingCalls(f.state),true);f.send({kind:"draw",number:73});
+ assert.equal(blockingCalls(f.state),false);f.send({kind:"draw",number:73});
  f.send({kind:"call",stage:"TRIPLE",context:"b".repeat(64)});assert.equal(f.state.calls.length,3);
 });
 test("three rounds and an extra use empty independent draws; closed history and pause time remain stable",()=>{

@@ -1,5 +1,7 @@
 # Bingoglöckchen: Anzeige, Kartenprüfung, Content und Abenddruck
 
+Aktualisierung 27.11.2026: Die [Bedienkorrektur im Bingoabend-Vertrag](bingo-evening-dramaturgy.md#bedienkorrektur-27112026--abnahmevertrag) ersetzt für neue V2-Bedienung den manuellen Rufweg durch ausschließlich direkte Kartenprüfung. Alte Rufe bleiben read-only und sperren keinen Abschluss; Nachprüfungen direkter Kartenentscheidungen bleiben verpflichtend. Korrektur ohne Pflichtbegründung/Extra-Dialog, sichtbare Decks und wechselnde Bühnenfarben gelten ab dieser Erweiterung. Nachfolgende frühere Bedienbeschreibungen bleiben als Ausgangsstand kenntlich; AP3-Replays und gespeicherte Journale werden nicht umgeschrieben.
+
 Erweiterung 26.11.2026: [Bingoabend und Veranstaltungsdramaturgie](bingo-evening-dramaturgy.md) ersetzt für die neue Bedienung das Moderationsraster durch die sortierbare Historie, entkoppelt Ziehungen von offenen Rufen und ergänzt Rundenfarben, Wahrscheinlichkeit, Veranstaltungsrahmen und Lose. Die nachfolgenden Abschnitte beschreiben den bisherigen Ausgangsvertrag.
 
 Stand: 25.11.2026. Ergänzt die AP1-, Vorbereitungs-, V2-Event-, Matching- und

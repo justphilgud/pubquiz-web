@@ -1,5 +1,7 @@
 # Bingo V3.1 – Umsetzung und Abnahmevertrag
 
+Aktualisierung 27.11.2026: Die [Bedienkorrektur im Bingoabend-Vertrag](bingo-evening-dramaturgy.md#bedienkorrektur-27112026--abnahmevertrag) ersetzt für neue V2-Bedienung den manuellen Rufweg durch ausschließlich direkte Kartenprüfung. Alte Rufe bleiben read-only und sperren keinen Abschluss; Nachprüfungen direkter Kartenentscheidungen bleiben verpflichtend. Korrektur ohne Pflichtbegründung/Extra-Dialog, sichtbare Decks und wechselnde Bühnenfarben gelten ab dieser Erweiterung. Nachfolgende frühere Bedienbeschreibungen bleiben als Ausgangsstand kenntlich; AP3-Replays und gespeicherte Journale werden nicht umgeschrieben.
+
 Aktualisierung 26.11.2026: Der [Bingoabend-Vertrag](bingo-evening-dramaturgy.md) hebt die frühere Ziehungssperre bei offenen Rufen ausdrücklich auf und begrenzt neue Abende auf zehn Runden. Historische Journale, Nachweise und Karten bleiben erhalten.
 
 Arbeitsbranch `codex/bingo-event-operation`, Basis Main `8fa60b68`.

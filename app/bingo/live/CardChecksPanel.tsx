@@ -15,7 +15,7 @@ export default function CardChecksPanel({gameId,runId,checks,cards,draws,claims,
   const input=useRef<HTMLInputElement>(null),inflight=useRef(false),focusNext=useRef(false);
   useEffect(()=>{if(focusNext.current&&!pending&&!disabled){input.current?.focus();focusNext.current=false;}},[pending,disabled]);
   const groups=groupChecks(checks);
-  return <section className={styles.panel} aria-label="Automatische Kartenprüfung"><h2>Karte prüfen</h2>
+  return <section id="card-checks" className={styles.panel} aria-label="Automatische Kartenprüfung"><h2>Karte prüfen</h2>
     <form onSubmit={async e=>{e.preventDefault();if(inflight.current||disabled)return;inflight.current=true;setPending(true);setMessage('');try{const result=await resolveCardCode(gameId,code);if(!result.success){setMessage(result.message);return;}if(await onCheck(result.cardId)){setCode('');focusNext.current=true;}}catch{setMessage('Prüfung fehlgeschlagen. Eingabe bleibt erhalten.');}finally{inflight.current=false;setPending(false);}}}>
       <label>Kartenkennung<input ref={input} required maxLength={64} value={code} onChange={e=>setCode(e.target.value)} disabled={pending||disabled} autoComplete="off"/></label><button className={styles.call} disabled={pending||disabled||!code.trim()}>{pending?'Wird geprüft …':'Check'}</button>
     </form>{message&&<p role="alert">{message}</p>}
