@@ -26,3 +26,10 @@ test("trusted branch approval is exact and cannot be inferred from CI or wildcar
   }
   assert.equal(isTrustedPreviewBranch("main", '["main"]'), false);
 });
+
+test('Preview accepts exact tested PR heads only with explicit same-repository PR identity',()=>{
+ const sha='a'.repeat(40),branch='codex/review';
+ const run={head_sha:sha,head_branch:branch,event:'pull_request',path:'.github/workflows/ci.yml',conclusion:'success',head_repository:{full_name:'justphilgud/pubquiz-web'},pull_requests:[{head:{sha,repo:{full_name:'justphilgud/pubquiz-web'}}}]};
+ assert.equal(hasSuccessfulPreviewCi([run],sha,branch),true);
+ for(const changed of [{path:'.github/workflows/other.yml'},{pull_requests:[]},{pull_requests:[{head:{sha:'b'.repeat(40),repo:{full_name:'justphilgud/pubquiz-web'}}}]},{pull_requests:[{head:{sha,repo:{full_name:'fork/pubquiz-web'}}}]}])assert.equal(hasSuccessfulPreviewCi([{...run,...changed}],sha,branch),false);
+});

@@ -1,3 +1,4 @@
+import {featureReleaseProof,completeFeatureHistory} from './feature-release-plan';
 import {approvedBingoPlan,assertBingoManifest} from "./production-preflight-bingo-plan";
 import { execFileSync } from "node:child_process";
 import { appendFileSync, writeFileSync, readFileSync } from "node:fs";
@@ -8,7 +9,8 @@ import { approvedPreflightPlan, approvedNoDeltaPreflightPlan, assertNoDeltaManif
 async function main() {
   assertPreflightContext(process.env);
   if (!/^[a-f0-9]{40}$/.test(process.env.RELEASE_CANDIDATE_SHA ?? "") || !/^[a-f0-9]{40}$/.test(process.env.EXPECTED_PRODUCTION_SHA ?? "")) throw new Error("INVALID_SHA");
-  if (!approvedBingoPlan(process.env.EXPECTED_PRODUCTION_SHA!,process.env.RELEASE_CANDIDATE_SHA!) && !approvedPreflightPlan(process.env.EXPECTED_PRODUCTION_SHA!, process.env.RELEASE_CANDIDATE_SHA!) &&
+  const feature=await featureReleaseProof(process.env.EXPECTED_PRODUCTION_SHA!,process.env.RELEASE_CANDIDATE_SHA!);
+  if (!feature && !approvedBingoPlan(process.env.EXPECTED_PRODUCTION_SHA!,process.env.RELEASE_CANDIDATE_SHA!) && !approvedPreflightPlan(process.env.EXPECTED_PRODUCTION_SHA!, process.env.RELEASE_CANDIDATE_SHA!) &&
       !approvedNoDeltaPreflightPlan(process.env.EXPECTED_PRODUCTION_SHA!, process.env.RELEASE_CANDIDATE_SHA!)) throw new Error("RELEASE_PLAN_UNAPPROVED");
   const mode = process.argv[2];
   let result;
@@ -25,6 +27,11 @@ async function main() {
     }
     try { execFileSync("git", ["merge-base", "--is-ancestor", baseline, candidate]); }
     catch { result = { gate: gate("BLOCKED", "RELEASE_ANCESTRY_UNVERIFIED") }; }
+    if (!result && feature) {
+      if(JSON.stringify(JSON.parse(readFileSync('expected-schema.json','utf8')))!==JSON.stringify(feature))throw Error('MANIFEST_ARTIFACT_MISMATCH');
+      const history=await readProductionMigrations(process.env.PRODUCTION_BACKUP_DATABASE_URL??'',migrationFiles(candidate),migrationFiles(baseline));
+      result={...history,repositoryEvidence:feature,schemaGate:gate('PASS','REPOSITORY_SCHEMA_IDENTICAL_LIVE_DDL_NOT_RECHECKED'),expectedDeltaGate:gate('PASS','REPOSITORY_MIGRATION_DELTA_EMPTY'),deltaGate:gate('PASS','NO_SQL_DELTA_TO_EXECUTE'),newInstallReplay:{status:'NOT_RUN',code:'HISTORICAL_BOOTSTRAP_LIMITATION_UNCHANGED'},gate:gate(completeFeatureHistory(history,feature)?'PASS':'FAIL','COMPLETE_FEATURE_PLAN_HISTORY_CHECK')};
+    }
     if (!result && approvedNoDeltaPreflightPlan(baseline,candidate)) {
       const schema=(revision:string)=>execFileSync("git",["show",`${revision}:prisma/schema.prisma`],{encoding:"utf8"});
       const before=migrationFiles(baseline),after=migrationFiles(candidate);

@@ -1,81 +1,81 @@
 name: Deploy Production
 
+# An explicit release consumes a completed Preflight. No automatic waiting deploy
+# holds production-deployment while the owner is trying to run that Preflight.
 on:
-  workflow_run:
-    workflows:
-      - CI
-    types:
-      - completed
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      release_candidate_sha:
+        description: Exact merged application SHA with successful main CI
+        type: string
+        required: true
+      preflight_run_id:
+        description: Successful protected Read-only Preflight run for this exact release
+        type: string
+        required: true
 
 permissions:
   contents: read
-
+  actions: read
+  pull-requests: read
 concurrency:
   group: production-deployment
   cancel-in-progress: false
-
 jobs:
-  deployment-scope:
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.event == 'push' &&
-       github.event.workflow_run.head_repository.full_name == github.repository &&
-       github.event.workflow_run.head_branch == 'main')
+  release-evidence:
+    if: github.repository == 'justphilgud/pubquiz-web' && github.ref == 'refs/heads/main' && vars.ACTIONS_DEPLOYMENTS_ENABLED == 'true'
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    outputs:
-      required: ${{ steps.scope.outputs.required }}
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_CANDIDATE_SHA: ${{ inputs.release_candidate_sha }}
+      PREFLIGHT_RUN_ID: ${{ inputs.preflight_run_id }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
-          fetch-depth: 2
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-      - id: scope
-        env:
-          MANUAL: ${{ github.event_name == 'workflow_dispatch' }}
+          cache: npm
+      - run: npm ci
+      - name: Verify exact merged main candidate CI and successful trusted Preflight run
+        run: node --import tsx scripts/operations/verify-production-release.ts metadata
+      - uses: actions/download-artifact@v4
+        with:
+          name: production-preflight-deployment
+          run-id: ${{ inputs.preflight_run_id }}
+          github-token: ${{ github.token }}
+          path: release-evidence/deployment
+      - uses: actions/download-artifact@v4
+        with:
+          name: production-preflight-migrations
+          run-id: ${{ inputs.preflight_run_id }}
+          github-token: ${{ github.token }}
+          path: release-evidence/migrations
+      - name: Verify all mandatory gates and exact SHA binding; bundle reviewed main guard
         run: |
-          node --experimental-strip-types --input-type=module <<'NODE'
-          import {execFileSync} from 'node:child_process';
-          import {appendFileSync} from 'node:fs';
-          import {needsApplicationDeployment} from './scripts/operations/deployment-scope.ts';
-          const paths=execFileSync('git',['diff','--name-only','-z','HEAD^','HEAD'],{encoding:'utf8'}).split('\0').filter(Boolean);
-          const required=process.env.MANUAL==='true'||needsApplicationDeployment(paths);
-          appendFileSync(process.env.GITHUB_OUTPUT,`required=${required}\n`);
-          NODE
+          node --import tsx scripts/operations/verify-production-release.ts evidence
+          npx esbuild scripts/operations/verify-production-release.ts --bundle --platform=node --format=cjs --outfile=release-evidence/release-guard.cjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: validated-production-release
+          path: |
+            release-evidence/validated.json
+            release-evidence/release-guard.cjs
+          if-no-files-found: error
+          retention-days: 14
   deploy-production:
-    needs: deployment-scope
+    needs: release-evidence
     name: Approve, migrate and deploy Production
-    if: >-
-      needs.deployment-scope.outputs.required == 'true' &&
-      vars.ACTIONS_DEPLOYMENTS_ENABLED == 'true' &&
-      (
-        (
-          github.event_name == 'workflow_run' &&
-          github.event.workflow_run.conclusion == 'success' &&
-          github.event.workflow_run.event == 'push' &&
-          github.event.workflow_run.head_repository.full_name == github.repository &&
-          github.event.workflow_run.head_branch == 'main'
-        ) ||
-        (
-          github.event_name == 'workflow_dispatch' &&
-          github.ref == 'refs/heads/main'
-        )
-      )
+    if: github.ref == 'refs/heads/main' && vars.ACTIONS_DEPLOYMENTS_ENABLED == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: production
     env:
       DEPLOYMENT_ENV: production
-      DEPLOYMENT_EVENT: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.event || github.event_name }}
-      DEPLOYMENT_REF: ${{ github.event_name == 'workflow_run' && format('refs/heads/{0}', github.event.workflow_run.head_branch) || github.ref }}
+      DEPLOYMENT_EVENT: workflow_dispatch
+      DEPLOYMENT_REF: refs/heads/main
       DEPLOYMENT_REPOSITORY: ${{ github.repository }}
-      DEPLOYMENT_SHA: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+      DEPLOYMENT_SHA: ${{ inputs.release_candidate_sha }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       EXPECTED_DATABASE_HOST: ${{ vars.EXPECTED_DATABASE_HOST }}
       EXPECTED_DATABASE_NAME: ${{ vars.EXPECTED_DATABASE_NAME }}
@@ -97,6 +97,20 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Download the immutable reviewed release guard and validated evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: validated-production-release
+          path: .release-guard
+      - name: Verify fresh Production alias, baseline and exact green candidate before migrations
+        env:
+          RELEASE_EVIDENCE_DIR: .release-guard
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_CANDIDATE_SHA: ${{ inputs.release_candidate_sha }}
+          PREFLIGHT_RUN_ID: ${{ inputs.preflight_run_id }}
+          PRODUCTION_ALIAS: ${{ vars.PRODUCTION_ALIAS }}
+        run: node .release-guard/release-guard.cjs fresh
 
       - name: Validate GitHub Production database identity
         run: npm run deployment:validate

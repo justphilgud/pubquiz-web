@@ -1,0 +1,9 @@
+{
+  "version": 1,
+  "kind": "NO_DELTA",
+  "baselineSha": "cd074a985aa3e91c0c917b8a96bb19768e337657",
+  "migrationCount": 81,
+  "lastMigration": "20261126120000_event_ceremony",
+  "manifestSha256": "85646ef7090288ee7f848dc32a289a9af7cf40a250cbc60d3569ff80e728e9a8",
+  "schemaSha256": "26cc4d670ef3c954731a14250b580c33667e51869c9edc176b238cbf7f6127b1"
+}
