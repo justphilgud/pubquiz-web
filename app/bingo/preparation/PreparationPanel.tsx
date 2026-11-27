@@ -1,4 +1,7 @@
 "use client";
+import SortableRounds,{SortableRound} from './SortableRounds';
+import CeremonyEditor from '../CeremonyEditor';
+import type {CeremonyState} from '@/app/rendering/ceremony/ceremony';
 import {publishContent} from '../content/actions';
 import PrintFormatFields from './PrintFormatFields';
 import type {PrintLayout} from './printFormats';
@@ -14,7 +17,8 @@ import {roundColor} from "../roundColors";
 import type { BingoCommand, PreparationView, RoundView } from "./policy";
 const subscribe = () => () => {};
 
-export default function PreparationPanel({ data }: { data: PreparationView }) {
+export default function PreparationPanel({ data,ceremony }: { data: PreparationView;ceremony?:CeremonyState }) {
+  const [framing,setFraming]=useState(ceremony);
   const router = useRouter(), [pending, start] = useTransition(), busy = useRef(false);
   const ready = useSyncExternalStore(subscribe, () => true, () => false);
   const [expanded,setExpanded]=useState<Set<string>>(new Set());
@@ -31,12 +35,13 @@ export default function PreparationPanel({ data }: { data: PreparationView }) {
     const next = new Set(current); if (dirty) next.add(id); else next.delete(id); return next;
   }), []);
   const base = { gameId: data.gameId, expectedSeriesId: data.seriesId, revision: data.revision };
-  function run(extra: Omit<Extract<BingoCommand, { operation: "createRound" }>, keyof typeof base>) {
+  function run(extra: Omit<Extract<BingoCommand, { operation: "createRound" }>, keyof typeof base>|{operation:"reorderRounds";roundIds:string[]}) {
     if (busy.current) return;
     busy.current = true;
     start(async () => { try { const result = await savePreparation({ ...base, ...extra }); if (result.success) router.refresh(); else setMessage(result.message); } catch { setMessage("Speichern fehlgeschlagen. Bitte erneut versuchen."); } finally { busy.current = false; } });
   }
   return <div className="space-y-5">
+    {framing&&<CeremonyEditor gameId={data.gameId} initial={framing} onSaved={setFraming}/>}
     <p className="text-sm text-slate-600">Vorbereitung · Durchläufe werden in der Moderation bewusst gestartet. Die geplante Ziehungszahl beendet keine Runde automatisch.</p>
     {data.archived && <p role="status">Archivierte Eventreihe: nur Lesen und PDF-Export möglich.</p>}
     {message && <p role="alert">{message}</p>}
@@ -45,7 +50,7 @@ export default function PreparationPanel({ data }: { data: PreparationView }) {
     {data.templates?.find(t=>t.id===templateId)?.special&&<p role="note">Diese Vorlage benötigt passende Spezialkarten. Die Zuordnung wird unabhängig kopiert; vorhandene Karten werden nicht ersetzt.</p>}
     <Link className="inline-flex min-h-11 items-center underline" href={`/bingo/${data.gameId}/karten`}>Karten und Druck für {data.title}</Link>
     {!data.rounds.length && <p>Noch keine Runden vorhanden.</p>}
-    {data.rounds.map((r,index)=><div key={r.id} data-round-id={r.id} style={data.roundCount<=10?{borderInlineStartColor:roundColor(index+1).background,borderInlineStartWidth:6}:undefined} className="rounded-xl border border-slate-300 bg-white p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-bold">{r.label}</h2><p className="text-sm text-slate-600">{r.terms?'Text-Bingo 75':'Zahlen-Bingo 75'} · {r.target} geplante Ziehungen · {r.cardCount} Karten · Ausgabe: {r.issued===null?"nicht erfasst":r.issued} · {r.locked?"Gestartet · unveränderlich":r.cardCount?"Bereit":"Karten fehlen"}</p></div><button className="min-h-11 rounded-lg border px-3" onClick={()=>{if(expanded.has(r.id)&&dirtyRounds.has(r.id)&&!window.confirm("Ungespeicherte Änderungen verwerfen?"))return;setExpanded(current=>{const next=new Set(current);if(next.has(r.id))next.delete(r.id);else next.add(r.id);return next;});}}>{expanded.has(r.id)?"Schließen":r.locked?"Ansehen":"Bearbeiten"}</button></div>{expanded.has(r.id)&&<RoundEditor key={r.id} round={r} data={data} onDirty={trackDirty} onBusy={trackBusy} externallyBlocked={pending||[...dirtyRounds,...busyRounds].some(id=>id!==r.id)}/>}</div>)}
+    <SortableRounds ids={data.rounds.map(r=>r.id)} disabled={pending||data.archived||dirtyRounds.size>0||busyRounds.size>0||data.rounds.some(r=>r.locked)||data.roundCount!==data.rounds.length} onChange={roundIds=>run({operation:"reorderRounds",roundIds})}>{data.rounds.map((r,index)=><SortableRound key={r.id} id={r.id} disabled={pending||data.archived||dirtyRounds.size>0||busyRounds.size>0||data.rounds.some(r=>r.locked)}><div data-round-id={r.id} style={data.roundCount<=10?{borderInlineStartColor:roundColor(index+1).background,borderInlineStartWidth:6}:undefined} className="rounded-xl border border-slate-300 bg-white p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-bold">{r.label}</h2><p className="text-sm text-slate-600">{r.terms?'Text-Bingo 75':'Zahlen-Bingo 75'} · {r.target} geplante Ziehungen · {r.cardCount} Karten · Ausgabe: {r.issued===null?"nicht erfasst":r.issued} · {r.locked?"Gestartet · unveränderlich":r.cardCount?"Bereit":"Karten fehlen"}</p></div><button className="min-h-11 rounded-lg border px-3" onClick={()=>{if(expanded.has(r.id)&&dirtyRounds.has(r.id)&&!window.confirm("Ungespeicherte Änderungen verwerfen?"))return;setExpanded(current=>{const next=new Set(current);if(next.has(r.id))next.delete(r.id);else next.add(r.id);return next;});}}>{expanded.has(r.id)?"Schließen":r.locked?"Ansehen":"Bearbeiten"}</button></div>{expanded.has(r.id)&&<RoundEditor key={r.id} round={r} data={data} onDirty={trackDirty} onBusy={trackBusy} externallyBlocked={pending||[...dirtyRounds,...busyRounds].some(id=>id!==r.id)}/>}{framing&&<CeremonyEditor gameId={data.gameId} initial={framing} onSaved={setFraming} placement={r.id} label={`Slides nach ${r.label}`}/>}</div></SortableRound>)}</SortableRounds>
     <nav aria-label="Rundenseiten" className="flex flex-wrap gap-4">{data.page > 1 && <Link href={`?page=${data.page - 1}&seriesPage=${data.seriesPage}`}>Vorherige Runden</Link>}{data.page * 25 < data.roundCount && <Link href={`?page=${data.page + 1}&seriesPage=${data.seriesPage}`}>Weitere Runden</Link>}</nav>
   </div>;
 }

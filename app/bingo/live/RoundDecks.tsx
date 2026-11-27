@@ -1,3 +1,4 @@
+import {shortCardCode} from '../preparation/bingoPrint';
 import Link from 'next/link';
 import type {EventModerationView} from './eventRepository.server';
 import styles from './EventModerationPanel.module.css';
@@ -11,9 +12,9 @@ export default function RoundDecks({data}:{data:EventModerationView}) {
     return <ol className={styles.deckList}>{selected.map(row=>{
       const round=data.rounds.find(r=>r.id===row.id),frozen=live?.state.frozen.find(r=>r.id===row.id);
       const active=current===row.id&&live?.state.run.status!=='ENDED'&&!live?.between;
-      const decks=frozen?data.frozenDecks.filter(d=>d.roundId===row.id):round?.series.map(s=>({id:s.series_id,code:s.series.code,count:s.series.card_count}))??[];
+      const decks=frozen?data.frozenDecks.filter(d=>d.roundId===row.id):round?.series.map(s=>({id:s.series_id,code:s.series.code,count:s.series.card_count,firstOrdinal:undefined,lastOrdinal:undefined,prefix:undefined}))??[];
       return <li key={row.id} data-active={active||undefined}><strong>{frozen?.label??round?.label??`Runde ${row.position}`}</strong><span>{active?'Aktive Decks':frozen?'Eingefrorene Decks':'Geplante Decks'}</span>
-        {decks.length?<ul>{decks.map(deck=><li key={deck.id}><Link href={`/bingo/${data.gameId}/karten?series=${deck.id}`}>{deck.code}</Link> · {deck.count} Karten</li>)}</ul>:<p>Keine Decks zugeordnet.</p>}
+        {decks.length?<ul>{decks.map(deck=><li key={deck.id}><Link href={`/bingo/${data.gameId}/karten?series=${deck.id}`}>{deck.code}</Link> · {deck.count} Karten{deck.prefix!==undefined&&deck.firstOrdinal!==undefined&&deck.lastOrdinal!==undefined&&<span>Karten: {shortCardCode(deck.prefix,deck.firstOrdinal)}–{shortCardCode(deck.prefix,deck.lastOrdinal)}</span>}</li>)}</ul>:<p>Keine Decks zugeordnet.</p>}
       </li>;
     })}</ol>;
   }

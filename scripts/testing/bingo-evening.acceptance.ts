@@ -37,6 +37,16 @@ export async function exerciseBingoEvening(db:Client,api:typeof Prep&{creation:t
  const view=()=>api.eventRun.readEventModeration(1,full.id,start.runId);
  assert.equal((await view()).ceremony.slide,null,'starting consciously leaves intro for the game board');
  const send=async(command:EventCommand)=>{const v=(await view()).live!;const input={gameId:full.id,runId:start.runId,requestId:randomUUID(),revision:v.revision,command};await api.eventRun.commandEventRun(1,input);return input;};
+ // Exercise the new journal command with real CAS, frozen cards and readback.
+ const firstView=await view(),firstId=firstView.live!.round.id,secondId=firstView.plan[1].round_id;
+ const oldDraws=JSON.stringify(firstView.live!.state.run.rounds[0].draws);
+ await send({kind:'navigateRound',roundId:secondId,preparationRevision:(await prep()).revision});
+ assert.equal((await api.eventRun.readEventAudience(1,(await view()).live!.audienceKey)).roundNumber,2);
+ await send({kind:'navigateRound',roundId:firstId,preparationRevision:(await prep()).revision});
+ assert.equal(JSON.stringify((await view()).live!.state.run.rounds[0].draws),oldDraws);
+ const rootState=(await view()).ceremony;
+ const insertion={...defaultCeremony().config,enabled:['welcome'] as const,welcome:'Nur nach Runde 1'};
+ await api.ceremony.writeCeremony(1,full.id,rootState.revision,{kind:'configure',config:{...rootState.config,insertions:{[firstId]:insertion}}});
  for(let i=0;i<6;i++){
   let v=(await view()).live!;const card=v.cards[0];
   assert.equal((await api.eventRun.readEventAudience(1,v.audienceKey)).roundNumber,i+1);
@@ -54,7 +64,8 @@ export async function exerciseBingoEvening(db:Client,api:typeof Prep&{creation:t
   v=(await view()).live!;const check=await send({kind:'check',cardId:card.id,context:v.callContext});await api.eventRun.commandEventRun(1,check);
   assert.equal((await view()).live!.raffle.count,i+1);
   await send({kind:'closeRound'});
-  if(i<5)await send({kind:'startRound',roundId:(await view()).plan[i+1].round_id,preparationRevision:(await prep()).revision});
+  if(i===0){const post=await api.eventRun.readEventAudience(1,(await view()).live!.audienceKey);assert.equal(post.ceremony.config.welcome,'Nur nach Runde 1');assert.equal(post.ceremony.slide,'welcome');}
+  if(i<5){await send({kind:'navigateRound',roundId:(await view()).plan[i+1].round_id,preparationRevision:(await prep()).revision});await send({kind:'resume'});}
  }
  await send({kind:'end'});let framing=(await view()).ceremony;
  framing=await api.ceremony.writeCeremony(1,full.id,framing.revision,{kind:'show',slide:'raffle'});

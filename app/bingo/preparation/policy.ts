@@ -14,6 +14,7 @@ export class BingoPreparationError extends Error {
 export const denied = () => new BingoPreparationError("Bingo nicht gefunden oder kein Zugriff. Bitte Rechte und Freischaltung prüfen.");
 type Base = { gameId: string; expectedSeriesId: number; revision: number };
 export type BingoCommand = Base & (
+  | {operation:"reorderRounds";roundIds:string[]}
   | { operation: "createRound"; templateId?: string }
   | { operation: "applyTemplate"; roundId:string; templateId:string|null }
   | { operation: "saveRound"; roundId: string; label: string; target: number; strategy: CardStrategy; issued: number | null }
@@ -36,6 +37,9 @@ export function parseCommand(input: unknown): BingoCommand {
   const base: Base = { gameId: uuid(r.gameId), expectedSeriesId: integer(r.expectedSeriesId, 1, 2147483647, "series"), revision: integer(r.revision, 0, 2147483646, "revision") };
   let result: BingoCommand;
   switch (r.operation) {
+    case 'reorderRounds':
+      if(!Array.isArray(r.roundIds)||!r.roundIds.length||r.roundIds.length>1000||new Set(r.roundIds).size!==r.roundIds.length)throw denied();
+      result={...base,operation:r.operation,roundIds:r.roundIds.map(uuid)};break;
     case "createRound": result = { ...base, operation: r.operation, ...(r.templateId===undefined?{}:{templateId:uuid(r.templateId)}) }; break;
     case "applyTemplate": result={...base,operation:r.operation,roundId:uuid(r.roundId),templateId:r.templateId===null?null:uuid(r.templateId)};break;
     case "saveRound":

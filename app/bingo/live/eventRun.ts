@@ -2,18 +2,18 @@ import {registerTickets,type RaffleTicket} from "./raffle";
 import type { CardCheck } from './cardChecks';
 import { evaluateCard, requireNumber, type BingoCard, type Stage } from "../core/cards";
 import { addRound, closeRound, endRun, openRound, pauseRun, resumeRun, type BingoRun } from "../core/run";
-import { correctDraw, decideClaim, recordClaim, evaluateClaim, isConfirmed } from "../core/round";
+import { createRound, correctDraw, decideClaim, recordClaim, evaluateClaim, isConfirmed } from "../core/round";
 import { applyLiveEvent, assertUuid, initialState, parseLiveCommand, type Call, type FrozenRound, type LiveCommand, type LiveEvent } from "./live";
 
 /** V2 is opt-in. AP3 replay and its one-round histories are deliberately unchanged. */
 export type EventCall = Call & { roundId: string; recordedAt: number };
 export type BingoPlayback = {id:string;drawId:string;action:'PLAY'|'PAUSE'|'REPLAY';at:number;sequence:number;restartId:string|null;position:number};
-export type EventRunState = { tickets?:readonly RaffleTicket[]; checks?: readonly CardCheck[]; playback?:BingoPlayback; revealed?:readonly string[]; version: 2; contextRevision:number; run: BingoRun; calls: readonly EventCall[]; frozen: readonly FrozenRound[] };
+export type EventRunState = { selectedRoundId?:string; tickets?:readonly RaffleTicket[]; checks?: readonly CardCheck[]; playback?:BingoPlayback; revealed?:readonly string[]; version: 2; contextRevision:number; run: BingoRun; calls: readonly EventCall[]; frozen: readonly FrozenRound[] };
 export type EventCommand = Exclude<LiveCommand, { kind: "call" } | { kind: "correct" }> |
   { kind: "call"; stage: Stage; context: string } | {kind:"check";cardId:string;context:string} | {kind:"decideCheck";checkId:string;action:"CONFIRM"|"REJECT"|"REVOKE";reason:string} | {kind:"reveal";drawId:string} |
   {kind:'playback';drawId:string;action:'PLAY'|'PAUSE'|'REPLAY'} |
   { kind: "correct"; drawId: string; number: number; reason: string } |
-  { kind: "closeRound" } | { kind: "startRound"; roundId: string; preparationRevision:number } | {kind:"appendRound";label:string;target:number;preparationRevision:number};
+  {kind:"navigateRound";roundId:string;preparationRevision:number} | { kind: "closeRound" } | { kind: "startRound"; roundId: string; preparationRevision:number } | {kind:"appendRound";label:string;target:number;preparationRevision:number};
 export type EventRunEvent = Omit<LiveEvent, "command"> & { command: EventCommand; frozen?: FrozenRound };
 export function parseEventCommand(value: unknown): EventCommand {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw Error("INVALID_COMMAND");
@@ -24,7 +24,7 @@ export function parseEventCommand(value: unknown): EventCommand {
   if(r.kind==='reveal'){assertUuid(r.drawId);if(Object.keys(r).sort().join()!=='drawId,kind')throw Error('INVALID_COMMAND');return r as EventCommand;}
   if (r.kind === "closeRound") { if (Object.keys(r).join() !== "kind") throw Error("INVALID_COMMAND"); return {kind:"closeRound"}; }
   if(r.kind==="appendRound") {if(Object.keys(r).sort().join()!=="kind,label,preparationRevision,target"||typeof r.label!=="string"||!r.label.trim()||r.label.length>80||!Number.isSafeInteger(r.preparationRevision)||Number(r.preparationRevision)<0||!Number.isInteger(r.target)||Number(r.target)<1||Number(r.target)>75)throw Error("INVALID_COMMAND");return r as EventCommand;}
-  if (r.kind === "startRound") { assertUuid(r.roundId); if(Object.keys(r).sort().join()!=="kind,preparationRevision,roundId"||!Number.isSafeInteger(r.preparationRevision)||Number(r.preparationRevision)<0)throw Error("INVALID_COMMAND");return {kind:"startRound",roundId:r.roundId,preparationRevision:Number(r.preparationRevision)}; }
+  if (r.kind === "startRound" || r.kind === "navigateRound") { assertUuid(r.roundId); if(Object.keys(r).sort().join()!=="kind,preparationRevision,roundId"||!Number.isSafeInteger(r.preparationRevision)||Number(r.preparationRevision)<0)throw Error("INVALID_COMMAND");return {kind:r.kind,roundId:r.roundId,preparationRevision:Number(r.preparationRevision)}; }
   if (r.kind === "call") {
     if (Object.keys(r).sort().join() !== "context,kind,stage" || typeof r.context !== "string" || !/^[a-f0-9]{64}$/.test(r.context)) throw Error("INVALID_CALL_CONTEXT");
     parseLiveCommand({kind:"call",stage:r.stage}); return r as EventCommand;
@@ -40,7 +40,7 @@ export function parseEventCommand(value: unknown): EventCommand {
 export function initialEventRun(runId: string, gameId: string, round: FrozenRound, at: number): EventRunState {
   return {version:2,contextRevision:0,...initialState(runId,gameId,round,at),calls:[],frozen:[round]};
 }
-export function currentEventRound(state: EventRunState) { return state.run.rounds.find(r=>r.status==="OPEN") ?? state.run.rounds.at(-1)!; }
+export function currentEventRound(state: EventRunState) { return state.run.rounds.find(r=>r.id===state.selectedRoundId) ?? state.run.rounds.find(r=>r.status==="OPEN") ?? state.run.rounds.at(-1)!; }
 export function blockingCalls(state: EventRunState): boolean {
   const round=currentEventRound(state);
   return state.calls.filter(c=>c.roundId===round.id&&state.checks?.some(check=>check.id===c.id)).some(call=>{
@@ -64,15 +64,21 @@ function applyEventRunEventInner(state: EventRunState, event: EventRunEvent, car
   if(run.status==="ENDED")throw Error("RUN_ENDED");
   const replace=(next:typeof round):EventRunState=>({...state,run:{...run,rounds:run.rounds.map(r=>r.id===round.id?next:r)}});
   if(c.kind==="appendRound")return state;
+  if(c.kind==='navigateRound') {
+    const existing=run.rounds.find(r=>r.id===c.roundId),frozen=event.frozen;
+    if(existing&&frozen)throw Error('INVALID_NEXT_ROUND');
+    if(!existing&&(!frozen||frozen.id!==c.roundId))throw Error('INVALID_NEXT_ROUND');
+    return {...state,selectedRoundId:c.roundId,run:{...run,rounds:existing?run.rounds:[...run.rounds,{...createRound(frozen!.id,frozen!.target),status:'OPEN'}]},frozen:existing?state.frozen:[...state.frozen,frozen!]};
+  }
   if(c.kind==="startRound") {
     if(run.rounds.some(r=>r.status==="OPEN")||run.status!=="PAUSED")throw Error("ROUND_STILL_OPEN");
     const frozen=event.frozen;
     if(!frozen||frozen.id!==c.roundId||run.rounds.some(r=>r.id===c.roundId))throw Error("INVALID_NEXT_ROUND");
     const next=openRound(addRound(resumeRun(run,event.at),frozen.id,frozen.target),frozen.id);
-    return {...state,run:next,frozen:[...state.frozen,frozen]};
+    return {...state,selectedRoundId:frozen.id,run:next,frozen:[...state.frozen,frozen]};
   }
   if(c.kind==="end") {
-    if(blockingCalls(state))throw Error("OPEN_CLAIMS");
+    if(run.rounds.some(r=>blockingCalls({...state,selectedRoundId:r.id})))throw Error("OPEN_CLAIMS");
     return {...state,run:endRun(run,event.at)};
   }
   if(round.status!=="OPEN")throw Error("ROUND_NOT_OPEN");
@@ -139,7 +145,7 @@ export function applyEventRunEvent(state:EventRunState,event:EventRunEvent,cards
  const next=applyEventRunEventInner(state,event,cards);
  let tickets=next.tickets;
  if((event.command.kind==="decideCheck"||event.command.kind==="decide")&&event.command.action==="CONFIRM"){const id=event.command.kind==="decideCheck"?event.command.checkId:event.command.callId;const round=currentEventRound(next),claim=round.claims.find(c=>c.id===id),card=cards.find(c=>c.id===claim?.cardId);if(card)tickets=registerTickets(tickets??[],round,id,card);}
- const clear=['draw','closeRound','startRound','end'].includes(event.command.kind)||event.command.kind==='correct'&&currentEventRound(state).draws.at(-1)?.id===event.command.drawId;
+ const clear=['draw','closeRound','startRound','navigateRound','end'].includes(event.command.kind)||event.command.kind==='correct'&&currentEventRound(state).draws.at(-1)?.id===event.command.drawId;
  const paused=event.command.kind==='pause'&&state.playback?{playback:{...state.playback,id:event.id,action:'PAUSE' as const,at:event.at,sequence:state.playback.sequence+1,position:state.playback.position+(state.playback.action==='PAUSE'?0:Math.max(0,event.at-state.playback.at)/1000)}}:{};
  return {...next,...(tickets?{tickets}:{}),...(clear?{playback:undefined}:paused),contextRevision:["call","check","decideCheck","identify","decide","reveal","playback"].includes(event.command.kind)?state.contextRevision:state.contextRevision+1};
 }

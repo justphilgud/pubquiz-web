@@ -63,3 +63,13 @@
 .stage[data-round-number] .board li[data-state="drawn"]{border-color:var(--bingo-round-ink)}
 .stage[data-round-number] .board li[data-state="current"]{background:var(--bingo-round-ink);color:var(--bingo-round-color);border-color:var(--bingo-round-color);outline-color:var(--bingo-round-ink)}
 @media(max-width:900px){.stage[data-round-number]{grid-template-rows:auto minmax(0,1fr) 44px;padding:12px}.stage[data-round-number] .header{flex-wrap:wrap;gap:10px}.stage[data-round-number] .header strong{flex-basis:100%}.stage[data-round-number] .header span{margin-left:0;white-space:normal}.stage[data-round-number] .partnerLogos{margin-left:auto}.stage[data-round-number] .partnerLogos img{width:110px;height:54px}.stage[data-round-number] .partnerLogos{gap:8px;padding:6px}}
+
+/* Quiet shades of the assigned round hue, without a black logo plaque. */
+.stage[data-round-number] .partnerLogos{background:transparent}
+.stage[data-round-number] .board li[data-state="unseen"]{background:color-mix(in srgb,var(--bingo-round-color) 78%,black);color:var(--bingo-round-ink);border-color:color-mix(in srgb,var(--bingo-round-color) 60%,white)}
+.stage[data-round-number] .content{grid-template-rows:minmax(120px,.85fr) minmax(0,1fr)}
+.current>span{display:block;text-align:center;font-size:clamp(22px,3vw,52px);width:min(100%,480px)}
+.stage .footer{display:flex;gap:16px;font-size:clamp(18px,1.8vw,32px)}
+.footer>strong{flex-shrink:0}
+.footer ol{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:12px;list-style:none;margin:0;padding:0;flex:1;min-width:0}
+.footer li{white-space:nowrap;text-align:center}
