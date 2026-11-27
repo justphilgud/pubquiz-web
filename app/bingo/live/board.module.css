@@ -74,14 +74,23 @@
 .footer ol{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:12px;list-style:none;margin:0;padding:0;flex:1;min-width:0}
 .footer li{white-space:nowrap;text-align:center}
 
-/* Final frame: title/progress left, original partner marks right, board and history share five rows. */
+/* Number stage: current number left, full board right, one quiet history row below it. */
 .stage,.stage[data-round-number]{grid-template-rows:108px minmax(0,1fr)}
-.headerTitle{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}.headerTitle strong{flex:none!important}.header .progress{margin:0;font-size:clamp(16px,1.5vw,26px);font-weight:400}
+.headerTitle{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}
+.headerTitle strong{flex:none!important}.header .progress{margin:0;font-size:clamp(16px,1.5vw,26px);font-weight:400}
 .stage[data-round-number] .partnerLogos .logoSeparator{margin:0;font:200 42px/1 Arial,Helvetica,sans-serif;color:inherit;flex:none}
-.numberGrid{align-self:center;display:grid;grid-template-columns:minmax(0,1fr) minmax(200px,25%);gap:18px;min-width:0;min-height:0;padding-top:30px}
-.recent{position:relative;min-width:0;border-inline-start:1px solid currentColor;padding-inline-start:16px;align-self:center}
-.recent h2{position:absolute;top:-32px;left:16px;margin:0;font:inherit;font-size:clamp(18px,1.8vw,30px);font-weight:400;white-space:nowrap}
-.recentList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(5,var(--bingo-cell-edge,40px));grid-auto-flow:column;gap:5px 10px;list-style:none;padding:0;margin:0}
-.recentList li{display:flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;font-size:var(--bingo-recent-font,20px);line-height:1.2}
-.recentList li>span{font-size:.65em;opacity:.8}.recentList strong{font-weight:400}.recent p{position:absolute;top:0;left:16px;margin:0;font-size:16px}
-@media(max-width:900px){.stage,.stage[data-round-number]{grid-template-rows:auto minmax(0,1fr)}.numberGrid{gap:10px;grid-template-columns:minmax(0,1fr) 200px}.header .progress{display:block!important}.stage[data-round-number] .partnerLogos .logoSeparator{font-size:28px}}
+.stage:not([data-media-mode]) .content{grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);grid-template-rows:minmax(0,1fr);align-items:stretch}
+.numberGrid{align-self:stretch;display:grid;grid-template-rows:minmax(0,1fr) 84px;gap:12px;min-width:0;min-height:0}
+.recent{position:relative;min-width:0;height:80px;border-top:1px solid currentColor;padding-top:8px;align-self:end}
+.recent h2{margin:0 0 6px;font:inherit;font-size:16px;line-height:24px;font-weight:400}
+.recentList{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:4px;list-style:none;padding:0;margin:0}
+.recentList li{display:flex;align-items:center;justify-content:center;gap:3px;white-space:nowrap;font-size:clamp(14px,1.4vw,26px);line-height:34px}
+.recentList li>span{font-size:.65em;opacity:.8}.recentList strong{font-weight:400}.recent p{margin:0;font-size:16px}
+.stage[data-round-number] .board li[data-state="unseen"]{background:color-mix(in srgb,var(--bingo-round-color) 18%,white);color:#40555D;border-color:transparent;font-weight:400}
+.stage[data-round-number] .board li[data-state="drawn"]{border-color:var(--bingo-round-ink)}
+@media(max-width:900px){.stage,.stage[data-round-number]{grid-template-rows:auto minmax(0,1fr)}.header .progress{display:block!important}.stage[data-round-number] .partnerLogos .logoSeparator{font-size:28px}}
+
+/* Preserve logo silhouettes on light round backgrounds without editing source assets. */
+.stage[data-light-round="true"] .partnerLogos img{filter:brightness(0)}
+
+.stage:not([data-term-mode]) .current strong{white-space:nowrap}

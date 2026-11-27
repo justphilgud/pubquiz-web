@@ -2,7 +2,8 @@
 import {PencilSquareIcon,TrashIcon,XMarkIcon,EyeIcon} from '@heroicons/react/24/outline';
 import {IconButton} from '@/components/ui';
 import SortableRounds,{SortableRound} from './SortableRounds';
-import CeremonyEditor from '../CeremonyEditor';
+import CeremonySummary from '../CeremonySummary';
+import {EventPreparationBlock} from '@/app/events/EventPreparationBlock';
 import type {CeremonyState} from '@/app/rendering/ceremony/ceremony';
 import {publishContent} from '../content/actions';
 import PrintFormatFields from './PrintFormatFields';
@@ -20,7 +21,7 @@ import type { BingoCommand, PreparationView, RoundView } from "./policy";
 const subscribe = () => () => {};
 
 export default function PreparationPanel({ data,ceremony }: { data: PreparationView;ceremony?:CeremonyState }) {
-  const [framing,setFraming]=useState(ceremony);
+  const framing=ceremony;
   const router = useRouter(), [pending, start] = useTransition(), busy = useRef(false);
   const ready = useSyncExternalStore(subscribe, () => true, () => false);
   const [expanded,setExpanded]=useState<Set<string>>(new Set());
@@ -37,13 +38,13 @@ export default function PreparationPanel({ data,ceremony }: { data: PreparationV
     const next = new Set(current); if (dirty) next.add(id); else next.delete(id); return next;
   }), []);
   const base = { gameId: data.gameId, expectedSeriesId: data.seriesId, revision: data.revision };
-  function run(extra: Omit<Extract<BingoCommand, { operation: "createRound" }>, keyof typeof base>|{operation:"reorderRounds";roundIds:string[]}|{operation:"removeRound";roundId:string}) {
+  function run(extra: Omit<Extract<BingoCommand, { operation: "createRound" }>, keyof typeof base>|{operation:"reorderRounds";roundIds:string[]}|{operation:"removeRound";roundId:string}|{operation:"moveRound";roundId:string;direction:-1|1}) {
     if (busy.current) return;
     busy.current = true;
     start(async () => { try { const result = await savePreparation({ ...base, ...extra }); if (result.success) router.refresh(); else setMessage(result.message); } catch { setMessage("Speichern fehlgeschlagen. Bitte erneut versuchen."); } finally { busy.current = false; } });
   }
   return <div className="space-y-5">
-    {framing&&<CeremonyEditor gameId={data.gameId} initial={framing} onSaved={setFraming}/>}
+    {framing&&<CeremonySummary gameId={data.gameId} state={framing}/>}
     <p className="text-sm text-slate-600">Vorbereitung · Durchläufe werden in der Moderation bewusst gestartet. Die geplante Ziehungszahl beendet keine Runde automatisch.</p>
     {data.archived && <p role="status">Archivierte Eventreihe: nur Lesen und PDF-Export möglich.</p>}
     {message && <p role="alert">{message}</p>}
@@ -52,15 +53,15 @@ export default function PreparationPanel({ data,ceremony }: { data: PreparationV
     {data.templates?.find(t=>t.id===templateId)?.special&&<p role="note">Diese Vorlage benötigt passende Spezialkarten. Die Zuordnung wird unabhängig kopiert; vorhandene Karten werden nicht ersetzt.</p>}
     <Link className="inline-flex min-h-11 items-center underline" href={`/bingo/${data.gameId}/karten`}>Karten und Druck für {data.title}</Link>
     {!data.rounds.length && <p>Noch keine Runden vorhanden.</p>}
-    <SortableRounds ids={data.rounds.map(r=>r.id)} disabled={pending||data.archived||dirtyRounds.size>0||busyRounds.size>0||data.rounds.some(r=>r.locked)||data.roundCount!==data.rounds.length} onChange={roundIds=>run({operation:"reorderRounds",roundIds})}>{data.rounds.map((r,index)=><SortableRound key={r.id} id={r.id} disabled={pending||data.archived||dirtyRounds.size>0||busyRounds.size>0||data.rounds.some(r=>r.locked)}><div data-round-id={r.id} style={data.roundCount<=10?{borderInlineStartColor:roundColor(index+1).background,borderInlineStartWidth:6}:undefined} className="rounded-xl border border-slate-300 bg-white p-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-bold">{r.label}</h2><p className="text-sm text-slate-600">{r.terms?'Text-Bingo 75':'Zahlen-Bingo 75'} · {r.target} geplante Ziehungen · {r.cardCount} Karten · Ausgabe: {r.issued===null?"nicht erfasst":r.issued} · {r.locked?"Gestartet · unveränderlich":r.cardCount?"Bereit":"Karten fehlen"}</p></div><div className="flex items-center gap-2"><IconButton icon={expanded.has(r.id)?XMarkIcon:r.locked?EyeIcon:PencilSquareIcon} label={`${expanded.has(r.id)?"Schließen":r.locked?"Ansehen":"Bearbeiten"}: ${r.label}`} title={`${r.label} bearbeiten`} onClick={()=>{if(expanded.has(r.id)&&dirtyRounds.has(r.id)&&!window.confirm("Ungespeicherte Änderungen verwerfen?"))return;setExpanded(current=>{const next=new Set(current);if(next.has(r.id))next.delete(r.id);else next.add(r.id);return next;});}}/><IconButton icon={TrashIcon} label={`${r.label} löschen`} title={r.locked||r.cardCount||r.series.length||r.issued!==null||r.history.length?"Löschen gesperrt: Karten, Ausgabe oder Historie vorhanden":`${r.label} löschen`} disabled={pending||data.archived||dirtyRounds.size>0||busyRounds.size>0||r.locked||r.cardCount>0||r.series.length>0||r.issued!==null||r.history.length>0} onClick={()=>{if(window.confirm(`${r.label} wirklich löschen? Karten und Laufhistorie werden nicht verändert.`))run({operation:'removeRound',roundId:r.id});}}/></div></div>{expanded.has(r.id)&&<RoundEditor key={r.id} round={r} data={data} onDirty={trackDirty} onBusy={trackBusy} externallyBlocked={pending||[...dirtyRounds,...busyRounds].some(id=>id!==r.id)}/>}</div></SortableRound>)}</SortableRounds>
-    {framing&&<CeremonyEditor gameId={data.gameId} initial={framing} onSaved={setFraming} placement="outro" label="Outro nach allen Runden"/>}
+    <SortableRounds ids={data.rounds.map(r=>r.id)} disabled={pending||data.archived||dirtyRounds.size>0||busyRounds.size>0||data.rounds.some(r=>r.locked)||data.roundCount!==data.rounds.length} onChange={roundIds=>run({operation:"reorderRounds",roundIds})}>{data.rounds.map((r,index)=><SortableRound key={r.id} id={r.id} disabled={pending||data.archived||dirtyRounds.size>0||busyRounds.size>0||data.rounds.some(r=>r.locked)||data.roundCount!==data.rounds.length}>{handle=><div data-round-id={r.id}><EventPreparationBlock title={`Block ${index+1} · ${r.label}`} marker={String(index+1)} dragHandle={handle} description={`${r.terms?'Text-Bingo 75':'Zahlen-Bingo 75'} · ${r.target} geplante Ziehungen · ${r.cardCount} Karten · Ausgabe: ${r.issued===null?'nicht erfasst':r.issued} · ${r.locked?'Gestartet · unveränderlich':r.cardCount?'Bereit':'Karten fehlen'}`} actions={<><button type="button" aria-label={`${r.label} nach oben`} title="Nach oben" className="min-h-11 min-w-11 rounded-lg border border-slate-300 bg-white text-slate-600 disabled:opacity-40" disabled={pending||data.archived||dirtyRounds.size>0||busyRounds.size>0||data.rounds.some(r=>r.locked)||data.roundCount!==data.rounds.length||index===0} onClick={()=>run({operation:'moveRound',roundId:r.id,direction:-1})}>↑</button><button type="button" aria-label={`${r.label} nach unten`} title="Nach unten" className="min-h-11 min-w-11 rounded-lg border border-slate-300 bg-white text-slate-600 disabled:opacity-40" disabled={pending||data.archived||dirtyRounds.size>0||busyRounds.size>0||data.rounds.some(r=>r.locked)||data.roundCount!==data.rounds.length||index===data.rounds.length-1} onClick={()=>run({operation:'moveRound',roundId:r.id,direction:1})}>↓</button><IconButton icon={expanded.has(r.id)?XMarkIcon:r.locked?EyeIcon:PencilSquareIcon} label={`${expanded.has(r.id)?"Schließen":r.locked?"Ansehen":"Bearbeiten"}: ${r.label}`} title={`${r.label} bearbeiten`} onClick={()=>{if(expanded.has(r.id)&&dirtyRounds.has(r.id)&&!window.confirm("Ungespeicherte Änderungen verwerfen?"))return;setExpanded(current=>{const next=new Set(current);if(next.has(r.id))next.delete(r.id);else next.add(r.id);return next;});}}/><IconButton icon={TrashIcon} label={`${r.label} löschen`} title={r.locked||r.cardCount||r.series.length||r.issued!==null||r.history.length?"Löschen gesperrt: Karten, Ausgabe oder Historie vorhanden":`${r.label} löschen`} disabled={pending||data.archived||dirtyRounds.size>0||busyRounds.size>0||r.locked||r.cardCount>0||r.series.length>0||r.issued!==null||r.history.length>0} onClick={()=>{if(window.confirm(`${r.label} wirklich löschen? Karten und Laufhistorie werden nicht verändert.`))run({operation:'removeRound',roundId:r.id});}}/></>}>{expanded.has(r.id)&&<RoundEditor key={r.id} round={r} data={data} onDirty={trackDirty} onBusy={trackBusy} externallyBlocked={pending||[...dirtyRounds,...busyRounds].some(id=>id!==r.id)}/>}</EventPreparationBlock></div>}</SortableRound>)}</SortableRounds>
+    {framing&&<CeremonySummary gameId={data.gameId} state={framing} placement="outro"/>}
     <nav aria-label="Rundenseiten" className="flex flex-wrap gap-4">{data.page > 1 && <Link href={`?page=${data.page - 1}&seriesPage=${data.seriesPage}`}>Vorherige Runden</Link>}{data.page * 25 < data.roundCount && <Link href={`?page=${data.page + 1}&seriesPage=${data.seriesPage}`}>Weitere Runden</Link>}</nav>
   </div>;
 }
 export function RoundEditor({ round, data, onDirty, onBusy, externallyBlocked }: { round: RoundView; data: PreparationView; onDirty: (id: string, dirty: boolean) => void; onBusy: (id: string, busy: boolean) => void; externallyBlocked: boolean }) {
   const router = useRouter(), [pending, start] = useTransition(), busy = useRef(false);
   const ready = useSyncExternalStore(subscribe, () => true, () => false);
-  const initial = { label: round.label, target: String(round.target), strategy: round.strategy, issued: round.issued === null ? "" : String(round.issued) };
+  const initial = { label: round.label, target: String(round.target), strategy: round.strategy, issued: round.issued === null ? "" : String(round.issued), color:round.color??"" };
   const [editRevision,setEditRevision]=useState<number|null>(null);
   function changeFields(value:typeof initial){setEditRevision(current=>current??data.revision);setFields(value);}
   const [fields, setFields] = useState(initial), [message, setMessage] = useState<{ text: string; error: boolean; field?: string } | null>(null);
@@ -90,11 +91,12 @@ export function RoundEditor({ round, data, onDirty, onBusy, externallyBlocked }:
   }
   const blocked = !ready || pending || data.archived || Boolean(round.locked) || externallyBlocked;
   return <section aria-labelledby={`round-${round.id}`} className="min-w-0 space-y-4 rounded-xl border border-slate-200 bg-white p-4">
-    <div className="flex flex-wrap items-center justify-between gap-2"><h2 id={`round-${round.id}`} className="text-lg">{round.label}</h2><div className="flex flex-wrap gap-2"><Button disabled={blocked || dirty || round.position === 1} onClick={() => run({ operation: "moveRound", direction: -1 })}>Nach oben</Button><Button disabled={blocked || dirty} onClick={() => run({ operation: "moveRound", direction: 1 })}>Nach unten</Button></div></div>
-    <form className="space-y-3" onSubmit={e => { e.preventDefault(); run({ operation: "saveRound", label: fields.label, target: Number(fields.target), strategy: fields.strategy, issued: fields.issued === "" ? null : Number(fields.issued) }, true); }}>
+    <h2 id={`round-${round.id}`} className="text-lg">{round.label}</h2>
+    <form className="space-y-3" onSubmit={e => { e.preventDefault(); run({ operation: "saveRound", label: fields.label, target: Number(fields.target), strategy: fields.strategy, color:fields.color||null, issued: fields.issued === "" ? null : Number(fields.issued) }, true); }}>
       <fieldset disabled={blocked} className="grid min-w-0 gap-3 sm:grid-cols-2">
         <FormField label="Bezeichnung" htmlFor={`label-${round.id}`}><Input id={`label-${round.id}`} required maxLength={80} value={fields.label} onChange={e => changeFields({ ...fields, label: e.target.value })} /></FormField>
         <FormField label="Geplante Ziehungen" htmlFor={`target-${round.id}`}><Input id={`target-${round.id}`} type="number" min={1} max={75} required list={`presets-${round.id}`} value={fields.target} onChange={e => changeFields({ ...fields, target: e.target.value })} /><datalist id={`presets-${round.id}`}><option value="20" /><option value="30" /><option value="40" /></datalist></FormField>
+        <FormField label="Rundenfarbe" htmlFor={`color-${round.id}`} hint={`Leer = Standard ${roundColor(Math.min(10,Math.max(1,data.rounds.findIndex(r=>r.id===round.id)+1))).name}; gilt für Präsentation und neue Kartenrückseiten. Gespeicherte PDFs bleiben unverändert.`}><div className="flex gap-2"><input type="color" aria-label="Rundenfarbe auswählen" className="min-h-11 w-12 rounded border" value={fields.color||roundColor(Math.min(10,Math.max(1,data.rounds.findIndex(r=>r.id===round.id)+1))).background} onChange={e=>changeFields({...fields,color:e.target.value})}/><Input id={`color-${round.id}`} placeholder="Standardfarbe" pattern="#[0-9a-fA-F]{6}" maxLength={7} value={fields.color} onChange={e=>changeFields({...fields,color:e.target.value})}/></div></FormField>
         <FormField label="Kartenstrategie" htmlFor={`strategy-${round.id}`}><Select id={`strategy-${round.id}`} value={fields.strategy} onChange={e => changeFields({ ...fields, strategy: e.target.value as "NEW" | "EXISTING" })}><option value="NEW">Neue Karten je Runde</option><option value="EXISTING">Vorhandene Karten verwenden</option></Select></FormField>
         <FormField label="Ausgegebene Karten gesamt" htmlFor={`issued-${round.id}`} hint={`Leer = nicht erfasst; 0 = ausdrücklich keine. Höchstens ${round.cardCount}.`}><Input id={`issued-${round.id}`} type="number" min={0} max={round.cardCount} value={fields.issued} onChange={e => changeFields({ ...fields, issued: e.target.value })} /></FormField>
       </fieldset>

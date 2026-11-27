@@ -1,5 +1,9 @@
 # Bingo: Intro, Rundenblock, Outro und schnelle Moderation
 
+Aktuelle Ergänzung: [Rundenfarben, Zahlenbühne und Folienpflege](bingo-presentation-colors.md)
+ersetzt die nachfolgenden historischen Angaben zu zehn Farben, dunkleren
+ungezogenen Zellen, zweispaltiger Historie und Inline-Konfiguration ausdrücklich.
+
 Stand: 27.11.2026. Ergänzt `bingo-evening-dramaturgy.md`; Quiz-Lifecycle,
 Antwortbewertung, AP3 und Druckstände bleiben getrennt und unverändert.
 

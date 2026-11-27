@@ -1,3 +1,4 @@
+import {testBingoColorDelta} from './bingo-color-release-delta';
 import {featureReleaseProof} from './feature-release-plan';
 import {approvedBingoEveningPlan} from "./production-preflight-bingo-evening-plan";
 import {testBingoEveningDelta} from "./production-preflight-bingo-evening-delta";
@@ -27,7 +28,7 @@ async function main(){
  if(process.env.GITHUB_ACTIONS!=='true'||process.env.GITHUB_REPOSITORY!=='justphilgud/pubquiz-web'||!/^[a-f0-9]{40}$/.test(sha))throw new Error('CONTEXT');
  const candidate=process.env.RELEASE_CANDIDATE_SHA??'';
  const feature=await featureReleaseProof(sha,candidate);
- if(feature){
+ if(feature&&feature.kind!=='BINGO_ROUND_COLOR'){
   writeFileSync('expected-schema.json',JSON.stringify(feature,null,2),{flag:'wx'});
   writeFileSync('delta-test.json',JSON.stringify({status:'PASS',code:'NO_SCHEMA_MIGRATION_DELTA',baselineSha:sha,candidateSha:candidate}),{flag:'wx'});
   writeFileSync('new-install-replay.json',JSON.stringify({status:'NOT_RUN',code:'HISTORICAL_BOOTSTRAP_LIMITATION_UNCHANGED'}),{flag:'wx'});
@@ -44,7 +45,7 @@ async function main(){
  const reference=JSON.parse(readFileSync('scripts/operations/schema-reference/provenance.json','utf8'));
  const bingo=approvedBingoPlan(sha,candidate);
  if(bingo){const schema=(rev:string)=>execFileSync('git',['show',`${rev}:prisma/schema.prisma`],{encoding:'utf8'});assertBingoManifest(sha,candidate,migrationFiles(sha),migrationFiles(candidate),schema(sha),schema(candidate));}
- const approved=approvedPreflightPlan(sha,process.env.RELEASE_CANDIDATE_SHA??reference.candidateSha)??(bingo?{baselineSha:sha,candidateSha:candidate,delta:'',checksum:'',kind:approvedBingoEveningPlan(sha,candidate)?'bingo-evening':approvedBingoBellPlan(sha,candidate)?'bingo-bell':approvedBingoMatchingPlan(sha,candidate)?'bingo-matching':approvedBingoPrintV4Plan(sha,candidate)?'bingo-print-v4':approvedBingoEventPlan(sha,candidate)?'bingo-event':approvedBingoLivePlan(sha,candidate)?'bingo-ap3':'bingo-ap2'}:undefined);
+ const approved=(feature?.kind==='BINGO_ROUND_COLOR'?{baselineSha:sha,candidateSha:candidate,delta:'',checksum:'',kind:'bingo-round-color'}:undefined)??approvedPreflightPlan(sha,process.env.RELEASE_CANDIDATE_SHA??reference.candidateSha)??(bingo?{baselineSha:sha,candidateSha:candidate,delta:'',checksum:'',kind:approvedBingoEveningPlan(sha,candidate)?'bingo-evening':approvedBingoBellPlan(sha,candidate)?'bingo-bell':approvedBingoMatchingPlan(sha,candidate)?'bingo-matching':approvedBingoPrintV4Plan(sha,candidate)?'bingo-print-v4':approvedBingoEventPlan(sha,candidate)?'bingo-event':approvedBingoLivePlan(sha,candidate)?'bingo-ap3':'bingo-ap2'}:undefined);
  if(!approved)throw new Error('RELEASE_PLAN_UNAPPROVED');
  const plan={...reference,...approved};
  const bootstrap=readFileSync('scripts/operations/schema-reference/prehistory.sql');
@@ -65,6 +66,16 @@ async function main(){
   phase='CATALOG_CAPTURE';
   const columns=query(DIAGNOSTIC_COLUMNS_SQL),catalog=query(DIAGNOSTIC_CATALOG_SQL),objects=query(SCHEMA_OBJECTS_SQL);
   phase='DELTA_TEST';
+  if(feature?.kind==='BINGO_ROUND_COLOR'){
+    const expected={baselineSha:sha,manifest:manifest.map(({name,checksum})=>({name,checksum})),major:17,columns,catalog,objects};
+    const deltaTest=testBingoColorDelta(sql,query,expected);
+    const newInstallReplay={status:'NOT_RUN',code:'HISTORICAL_BOOTSTRAP_LIMITATION_UNCHANGED'};
+    writeFileSync('expected-schema.json',JSON.stringify({...expected,featureProof:feature,deltaTest,newInstallReplay},null,2),{flag:'wx'});
+    writeFileSync('delta-test.json',JSON.stringify(deltaTest,null,2),{flag:'wx'});
+    writeFileSync('new-install-replay.json',JSON.stringify(newInstallReplay),{flag:'wx'});
+    return;
+  }
+
   if(bingo){
     const deltaTest=(approvedBingoEveningPlan(sha,candidate)?testBingoEveningDelta:approvedBingoBellPlan(sha,candidate)?testBingoBellDelta:approvedBingoMatchingPlan(sha,candidate)?testBingoMatchingDelta:approvedBingoPrintV4Plan(sha,candidate)?testBingoPrintV4Delta:approvedBingoCardPlan(sha,candidate)?testBingoCardDelta:approvedBingoEventPlan(sha,candidate)?testBingoEventDelta:approvedBingoLivePlan(sha,candidate)?testBingoLiveDelta:testBingoDelta)(sql,query,sha,candidate,manifest,columns,catalog,objects);
     writeFileSync('delta-test.json',JSON.stringify(deltaTest,null,2),{flag:'wx'});

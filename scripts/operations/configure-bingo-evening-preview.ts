@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { checkVercelGitPreview, type GitPreviewDeploymentInput } from "../deploy-vercel-git-preview";
-import { BINGO_EVENING_REVIEW_DATABASE as review, validateDeploymentEnvironment } from "../validate-deployment-environment";
+import { BINGO_EVENING_REVIEW_DATABASE as originalReview, BINGO_COLOR_REVIEW_BRANCH, validateDeploymentEnvironment } from "../validate-deployment-environment";
 
 const team = "team_BE4XNxNRwsaEnSb9N8FFvWEH";
 const project = "prj_9Nnwer6B43P0nfrOZPIEygFWg666";
@@ -10,6 +10,7 @@ const keys = ["DATABASE_URL", "EXPECTED_DATABASE_HOST", "EXPECTED_DATABASE_NAME"
 type Variable = { id?: string; key: string; target?: string[]; gitBranch?: string; type?: string; visibility?: string; value?: string };
 
 export function eveningPreviewVariables(environment: Record<string, string | undefined>) {
+  const review={...originalReview,branch:environment.DEPLOYMENT_BRANCH===BINGO_COLOR_REVIEW_BRANCH?BINGO_COLOR_REVIEW_BRANCH:originalReview.branch};
   assert.equal(environment.DEPLOYMENT_BRANCH, review.branch);
   assert.equal(environment.DEPLOYMENT_EVENT, "workflow_dispatch");
   assert.equal(environment.VERCEL_ORG_ID, team);
@@ -32,6 +33,7 @@ export function eveningPreviewVariables(environment: Record<string, string | und
 
 async function main() {
   const variables = eveningPreviewVariables(process.env);
+  const review={...originalReview,branch:process.env.DEPLOYMENT_BRANCH===BINGO_COLOR_REVIEW_BRANCH?BINGO_COLOR_REVIEW_BRANCH:originalReview.branch};
   const input: GitPreviewDeploymentInput = {
     branch: review.branch, deploymentEnvironment: process.env.DEPLOYMENT_ENV,
     repository: process.env.DEPLOYMENT_REPOSITORY, repositoryId: process.env.DEPLOYMENT_REPOSITORY_ID,

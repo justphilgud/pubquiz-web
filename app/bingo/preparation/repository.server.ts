@@ -79,7 +79,7 @@ export async function writePreparation(userId: number, input: unknown) {
         if (command.strategy === "NEW" && round!.series.some(s => s.series.origin_round_id !== round!.id)) throw new BingoPreparationError("Für neue Karten zuerst die ausdrücklich zugeordneten fremden Serien entfernen.", "strategy");
         const count = round!.series.reduce((n, s) => n + s.series.card_count, 0);
         if (command.issued !== null && command.issued > count) throw new BingoPreparationError(`Es sind nur ${count} unterschiedliche Karten zugeordnet.`, "issued");
-        await tx.bingo_rounds.update({ where: { id: round!.id }, data: { label: command.label, planned_draws: command.target, strategy: command.strategy, issued_count: command.issued } });
+        await tx.bingo_rounds.update({ where: { id: round!.id }, data: { label: command.label, planned_draws: command.target, strategy: command.strategy, issued_count: command.issued, ...(command.color===undefined?{}:{presentation_color:command.color}) } });
         if (round!.issued_count !== command.issued) await tx.bingo_issuance_changes.create({ data: { id: randomUUID(), round_id: round!.id, actor_id: userId, previous_count: round!.issued_count, new_count: command.issued } });
         break;
       }
@@ -139,10 +139,10 @@ async function generateRound(tx:Prisma.TransactionClient,userId:number,game:Pris
         const settings=await resolveSelectedPrint(tx,design,series.bingo_print_config,game.bingo_print_config);
         if(command.printLayout)settings.layout={version:settings.layout?.version??3,textFont:settings.layout?.textFont??'ARIMO',...command.printLayout};
         const roundNumber=await tx.bingo_rounds.count({where:{game_id:game.id,position:{lte:round.position}}});
-        const theme=roundColor(roundNumber);
+        const theme=roundColor(roundNumber,round.presentation_color);
         settings.colors={...settings.colors,back:theme.background};
         settings.backLogos=['/branding/bingo-print/lovd-small-creme.png','/branding/bingo-print/phil-gud.png'];
-        let snapshot = await captureNewPrintSnapshot(design, game.titel, round.label,settings,await selectedPrintSource(tx,game.bingo_print_config??series.bingo_print_config),roundNumber);
+        let snapshot = await captureNewPrintSnapshot(design, game.titel, round.label,settings,await selectedPrintSource(tx,game.bingo_print_config??series.bingo_print_config),roundNumber,theme.background);
         if(round.term_snapshot!==null){if(snapshot.version!==3&&snapshot.version!==4)throw new BingoPreparationError('Für Textkarten bitte ein neues V3-Druckformat auswählen.');snapshot=parsePrintSnapshot({...snapshot,terms:parseTermSet(round.term_snapshot)});}
         validateModernTerms(snapshot);validateReferenceTerms(snapshot);
         // Game lock serializes generation. Include existing game layouts, not just this request.

@@ -74,6 +74,7 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   await db.query(bellMigration.replace(/COMMIT;\s*$/,'ROLLBACK;'));
   assert.equal((await db.query("SELECT to_regclass('pubquiz.bingo_round_templates') AS t")).rows[0].t,null);
   await db.query(bellMigration);
+  await db.query(readFileSync('prisma/migrations/20261127220000_bingo_round_color/migration.sql','utf8'));
   const legacyV2=await seedLegacyPrintFixture(db);
   await db.query(v3Migration);
   assert.deepEqual(await legacyV2.read(),legacyV2.before,"V3 migration preserves genuine pre-existing card IDs, cells, print snapshot, round and prefix");

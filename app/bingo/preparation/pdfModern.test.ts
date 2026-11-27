@@ -21,6 +21,18 @@ test('V3 renderer embeds original Phil Gud digits, separates IDs onto backs and 
     const snapshot=await api.capturePrintSnapshot(design,'Titel','Runde 1',settings);
     assert.equal(snapshot.version,3);if(snapshot.version!==3)throw Error('snapshot');
     assert.equal(snapshot.settings.numberFont,'PHIL_GUD');
+    if(format==='A4_FOUR'){
+      const before=JSON.stringify(snapshot);
+      const light=await api.captureNewPrintSnapshot(design,'Titel','Runde 3',settings,undefined,3);
+      assert.ok(light.version===3);if(light.version!==3)throw Error('light snapshot');
+      assert.equal(light.roundInk,'#062C3D');assert.equal(light.settings.colors.back,'#FFF9E9');
+      assert.equal(light.logo.sha256,snapshot.logo.sha256);
+      assert.deepEqual({...light.settings.colors,back:snapshot.settings.colors.back},snapshot.settings.colors);
+      assert.equal(light.body.sha256,snapshot.body.sha256);assert.equal(light.display.sha256,snapshot.display.sha256);
+      assert.equal(JSON.stringify(snapshot),before);
+      assert.throws(()=>parsePrintSnapshot({...light,roundInk:'#FFFFFF'}));
+    }
+
     const g=geometry(format),pdf=await PDFDocument.load(await api.createModernCardsPdf(snapshot,cards,'duplex'));
     assert.equal(pdf.getPageCount(),2*Math.ceil(cards.length/g.capacity));
     assert.ok(Math.abs(pdf.getPage(0).getWidth()-g.width)<.001);

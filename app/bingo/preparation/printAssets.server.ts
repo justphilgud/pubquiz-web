@@ -58,8 +58,13 @@ export async function capturePrintSnapshot(input: SharedDesign, title: string, r
 }
 
 /** Only called by new-card generation or an explicitly selected redesign, never by old exports. */
-export function captureNewPrintSnapshot(input:SharedDesign,title:string,roundLabel:string,settings:BingoPrint,templateSource?:{id:string;name:string},roundNumber?:number){
+export function captureNewPrintSnapshot(input:SharedDesign,title:string,roundLabel:string,settings:BingoPrint,templateSource?:{id:string;name:string},roundNumber?:number,color?:string){
  const prepared=prepareLovdPrint(settings.layout?settings:{...settings,layout:{version:3,format:'A4_FOUR',textFont:'ARIMO'}});
- if(roundNumber){prepared.colors.back=roundColor(roundNumber).background;prepared.backLogos=['/branding/lovd/lovd-stelp-creme-rgb.png','/branding/bingo-print/phil-gud.png'];prepared.partnerBack=1;}
- return capturePrintSnapshot(input,title,roundLabel,prepared,templateSource).then(snapshot=>roundNumber?parsePrintSnapshot({...snapshot,roundNumber}):snapshot);
+ if(roundNumber){prepared.colors.back=roundColor(roundNumber,color).background;prepared.backLogos=['/branding/lovd/lovd-stelp-creme-rgb.png','/branding/bingo-print/phil-gud.png'];prepared.partnerBack=1;}
+ return capturePrintSnapshot(input,title,roundLabel,prepared,templateSource).then(async snapshot=>{
+   if(roundNumber&&snapshot.version!==1&&roundColor(roundNumber,color).foreground!=='#FFFFFF'){
+     snapshot.backLogos=await Promise.all(snapshot.backLogos.map(async logo=>asset(logo.name,await sharp(Buffer.from(logo.bytes,'base64')).linear(0,0).png().toBuffer())));
+   }
+   return roundNumber?parsePrintSnapshot({...snapshot,roundNumber,roundInk:roundColor(roundNumber,color).foreground}):snapshot;
+ });
 }

@@ -1655,6 +1655,7 @@ model bingo_matching_assets {
  @@schema("pubquiz")
 }
 model bingo_rounds {
+  presentation_color String? @db.VarChar(7)
   bingo_print_job_items bingo_print_job_items[]
 
   term_snapshot Json?

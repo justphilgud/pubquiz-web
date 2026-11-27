@@ -60,6 +60,12 @@ in demselben Feature-PR implementiert und reviewed werden. Aktuell wird nur
 historische SQL-Releasepaare bleiben über ihre unveränderten Spezialprüfungen
 verfügbar. Kein automatischer Freifahrtschein für beliebiges neues SQL.
 
+Der Bingo-Farbauftrag ergänzt die eng begrenzte Planart `BINGO_ROUND_COLOR`
+für exakt eine nullable HEX-Farbspalte an `bingo_rounds`. Plan, Validator,
+isolierter Schema-/Daten-/Rückwegtest und Anwendung liegen gemeinsam im Feature-PR.
+Die allgemeine SQL-Sperre und alle geschützten Freigaben bleiben erhalten;
+Details im [Bingo-Farbvertrag](../architecture/bingo-presentation-colors.md).
+
 ## CI und Preview
 
 `CI`, `Production Preflight Safety` und `AP9.4 Bridge Checks` laufen auf PRs und
