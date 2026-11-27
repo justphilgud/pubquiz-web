@@ -1,4 +1,4 @@
-import {CEREMONY_SLIDES,ceremonyAt} from '@/app/rendering/ceremony/ceremony';
+import {outroConfig,CEREMONY_SLIDES,ceremonyAt} from '@/app/rendering/ceremony/ceremony';
 import {readCeremony} from "../ceremonyRepository.server";
 import {raffleEntries,raffleSummary} from "./raffle";
 import {MAX_BINGO_ROUNDS} from "../roundColors";
@@ -148,10 +148,12 @@ export async function commandEventRun(userId:number,input:{gameId:string;runId:s
   if(command.kind==='check'&&!loaded.cardsByRound.get(round.id)?.some(card=>card.id===command.cardId))throw Error('WRONG_ROUND');
   if(command.kind==='decideCheck'&&command.action==='CONFIRM'&&!loaded.cardsByRound.get(round.id)?.some(card=>card.id===state.checks?.find(check=>check.id===command.checkId)?.cardId))throw Error('WRONG_ROUND');
   const next=applyEventRunEvent(state,{id:input.requestId,at,actorId:userId,command,...(opened?{frozen:opened}:{})},["check","decideCheck","correct"].includes(command.kind)?[...new Map([...(loaded.cardsByRound.get(round.id)??[]),...loaded.checkCards,...checkRows.map(storedCard)].map(card=>[card.id,card])).values()]:loaded.cardsByRound.get(round.id)??[]);
-  if(['navigateRound','startRound','closeRound'].includes(command.kind)&&(await tx.$queryRaw<{present:string|null}[]>`SELECT to_regclass('pubquiz.game_ceremonies')::text present`)[0].present){
-   const ceremony=await readCeremony(tx,game.id),config=ceremony.config.insertions?.[round.id];
-   const slide=command.kind==='closeRound'&&config?CEREMONY_SLIDES.find(s=>s.id!=='raffle'&&config.enabled.includes(s.id))?.id??null:null;
-   const framing={...ceremony,revision:ceremony.revision+1,slide,revealCount:0,media:{action:'stop',commandId:ceremony.revision+1},...(slide?{placement:round.id}:{})};
+  if(['navigateRound','startRound','closeRound','end'].includes(command.kind)&&(await tx.$queryRaw<{present:string|null}[]>`SELECT to_regclass('pubquiz.game_ceremonies')::text present`)[0].present){
+   const ceremony=await readCeremony(tx,game.id),config=outroConfig(ceremony.config);
+   const plan=await tx.$queryRaw<{round_id:string}[]>`SELECT round_id FROM pubquiz.bingo_event_round_plan WHERE run_id=${row.id}::uuid`;
+   const finished=command.kind==='end'||plan.every(p=>next.run.rounds.some(r=>r.id===p.round_id&&r.status==='CLOSED'));
+   const slide=(command.kind==='closeRound'||command.kind==='end')&&finished?CEREMONY_SLIDES.find(s=>s.phase==='OUTRO'&&s.id!=='raffle'&&config.enabled.includes(s.id))?.id??null:null;
+   const framing={...ceremony,revision:ceremony.revision+1,slide,revealCount:0,media:{action:'stop',commandId:ceremony.revision+1},...(slide?{placement:'outro'}:{})};
    if(!slide)delete framing.placement;
    await tx.$executeRaw`INSERT INTO pubquiz.game_ceremonies(game_id,state) VALUES(${game.id}::uuid,${JSON.stringify(framing)}::jsonb) ON CONFLICT(game_id) DO UPDATE SET state=EXCLUDED.state,updated_at=clock_timestamp()`;
   }
@@ -237,4 +239,15 @@ function shortPrefix(letters:string) {let n=0;for(const letter of letters)n=n*26
 export async function raffleForCeremony(tx:Tx,gameId:string,runId:string){
  assertUuid(runId);const [row]=await tx.$queryRaw<Row[]>`SELECT r.* FROM pubquiz.bingo_live_runs r JOIN pubquiz.bingo_event_runs e ON e.run_id=r.id WHERE r.id=${runId}::uuid AND r.game_id=${gameId}::uuid AND r.id=(SELECT id FROM pubquiz.bingo_live_runs WHERE game_id=${gameId}::uuid ORDER BY started_at DESC,id DESC LIMIT 1) FOR UPDATE OF r`;
  if(!row||row.status!=="ENDED")throw Error("RAFFLE_NOT_READY");const loaded=await load(tx,row);return raffleEntries(loaded.state.tickets??[],loaded.state.run.rounds,[...loaded.cardsByRound.values()].flat(),loaded.state.checks?.map(c=>c.id)??[]);
+}
+
+/** Read-only lifecycle gate shared by the ceremony writer, within its existing transaction. */
+export async function allEventRoundsClosed(tx:Tx,gameId:string):Promise<boolean>{
+ const [row]=await tx.$queryRaw<Row[]>`SELECT r.* FROM pubquiz.bingo_live_runs r WHERE r.game_id=${gameId}::uuid ORDER BY r.started_at DESC,r.id DESC LIMIT 1`;
+ if(!row)return false;if(row.status==='ENDED')return true;
+ const [event]=await tx.$queryRaw<{version:number}[]>`SELECT version FROM pubquiz.bingo_event_runs WHERE run_id=${row.id}::uuid`;
+ if(!event)return false;
+ const {state}=await load(tx,row);
+ const plan=await tx.$queryRaw<{round_id:string}[]>`SELECT round_id FROM pubquiz.bingo_event_round_plan WHERE run_id=${row.id}::uuid`;
+ return plan.length>0&&plan.every(p=>state.run.rounds.some(r=>r.id===p.round_id&&r.status==='CLOSED'));
 }

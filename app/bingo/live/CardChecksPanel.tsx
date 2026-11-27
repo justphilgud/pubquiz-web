@@ -17,7 +17,7 @@ export default function CardChecksPanel({gameId,runId,checks,cards,draws,claims,
   const groups=groupChecks(checks);
   return <section id="card-checks" className={styles.panel} aria-label="Automatische Kartenprüfung"><h2>Karte prüfen</h2>
     <form className={styles.checkForm} onSubmit={async e=>{e.preventDefault();if(inflight.current||disabled)return;inflight.current=true;setPending(true);setMessage('');try{const result=await resolveCardCode(gameId,code);if(!result.success){setMessage(result.message);return;}if(await onCheck(result.cardId)){setCode('');focusNext.current=true;}}catch{setMessage('Prüfung fehlgeschlagen. Eingabe bleibt erhalten.');}finally{inflight.current=false;setPending(false);}}}>
-      <label>Kartenkennung<input ref={input} required maxLength={64} value={code} onChange={e=>setCode(e.target.value)} disabled={pending||disabled} autoComplete="off"/></label><button className={styles.call} disabled={pending||disabled||!code.trim()}>{pending?'Wird geprüft …':'Check'}</button>
+      <label><span className={styles.visuallyHidden}>Kartenkennung</span><input ref={input} placeholder="Karte prüfen" required maxLength={64} value={code} onChange={e=>setCode(e.target.value)} disabled={pending||disabled} autoComplete="off"/></label><button className={styles.call} disabled={pending||disabled||!code.trim()}>{pending?'Wird geprüft …':'Check'}</button>
     </form>{message&&<p role="alert">{message}</p>}
     <p className={styles.hint}>Prüfung ermittelt Linien, bestätigt keinen Gewinn. Erneute Prüfung ergänzt die Historie derselben Karte.</p>
     <p className={styles.legend}><span data-result="0">✕ Kein Bingo</span><span data-result="1">✓ Bingo</span><span data-result="2">✓✓ Doppel</span><span data-result="3">★ Triple</span></p>
