@@ -95,3 +95,18 @@ Historischer Neuinstallations-Replay bleibt NOT_RUN. Nach Schreiben neuer
 Lauf-/Drucksnapshots mit `color`/`roundInk` ist ein blindes Code-Rollback auf
 Parser ohne diese Felder nicht zulässig. Keine Datenrückschreibung oder Löschung
 als Rückweg. Kein Production-Backup, Deployment oder Merge in diesem Auftrag.
+
+
+### Besonderheit der isolierten synthetischen Preview
+
+Die vorhandene Datenbank `bingo_evening_review` wurde als Schema ohne
+Prisma-Historie importiert. Das wurde lesend bestätigt; die Farbfeld-Migration
+war beim Befund noch nicht angewandt. Der exakte Preview-Helper erwartet deshalb
+ausdrücklich keine Migrationstabelle und prüft die festgehaltene vollständige
+Struktur von `bingo_rounds` (Spalten, Constraints, Indizes). Nach exakter
+Commit-/Planprüfung führt er ausschließlich die freigegebenen SQL-Bytes der
+Farbfeld-Migration transaktional aus, prüft die erwartete additive Struktur und
+denselben Hash aller bisherigen Rundenfelder und rollt bei Abweichung zurück.
+Ein bereits korrekt erweitertes Schema ist idempotent. Keine erfundene Baseline,
+kein historischer Replay, kein allgemeines `migrate deploy` auf dieser Preview.
+Production verwendet weiterhin die vollständige Historien- und Schemaprüfung.

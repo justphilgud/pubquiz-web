@@ -6,7 +6,8 @@ import {pathToFileURL} from 'node:url';
 import {Client} from 'pg';
 import {validateDeploymentEnvironment,BINGO_COLOR_REVIEW_BRANCH} from '../validate-deployment-environment';
 import {migrationFiles,assessMigrations,type Applied,type Migration} from './production-preflight';
-import {verifyBingoColorPlan,COLOR_MIGRATION} from './bingo-color-release-plan';
+import {verifySyntheticRoundShape,ROUND_SHAPE_SQL} from './bingo-color-preview-shape';
+import {verifyBingoColorPlan,COLOR_SQL,COLOR_MIGRATION} from './bingo-color-release-plan';
 
 /** Explicitly authorized synthetic Preview only; never a general migration entry point. */
 export function verifyColorPreviewMigrations(after:Migration[],rows:Applied[]){
@@ -32,17 +33,25 @@ async function main(){
  verifyBingoColorPlan(plan,plan.baselineSha,process.env.DEPLOYMENT_SHA??'',before,after,schema.replace('  presentation_color String? @db.VarChar(7)\n',''),schema);
  console.log('Exact committed color manifest and schema verified.');
  const client=new Client({connectionString:process.env.DATABASE_URL});
- await client.connect();let pending:string[];
+ await client.connect();
  try{
-  await client.query('BEGIN READ ONLY');
-  const identity=(await client.query("SELECT current_database() AS name,current_setting('transaction_read_only') AS ro")).rows[0];
-  assert.equal(identity.name,'bingo_evening_review');assert.equal(identity.ro,'on');
-  const rows=(await client.query('SELECT migration_name,checksum,finished_at,rolled_back_at FROM public._prisma_migrations ORDER BY migration_name')).rows as Applied[];
-  pending=verifyColorPreviewMigrations(after,rows);
-  console.log('Synthetic database identity and complete baseline history verified.');
- }finally{await client.query('ROLLBACK').catch(()=>undefined);await client.end();}
- if(pending.length)execFileSync(process.execPath,['node_modules/prisma/build/index.js','migrate','deploy'],{stdio:['ignore','pipe','pipe']});
- execFileSync(process.execPath,['node_modules/prisma/build/index.js','migrate','status'],{stdio:['ignore','pipe','pipe']});
+  await client.query('BEGIN');
+  await client.query("SET LOCAL lock_timeout='2s';SET LOCAL statement_timeout='30s'");
+  const identity=(await client.query("SELECT current_database() AS name,to_regclass('public._prisma_migrations')::text AS public_history,to_regclass('pubquiz._prisma_migrations')::text AS schema_history")).rows[0];
+  assert.equal(identity.name,'bingo_evening_review');
+  // This pre-existing synthetic DB was imported schema-only, with no Prisma history.
+  // Never invent a baseline or replay historical migrations into it.
+  assert.equal(identity.public_history,null);assert.equal(identity.schema_history,null);
+  await client.query('LOCK TABLE pubquiz.bingo_rounds IN ACCESS EXCLUSIVE MODE');
+  const pending=verifySyntheticRoundShape((await client.query(ROUND_SHAPE_SQL)).rows[0].shape);
+  const rows=async()=> (await client.query("SELECT md5(coalesce(jsonb_agg(to_jsonb(r)-'presentation_color' ORDER BY id)::text,'null')) AS digest FROM pubquiz.bingo_rounds r")).rows[0].digest;
+  const beforeRows=await rows();
+  if(pending)await client.query(COLOR_SQL);
+  assert.equal(verifySyntheticRoundShape((await client.query(ROUND_SHAPE_SQL)).rows[0].shape),false);
+  assert.equal(await rows(),beforeRows);
+  if(pending)assert.equal((await client.query('SELECT count(*)::int AS count FROM pubquiz.bingo_rounds WHERE presentation_color IS NOT NULL')).rows[0].count,0);
+  await client.query('COMMIT');
+ }catch(error){await client.query('ROLLBACK').catch(()=>undefined);throw error;}finally{await client.end();}
  console.log('Exact approved synthetic Bingo color Preview migration verified; Production inaccessible by this entry point.');
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(resolve(process.argv[1])).href)void main().catch(()=>{console.error('BLOCKED: synthetic Bingo color Preview migration not fully verifiable');process.exitCode=1;});
