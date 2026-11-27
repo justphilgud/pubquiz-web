@@ -31,7 +31,7 @@ test('Bingo workstation, editable history, ten Full-HD colour schemes and shared
  window.fetch=async()=>({ok:true,status:200,json:async()=>view(),headers:new Headers()});
  window.showModeration=()=>{seq=100;state=initialEventRun(id(1),id(2),round,1000);for(const number of [1,16,31,46,61,2,17,32,47,62])command({kind:'draw',number});flushSync(()=>root.render(<Panel key={++mount} initial={view()}/>));};
  window.openCall=()=>{command({kind:'call',stage:'BINGO',context:'a'.repeat(64)});};
- window.showBoard=(roundNumber,media=false,count=20)=>{const data={id:'fixture',revision:20,startedAt:1,status:'RUNNING',label:'Runde '+roundNumber,roundNumber,target:30,draws:Array.from({length:count},(_,i)=>({id:String(i),position:i+1,number:i+1})),design,assetBase:null,claims:[],...(media?{content:{kind:'IMAGE',url:'/fixture.svg',answer:'Musik-Bingo'}}:{})};flushSync(()=>root.render(<div style={{height:'100dvh'}}><Board data={data}/></div>));};
+ window.showBoard=(roundNumber,media=false,count=20,confirmed=false)=>{const data={id:'fixture',revision:20,startedAt:1,status:'RUNNING',label:'Runde '+roundNumber,roundNumber,target:30,draws:Array.from({length:count},(_,i)=>({id:String(i),position:i+1,number:i+1})),design,assetBase:null,claims:confirmed?[{id:'feedback',action:'CONFIRM',stage:'BINGO',needsReview:false}]:[],...(media?{content:{kind:'IMAGE',url:'/fixture.svg',answer:'Musik-Bingo'}}:{})};flushSync(()=>root.render(<div style={{height:'100dvh'}}><Board data={data}/></div>));};
  window.showCeremony=(slide,revealCount=0)=>{const state={...defaultCeremony(),slide,revealCount,config:{...defaultCeremony().config,prizes:['Goldpreis','Silberpreis','Bronzepreis']}};flushSync(()=>root.render(<div style={{height:'100dvh'}}><Ceremony state={state} title="Binglöckchen" winner={{number:23,cardCode:'B-045',roundLabel:'Runde 2'}}/></div>));};
  window.setInput=(input,value)=>flushSync(()=>{Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input,value);input.dispatchEvent(new Event('input',{bubbles:true}));});
  window.setSelect=(select,value)=>flushSync(()=>{select.value=value;select.dispatchEvent(new Event('change',{bubbles:true}));});
@@ -109,6 +109,9 @@ test('Bingo workstation, editable history, ten Full-HD colour schemes and shared
    assert.equal(branding.title,`Runde ${number}`);assert.equal(branding.font,true);assert.equal(branding.logos,true);assert.equal(branding.separate,true);assert.equal(branding.currentDistinct,true);backgrounds.add(branding.background);
   }
   assert.equal(backgrounds.size,10);
+  await evaluate('window.showBoard(1,false,20,true)');
+  assert.ok((await evaluate(`document.querySelector('header').textContent`) as string).includes('Bingo bestätigt'));
+
   for(const count of [0,3,10,25]){await evaluate(`window.showBoard(1,false,${count});document.fonts.ready`);assert.equal(await evaluate(`document.querySelectorAll('footer li').length`),Math.min(10,count));}
 
   assert.equal(await evaluate(`(()=>{const e=new KeyboardEvent('keydown',{key:'+',code:'NumpadAdd',bubbles:true,cancelable:true});window.dispatchEvent(e);return e.defaultPrevented;})()`),false);

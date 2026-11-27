@@ -9,7 +9,7 @@ Eigenständiger Umsetzungsauftrag; kein Teil eines früheren Production-Releases
 | Anforderung | Umsetzung und Nachweis |
 | --- | --- |
 | Kompaktes Intro oben, einzelne Slides | `PreparationPanel` zeigt den geschlossenen Intro-Konfigurator zuerst. `CeremonyEditor` wählt einzelne Slides und ihre Felder; Browser prüft geschlossene Ausgangsansicht und Einzelbearbeitung. |
-| Unabhängige Einfügung nach jeder Runde | Vollständige JSON-Konfiguration pro stabiler Runden-ID; unabhängige Intro-/Rundentexte in Unit-, Browser- und echter PostgreSQL-Prüfung. Nach Rundenabschluss erscheint die konfigurierte Einfügung öffentlich. |
+| Unabhängige Einfügung nach jeder Runde | Vollständige JSON-Konfiguration pro stabiler Runden-ID; unabhängige Intro-/Rundentexte in Unit-, Browser- und echter PostgreSQL-Prüfung. Nach Rundenabschluss erscheint die konfigurierte Einfügung öffentlich; auch die lesende Vorschau vor dem ersten Start projiziert die ausgewählte Einfügung. |
 | Reihenfolge und Entfernen | Bestehendes dnd-kit mit Pointer- und Tastaturbedienung. Browser führt Tastatur-Drag-&-Drop aus; PostgreSQL prüft gespeicherte Reihenfolge und ungültige ID-Mengen. Bestätigtes Entfernen samt Schutz für Karten und Historie bleibt erhalten. |
 | Größere Eingaben | Ziehungsfeld mindestens 76 px hoch, Schrift bis 56 px; Kartenkennung mindestens 64 px hoch, Schrift 28 px. Hauptaktionen bei 1280×720, 1366×768, 1920×1080 erreichbar. |
 | Plus und Enter | Echtes Browser-Enter veröffentlicht genau einmal, leert und fokussiert die Eingabe. Plus/NumpadAdd wechselt aus der Kartenkennung zum Zahlenfeld. Nach Unmount greift der Shortcut nicht mehr. Textbutton bleibt sichtbar. V2-APPROVAL verwendet denselben ausdrücklichen Submit ohne zusätzlichen Dialog; AP3 bleibt unverändert. |
@@ -17,7 +17,7 @@ Eigenständiger Umsetzungsauftrag; kein Teil eines früheren Production-Releases
 | Decks und echte Kennungen | Mehrere eingefrorene Decks bleiben vollständig sichtbar. Präfix und tatsächliche Ordinalgrenzen liefern Kurzcodebereiche. Browser wechselt von A-001–A-100 zu B-001–B-080; diese Werte stammen ausdrücklich aus der synthetischen Fixture, nicht aus Production. |
 | Logo-Bereich / aktuelle Zahl | Unveränderte Originalassets ohne schwarze Plakette; größere Zahl und darüber passend bemessene Überschrift. Alle zehn Full-HD-Runden sowie Laptopgrößen gemessen. |
 | Farben | Eine Familie aus Rundenfarbe und dunklerer Nuance statt pauschaler schwarzer Zellen; aktuelle Zahl weiterhin invertiert und mehrfach konturiert. Alle zehn Farbfamilien geprüft. |
-| Letzte zehn Ziehungen | Beschriftete scrollfreie Fußzeile, neueste zuerst. Browser prüft 0/3/10/25 Ziehungen und maximal zehn Einträge. Allgemeiner Moderatorprüfhinweis entfernt. |
+| Letzte zehn Ziehungen | Beschriftete scrollfreie Fußzeile, neueste zuerst. Browser prüft 0/3/10/25 Ziehungen und maximal zehn Einträge. Allgemeiner Moderatorprüfhinweis entfernt; konkrete Gewinnrückmeldungen bleiben im Kopfstatus sichtbar. |
 | Datenerhalt | Nur eigene lokale synthetische Fixtures verwendet. Vollständige bestehende Karten-, Journal-, Rechte-, CAS-, Matching-, Druck- und Wiederherstellungsregressionen erfolgreich. Keine Änderung eines bestehenden produktiven Events, seiner Karten, Ziehungen oder Bewertungen. |
 
 ## Ausgeführte Prüfungen

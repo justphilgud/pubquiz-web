@@ -12,7 +12,7 @@ import {defaultCeremony} from '@/app/rendering/ceremony/ceremony';
 import type {EventCommand} from '@/app/bingo/live/eventRun';
 import {roundColor} from '@/app/bingo/roundColors';
 
-export async function exerciseBingoEvening(db:Client,api:typeof Prep&{creation:typeof Creation;eventRun:typeof Event;ceremony:typeof Ceremony;evening:typeof Evening;createCardsPdf:typeof import('@/app/bingo/preparation/pdf.server').createCardsPdf}){
+export async function exerciseBingoEvening(db:Client,api:typeof Prep&{creation:typeof Creation;eventRun:typeof Event;ceremony:typeof Ceremony;live:typeof import('@/app/bingo/live/repository.server');evening:typeof Evening;createCardsPdf:typeof import('@/app/bingo/preparation/pdf.server').createCardsPdf}){
  const before=(await db.query('SELECT id,layout_hash,cells,printed_code FROM pubquiz.bingo_cards ORDER BY id')).rows;
  const ddl=readFileSync('prisma/migrations/20261126120000_event_ceremony/migration.sql','utf8');
  await db.query('BEGIN');await db.query(ddl);await db.query('ROLLBACK');assert.equal((await db.query("SELECT to_regclass('pubquiz.game_ceremonies') t")).rows[0].t,null);
@@ -33,6 +33,10 @@ export async function exerciseBingoEvening(db:Client,api:typeof Prep&{creation:t
  await assert.rejects(api.ceremony.writeCeremony(1,full.id,1,{kind:'show',slide:'waiting'}),/REVISION_CONFLICT/);
  let mediaState=await api.ceremony.writeCeremony(1,full.id,2,{kind:'show',slide:'countdown'});
  for(const action of ['play','pause','stop'] as const){mediaState=await api.ceremony.writeCeremony(1,full.id,mediaState.revision,{kind:'media',action});assert.equal(mediaState.media?.action,action);}
+ const preparedRound=(await prep()).rounds[0].id;
+ mediaState=await api.ceremony.writeCeremony(1,full.id,mediaState.revision,{kind:'configure',config:{...mediaState.config,insertions:{[preparedRound]:{...defaultCeremony().config,welcome:'Unabhängige vorbereitete Einfügung'}}}});
+ mediaState=await api.ceremony.writeCeremony(1,full.id,mediaState.revision,{kind:'show',slide:'welcome',placement:preparedRound});
+ assert.equal((await api.live.readGameAudience(1,full.id)).ceremony?.config.welcome,'Unabhängige vorbereitete Einfügung');
  const start=await api.eventRun.startEventRun(1,{gameId:full.id,expectedSeriesId:10,preparationRevision:(await prep()).revision,requestId:randomUUID()});
  const view=()=>api.eventRun.readEventModeration(1,full.id,start.runId);
  assert.equal((await view()).ceremony.slide,null,'starting consciously leaves intro for the game board');

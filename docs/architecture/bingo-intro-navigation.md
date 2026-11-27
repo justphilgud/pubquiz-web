@@ -112,7 +112,7 @@ Kontur und Inversion unterscheidbar. Logos stehen unverändert und transparent
 ohne schwarze Plakette. „Aktuelle Zahl“ steht direkt über der vergrößerten Zahl;
 der bestehende DOM-Fitter berücksichtigt Schriftladen und Resize. Die Fußzeile
 zeigt maximal zehn letzte Ziehungen, neueste zuerst, ohne Scrollbereich und ohne
-den bisherigen allgemeinen Moderatorprüfhinweis. Konkrete Gewinnprüfungen werden
+den bisherigen allgemeinen Moderatorprüfhinweis. Konkrete öffentliche Gewinnrückmeldungen bleiben in der Kopfstatuszeile sichtbar. Konkrete Gewinnprüfungen werden
 weiterhin in der Moderation bearbeitet, nicht automatisch entschieden.
 
 Die dokumentierte Abweichung von der neutralen Manifest-Bühne bleibt bewusst:
