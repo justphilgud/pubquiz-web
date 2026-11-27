@@ -9,6 +9,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { build } from "esbuild";
 import postcss from "postcss";
 import tailwindcss from "@tailwindcss/postcss";
+import {waitForChromeEndpoint} from "../../scripts/testing/chrome-endpoint";
 
 type ProtocolResult = { targetId?: string; sessionId?: string; result?: { value?: unknown }; exceptionDetails?: unknown };
 
@@ -92,13 +93,11 @@ test("presentation acknowledges committed targets without focus or animation fra
   let socket: WebSocket | undefined;
   try {
     const portFile = join(profile, "DevToolsActivePort");
-    for (let attempt = 0; attempt < 400 && !existsSync(portFile); attempt++) {
-      if (browserError || browser.exitCode !== null || browser.signalCode !== null) break;
-      await delay(50);
-    }
-    assert.ok(existsSync(portFile), `Chrome did not start: ${browserError?.message ?? browserDiagnostic}`);
-    const [port, endpoint] = readFileSync(portFile, "utf8").trim().split(/\r?\n/);
-    const ws = new WebSocket(`ws://127.0.0.1:${port}${endpoint}`);
+    const endpoint=await waitForChromeEndpoint(portFile,{
+      timeoutMs:45_000,
+      exited:()=>Boolean(browserError)||browser.exitCode!==null||browser.signalCode!==null,
+    }).catch((cause:unknown)=>{throw new Error(`Chrome startup failed: ${browserError?.message??(browserDiagnostic||'no browser diagnostic')}`,{cause});});
+    const ws = new WebSocket(endpoint);
     socket = ws;
     await new Promise<void>((ready, reject) => {
       ws.onopen = () => ready();
