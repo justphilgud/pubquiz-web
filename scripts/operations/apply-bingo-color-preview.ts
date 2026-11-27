@@ -25,9 +25,12 @@ async function main(){
  assert.equal(process.env.DEPLOYMENT_BRANCH,BINGO_COLOR_REVIEW_BRANCH);
  assert.equal(process.env.DEPLOYMENT_ENV,'preview');
  validateDeploymentEnvironment({deploymentEnvironment:'preview',deploymentEvent:process.env.DEPLOYMENT_EVENT,deploymentRef:process.env.DEPLOYMENT_REF,deploymentRepository:process.env.DEPLOYMENT_REPOSITORY,databaseUrl:process.env.DATABASE_URL,expectedDatabaseHost:process.env.EXPECTED_DATABASE_HOST,expectedDatabaseName:process.env.EXPECTED_DATABASE_NAME,expectedDatabaseBranch:process.env.EXPECTED_DATABASE_BRANCH});
- const plan=JSON.parse(readFileSync('release/plan.json','utf8')),after=migrationFiles('HEAD'),before=after.filter(f=>f.name!==COLOR_MIGRATION);
+ const candidate=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+ assert.equal(candidate,process.env.DEPLOYMENT_SHA);
+ const plan=JSON.parse(readFileSync('release/plan.json','utf8')),after=migrationFiles(candidate),before=after.filter(f=>f.name!==COLOR_MIGRATION);
  const schema=readFileSync('prisma/schema.prisma','utf8').replaceAll('\r\n','\n');
  verifyBingoColorPlan(plan,plan.baselineSha,process.env.DEPLOYMENT_SHA??'',before,after,schema.replace('  presentation_color String? @db.VarChar(7)\n',''),schema);
+ console.log('Exact committed color manifest and schema verified.');
  const client=new Client({connectionString:process.env.DATABASE_URL});
  await client.connect();let pending:string[];
  try{
@@ -36,6 +39,7 @@ async function main(){
   assert.equal(identity.name,'bingo_evening_review');assert.equal(identity.ro,'on');
   const rows=(await client.query('SELECT migration_name,checksum,finished_at,rolled_back_at FROM public._prisma_migrations ORDER BY migration_name')).rows as Applied[];
   pending=verifyColorPreviewMigrations(after,rows);
+  console.log('Synthetic database identity and complete baseline history verified.');
  }finally{await client.query('ROLLBACK').catch(()=>undefined);await client.end();}
  if(pending.length)execFileSync(process.execPath,['node_modules/prisma/build/index.js','migrate','deploy'],{stdio:['ignore','pipe','pipe']});
  execFileSync(process.execPath,['node_modules/prisma/build/index.js','migrate','status'],{stdio:['ignore','pipe','pipe']});
