@@ -10,7 +10,7 @@ import {tmpdir} from 'node:os';
 test('Bingo workstation, editable history, ten Full-HD colour schemes and shared prize/raffle scenes',{timeout:90000},async()=>{
  const source=String.raw`
  import React from 'react';import{createRoot}from'react-dom/client';import{flushSync}from'react-dom';
- import Board from './app/bingo/live/BingoBoard';import Panel from './app/bingo/live/EventModerationPanel';import Ceremony from './app/rendering/ceremony/CeremonySlide';
+ import Board from './app/bingo/live/BingoBoard';import Panel from './app/bingo/live/EventModerationPanel';import Ceremony from './app/rendering/ceremony/CeremonySlide';import Preparation from './app/bingo/preparation/PreparationPanel';
  import{getPresentationTemplate}from'./app/rendering/templateRegistry';import{generateCard,evaluateCard}from'./app/bingo/core/cards';
  import{applyEventRunEvent,initialEventRun,currentEventRound,blockingCalls}from'./app/bingo/live/eventRun';import{defaultCeremony}from'./app/rendering/ceremony/ceremony';
  const root=createRoot(document.getElementById('app')),id=n=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0');
@@ -19,15 +19,19 @@ test('Bingo workstation, editable history, ten Full-HD colour schemes and shared
  let seed=12345;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
  const activeCards=[card,...Array.from({length:99},(_,i)=>({...generateCard(id(901+i),random),code:'BG-SYNTHETIC-'+(i+2),shortCode:'A-'+String(i+2).padStart(3,'0'),ordinal:i+2}))];
  const round={id:id(3),label:'Binglöckchen · Runde 1',target:30,issued:null,seriesIds:[id(4)]};
- function command(c){state=applyEventRunEvent(state,{id:id(seq++),at:2000+seq,actorId:1,command:c},[card]);}
- function view(){const r=currentEventRound(state);return{protocol:2,gameId:id(2),title:'Binglöckchen · 08.12.2026',seriesId:10,archived:false,preparationRevision:0,rounds:[{id:round.id,position:1,label:round.label,series:[{series_id:id(4),series:{code:'DECK-A',card_count:100}}]},{id:id(5),position:2,label:'Musikrunde',series:[{series_id:id(6),series:{code:'DECK-B',card_count:80}}]}],frozenDecks:[{roundId:round.id,id:id(4),code:'DECK-A',count:100}],plan:[{round_id:round.id,position:1},{round_id:id(5),position:2}],runs:[],preparation:{rounds:[]},ceremony,live:{id:id(1),revision:seq,startedAt:1000,round,state,events:[],cards:activeCards,checkCards:[card],matchingEntry:null,design,serverAt:Date.now(),elapsedMs:100000,roundElapsedMs:100000,callContext:'a'.repeat(64),blocked:blockingCalls(state),between:false,summary:[],raffle:{count:0,max:0,overCapacity:false,needsReview:false,voidNumbers:[],entries:[]}}};}
+ function command(c){state=applyEventRunEvent(state,{id:id(seq++),at:2000+seq,actorId:1,command:c,...(c.kind==='navigateRound'&&!state.frozen.some(f=>f.id===c.roundId)?{frozen:{...round,id:c.roundId,label:'Musikrunde',seriesIds:[id(6)]}}:{})},[card]);}
+ function view(){const r=currentEventRound(state);return{protocol:2,gameId:id(2),title:'Binglöckchen · 08.12.2026',seriesId:10,archived:false,preparationRevision:0,rounds:[{id:round.id,position:1,label:round.label,series:[{series_id:id(4),series:{code:'DECK-A',card_count:100}}]},{id:id(5),position:2,label:'Musikrunde',series:[{series_id:id(6),series:{code:'DECK-B',card_count:80}}]}],frozenDecks:[{roundId:round.id,id:id(4),code:'DECK-A',count:100,prefix:1,firstOrdinal:1,lastOrdinal:100},{roundId:id(5),id:id(6),code:'DECK-B',count:80,prefix:2,firstOrdinal:1,lastOrdinal:80}],plan:[{round_id:round.id,position:1},{round_id:id(5),position:2}],runs:[],preparation:{rounds:[]},ceremony,live:{id:id(1),revision:seq,startedAt:1000,round:state.frozen.find(f=>f.id===r.id),state,events:[],cards:activeCards,checkCards:[card],matchingEntry:null,design,serverAt:Date.now(),elapsedMs:100000,roundElapsedMs:100000,callContext:'a'.repeat(64),blocked:blockingCalls(state),between:false,summary:[],raffle:{count:0,max:0,overCapacity:false,needsReview:false,voidNumbers:[],entries:[]}}};}
+ let preparationOrder=[round.id,id(5)];
+ const prep=()=>({gameId:id(2),title:'Synthetischer Abend',seriesId:10,revision:0,archived:false,roundCount:2,seriesCount:0,page:1,seriesPage:1,available:[],templates:[],termSets:[],rounds:preparationOrder.map((rid,index)=>({id:rid,position:index+1,label:rid===round.id?'Runde A':'Runde B',target:30,cardCount:0,issued:null,strategy:'NEW',series:[],history:[],locked:false}))});
+ window.showPreparation=()=>flushSync(()=>root.render(<Preparation key={++mount} data={prep()} ceremony={ceremony}/>));
+ window.fakePreparation=async command=>{window.prepCommands.push(command);if(command.operation==='reorderRounds')preparationOrder=command.roundIds;return{success:true};};window.prepCommands=[];
  window.fixtureView=view;
- window.fakeSave=async input=>{if(input.operation==='command')command(input.command);return{success:true};};
- window.fakeCeremony=async(_g,_r,c)=>{ceremony={...ceremony,revision:ceremony.revision+1,slide:c.slide??ceremony.slide,revealCount:c.kind==='reveal'?ceremony.revealCount+1:0};return{success:true,state:ceremony};};
+ window.savedCommands=[];window.fakeSave=async input=>{window.savedCommands.push(input);if(input.operation==='command')command(input.command);return{success:true};};
+ window.fakeCeremony=async(_g,_r,c)=>{ceremony={...ceremony,...(c.kind==='configure'?{config:c.config}:{}),revision:ceremony.revision+1,slide:c.slide??ceremony.slide,revealCount:c.kind==='reveal'?ceremony.revealCount+1:0};return{success:true,state:ceremony};};
  window.fetch=async()=>({ok:true,status:200,json:async()=>view(),headers:new Headers()});
  window.showModeration=()=>{seq=100;state=initialEventRun(id(1),id(2),round,1000);for(const number of [1,16,31,46,61,2,17,32,47,62])command({kind:'draw',number});flushSync(()=>root.render(<Panel key={++mount} initial={view()}/>));};
  window.openCall=()=>{command({kind:'call',stage:'BINGO',context:'a'.repeat(64)});};
- window.showBoard=(roundNumber,media=false)=>{const data={id:'fixture',revision:20,startedAt:1,status:'RUNNING',label:'Runde '+roundNumber,roundNumber,target:30,draws:Array.from({length:20},(_,i)=>({id:String(i),position:i+1,number:i+1})),design,assetBase:null,claims:[],...(media?{content:{kind:'IMAGE',url:'/fixture.svg',answer:'Musik-Bingo'}}:{})};flushSync(()=>root.render(<div style={{height:'100dvh'}}><Board data={data}/></div>));};
+ window.showBoard=(roundNumber,media=false,count=20,confirmed=false)=>{const data={id:'fixture',revision:20,startedAt:1,status:'RUNNING',label:'Runde '+roundNumber,roundNumber,target:30,draws:Array.from({length:count},(_,i)=>({id:String(i),position:i+1,number:i+1})),design,assetBase:null,claims:confirmed?[{id:'feedback',action:'CONFIRM',stage:'BINGO',needsReview:false}]:[],...(media?{content:{kind:'IMAGE',url:'/fixture.svg',answer:'Musik-Bingo'}}:{})};flushSync(()=>root.render(<div style={{height:'100dvh'}}><Board data={data}/></div>));};
  window.showCeremony=(slide,revealCount=0)=>{const state={...defaultCeremony(),slide,revealCount,config:{...defaultCeremony().config,prizes:['Goldpreis','Silberpreis','Bronzepreis']}};flushSync(()=>root.render(<div style={{height:'100dvh'}}><Ceremony state={state} title="Binglöckchen" winner={{number:23,cardCode:'B-045',roundLabel:'Runde 2'}}/></div>));};
  window.setInput=(input,value)=>flushSync(()=>{Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input,value);input.dispatchEvent(new Event('input',{bubbles:true}));});
  window.setSelect=(select,value)=>flushSync(()=>{select.value=value;select.dispatchEvent(new Event('change',{bubbles:true}));});
@@ -37,8 +41,8 @@ test('Bingo workstation, editable history, ten Full-HD colour schemes and shared
   b.onResolve({filter:/^(next\/link|next\/navigation)$/},a=>({path:a.path,namespace:'test'}));
   b.onResolve({filter:/PreparationPanel$/},a=>a.importer.endsWith('EventModerationPanel.tsx')?{path:'prep',namespace:'test'}:undefined);
   b.onResolve({filter:/useContentNavigationGuard$/},()=>({path:'guard',namespace:'test'}));
-  b.onResolve({filter:/\/actions$|ceremonyActions$/},a=>/[\\/]bingo[\\/]/.test(a.importer)?{path:a.path.includes('ceremony')?'ceremony':'actions',namespace:'test'}:undefined);
-  b.onLoad({filter:/.*/,namespace:'test'},a=>({resolveDir:process.cwd(),loader:'tsx',contents:a.path==='next/link'?`import React from 'react';export default function Link({children,...props}){return <a {...props}>{children}</a>}`:a.path==='next/navigation'?`export const useRouter=()=>({replace(){},refresh(){}});` :a.path==='prep'?`export const RoundEditor=()=>null;`:a.path==='guard'?`export const useContentNavigationGuard=()=>()=>{};`:a.path==='ceremony'?`export const saveCeremony=(...args)=>window.fakeCeremony(...args);`:`export async function findMatchingSources(){return []}export async function getMatchingSource(){return null}export async function getMatchingTemplates(){return []}export const saveEventRun=(...args)=>window.fakeSave(...args);export async function resolveCardCode(_g,code){return code.toUpperCase()==='A-001'?{success:true,cardId:'00000000-0000-4000-8000-000000000900'}:{success:false,message:'Karte im aktuellen Bingo-Abend nicht gefunden'}};`}));
+  b.onResolve({filter:/\/actions$|ceremonyActions$|termActions$/},a=>/[\\/]bingo[\\/]/.test(a.importer)?{path:a.path.includes('ceremony')?'ceremony':'actions',namespace:'test'}:undefined);
+  b.onLoad({filter:/.*/,namespace:'test'},a=>({resolveDir:process.cwd(),loader:'tsx',contents:a.path==='next/link'?`import React from 'react';export default function Link({children,...props}){return <a {...props}>{children}</a>}`:a.path==='next/navigation'?`export const useRouter=()=>({replace(){},refresh(){}});` :a.path==='prep'?`export const RoundEditor=()=>null;`:a.path==='guard'?`export const useContentNavigationGuard=()=>()=>{};`:a.path==='ceremony'?`export const saveCeremony=(...args)=>window.fakeCeremony(...args);`:`export async function saveRoundTerms(){return {success:true}}export async function publishContent(){return {success:true}}export async function findMatchingSources(){return []}export async function getMatchingSource(){return null}export async function getMatchingTemplates(){return []}export const savePreparation=(...args)=>window.fakePreparation(...args);export const saveEventRun=(...args)=>window.fakeSave(...args);export async function resolveCardCode(_g,code){return code.toUpperCase()==='A-001'?{success:true,cardId:'00000000-0000-4000-8000-000000000900'}:{success:false,message:'Karte im aktuellen Bingo-Abend nicht gefunden'}};`}));
  }}]});
  const js=bundle.outputFiles.find(f=>f.path.endsWith('.js'))!,css=bundle.outputFiles.find(f=>f.path.endsWith('.css'))!;
  const server=createServer((req,res)=>{
@@ -60,7 +64,7 @@ test('Bingo workstation, editable history, ten Full-HD colour schemes and shared
   const {targetId}=await call('Target.createTarget',{url:`http://127.0.0.1:${address.port}`}),{sessionId}=await call('Target.attachToTarget',{targetId,flatten:true});
   const evaluate=async(expression:string)=>{const result=await call('Runtime.evaluate',{expression,awaitPromise:true,returnByValue:true},sessionId);assert.equal(result.exceptionDetails,undefined,JSON.stringify(result));return result.result?.value;};
   for(let i=0;i<200;i++){if(await evaluate('typeof window.showBoard')==='function')break;await new Promise(r=>setTimeout(r,30));}
-  mkdirSync('docs/acceptance/assets/bingo-moderation-2026-11-27',{recursive:true});const shot=async(name:string)=>{const result=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false},sessionId);writeFileSync(`docs/acceptance/assets/bingo-moderation-2026-11-27/${name}.png`,Buffer.from(result.data!,'base64'));};
+  mkdirSync('docs/acceptance/assets/bingo-intro-2026-11-27',{recursive:true});const shot=async(name:string)=>{const result=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false},sessionId);writeFileSync(`docs/acceptance/assets/bingo-intro-2026-11-27/${name}.png`,Buffer.from(result.data!,'base64'));};
   for(const [width,height] of [[1280,720],[1366,768],[1920,1080]]){
    await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},sessionId);await evaluate('window.showModeration()');await new Promise(r=>setTimeout(r,100));await evaluate(`window.setInput(document.querySelector('[aria-label="Zahlenarbeitsfläche"] input'),'42')`);
    const layout=await evaluate(`(()=>{const workspace=document.querySelector('[aria-label="Zahlenarbeitsfläche"]'),form=workspace.querySelector('form'),current=workspace.querySelector('[aria-live="polite"]'),checks=document.querySelector('[aria-label="Automatische Kartenprüfung"]');return{left:form.getBoundingClientRect().left<current.getBoundingClientRect().left,within:checks.getBoundingClientRect().bottom<=innerHeight,noMatrix:!document.querySelector('[aria-label="Zahlenübersicht"]'),ceremony:!!document.querySelector('[aria-label="Intro und Outro"] select'),history:document.querySelector('[aria-label="Ziehungshistorie"]').querySelectorAll('li').length,scroll:document.documentElement.scrollWidth>innerWidth};})()`);
@@ -72,6 +76,15 @@ test('Bingo workstation, editable history, ten Full-HD colour schemes and shared
    assert.equal(await evaluate(`document.querySelector('[aria-label="Bingo-Buchstabe"]').textContent`),letter);
   }
   await evaluate(`window.setInput(document.querySelector('[aria-label="Zahlenarbeitsfläche"] input'),'')`);
+  assert.equal(await evaluate(`(()=>{const input=document.querySelector('[aria-label="Automatische Kartenprüfung"] input');input.focus();document.dispatchEvent(new KeyboardEvent('keydown',{key:'+',code:'NumpadAdd',bubbles:true}));return document.activeElement===document.querySelector('[aria-label="Zahlenarbeitsfläche"] input');})()`),true);
+  await evaluate(`window.setInput(document.querySelector('[aria-label="Zahlenarbeitsfläche"] input'),'3')`);
+  await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Enter',code:'Enter',text:'\r',unmodifiedText:'\r',windowsVirtualKeyCode:13},sessionId);
+  await call('Input.dispatchKeyEvent',{type:'keyUp',key:'Enter',code:'Enter',windowsVirtualKeyCode:13},sessionId);
+  await new Promise(r=>setTimeout(r,100));
+  assert.equal(await evaluate(`window.savedCommands.filter(c=>c.command?.kind==='draw').length`),1);
+  assert.equal(await evaluate(`document.activeElement===document.querySelector('[aria-label="Zahlenarbeitsfläche"] input')`),true);
+  assert.ok(await evaluate(`document.querySelector('[aria-label="Kartendecks je Runde"]').textContent.includes('A-001–A-100')`));
+  await evaluate('window.showModeration()');
   const sorts=await evaluate(`(()=>{const history=document.querySelector('[aria-label="Ziehungshistorie"]'),select=history.querySelector('select'),results={};for(const order of ['ORDER_ASC','ORDER_DESC','NUMBER_ASC','NUMBER_DESC']){window.setSelect(select,order);results[order]=[...history.querySelectorAll('li')].map(li=>li.innerText);}return results;})()` ) as Record<string,string[]>;
   assert.ok(sorts.ORDER_DESC[0].includes('#10'));assert.ok(sorts.ORDER_ASC[0].includes('#1'));assert.ok(sorts.NUMBER_ASC[0].includes('B 1'));assert.ok(sorts.NUMBER_DESC[0].includes('O 62'));
   await evaluate(`window.setSelect(document.querySelector('[aria-label="Ziehungshistorie"] select'),'ORDER_ASC');document.querySelector('[aria-label="Ziehungshistorie"] li button').click()`);
@@ -96,6 +109,13 @@ test('Bingo workstation, editable history, ten Full-HD colour schemes and shared
    assert.equal(branding.title,`Runde ${number}`);assert.equal(branding.font,true);assert.equal(branding.logos,true);assert.equal(branding.separate,true);assert.equal(branding.currentDistinct,true);backgrounds.add(branding.background);
   }
   assert.equal(backgrounds.size,10);
+  await evaluate('window.showBoard(1,false,20,true)');
+  assert.ok((await evaluate(`document.querySelector('header').textContent`) as string).includes('Bingo bestätigt'));
+
+  for(const count of [0,3,10,25]){await evaluate(`window.showBoard(1,false,${count});document.fonts.ready`);assert.equal(await evaluate(`document.querySelectorAll('footer li').length`),Math.min(10,count));}
+
+  assert.equal(await evaluate(`(()=>{const e=new KeyboardEvent('keydown',{key:'+',code:'NumpadAdd',bubbles:true,cancelable:true});window.dispatchEvent(e);return e.defaultPrevented;})()`),false);
+  assert.deepEqual(await evaluate(`(()=>{const footer=document.querySelector('footer'),rows=[...footer.querySelectorAll('li')];return{count:rows.length,label:footer.querySelector('strong').textContent,scroll:footer.scrollWidth>footer.clientWidth||footer.scrollHeight>footer.clientHeight,old:footer.textContent.includes('Moderator')};})()`),{count:10,label:'Letzte 10 Ziehungen',scroll:false,old:false});
   for(const [width,height] of [[390,844],[1280,720]]){
    await call('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:false},sessionId);await evaluate('window.showBoard(1);document.fonts.ready');await new Promise(r=>setTimeout(r,100));
    assert.equal(await evaluate('document.documentElement.scrollWidth<=innerWidth'),true);
@@ -105,6 +125,34 @@ test('Bingo workstation, editable history, ten Full-HD colour schemes and shared
   await evaluate(`window.showBoard(2,true);document.fonts.ready`);await new Promise(r=>setTimeout(r,100));assert.equal(await evaluate(`document.querySelector('ol').getBoundingClientRect().top>=document.querySelector('[data-media-slot]').getBoundingClientRect().bottom`),true);await shot('musik-bingo');
   for(const count of [0,1,2,3]){await evaluate(`window.showCeremony('prizes',${count})`);const text=await evaluate('document.body.innerText') as string;assert.equal(text.includes('Goldpreis'),count===3);assert.equal(text.includes('Silberpreis'),count>=2);assert.equal(text.includes('Bronzepreis'),count>=1);}
   await shot('preise-aufgedeckt');await evaluate(`window.showCeremony('raffle',2)`);await shot('abschlussverlosung');
+  await evaluate('window.showModeration()');
+  await evaluate(`document.querySelector('[aria-label="Rundennavigation"] button:last-child').click()`);
+  assert.ok((await evaluate(`document.querySelector('[role="dialog"]').textContent`) as string).includes('10 von 30'));
+  await shot('rundenwechsel-warnung');
+  await evaluate(`[...document.querySelector('[role="dialog"]').querySelectorAll('button')].find(b=>b.textContent==='Abbrechen').click()`);
+  assert.equal(await evaluate(`window.fixtureView().live.round.id`),'00000000-0000-4000-8000-000000000003');
+  await evaluate(`document.querySelector('[aria-label="Rundennavigation"] button:last-child').click()`);
+  await evaluate(`[...document.querySelector('[role="dialog"]').querySelectorAll('button')].find(b=>b.textContent==='Wechsel fortsetzen').click()`);await new Promise(r=>setTimeout(r,100));
+  assert.equal(await evaluate(`window.fixtureView().live.round.id`),'00000000-0000-4000-8000-000000000005');
+  assert.ok(await evaluate(`document.querySelector('[aria-label="Kartendecks je Runde"] [data-active]').textContent.includes('B-001–B-080')`));
+  assert.equal(await evaluate(`window.fixtureView().live.state.run.rounds[0].draws.length`),10);
+  await evaluate('window.showPreparation()');
+  assert.equal(await evaluate(`document.querySelectorAll('details').length`),3);
+  assert.equal(await evaluate(`document.querySelectorAll('details[open]').length`),0);
+  await evaluate(`document.querySelector('details').open=true;window.setSelect(document.querySelector('details select'),'welcome')`);
+  // Select an independent insertion and persist only its own text.
+  await evaluate(`(()=>{const d=[...document.querySelectorAll('details')][1];d.open=true;window.setSelect(d.querySelector('select'),'welcome');const input=[...d.querySelectorAll('textarea')].find(e=>e.closest('label').textContent.startsWith('Begrüßung'));Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(input,'Nur nach A');input.dispatchEvent(new Event('input',{bubbles:true}));})()`);
+  await evaluate(`document.querySelectorAll('details')[1].querySelector('form').requestSubmit()`);await new Promise(r=>setTimeout(r,50));
+  assert.equal(await evaluate(`window.fixtureView().ceremony.config.insertions['00000000-0000-4000-8000-000000000003'].welcome`),'Nur nach A');
+  assert.equal(await evaluate(`window.fixtureView().ceremony.config.welcome`),'Willkommen zum Bingoabend');
+  await evaluate('window.showPreparation()');
+  await evaluate(`document.querySelector('[aria-label="Runde verschieben"]').focus()`);
+  for(const key of ['Space','ArrowDown','Space']){await call('Input.dispatchKeyEvent',{type:'keyDown',key:key==='Space'?' ':key,code:key,windowsVirtualKeyCode:key==='Space'?32:40},sessionId);await call('Input.dispatchKeyEvent',{type:'keyUp',key:key==='Space'?' ':key,code:key,windowsVirtualKeyCode:key==='Space'?32:40},sessionId);await new Promise(r=>setTimeout(r,100));}
+  await new Promise(r=>setTimeout(r,100));
+  assert.equal(await evaluate(`window.prepCommands.at(-1)?.operation`),'reorderRounds');
+  await evaluate('window.showPreparation()');
+  assert.equal(await evaluate(`document.querySelector('[data-round-id]').getAttribute('data-round-id')`),'00000000-0000-4000-8000-000000000005');
+  await shot('verwaltung-sortiert');
   assert.deepEqual(await evaluate('window.errors'),[]);
  }finally{socket?.close();browser.kill();if(browser.exitCode===null)await new Promise(r=>browser.once('exit',r));await new Promise<void>(r=>server.close(()=>r()));rmSync(profile,{recursive:true,force:true,maxRetries:10,retryDelay:100});}
 });

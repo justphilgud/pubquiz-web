@@ -130,6 +130,10 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   await assert.rejects(save(second, 8, "NEW"));
   await command({ operation: "moveRound", roundId: second, direction: -1 });
   assert.equal((await current()).rounds[0].id, second);
+  await command({operation:'reorderRounds',roundIds:[first,second]});
+  assert.deepEqual((await current()).rounds.map(r=>r.id),[first,second]);
+  await assert.rejects(command({operation:'reorderRounds',roundIds:[first,first]}));
+  await command({operation:'reorderRounds',roundIds:[second,first]});
   await assert.rejects(command({ operation: "removeRound", roundId: first }));
   await command({ operation: "createRound" }); view = await current();
   const empty = view.rounds[2].id; await command({ operation: "removeRound", roundId: empty });

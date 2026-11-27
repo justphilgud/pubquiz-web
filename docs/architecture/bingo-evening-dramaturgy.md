@@ -1,5 +1,10 @@
 # Bingoabend: Moderation, Rundendesign und Abschlussverlosung
 
+Aktuelle Ergänzung vom 27.11.2026: [Bingo-Intro und Rundennavigation](bingo-intro-navigation.md)
+präzisiert unabhängige Folieneinfügungen, journalisierte Hin-/Rücknavigation,
+größere Eingaben und die abgestufte Präsentation. Bei diesen Punkten gilt die
+Ergänzung vor den nachfolgenden historischen Bestandsbeschreibungen.
+
 Stand: 26.11.2026. Basis `93f074973c4bf73ed4bf6c489d375682f510ba82`, einschließlich PR180 und PR181. Dieser Vertrag erweitert die bisherigen Bingo-Verträge ausdrücklich für den Auftrag Binglöckchen am 08.12.2026.
 
 ## Zuständigkeiten und Zustandsquellen

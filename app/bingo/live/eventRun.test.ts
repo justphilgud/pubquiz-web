@@ -1,11 +1,30 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import {parseEventEnvelope} from './eventEnvelope';
 import {generateCard} from "../core/cards";
 import {activeElapsedMs} from "../core/run";
 import {applyEventRunEvent,blockingCalls,callContextData,currentEventRound,initialEventRun,parseEventCommand,type EventCommand} from "./eventRun";
 const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,"0")}`;
 const card=generateCard(id(9),()=>0),frozen={id:id(3),label:"Runde 1",target:30,issued:null,seriesIds:[id(4)]};
 function fixture(){let state=initialEventRun(id(1),id(2),frozen,1000),n=20;return {get state(){return state},send(command:EventCommand,at=2000,next?:typeof frozen){const event={id:id(n++),at,actorId:1,command,...(next?{frozen:next}:{})};state=applyEventRunEvent(state,event,[card]);return event.id}}}
+
+test('round navigation preserves incomplete draws, checks and frozen membership; closed rounds remain read-only',()=>{
+ const f=fixture();f.send({kind:'draw',number:15});
+ const original=structuredClone(currentEventRound(f.state)),context=callContextData(f.state);
+ const second={...frozen,id:id(5),label:'Runde 2'};
+ const command={kind:'navigateRound' as const,roundId:second.id,preparationRevision:0};
+ assert.deepEqual(parseEventEnvelope({version:2,input:{revision:1,command},opened:second}).opened,second);
+ f.send(command,2000,second);assert.equal(currentEventRound(f.state).id,second.id);
+ assert.deepEqual(f.state.run.rounds[0],original);f.send({kind:'draw',number:22});
+ f.send({kind:'navigateRound',roundId:frozen.id,preparationRevision:0});
+ assert.deepEqual(currentEventRound(f.state),original);assert.notDeepEqual(callContextData(f.state),context);
+ f.send({kind:'closeRound'});const closed=structuredClone(currentEventRound(f.state));
+ f.send(command);assert.equal(currentEventRound(f.state).draws[0].number,22);
+ f.send({kind:'navigateRound',roundId:frozen.id,preparationRevision:0});
+ assert.deepEqual(currentEventRound(f.state),closed);
+ assert.throws(()=>f.send({kind:'draw',number:3}),/ROUND_NOT_OPEN/);
+ assert.throws(()=>parseEventCommand({...command,unexpected:true}));
+});
 test("independent calls keep identity, boundary, original card evidence; legacy manual history stays intact and never blocks current finishing",()=>{
  const f=fixture();for(const number of card.cells[0])f.send({kind:"draw",number:number!});
  const before=callContextData(f.state),a=f.send({kind:"call",stage:"BINGO",context:"a".repeat(64)}),b=f.send({kind:"call",stage:"DOUBLE",context:"a".repeat(64)});

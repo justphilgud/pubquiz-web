@@ -83,6 +83,17 @@ export async function writePreparation(userId: number, input: unknown) {
         if (round!.issued_count !== command.issued) await tx.bingo_issuance_changes.create({ data: { id: randomUUID(), round_id: round!.id, actor_id: userId, previous_count: round!.issued_count, new_count: command.issued } });
         break;
       }
+      case 'reorderRounds': {
+        const rounds=await tx.bingo_rounds.findMany({where:{game_id:game.id},orderBy:{position:'asc'}});
+        if(rounds.length!==command.roundIds.length||rounds.some(r=>!command.roundIds.includes(r.id)))throw denied();
+        const available=(await tx.$queryRaw<{present:string|null}[]>`SELECT to_regclass('pubquiz.bingo_live_runs')::text present`)[0].present;
+        const active=available?(await tx.$queryRaw<{n:number}[]>`SELECT count(*)::int n FROM pubquiz.bingo_live_runs WHERE game_id=${game.id}::uuid AND status IN ('RUNNING','PAUSED')`)[0]:{n:0};
+        if(active.n)throw new BingoPreparationError('Reihenfolge eines laufenden Abends bleibt unverändert.');
+        const max=Math.max(...rounds.map(r=>r.position));
+        for(const [index,id] of command.roundIds.entries())await tx.bingo_rounds.update({where:{id},data:{position:max+index+1}});
+        for(const [index,id] of command.roundIds.entries())await tx.bingo_rounds.update({where:{id},data:{position:index+1}});
+        break;
+      }
       case "moveRound": {
         const adjacent = await tx.bingo_rounds.findFirst({ where: { game_id: game.id, position: command.direction === -1 ? { lt: round!.position } : { gt: round!.position } }, orderBy: { position: command.direction === -1 ? "desc" : "asc" } });
         if (!adjacent) throw new BingoPreparationError("Die Runde kann nicht weiter verschoben werden.");

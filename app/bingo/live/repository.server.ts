@@ -1,3 +1,4 @@
+import {ceremonyAt} from '@/app/rendering/ceremony/ceremony';
 import {readCeremony} from "../ceremonyRepository.server";
 import "server-only";
 import {selectedRun,readEventModeration,readEventAudience,eventStorageAvailable} from "./eventRepository.server";
@@ -164,7 +165,7 @@ export async function readGameAudience(userId: number, gameId: string): Promise<
     const [row] = await tx.$queryRaw<{ audience_key: string }[]>`SELECT audience_key FROM pubquiz.bingo_live_runs WHERE game_id=${gameId}::uuid ORDER BY started_at DESC,id DESC LIMIT 1`;
     if (row) return { key: row.audience_key };
     const design = (await resolveSharedDesign(tx, game.shared_design_template_id, series)).design;
-    return { ceremony:await readCeremony(tx,gameId),design, title: game.titel };
+    return { ceremony:ceremonyAt(await readCeremony(tx,gameId)),design, title: game.titel };
   }, { isolationLevel: "RepeatableRead" });
   if ("key" in result && result.key) return readAudience(userId, result.key);
   if (!("design" in result) || !result.design) fail("DESIGN_NOT_FOUND");

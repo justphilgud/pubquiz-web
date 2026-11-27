@@ -51,3 +51,11 @@
 
 @media(min-width:1000px){.layout{grid-template-columns:minmax(0,1fr) minmax(340px,32%);gap:14px}.sidebar{display:block}}
 @media(max-width:600px){.numberRow .publish{max-width:none}.numberRow .current{min-width:90px}.numberRow .current strong{font-size:44px}.publish label{width:164px}.historyHeading{align-items:flex-start}.historyHeading label{flex-wrap:wrap}.statistics strong{font-size:28px}}
+
+.root .numberInput input{font-size:clamp(32px,4vw,56px);min-height:76px;width:100%}.root .checkForm input{font-size:28px;min-height:64px}
+
+@media(min-width:1000px){.drawHistory{max-height:88px}.root .checkForm{margin-block:6px}.root .central>nav{float:right}.roundHeading{clear:none;min-height:44px}}
+
+.deckList ul li>span{display:block}
+
+@media(min-width:1000px){.sidebar>.panel{padding:10px}.statistics{gap:6px}}
