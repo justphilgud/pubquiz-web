@@ -474,10 +474,10 @@ test('PR191 exact merge pins all 81 migration files and unchanged schema; comple
  for(const bad of [rows.slice(1),[...rows,{...rows[0],migration_name:'unexpected'}],[{...rows[0],finished_at:null},...rows.slice(1)],[{...rows[0],checksum:'0'.repeat(64)},...rows.slice(1)]])assert.equal(assessMigrations(after,before,bad).gate.status,'FAIL');
 });
 
-test('PR191 plan remains Operations-only and preserves isolated CI plus protected live gates',()=>{
+test('PR191 registry is Operations-only; additional browser fixes retain conservative deployment gating',()=>{
  const paths=['scripts/operations/production-preflight-plan.ts','scripts/operations/production-preflight-plan.test.ts','.github/workflows/production-preflight-ci.yml','docs/operations/pr191-release-preflight.md'];
  assert.equal(needsApplicationDeployment(paths),false);
- for(const path of ['app/bingo/live/EventModerationPanel.tsx','prisma/schema.prisma','prisma/migrations/extra/migration.sql','package.json'])assert.equal(needsApplicationDeployment([...paths,path]),true);
+ for(const path of ['app/bingo/matching/MatchingTemplateSelect.browser.test.ts','scripts/testing/chrome-endpoint.ts','app/bingo/live/EventModerationPanel.tsx','prisma/schema.prisma','prisma/migrations/extra/migration.sql','package.json'])assert.equal(needsApplicationDeployment([...paths,path]),true);
  const safety=readFileSync('.github/workflows/production-preflight-ci.yml','utf8');
  assert.match(safety,/baseline: e144cfc931c695423c28f20e1a3dd83409732c1c\s+candidate: cd074a985aa3e91c0c917b8a96bb19768e337657/);
  assert.match(safety,/postgres:17/);assert.doesNotMatch(safety,/environment:|secrets\.|PRODUCTION_BACKUP_DATABASE_URL/);

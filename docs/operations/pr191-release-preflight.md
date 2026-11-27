@@ -57,3 +57,22 @@ RÃ¼ckmigration. Ein RÃ¼ckweg benÃ¶tigt separat geprÃ¼fte kompatible Reader und d
 aktuelle Datenlage. Reale Beamer-/Numpad-/AkustikprÃ¼fung bleibt offen; schreibende
 FÃ¤lle sind lokal synthetisch belegt. Bei CI-, Preflight- oder Deployfehler anhalten.
 Lauf-IDs und tatsÃ¤chliche Smoke-Ergebnisse am Release-PR dokumentieren.
+
+## CI-Browsertestkorrektur im selben PR
+
+Der CI-Lauf 46012079486 scheiterte im unveränderten Matching-Template-Browsertest
+mit `Invalid URL` beim Chrome-WebSocket-Start. Der Fix wartet auf zwei vollständig
+validierte Zeilen in Chromes `DevToolsActivePort`: Port 1–65535 und lokaler
+`/devtools/browser/...`-Pfad. Fehlende/leere/teilweise Dateien werden nur bis zum
+Timeout erneut gelesen; echte Lesefehler und vorzeitiger Browserexit bleiben Fehler.
+Die fachlichen Combobox-/Modal-Assertions bleiben unverändert. Unit-Tests simulieren
+das mehrstufige Schreiben, ungültige Daten, Timeout und Browserexit; der bestehende
+Vorbereitungstestbefehl führt sie regulär mit aus. Keine neue Abhängigkeit.
+
+Dieser PR enthält deshalb neben der Operationsregistrierung auch Testdateien und
+eine Testskript-Erweiterung in package.json. Die unveränderte Scope-Prüfung stuft
+diesen gemischten Commit konservativ als deploymentrelevant ein. Ein dadurch
+entstehender zusätzlicher Owner-wartender Deploy wird vor jedem Production-Schritt
+gemäß obigem Ablauf beendet. Er wird nicht freigegeben oder als Anwendungskandidat
+verwendet. Veröffentlicht wird weiterhin ausschließlich `cd074a98...`; kein
+Scopefilter oder Schutzgate wird geändert, um diese Prüfung zu umgehen.

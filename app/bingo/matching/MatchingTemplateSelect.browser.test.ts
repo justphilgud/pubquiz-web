@@ -3,9 +3,10 @@ import test from "node:test";
 import { build } from "esbuild";
 import { createServer } from "node:http";
 import { spawn } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
+import {waitForChromeEndpoint} from '../../../scripts/testing/chrome-endpoint';
 test("matching template combobox searches and selects without dismissing its media dialog",async()=>{
  const chrome=[process.env.CHROME_BIN,"/usr/bin/google-chrome","/usr/bin/chromium","C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"].find(p=>p&&existsSync(p));assert.ok(chrome,"Chrome required");
  const source=String.raw`
@@ -31,10 +32,7 @@ test("matching template combobox searches and selects without dismissing its med
     // Use wall-clock waits: virtual time can exhaust media waits before metadata IO.
     const deadline = Date.now() + 30_000;
     const portFile = join(profile, "DevToolsActivePort");
-    while (!existsSync(portFile) && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 50));
-    assert.ok(existsSync(portFile), "Test browser did not start");
-    const [port, endpoint] = readFileSync(portFile, "utf8").trim().split(/\r?\n/);
-    socket = new WebSocket(`ws://127.0.0.1:${port}${endpoint}`);
+    socket = new WebSocket(await waitForChromeEndpoint(portFile,{exited:()=>browser.exitCode!==null||browser.signalCode!==null}));
     await new Promise<void>((resolve, reject) => { socket!.onopen = () => resolve(); socket!.onerror = () => reject(new Error("Test browser connection failed")); });
     let nextId = 0;
     type ProtocolResult = { targetId?: string; sessionId?: string; result?: { value?: string } };
