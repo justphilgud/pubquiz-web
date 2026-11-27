@@ -1,12 +1,13 @@
-# Bingo: Einfügungen, Rundenwahl und schnelle Moderation
+# Bingo: Intro, Rundenblock, Outro und schnelle Moderation
 
 Stand: 27.11.2026. Ergänzt `bingo-evening-dramaturgy.md`; Quiz-Lifecycle,
 Antwortbewertung, AP3 und Druckstände bleiben getrennt und unverändert.
 
 ## Zweck und Oberflächen
 
-Die Vorbereitung zeigt vor Runde 1 eine kompakte Folienkonfiguration und nach
-jeder Runde eine eigene Einfügung. Erst „Konfigurieren“ öffnet die Felder.
+Die Vorbereitung zeigt ein kompaktes Intro vor allen Runden und ein unabhängiges
+Outro nach dem gesamten Rundenblock. Dies ersetzt bewusst die frühere Anordnung
+von Einfügungen nach jeder Runde. Erst „Konfigurieren“ öffnet die Felder.
 Die Auswahl einer einzelnen Slide zeigt deren Inhalt und Medienfelder. Wie im
 Quiz bleiben Aktivierung, ausdrückliches Speichern und Abbrechen getrennt.
 Wartebild/-video, Countdown/Startzeit, Begrüßung, Preise, Regeln,
@@ -19,34 +20,38 @@ Formatneutrale Folientypen und Renderer bleiben in `rendering/ceremony`.
 `PreparationPanel` verteilt erfolgreich gespeicherte Revisionen an saubere
 Editoren. Bereits veränderte andere Entwürfe werden nicht überschrieben; ihre
 alte Revision führt gegebenenfalls zum sichtbaren CAS-Konflikt statt Datenverlust.
-Alle Rundeneinfügungen sind über stabile Runden-UUIDs zugeordnet, nicht über
-Listenindizes. Umsortieren vertauscht deshalb keine Folieninhalte.
+Intro und Outro verwenden getrennte Entwürfe. Umsortieren verändert keine Folieninhalte.
+Frühere Rundeneinfügungen bleiben unter ihren stabilen UUIDs als Altdaten lesbar;
+die neue Oberfläche erzeugt oder verändert sie nicht.
 
 ## Persistenz und Eingaben
 
-Die vorhandene `game_ceremonies.state.config` erhält optional
-`insertions: Record<roundUuid, CeremonyConfig>`. Jede Einfügung besitzt eine
-vollständige unabhängige Konfiguration; verschachtelte Einfügungen werden
-abgewiesen. Ohne gespeicherte Einfügung wird nur lokal ein neuer Standardentwurf
-angezeigt. Bestehende Datensätze werden weder migriert noch zurückgeschrieben.
-`state.placement` wählt optional eine gespeicherte Rundeneinfügung; ohne Wert ist
-der Rahmen vor Runde 1 ausgewählt. Öffentlich wird ausschließlich die ausgewählte
-Konfiguration projiziert. Folien-, Reveal- und Musikbefehle behalten CAS,
-Rechteprüfung und ihre bisherigen bewussten Aktionen. Abschlussziehung bleibt
-bis zum beendeten Event gesperrt und verwendet unverändert gültige Lose.
+Die vorhandene `game_ceremonies.state.config` erhält optional `outro: CeremonyConfig`.
+Intro bleibt im bisherigen Wurzelobjekt; das Outro besitzt eine unabhängige Kopie
+mit eigener Aktivierung und eigenen Text-/Medienfeldern. Ohne gespeichertes Outro
+liest ein reiner Adapter die bisherigen OUTRO-Folien der Wurzel; kein Backfill.
+Verschachtelte Outros oder Einfügungen innerhalb eines Outros werden abgewiesen.
+Alte `insertions: Record<roundUuid, CeremonyConfig>` bleiben unverändert lesbar.
+`state.placement="outro"` wählt das Outro; ohne Wert wird das Intro ausgewählt.
+Öffentlich wird nur die aktive Konfiguration projiziert. Die Oberfläche bietet
+historische Rundeneinfügungen nur lesend an; der kompatible Reader bleibt erhalten.
+CAS, Rechte und explizite Reveal-/Medienaktionen gelten weiter.
 
-Rundenabschluss öffnet die erste aktivierte normale Slide der zugehörigen
-gespeicherten Einfügung. Weitere Slides sind mit Vor/Zurück bzw. der expliziten
-Auswahl erreichbar. Eine Foliennavigation startet keine Runde und erzeugt keine
-Ziehung. Ein Rundenwechsel verlässt die Folie und stoppt ihren Medienkontext.
-Die nächste Runde wird ausdrücklich gewählt; eine bestehende manuelle Pause
-bleibt bestehen und muss ausdrücklich aufgehoben werden.
+Die Folienauswahl und Vor/Zurück bleiben innerhalb des jeweiligen Abschnitts.
+Der Server sperrt sämtliche OUTRO-Folien bis alle Runden im eingefrorenen Plan
+abgeschlossen sind oder das Event ausdrücklich beendet wurde. Der letzte
+Rundenabschluss öffnet die erste aktive normale Outro-Folie, frühere Abschlüsse
+zeigen das Board. Abschlussverlosung bleibt zusätzlich bis zum Eventende gesperrt.
+Ein explizites Eventende darf auch einen unvollständigen Abend beenden; es ergänzt
+keine Ziehungen. Intro/Runden/Outro starten weder durch Countdown noch Folienwechsel
+automatisch. Rundenwahl bleibt bewusst, ihr Wechsel stoppt den alten Medienkontext.
+Eine bestehende manuelle Pause muss ausdrücklich aufgehoben werden.
 
 ## Rundensortierung und Löschung
 
 `SortableRounds` verwendet wie die Quizblöcke das bereits installierte dnd-kit,
-mit eigener Griffaktion, Pointer-Schwelle und Tastaturkoordinaten. Die bestehende
-Auf-/Ab-Aktion bleibt verfügbar. Der neue `reorderRounds`-Befehl akzeptiert nur
+mit eigener Griffaktion, Pointer-Schwelle und Tastaturkoordinaten. Bearbeiten und Löschen verwenden die gemeinsamen `IconButton`-Komponenten mit
+Tooltip und barrierefreiem Namen; die bestehende Auf-/Ab-Aktion bleibt verfügbar. Der neue `reorderRounds`-Befehl akzeptiert nur
 die vollständige eindeutige ID-Menge des Events, prüft Rechte und Revision und
 schreibt die Reihenfolge atomar über temporäre Positionen. Laufende/pausierte
 Events werden nicht umsortiert. Der Durchlauf übernimmt weiterhin beim Start
@@ -90,15 +95,20 @@ wiederverwendbaren Kontext.
 
 Enter im Zahlenfeld löst das Formular direkt aus; wiederholte gehaltene
 Enter-Ereignisse werden abgefangen. Bewusste V2-Erweiterung der früheren
-APPROVAL-Bedienregel: Der ausdrückliche Enter-/Textbutton-Submit ist selbst die
+APPROVAL-Bedienregel: Der ausdrückliche Enter-/Iconbutton-Submit ist selbst die
 Moderationsfreigabe; kein zusätzlicher Dialog verzögert diese Veröffentlichung.
 Die vorbereitete Veröffentlichungsvorschau und DIRECT/HIDDEN-Projektion bleiben;
 AP3 behält seinen bisherigen zusätzlichen APPROVAL-Dialog. Der vorhandene synchrone Inflight-Schutz,
 Request-ID und serverseitige Dublettenschutz bleiben maßgeblich. Nach bestätigter
 Veröffentlichung wird die Eingabe geleert und erneut fokussiert. `+` und
 `NumpadAdd` fokussieren ausschließlich während des Mounts der V2-Moderation die
-Zahleneingabe; kein Shortcut veröffentlicht selbst. Der sichtbare Textbutton
-bleibt. Zahleneingabe und Kartenkennung besitzen größere Schrift/Eingabeflächen.
+Zahleneingabe; kein Shortcut veröffentlicht selbst. Der Veröffentlichungsbutton
+zeigt ein Weiter-Icon mit Tooltip und barrierefreiem Namen; der Präsentationslink
+verwendet denselben Play-Icon-Link wie die Quizübersicht. Zahleneingabe und Kartenkennung besitzen größere Schrift/Eingabeflächen.
+Das sichtbare Label „Kartenkennung“ entfällt, sein zugänglicher Name bleibt.
+Die linke Arbeitsfläche hat Vorrang, die Sidebar ist auf 300 px begrenzt.
+Die kompakte Ziehungshistorie bricht in Zeilen um, ohne eigenen Scrollbereich
+oder Stiftglyphen. Die Sortierauswahl bleibt beschriftet und bedienbar.
 Die fachliche Kartenprüfung und ihre bewussten Ergebnisaktionen bleiben erhalten.
 
 Aktive Decks zeigen gespeicherte Serienkennung, tatsächlich eingefrorene Anzahl
@@ -109,10 +119,18 @@ verwenden dieselbe ausgewählte Runden-ID.
 Die Präsentation behält die zehn Rundenfarben, leitet ungezogene Zellen aber als
 dunklere Nuance dieser Farbe ab. Gezogen und aktuell bleiben zusätzlich über
 Kontur und Inversion unterscheidbar. Logos stehen unverändert und transparent
-ohne schwarze Plakette. „Aktuelle Zahl“ steht direkt über der vergrößerten Zahl;
-der bestehende DOM-Fitter berücksichtigt Schriftladen und Resize. Die Fußzeile
-zeigt maximal zehn letzte Ziehungen, neueste zuerst, ohne Scrollbereich und ohne
-den bisherigen allgemeinen Moderatorprüfhinweis. Konkrete öffentliche Gewinnrückmeldungen bleiben in der Kopfstatuszeile sichtbar. Konkrete Gewinnprüfungen werden
+ohne schwarze Plakette mit einem dünnen × dazwischen. „Aktuelle Zahl“ steht
+zentriert direkt über der großen Zahl, ihre Box ist 90 % der unskalierten
+Zahlenbreite breit. Der DOM-Fitter berücksichtigt Schriftladen, Resize und
+Vollbild; die Einblendanimation verändert die Messgrundlage nicht. Links unter
+dem Rundentitel steht ausschließlich der Zähler „10 von 30“. Laufstatus bleibt
+für Screenreader zugänglich, ohne doppelten sichtbaren Zähler.
+Rechts neben dem Raster steht ein durch eine dünne Linie abgetrennter Bereich
+„Letzte 10“: die letzten zehn Ziehungen absteigend, Position · Buchstabe Zahl,
+spaltenweise fünf Einträge. Beide Spalten verwenden dieselben fünf Zeilenhöhen
+und Abstände wie das Zahlenraster. Leere/kurze Historien verändern die Geometrie
+nicht. Kein interner Scrollbereich, keine alte Fußzeile und kein allgemeiner
+Moderatorprüfhinweis. Konkrete öffentliche Gewinnrückmeldungen bleiben in der Kopfstatuszeile sichtbar. Konkrete Gewinnprüfungen werden
 weiterhin in der Moderation bearbeitet, nicht automatisch entschieden.
 
 Die dokumentierte Abweichung von der neutralen Manifest-Bühne bleibt bewusst:
@@ -124,7 +142,7 @@ werden nicht verändert.
 
 Keine Schema-Migration, kein Backfill, keine neue Abhängigkeit. Alte Konfiguration
 und alte Journale bleiben lesbar. Alte Codeversionen kennen `navigateRound`,
-`placement` und `insertions` jedoch nicht: Nach solchen neuen Schreibvorgängen
+`placement`, `insertions` und `outro` jedoch nicht: Nach solchen neuen Schreibvorgängen
 ist ein blindes Code-Rollback nicht zulässig; ein kompatibler Reader wäre vorab
 separat zu prüfen. Es erfolgt keine Journalreparatur oder automatische Rückmigration.
 
@@ -134,11 +152,11 @@ separat zu prüfen. Es erfolgt keine Journalreparatur oder automatische Rückmig
   abgewiesene ungültige/verschachtelte Einfügungen.
 - `bingo-preparation.integration.test.ts` / `bingo-evening.acceptance.ts`:
   echte atomare Sortierung, CAS/Rechte, eingefrorene Karten, Journal-Readback,
-  Rundennummer und Einfügungsinhalt im öffentlichen Read Model.
+  Rundennummer, Outro-Sperre, letzte Runde und Outro-Inhalt im öffentlichen Read Model.
 - `bingo-evening.browser.test.ts`: größere Eingaben, echtes Enter, Plus/Fokus
   und Cleanup, Warnung/Abbrechen/Fortsetzen, Deckwechsel mit echten Fixturecodes,
   unabhängige Folienbearbeitung und Tastatur-Drag-&-Drop, zehn Farben und Historie.
 - Bestehende Bingo-, Board-, Matching-, Kartenprüf-, Preis- und Druckregressionen.
 
 Tatsächlich ausgeführte Prüfungen und reale Geräte-/Deploymentgrenzen stehen im
-[Abnahmebericht](../acceptance/bingo-intro-2026-11-27.md).
+[Abnahmebericht](../acceptance/bingo-outro-layout-2026-11-27.md).

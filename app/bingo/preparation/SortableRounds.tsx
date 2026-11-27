@@ -6,7 +6,7 @@ import {CSS} from '@dnd-kit/utilities';
 
 export function SortableRound({id,disabled,children}:{id:string;disabled:boolean;children:ReactNode}) {
   const {attributes,listeners,setNodeRef,transform,transition}=useSortable({id,disabled});
-  return <div ref={setNodeRef} style={{transform:CSS.Transform.toString(transform),transition}}><button type="button" className="min-h-11 rounded border px-3" disabled={disabled} {...attributes} {...listeners} aria-label="Runde verschieben">⠿ Runde verschieben</button>{children}</div>;
+  return <div ref={setNodeRef} style={{transform:CSS.Transform.toString(transform),transition}}><button type="button" className="min-h-11 min-w-11 rounded border px-3" disabled={disabled} {...attributes} {...listeners} aria-label="Runde verschieben" title="Runde verschieben" style={{touchAction:"none",cursor:"grab"}}>⋮⋮</button>{children}</div>;
 }
 export default function SortableRounds({ids,disabled,onChange,children}:{ids:string[];disabled:boolean;onChange:(ids:string[])=>void;children:ReactNode}) {
   const id=useId();

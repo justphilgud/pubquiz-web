@@ -59,3 +59,14 @@
 .deckList ul li>span{display:block}
 
 @media(min-width:1000px){.sidebar>.panel{padding:10px}.statistics{gap:6px}}
+
+/* Drawing desk has priority; only the information sidebar becomes denser. */
+.visuallyHidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+.root svg{width:24px;height:24px;flex-shrink:0}
+.header nav>a[aria-label="Präsentation öffnen"]{justify-content:center;min-width:44px}
+@media(min-width:1000px){.layout{grid-template-columns:minmax(0,1fr) 300px}.sidebar h2{font-size:16px}.statistics>span{font-size:13px}.statistics strong{min-width:65px;font-size:25px}.sidebar .hint{font-size:11px}}
+.drawHistory{max-height:none!important;overflow:visible;display:flex;flex-wrap:wrap;gap:4px;list-style:none;padding:0}
+.root .drawHistory button{font-size:12px;padding:4px 8px;gap:5px;min-height:44px}
+.drawHistory strong{font-size:18px}.drawHistory li:first-child strong{font-size:25px}.drawHistory li:nth-child(n+9) strong{font-size:15px}
+.historyHeading{gap:8px;margin-top:8px}.historyHeading h3{font-size:13px}.root .historyHeading select{font-size:11px;width:165px;min-height:36px;padding:4px 6px}
+.root .publish button{min-width:54px;min-height:54px;padding:12px}.root .publish button svg{width:26px;height:26px}

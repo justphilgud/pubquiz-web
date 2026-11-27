@@ -27,6 +27,7 @@ export async function exerciseBingoEvening(db:Client,api:typeof Prep&{creation:t
  mkdirSync('output/pdf',{recursive:true});writeFileSync('output/pdf/bingo-sechs-runden-abenddruck-sra3.pdf',eveningPdf);
  assert.equal((await db.query('SELECT count(*)::int n FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_card_series s ON s.id=c.series_id WHERE s.game_id=$1',[full.id])).rows[0].n,600);
  const config={...defaultCeremony().config,prizes:['Erster Preis','Zweiter Preis','Dritter Preis'],startsAt:'2026-12-08T18:30:00.000Z',introVideoUrl:'/medien/intro.mp4',introMusicUrl:'/medien/intro.mp3',outroMusicUrl:'/medien/outro.mp3'};
+ await assert.rejects(api.ceremony.writeCeremony(1,full.id,0,{kind:'show',slide:'announcements',placement:'outro'}),/OUTRO_NOT_READY/);
  const configured=await api.ceremony.writeCeremony(1,full.id,0,{kind:'configure',config});assert.equal(configured.revision,1);
  await assert.rejects(api.ceremony.writeCeremony(2,full.id,1,{kind:'show',slide:'welcome'}));
  const races=await Promise.allSettled(['welcome','rules'].map(slide=>api.ceremony.writeCeremony(1,full.id,1,{kind:'show',slide:slide as 'welcome'|'rules'})));assert.equal(races.filter(r=>r.status==='fulfilled').length,1);
@@ -50,7 +51,7 @@ export async function exerciseBingoEvening(db:Client,api:typeof Prep&{creation:t
  assert.equal(JSON.stringify((await view()).live!.state.run.rounds[0].draws),oldDraws);
  const rootState=(await view()).ceremony;
  const insertion={...defaultCeremony().config,enabled:['welcome'] as const,welcome:'Nur nach Runde 1'};
- await api.ceremony.writeCeremony(1,full.id,rootState.revision,{kind:'configure',config:{...rootState.config,insertions:{[firstId]:insertion}}});
+ await api.ceremony.writeCeremony(1,full.id,rootState.revision,{kind:'configure',config:{...rootState.config,insertions:{[firstId]:insertion},outro:{...defaultCeremony().config,enabled:['announcements','raffle'],announcements:'Nach allen sechs Runden'}}});
  for(let i=0;i<6;i++){
   let v=(await view()).live!;const card=v.cards[0];
   assert.equal((await api.eventRun.readEventAudience(1,v.audienceKey)).roundNumber,i+1);
@@ -68,9 +69,13 @@ export async function exerciseBingoEvening(db:Client,api:typeof Prep&{creation:t
   v=(await view()).live!;const check=await send({kind:'check',cardId:card.id,context:v.callContext});await api.eventRun.commandEventRun(1,check);
   assert.equal((await view()).live!.raffle.count,i+1);
   await send({kind:'closeRound'});
-  if(i===0){const post=await api.eventRun.readEventAudience(1,(await view()).live!.audienceKey);assert.equal(post.ceremony.config.welcome,'Nur nach Runde 1');assert.equal(post.ceremony.slide,'welcome');}
+  if(i===0){const post=await api.eventRun.readEventAudience(1,(await view()).live!.audienceKey);assert.equal(post.ceremony.slide,null);await assert.rejects(api.ceremony.writeCeremony(1,full.id,(await view()).ceremony.revision,{kind:'show',slide:'announcements',placement:'outro'}),/OUTRO_NOT_READY/);}
   if(i<5){await send({kind:'navigateRound',roundId:(await view()).plan[i+1].round_id,preparationRevision:(await prep()).revision});await send({kind:'resume'});}
  }
+ const completed=await api.eventRun.readEventAudience(1,(await view()).live!.audienceKey);assert.equal(completed.ceremony.slide,'announcements');assert.equal(completed.ceremony.config.announcements,'Nach allen sechs Runden');
+ await assert.rejects(api.ceremony.writeCeremony(1,full.id,(await view()).ceremony.revision,{kind:'show',slide:'welcome',placement:'outro'}),/INVALID_CEREMONY/);
+ await assert.rejects(api.ceremony.writeCeremony(1,full.id,(await view()).ceremony.revision,{kind:'show',slide:'raffle',placement:'outro'}),/RAFFLE_NOT_READY/);
+ await api.ceremony.writeCeremony(1,full.id,(await view()).ceremony.revision,{kind:'show',slide:'announcements',placement:'outro'});
  await send({kind:'end'});let framing=(await view()).ceremony;
  framing=await api.ceremony.writeCeremony(1,full.id,framing.revision,{kind:'show',slide:'raffle'});
  framing=await api.ceremony.writeCeremony(1,full.id,framing.revision,{kind:'reveal'});

@@ -1,7 +1,7 @@
 # Bingoabend: Moderation, Rundendesign und Abschlussverlosung
 
 Aktuelle Ergänzung vom 27.11.2026: [Bingo-Intro und Rundennavigation](bingo-intro-navigation.md)
-präzisiert unabhängige Folieneinfügungen, journalisierte Hin-/Rücknavigation,
+präzisiert unabhängiges Intro vor und Outro nach dem Rundenblock, journalisierte Hin-/Rücknavigation,
 größere Eingaben und die abgestufte Präsentation. Bei diesen Punkten gilt die
 Ergänzung vor den nachfolgenden historischen Bestandsbeschreibungen.
 
@@ -39,7 +39,7 @@ Die Grundlage lautet sichtbar „Alle generierten, dieser Runde zugeordneten Kar
 
 `roundColors.ts` ist die gemeinsame Quelle von zehn nummerierten Farben. LOVD-Rot `#74291D` ist die erste Farbe. Alle zehn Schrift-/Farbpaare erreichen mindestens 4,5:1. Die Präsentation verwendet die Rundenfarbe als sichtbare Bühne, dunkle ungezogene Zellen, rundenfarbige gezogene Zahlen mit heller Kontur und eine invertierte helle Fläche plus mehrfache Kontur für die aktuelle Zahl. Dies ersetzt bewusst die bisher neutrale Bühne des Designmanifests: Die dominante Farbe dient der Rundenorientierung, nicht gleichzeitiger Dekoration. Gespeicherte Designs und Druckstände werden nicht verändert. Farbe ist nicht das einzige Merkmal: Flächen, Helligkeit, Schrift und zugängliche Zustandsnamen unterscheiden die Zustände.
 
-Die vorhandene Phil-Gud-WOFF-Datei setzt aktuelle Zahl, Zahlenraster, B/I/N/G/O sowie Kopf-, Status- und Fußbeschriftungen. Der gespeicherte Rundenname erscheint genau einmal. Partnerlogos erhalten bei Präsentationsbreiten ab 901 px je 180 × 84 px statt 90 × 42 px und einen reservierten Bereich; schmale Fenster brechen um. Nach einem zu schmalen Fenster wird das wieder sichtbare Board neu gemessen, statt einen ausgeblendeten Bereich als dauerhaft unlesbar zu behandeln. Fonts werden lokal geladen; die bestehende Größenmessung reagiert weiterhin auf Fontladen, Resize und Vollbild. LOVD und Phil Gud stehen gemeinsam in einem reservierten Logo-Bereich. Der Titel erhält einen eigenen, begrenzten Bereich.
+Die vorhandene Phil-Gud-WOFF-Datei setzt aktuelle Zahl, Zahlenraster, B/I/N/G/O sowie Kopf-, Fortschritts- und Historienbeschriftungen. Der gespeicherte Rundenname erscheint genau einmal. Partnerlogos erhalten bei Präsentationsbreiten ab 901 px je 180 × 84 px statt 90 × 42 px und einen reservierten Bereich; schmale Fenster brechen um. Nach einem zu schmalen Fenster wird das wieder sichtbare Board neu gemessen, statt einen ausgeblendeten Bereich als dauerhaft unlesbar zu behandeln. Fonts werden lokal geladen; die bestehende Größenmessung reagiert weiterhin auf Fontladen, Resize und Vollbild. LOVD und Phil Gud stehen gemeinsam in einem reservierten Logo-Bereich. Der Titel erhält einen eigenen, begrenzten Bereich.
 
 Neue Generierungen frieren die Rundennummer, Rundenfarbe und die vorhandenen kontrastreichen Partnerlogos in den jeweiligen Druckstand ein. V3/V4 zeichnen eine explizite Rundennummer zusätzlich zur dauerhaften Kartenkennung. Formatgeometrie, Schriften der Vorderseite, vollständige Kennungen, SRA3-Raster, lange-Kante-Spiegelung, Abenddruck und historische Exporte bleiben im bestehenden Renderer. Bestehende gespeicherte Karten werden nicht umgefärbt. Historische Neugestaltung bleibt eine ausdrückliche separate Druckversion.
 

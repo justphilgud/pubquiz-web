@@ -3,7 +3,7 @@ import type {Prisma} from '@/app/generated/prisma/client';
 import {prisma} from '@/app/lib/prisma';
 import {preparationContext} from './preparation/access.server';
 import {ceremonyAt,parseCeremony,parseCeremonyConfig,CEREMONY_SLIDES,type CeremonyState,type CeremonySlideId} from '@/app/rendering/ceremony/ceremony';
-import {raffleForCeremony} from './live/eventRepository.server';
+import {allEventRoundsClosed,raffleForCeremony} from './live/eventRepository.server';
 import {selectRaffleWinner} from './live/raffle';
 
 export async function readCeremony(tx:Prisma.TransactionClient,gameId:string):Promise<CeremonyState>{
@@ -24,13 +24,17 @@ export async function writeCeremony(userId:number,gameId:string,revision:number,
     if(command.kind==='configure'){
       next={...next,placement:undefined,config:parseCeremonyConfig(command.config),slide:null,revealCount:0,media:{action:'stop',commandId:next.revision}};
     }else if(command.kind==='show'){
-      const selection={...previous,placement:command.placement};
-      if(command.placement&&!previous.config.insertions?.[command.placement])throw Error('INVALID_CEREMONY');
+      const outro=command.placement==='outro'||CEREMONY_SLIDES.some(s=>s.id===command.slide&&s.phase==='OUTRO');
+      const placement=outro?'outro':command.placement;
+      if(outro&&!await allEventRoundsClosed(tx,gameId))throw Error('OUTRO_NOT_READY');
+      if(outro&&command.slide!==null&&!CEREMONY_SLIDES.some(s=>s.id===command.slide&&s.phase==='OUTRO'))throw Error('INVALID_CEREMONY');
+      const selection={...previous,placement};
+      if(placement&&placement!=='outro'&&!previous.config.insertions?.[placement])throw Error('INVALID_CEREMONY');
       if(command.slide!==null&&!ceremonyAt(selection).config.enabled.includes(command.slide))throw Error('CEREMONY_DISABLED');
       if(command.slide!==null&&!CEREMONY_SLIDES.some(s=>s.id===command.slide))throw Error('INVALID_CEREMONY');
       const [run]=await tx.$queryRaw<{status:string}[]>`SELECT status FROM pubquiz.bingo_live_runs WHERE game_id=${gameId}::uuid ORDER BY started_at DESC,id DESC LIMIT 1`;
       if(command.slide==='raffle'&&run?.status!=='ENDED')throw Error('RAFFLE_NOT_READY');
-      next={...next,placement:command.placement,slide:command.slide,revealCount:command.slide==='raffle'?previous.raffleRevealCount??0:0,media:{action:'stop',commandId:next.revision}};
+      next={...next,placement,slide:command.slide,revealCount:command.slide==='raffle'?previous.raffleRevealCount??0:0,media:{action:'stop',commandId:next.revision}};
     }else if(command.kind==='media'){
       if(!['play','pause','stop'].includes(command.action))throw Error('INVALID_CEREMONY');
       if(previous.slide!=='countdown'&&previous.slide!=='announcements')throw Error('INVALID_CEREMONY');
