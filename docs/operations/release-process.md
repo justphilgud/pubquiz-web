@@ -177,3 +177,22 @@ vom neuen Validator mit dem korrekten exakten Paar akzeptiert. Es wurde dafür
 keine Production-API oder Datenbank aufgerufen. Das ist kein neuer Live-Preflight
 und keine Production-Abnahme dieses Workflowumbaus. Die neue geschützte
 End-to-End-Orchestrierung bleibt bis zur separaten Integrationsfreigabe ungefahren.
+
+### Excel-Browserstart (PR #194)
+
+Der Excel-Import-Browsertest verwendet den vorhandenen `waitForChromeEndpoint`-
+Prüfer statt nur auf die Existenz von `DevToolsActivePort` zu warten. Fehlende,
+leere oder teilweise geschriebene Dateien gelten nicht als Bereitschaft. Das
+explizite Startbudget beträgt wie beim Präsentationsharness 45 Sekunden; das
+Gesamttestlimit bleibt bei 300 Sekunden. Prozessende, Signal und Spawnfehler
+brechen den Start ab. Eine begrenzte Chrome-Fehlerausgabe wird zusammen mit
+Exitstatus und Next.js-Diagnose gemeldet. `--disable-dev-shm-usage` übernimmt
+die bestehende Harness-Konfiguration für Runner mit begrenztem Shared Memory.
+
+Der vorangegangene CI-Lauf belegte nur den fehlenden Endpunkt nach 30 Sekunden;
+die verworfene Chrome-Ausgabe erlaubt keine nachträgliche Aussage zur konkreten
+Prozessursache. Kein automatischer Neustart, keine gelockerten fachlichen
+Assertions und keine Änderung an Anwendung, Datenbank oder Release-Gates.
+Die vorhandenen Endpunktregressionen prüfen verzögerten Start, Teilinhalte,
+ungültige Endpunkte, Timeout und vorzeitiges Prozessende. Der echte Excel-
+Browserablauf wird weiterhin im isolierten PostgreSQL-CI-Job ausgeführt.
