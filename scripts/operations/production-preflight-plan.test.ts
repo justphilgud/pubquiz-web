@@ -4,7 +4,7 @@ import {execFileSync} from "node:child_process";
 import {migrationFiles,assessMigrations} from "./production-preflight";
 import { readFileSync } from "node:fs";
 import { APPROVED_PREFLIGHT_PLANS, approvedPreflightPlan, hasApprovedDeltaEvidence, hasApprovedPendingDelta,
-  NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN, ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN, BINGO_POLLING_NO_DELTA_PREFLIGHT_PLAN, BINGO_MATCHING_UX_NO_DELTA_PREFLIGHT_PLAN, QUIZ_MODERATION_PR175_NO_DELTA_PREFLIGHT_PLAN, PODIUM_PR177_NO_DELTA_PREFLIGHT_PLAN, approvedNoDeltaPreflightPlan, assertNoDeltaManifest, hasCompleteNoDeltaHistory } from "./production-preflight-plan";
+  NO_DELTA_PREFLIGHT_PLAN, BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN, ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN, BINGO_POLLING_NO_DELTA_PREFLIGHT_PLAN, BINGO_MATCHING_UX_NO_DELTA_PREFLIGHT_PLAN, QUIZ_MODERATION_PR175_NO_DELTA_PREFLIGHT_PLAN, PODIUM_PR177_NO_DELTA_PREFLIGHT_PLAN, BINGO_MODERATION_PR187_NO_DELTA_PREFLIGHT_PLAN, approvedNoDeltaPreflightPlan, assertNoDeltaManifest, hasCompleteNoDeltaHistory } from "./production-preflight-plan";
 import { needsApplicationDeployment } from "./deployment-scope";
 
 test("only exact reviewed release pairs and SQL checksums are eligible", () => {
@@ -368,4 +368,43 @@ test("PR177 Operations plan stays in isolated safety CI and cannot deploy applic
   assert.match(protectedWorkflow, /environment: operations-backup/);
   assert.match(protectedWorkflow, /github.ref == 'refs\/heads\/main'/);
   assert.doesNotMatch(protectedWorkflow, /db:deploy|vercel.*deploy|acceptance-cli|workflow_run:/);
+});
+
+
+test('PR187 exact merge pins all 81 migration files and unchanged schema; complete history only',()=>{
+ const p=BINGO_MODERATION_PR187_NO_DELTA_PREFLIGHT_PLAN;
+ const before=migrationFiles(p.baselineSha),after=migrationFiles(p.candidateSha);
+ const schema=(sha:string)=>execFileSync('git',['show',`${sha}:prisma/schema.prisma`],{encoding:'utf8'});
+ const a=schema(p.baselineSha),b=schema(p.candidateSha);
+ const verify=(left=before,right=after,sa=a,sb=b)=>assertNoDeltaManifest(p.baselineSha,p.candidateSha,left,right,sa,sb);
+ assert.equal(approvedNoDeltaPreflightPlan(p.baselineSha,p.candidateSha),p);
+ assert.equal(verify().migrationCount,81);
+ execFileSync('git',['merge-base','--is-ancestor',p.baselineSha,p.candidateSha]);
+ // The regular merge must contain exactly the green, user-approved PR187 tree.
+ execFileSync('git',['diff','--exit-code','6e7591cd44e461c6a98a79b9d8a6cadb8098fd68',p.candidateSha]);
+ const oldPlans=[NO_DELTA_PREFLIGHT_PLAN,BINGO_AP1_NO_DELTA_PREFLIGHT_PLAN,ICON_ORDERING_NO_DELTA_PREFLIGHT_PLAN,BINGO_POLLING_NO_DELTA_PREFLIGHT_PLAN,BINGO_MATCHING_UX_NO_DELTA_PREFLIGHT_PLAN,QUIZ_MODERATION_PR175_NO_DELTA_PREFLIGHT_PLAN,PODIUM_PR177_NO_DELTA_PREFLIGHT_PLAN];
+ for(const old of oldPlans)assert.equal(approvedNoDeltaPreflightPlan(old.baselineSha,old.candidateSha),old);
+ const invalidPairs=[[p.candidateSha,p.baselineSha],[p.baselineSha,p.baselineSha],['a'.repeat(40),p.candidateSha],[p.baselineSha,'b'.repeat(40)],[p.baselineSha.slice(0,8),p.candidateSha],[p.baselineSha,p.candidateSha.slice(0,8)],[p.baselineSha,'6e7591cd44e461c6a98a79b9d8a6cadb8098fd68'],['f03fd4912e0e0859f301078c2d329f4202152022',p.candidateSha],...oldPlans.flatMap(old=>[[old.baselineSha,p.candidateSha],[p.baselineSha,old.candidateSha]])];
+ for(const [base,candidate] of invalidPairs){assert.equal(approvedNoDeltaPreflightPlan(base,candidate),undefined);assert.throws(()=>assertNoDeltaManifest(base,candidate,before,after,a,b));}
+ const changed=after.map((f,i)=>i===0?{...f,checksum:'0'.repeat(64)}:f);
+ for(const bad of [after.slice(1),[...after,{...after[0],name:'unexpected'}],after.map((f,i)=>i===80?after[0]:f),changed])assert.throws(()=>verify(before,bad));
+ assert.throws(()=>verify(changed,changed),/NO_DELTA_PINNED_BYTES_UNVERIFIED/);
+ assert.throws(()=>verify([...before].reverse(),[...after].reverse()),/NO_DELTA_PINNED_BYTES_UNVERIFIED/);
+ assert.throws(()=>verify(before,after,a+' ',b));assert.throws(()=>verify(before,after,a+' ',b+' '),/NO_DELTA_PINNED_BYTES_UNVERIFIED/);
+ const rows=before.map(f=>({migration_name:f.name,checksum:f.checksum,finished_at:'done',rolled_back_at:null}));
+ const history=assessMigrations(after,before,rows);
+ assert.equal(hasCompleteNoDeltaHistory(history,after,p),true);assert.equal(hasCompleteNoDeltaHistory(history,after),false);
+ for(const bad of [{...history,gate:{status:'BLOCKED'}},{...history,gate:{status:'FAIL'}},{...history,applied:history.applied.slice(1)},{...history,applied:[...history.applied,'extra']},{...history,applied:history.applied.map((v,i)=>i===80?history.applied[0]:v)},{...history,pending:[p.lastMigration]},{...history,expected:[p.lastMigration]}])assert.equal(hasCompleteNoDeltaHistory(bad,after,p),false);
+ for(const bad of [rows.slice(1),[...rows,{...rows[0],migration_name:'unexpected'}],[{...rows[0],finished_at:null},...rows.slice(1)],[{...rows[0],checksum:'0'.repeat(64)},...rows.slice(1)]])assert.equal(assessMigrations(after,before,bad).gate.status,'FAIL');
+});
+
+test('PR187 plan remains Operations-only and preserves isolated CI plus protected live gates',()=>{
+ const paths=['scripts/operations/production-preflight-plan.ts','scripts/operations/production-preflight-plan.test.ts','.github/workflows/production-preflight-ci.yml','docs/operations/pr187-release-preflight.md'];
+ assert.equal(needsApplicationDeployment(paths),false);
+ for(const path of ['app/bingo/live/EventModerationPanel.tsx','prisma/schema.prisma','prisma/migrations/extra/migration.sql','package.json'])assert.equal(needsApplicationDeployment([...paths,path]),true);
+ const safety=readFileSync('.github/workflows/production-preflight-ci.yml','utf8');
+ assert.match(safety,/baseline: 6fa37aa5114eabeb9fa6c58f6fd30bd6a295d67a\s+candidate: 3b8fc6f1f1427504e1191004ffc8e37e94410a2e/);
+ assert.match(safety,/postgres:17/);assert.doesNotMatch(safety,/environment:|secrets\.|PRODUCTION_BACKUP_DATABASE_URL/);
+ const live=readFileSync('.github/workflows/production-read-only-preflight.yml','utf8');
+ assert.match(live,/environment: production/);assert.match(live,/environment: operations-backup/);assert.doesNotMatch(live,/db:deploy|vercel.*deploy|acceptance-cli|workflow_run:/);
 });
