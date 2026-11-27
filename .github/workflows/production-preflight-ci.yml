@@ -52,6 +52,8 @@ jobs:
             artifact_suffix: -6fa37aa5114eabeb9fa6c58f6fd30bd6a295d67a
           - baseline: 6fa37aa5114eabeb9fa6c58f6fd30bd6a295d67a
             candidate: 3b8fc6f1f1427504e1191004ffc8e37e94410a2e
+          - baseline: 3b8fc6f1f1427504e1191004ffc8e37e94410a2e
+            candidate: e144cfc931c695423c28f20e1a3dd83409732c1c
     services:
       postgres:
         image: postgres:17
