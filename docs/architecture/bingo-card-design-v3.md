@@ -114,6 +114,9 @@ Beim Start wird die Rundenzuordnung zusätzlich im vorhandenen Rundensnapshot
 festgehalten. Moderation zeigt bereits vor Veröffentlichung den Begriff zur manuell
 eingegebenen Zahl. DIRECT veröffentlicht durch die bestehende ausdrückliche
 Zahlenaktion, APPROVAL fordert davor eine zusätzliche Moderationsbestätigung.
+Für die neue V2-Moderation präzisiert der Auftrag vom 27.11.2026 dies bewusst:
+Enter bzw. der sichtbare Textbutton sind selbst die ausdrückliche Freigabe, ohne
+weiteren Dialog. AP3 bleibt unverändert; siehe [Rundennavigation](bingo-intro-navigation.md).
 HIDDEN zeigt dem Publikum zunächst „Verdeckt“; erst „Begriff auflösen“ schreibt
 ein ausdrückliches, revisionsgebundenes Journalereignis. Verdeckte Texte gelangen
 nicht in die Publikumsprojektion. Eine Korrektur verbirgt den Ersatzbegriff erneut.

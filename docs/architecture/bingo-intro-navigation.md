@@ -89,7 +89,11 @@ wiederverwendbaren Kontext.
 ## Eingaben und Darstellung
 
 Enter im Zahlenfeld löst das Formular direkt aus; wiederholte gehaltene
-Enter-Ereignisse werden abgefangen. Der vorhandene synchrone Inflight-Schutz,
+Enter-Ereignisse werden abgefangen. Bewusste V2-Erweiterung der früheren
+APPROVAL-Bedienregel: Der ausdrückliche Enter-/Textbutton-Submit ist selbst die
+Moderationsfreigabe; kein zusätzlicher Dialog verzögert diese Veröffentlichung.
+Die vorbereitete Veröffentlichungsvorschau und DIRECT/HIDDEN-Projektion bleiben;
+AP3 behält seinen bisherigen zusätzlichen APPROVAL-Dialog. Der vorhandene synchrone Inflight-Schutz,
 Request-ID und serverseitige Dublettenschutz bleiben maßgeblich. Nach bestätigter
 Veröffentlichung wird die Eingabe geleert und erneut fokussiert. `+` und
 `NumpadAdd` fokussieren ausschließlich während des Mounts der V2-Moderation die
