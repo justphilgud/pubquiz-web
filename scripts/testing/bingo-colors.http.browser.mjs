@@ -57,10 +57,10 @@ try{
  await click(s,'[data-round-id="'+roundId+'"] button[aria-label^="Bearbeiten:"]');
  await until(()=>evaluate(s,`document.querySelector('#color-${roundId}')?.value==='#FFF9E9'`),'persisted color after actual reload');
  report.checks.push('three numbered blocks, fixed Intro/Outro and saved custom cream color');
- await click(s,'a[href$="/slides/intro"]');await until(()=>evaluate(s,'location.pathname.endsWith("/slides/intro")&&!!document.querySelector("nav[aria-label$=\"-Slides\"]")'),'Intro configuration');
+ await click(s,'a[href$="/slides/intro"]');await until(()=>evaluate(s,`location.pathname.endsWith('/slides/intro')&&!!document.querySelector('nav[aria-label$="-Slides"]')`),'Intro configuration');
  await evaluate(s,"[...document.querySelectorAll('nav[aria-label$=\"-Slides\"] button')].find(b=>b.textContent.includes('Begrüßung')).click()");
  await set(s,'label:not([hidden]) textarea','Synthetisches Intro bleibt unabhängig');await button(s,'Slide speichern');await until(()=>evaluate(s,'location.pathname==="/bingo/'+game+'"'),'Intro saved and compact');
- await click(s,'a[href$="/slides/outro"]');await until(()=>evaluate(s,'location.pathname.endsWith("/slides/outro")&&!!document.querySelector("nav[aria-label$=\"-Slides\"]")'),'Outro configuration');
+ await click(s,'a[href$="/slides/outro"]');await until(()=>evaluate(s,`location.pathname.endsWith('/slides/outro')&&!!document.querySelector('nav[aria-label$="-Slides"]')`),'Outro configuration');
  await set(s,'label:not([hidden]) textarea','Synthetisches Outro nach allen Runden');await button(s,'Slide speichern');await until(()=>evaluate(s,'location.pathname==="/bingo/'+game+'"'),'Outro saved and compact');
  const config=(await state(s)).ceremony.config;assert.equal(config.welcome,'Synthetisches Intro bleibt unabhängig');assert.equal(config.outro.announcements,'Synthetisches Outro nach allen Runden');report.checks.push('routed editors with independent Intro/Outro persistence and compact return');
  await click(s,'[data-round-id="'+roundId+'"] button[aria-label^="Bearbeiten:"]');await until(()=>evaluate(s,'!!document.querySelector("#count-'+roundId+'")'),'card form');

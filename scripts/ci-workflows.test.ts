@@ -295,3 +295,5 @@ test('Matching UX Preview cannot run the shared migration job and retains all ex
   assert.ok(job.includes("if: github.ref == 'refs/heads/codex/bingo-presentation-colors'"));
   assert.ok(job.indexOf('scripts/operations/apply-bingo-color-preview.ts') < job.indexOf('scripts/deploy-vercel-git-preview.ts'));
  });
+
+import './testing/bingo-colors-browser-expressions.test';
