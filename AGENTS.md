@@ -16,6 +16,46 @@ Heed deprecation notices.
 
 # PubQuiz Development Rules
 
+## Verbindlicher Release-Standard
+
+Vor jedem Release `docs/operations/release-process.md` lesen und befolgen.
+Der mit PR #194 eingeführte und für `ba484967` erfolgreich ausgeführte Ablauf
+ist der Standard für künftige Releases:
+
+- Den Release-Plan `release/plan.json` im normalen Feature-PR mitführen und
+  prüfen: unabhängig bestätigte Production-Basis, Schema- und vollständige
+  Migrationsprüfsummen. Kein zusätzlicher Operations-PR oder Operations-Merge
+  nur zur Registrierung des nach dem Merge entstandenen Release-SHA-Paars.
+- Aktuell unterstützt der allgemeine Pfad nur `NO_DELTA`. Bei neuen Migrationen
+  müssen die enge Planvalidierung sowie isolierte Delta-, Kompatibilitäts- und
+  Rückwegtests bereits in denselben Feature-PR. Unbekannte Planarten bleiben
+  blockiert; keine pauschale SQL-Freigabe oder Rückkehr zur routinemäßigen
+  zusätzlichen Operationsregistrierung.
+- Feature-CI über `pull_request` ausführen, einschließlich Draft-PRs; keine
+  zusätzliche gleichartige Push-CI auf Feature-Branches einführen. PR-CI prüft
+  den exakten PR-Head. Die separate CI für den tatsächlichen `main`-Merge-Commit
+  bleibt verpflichtend; Qualitäts-, Safety-, Bridge- und PostgreSQL-Prüfungen
+  sowie ihre bestehenden Pfadfilter erhalten.
+- Nur nach Freigabe und grünen Checks regulär mergen. Vor dem Release die
+  erfolgreiche CI des exakten resultierenden `main`-Commits bestätigen.
+- Den bestehenden geschützten Read-only-Preflight mit exaktem Kandidaten und
+  unabhängig erwarteter Production-Basis ausführen. Production ausschließlich
+  ausdrücklich über den manuellen geschützten Workflow mit genau diesem
+  Release-SHA und der erfolgreichen Preflight-Lauf-ID starten. Keine automatischen
+  Production-Deployments durch Feature-/Operations-Merges oder CI-Abschluss.
+- GitHub-Environment-/Owner-Freigaben muss der vorgeschriebene Reviewer selbst
+  erteilen. main-only, Featureflag, Serialisierung, Reader-Rechte, unveränderliche
+  Artefakte, Herkunfts-/SHA-/CI-/Versuchsbindung, frische Alias-/Basisprüfung und
+  DB-Identitäts-/Migrationsprüfungen unverändert erhalten. Keine Schutzmaßnahmen
+  umgehen oder abschwächen; bei fehlenden oder widersprüchlichen Nachweisen stoppen.
+- Das dokumentierte Backupverfahren bleibt gültig. Ein Backup-Verzicht benötigt
+  eine ausdrückliche Freigabe für den konkreten Release; frühere Ausnahmen gelten
+  nicht für spätere Releases.
+- Nach dem Deployment Migrationsstatus, READY/Current, tatsächlichen Runtime-SHA,
+  HTTP- und möglichst lesenden fachlichen Smoke-Test prüfen und dokumentieren.
+  Keine echten Quizdaten oder Bewertungen für den Smoke-Test verändern; bekannte
+  Messlücken und nicht ausgeführte Prüfungen ausdrücklich benennen.
+
 ## Living Specifications
 
 Für relevante Funktionen, Komponenten und Templates gilt verbindlich:
