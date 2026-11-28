@@ -39,6 +39,7 @@ export type Bingo_roundsSumAggregateOutputType = {
 }
 
 export type Bingo_roundsMinAggregateOutputType = {
+  presentation_color: string | null
   id: string | null
   game_id: string | null
   position: number | null
@@ -50,6 +51,7 @@ export type Bingo_roundsMinAggregateOutputType = {
 }
 
 export type Bingo_roundsMaxAggregateOutputType = {
+  presentation_color: string | null
   id: string | null
   game_id: string | null
   position: number | null
@@ -61,6 +63,7 @@ export type Bingo_roundsMaxAggregateOutputType = {
 }
 
 export type Bingo_roundsCountAggregateOutputType = {
+  presentation_color: number
   term_snapshot: number
   id: number
   game_id: number
@@ -87,6 +90,7 @@ export type Bingo_roundsSumAggregateInputType = {
 }
 
 export type Bingo_roundsMinAggregateInputType = {
+  presentation_color?: true
   id?: true
   game_id?: true
   position?: true
@@ -98,6 +102,7 @@ export type Bingo_roundsMinAggregateInputType = {
 }
 
 export type Bingo_roundsMaxAggregateInputType = {
+  presentation_color?: true
   id?: true
   game_id?: true
   position?: true
@@ -109,6 +114,7 @@ export type Bingo_roundsMaxAggregateInputType = {
 }
 
 export type Bingo_roundsCountAggregateInputType = {
+  presentation_color?: true
   term_snapshot?: true
   id?: true
   game_id?: true
@@ -208,6 +214,7 @@ export type bingo_roundsGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
 }
 
 export type Bingo_roundsGroupByOutputType = {
+  presentation_color: string | null
   term_snapshot: runtime.JsonValue | null
   id: string
   game_id: string
@@ -243,6 +250,7 @@ export type bingo_roundsWhereInput = {
   AND?: Prisma.bingo_roundsWhereInput | Prisma.bingo_roundsWhereInput[]
   OR?: Prisma.bingo_roundsWhereInput[]
   NOT?: Prisma.bingo_roundsWhereInput | Prisma.bingo_roundsWhereInput[]
+  presentation_color?: Prisma.StringNullableFilter<"bingo_rounds"> | string | null
   term_snapshot?: Prisma.JsonNullableFilter<"bingo_rounds">
   id?: Prisma.UuidFilter<"bingo_rounds"> | string
   game_id?: Prisma.UuidFilter<"bingo_rounds"> | string
@@ -262,6 +270,7 @@ export type bingo_roundsWhereInput = {
 }
 
 export type bingo_roundsOrderByWithRelationInput = {
+  presentation_color?: Prisma.SortOrderInput | Prisma.SortOrder
   term_snapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   id?: Prisma.SortOrder
   game_id?: Prisma.SortOrder
@@ -287,6 +296,7 @@ export type bingo_roundsWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.bingo_roundsWhereInput | Prisma.bingo_roundsWhereInput[]
   OR?: Prisma.bingo_roundsWhereInput[]
   NOT?: Prisma.bingo_roundsWhereInput | Prisma.bingo_roundsWhereInput[]
+  presentation_color?: Prisma.StringNullableFilter<"bingo_rounds"> | string | null
   term_snapshot?: Prisma.JsonNullableFilter<"bingo_rounds">
   game_id?: Prisma.UuidFilter<"bingo_rounds"> | string
   position?: Prisma.IntFilter<"bingo_rounds"> | number
@@ -305,6 +315,7 @@ export type bingo_roundsWhereUniqueInput = Prisma.AtLeast<{
 }, "id" | "id_game_id" | "game_id_position">
 
 export type bingo_roundsOrderByWithAggregationInput = {
+  presentation_color?: Prisma.SortOrderInput | Prisma.SortOrder
   term_snapshot?: Prisma.SortOrderInput | Prisma.SortOrder
   id?: Prisma.SortOrder
   game_id?: Prisma.SortOrder
@@ -325,6 +336,7 @@ export type bingo_roundsScalarWhereWithAggregatesInput = {
   AND?: Prisma.bingo_roundsScalarWhereWithAggregatesInput | Prisma.bingo_roundsScalarWhereWithAggregatesInput[]
   OR?: Prisma.bingo_roundsScalarWhereWithAggregatesInput[]
   NOT?: Prisma.bingo_roundsScalarWhereWithAggregatesInput | Prisma.bingo_roundsScalarWhereWithAggregatesInput[]
+  presentation_color?: Prisma.StringNullableWithAggregatesFilter<"bingo_rounds"> | string | null
   term_snapshot?: Prisma.JsonNullableWithAggregatesFilter<"bingo_rounds">
   id?: Prisma.UuidWithAggregatesFilter<"bingo_rounds"> | string
   game_id?: Prisma.UuidWithAggregatesFilter<"bingo_rounds"> | string
@@ -337,6 +349,7 @@ export type bingo_roundsScalarWhereWithAggregatesInput = {
 }
 
 export type bingo_roundsCreateInput = {
+  presentation_color?: string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
   position: number
@@ -355,6 +368,7 @@ export type bingo_roundsCreateInput = {
 }
 
 export type bingo_roundsUncheckedCreateInput = {
+  presentation_color?: string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
   game_id: string
@@ -373,6 +387,7 @@ export type bingo_roundsUncheckedCreateInput = {
 }
 
 export type bingo_roundsUpdateInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
@@ -391,6 +406,7 @@ export type bingo_roundsUpdateInput = {
 }
 
 export type bingo_roundsUncheckedUpdateInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   game_id?: Prisma.StringFieldUpdateOperationsInput | string
@@ -409,6 +425,7 @@ export type bingo_roundsUncheckedUpdateInput = {
 }
 
 export type bingo_roundsCreateManyInput = {
+  presentation_color?: string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
   game_id: string
@@ -421,6 +438,7 @@ export type bingo_roundsCreateManyInput = {
 }
 
 export type bingo_roundsUpdateManyMutationInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
@@ -432,6 +450,7 @@ export type bingo_roundsUpdateManyMutationInput = {
 }
 
 export type bingo_roundsUncheckedUpdateManyInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   game_id?: Prisma.StringFieldUpdateOperationsInput | string
@@ -464,6 +483,7 @@ export type bingo_roundsGame_idPositionCompoundUniqueInput = {
 }
 
 export type bingo_roundsCountOrderByAggregateInput = {
+  presentation_color?: Prisma.SortOrder
   term_snapshot?: Prisma.SortOrder
   id?: Prisma.SortOrder
   game_id?: Prisma.SortOrder
@@ -482,6 +502,7 @@ export type bingo_roundsAvgOrderByAggregateInput = {
 }
 
 export type bingo_roundsMaxOrderByAggregateInput = {
+  presentation_color?: Prisma.SortOrder
   id?: Prisma.SortOrder
   game_id?: Prisma.SortOrder
   position?: Prisma.SortOrder
@@ -493,6 +514,7 @@ export type bingo_roundsMaxOrderByAggregateInput = {
 }
 
 export type bingo_roundsMinOrderByAggregateInput = {
+  presentation_color?: Prisma.SortOrder
   id?: Prisma.SortOrder
   game_id?: Prisma.SortOrder
   position?: Prisma.SortOrder
@@ -641,6 +663,7 @@ export type bingo_roundsUpdateOneRequiredWithoutBingo_print_job_itemsNestedInput
 }
 
 export type bingo_roundsCreateWithoutGameInput = {
+  presentation_color?: string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
   position: number
@@ -658,6 +681,7 @@ export type bingo_roundsCreateWithoutGameInput = {
 }
 
 export type bingo_roundsUncheckedCreateWithoutGameInput = {
+  presentation_color?: string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
   position: number
@@ -704,6 +728,7 @@ export type bingo_roundsScalarWhereInput = {
   AND?: Prisma.bingo_roundsScalarWhereInput | Prisma.bingo_roundsScalarWhereInput[]
   OR?: Prisma.bingo_roundsScalarWhereInput[]
   NOT?: Prisma.bingo_roundsScalarWhereInput | Prisma.bingo_roundsScalarWhereInput[]
+  presentation_color?: Prisma.StringNullableFilter<"bingo_rounds"> | string | null
   term_snapshot?: Prisma.JsonNullableFilter<"bingo_rounds">
   id?: Prisma.UuidFilter<"bingo_rounds"> | string
   game_id?: Prisma.UuidFilter<"bingo_rounds"> | string
@@ -716,6 +741,7 @@ export type bingo_roundsScalarWhereInput = {
 }
 
 export type bingo_roundsCreateWithoutOriginal_seriesInput = {
+  presentation_color?: string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
   position: number
@@ -733,6 +759,7 @@ export type bingo_roundsCreateWithoutOriginal_seriesInput = {
 }
 
 export type bingo_roundsUncheckedCreateWithoutOriginal_seriesInput = {
+  presentation_color?: string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
   game_id: string
@@ -766,6 +793,7 @@ export type bingo_roundsUpdateToOneWithWhereWithoutOriginal_seriesInput = {
 }
 
 export type bingo_roundsUpdateWithoutOriginal_seriesInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
@@ -783,6 +811,7 @@ export type bingo_roundsUpdateWithoutOriginal_seriesInput = {
 }
 
 export type bingo_roundsUncheckedUpdateWithoutOriginal_seriesInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   game_id?: Prisma.StringFieldUpdateOperationsInput | string
@@ -800,6 +829,7 @@ export type bingo_roundsUncheckedUpdateWithoutOriginal_seriesInput = {
 }
 
 export type bingo_roundsCreateWithoutSeriesInput = {
+  presentation_color?: string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
   position: number
@@ -817,6 +847,7 @@ export type bingo_roundsCreateWithoutSeriesInput = {
 }
 
 export type bingo_roundsUncheckedCreateWithoutSeriesInput = {
+  presentation_color?: string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
   game_id: string
@@ -850,6 +881,7 @@ export type bingo_roundsUpdateToOneWithWhereWithoutSeriesInput = {
 }
 
 export type bingo_roundsUpdateWithoutSeriesInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
@@ -867,6 +899,7 @@ export type bingo_roundsUpdateWithoutSeriesInput = {
 }
 
 export type bingo_roundsUncheckedUpdateWithoutSeriesInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   game_id?: Prisma.StringFieldUpdateOperationsInput | string
@@ -884,6 +917,7 @@ export type bingo_roundsUncheckedUpdateWithoutSeriesInput = {
 }
 
 export type bingo_roundsCreateWithoutIssuance_changesInput = {
+  presentation_color?: string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
   position: number
@@ -901,6 +935,7 @@ export type bingo_roundsCreateWithoutIssuance_changesInput = {
 }
 
 export type bingo_roundsUncheckedCreateWithoutIssuance_changesInput = {
+  presentation_color?: string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
   game_id: string
@@ -934,6 +969,7 @@ export type bingo_roundsUpdateToOneWithWhereWithoutIssuance_changesInput = {
 }
 
 export type bingo_roundsUpdateWithoutIssuance_changesInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
@@ -951,6 +987,7 @@ export type bingo_roundsUpdateWithoutIssuance_changesInput = {
 }
 
 export type bingo_roundsUncheckedUpdateWithoutIssuance_changesInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   game_id?: Prisma.StringFieldUpdateOperationsInput | string
@@ -968,6 +1005,7 @@ export type bingo_roundsUncheckedUpdateWithoutIssuance_changesInput = {
 }
 
 export type bingo_roundsCreateWithoutLive_runsInput = {
+  presentation_color?: string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
   position: number
@@ -985,6 +1023,7 @@ export type bingo_roundsCreateWithoutLive_runsInput = {
 }
 
 export type bingo_roundsUncheckedCreateWithoutLive_runsInput = {
+  presentation_color?: string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
   game_id: string
@@ -1018,6 +1057,7 @@ export type bingo_roundsUpdateToOneWithWhereWithoutLive_runsInput = {
 }
 
 export type bingo_roundsUpdateWithoutLive_runsInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1035,6 +1075,7 @@ export type bingo_roundsUpdateWithoutLive_runsInput = {
 }
 
 export type bingo_roundsUncheckedUpdateWithoutLive_runsInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   game_id?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1052,6 +1093,7 @@ export type bingo_roundsUncheckedUpdateWithoutLive_runsInput = {
 }
 
 export type bingo_roundsCreateWithoutEvent_planInput = {
+  presentation_color?: string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
   position: number
@@ -1069,6 +1111,7 @@ export type bingo_roundsCreateWithoutEvent_planInput = {
 }
 
 export type bingo_roundsUncheckedCreateWithoutEvent_planInput = {
+  presentation_color?: string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
   game_id: string
@@ -1102,6 +1145,7 @@ export type bingo_roundsUpdateToOneWithWhereWithoutEvent_planInput = {
 }
 
 export type bingo_roundsUpdateWithoutEvent_planInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1119,6 +1163,7 @@ export type bingo_roundsUpdateWithoutEvent_planInput = {
 }
 
 export type bingo_roundsUncheckedUpdateWithoutEvent_planInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   game_id?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1136,6 +1181,7 @@ export type bingo_roundsUncheckedUpdateWithoutEvent_planInput = {
 }
 
 export type bingo_roundsCreateWithoutBingo_print_job_itemsInput = {
+  presentation_color?: string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
   position: number
@@ -1153,6 +1199,7 @@ export type bingo_roundsCreateWithoutBingo_print_job_itemsInput = {
 }
 
 export type bingo_roundsUncheckedCreateWithoutBingo_print_job_itemsInput = {
+  presentation_color?: string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
   game_id: string
@@ -1186,6 +1233,7 @@ export type bingo_roundsUpdateToOneWithWhereWithoutBingo_print_job_itemsInput = 
 }
 
 export type bingo_roundsUpdateWithoutBingo_print_job_itemsInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1203,6 +1251,7 @@ export type bingo_roundsUpdateWithoutBingo_print_job_itemsInput = {
 }
 
 export type bingo_roundsUncheckedUpdateWithoutBingo_print_job_itemsInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   game_id?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1220,6 +1269,7 @@ export type bingo_roundsUncheckedUpdateWithoutBingo_print_job_itemsInput = {
 }
 
 export type bingo_roundsCreateManyGameInput = {
+  presentation_color?: string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: string
   position: number
@@ -1231,6 +1281,7 @@ export type bingo_roundsCreateManyGameInput = {
 }
 
 export type bingo_roundsUpdateWithoutGameInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1248,6 +1299,7 @@ export type bingo_roundsUpdateWithoutGameInput = {
 }
 
 export type bingo_roundsUncheckedUpdateWithoutGameInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1265,6 +1317,7 @@ export type bingo_roundsUncheckedUpdateWithoutGameInput = {
 }
 
 export type bingo_roundsUncheckedUpdateManyWithoutGameInput = {
+  presentation_color?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   term_snapshot?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   id?: Prisma.StringFieldUpdateOperationsInput | string
   position?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1352,6 +1405,7 @@ export type Bingo_roundsCountOutputTypeCountIssuance_changesArgs<ExtArgs extends
 
 
 export type bingo_roundsSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  presentation_color?: boolean
   term_snapshot?: boolean
   id?: boolean
   game_id?: boolean
@@ -1372,6 +1426,7 @@ export type bingo_roundsSelect<ExtArgs extends runtime.Types.Extensions.Internal
 }, ExtArgs["result"]["bingo_rounds"]>
 
 export type bingo_roundsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  presentation_color?: boolean
   term_snapshot?: boolean
   id?: boolean
   game_id?: boolean
@@ -1385,6 +1440,7 @@ export type bingo_roundsSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
 }, ExtArgs["result"]["bingo_rounds"]>
 
 export type bingo_roundsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+  presentation_color?: boolean
   term_snapshot?: boolean
   id?: boolean
   game_id?: boolean
@@ -1398,6 +1454,7 @@ export type bingo_roundsSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
 }, ExtArgs["result"]["bingo_rounds"]>
 
 export type bingo_roundsSelectScalar = {
+  presentation_color?: boolean
   term_snapshot?: boolean
   id?: boolean
   game_id?: boolean
@@ -1409,7 +1466,7 @@ export type bingo_roundsSelectScalar = {
   created_at?: boolean
 }
 
-export type bingo_roundsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"term_snapshot" | "id" | "game_id" | "position" | "label" | "planned_draws" | "strategy" | "issued_count" | "created_at", ExtArgs["result"]["bingo_rounds"]>
+export type bingo_roundsOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"presentation_color" | "term_snapshot" | "id" | "game_id" | "position" | "label" | "planned_draws" | "strategy" | "issued_count" | "created_at", ExtArgs["result"]["bingo_rounds"]>
 export type bingo_roundsInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   bingo_print_job_items?: boolean | Prisma.bingo_rounds$bingo_print_job_itemsArgs<ExtArgs>
   event_plan?: boolean | Prisma.bingo_rounds$event_planArgs<ExtArgs>
@@ -1439,6 +1496,7 @@ export type $bingo_roundsPayload<ExtArgs extends runtime.Types.Extensions.Intern
     issuance_changes: Prisma.$bingo_issuance_changesPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
+    presentation_color: string | null
     term_snapshot: runtime.JsonValue | null
     id: string
     game_id: string
@@ -1531,8 +1589,8 @@ export interface bingo_roundsDelegate<ExtArgs extends runtime.Types.Extensions.I
    * // Get first 10 Bingo_rounds
    * const bingo_rounds = await prisma.bingo_rounds.findMany({ take: 10 })
    *
-   * // Only select the `term_snapshot`
-   * const bingo_roundsWithTerm_snapshotOnly = await prisma.bingo_rounds.findMany({ select: { term_snapshot: true } })
+   * // Only select the `presentation_color`
+   * const bingo_roundsWithPresentation_colorOnly = await prisma.bingo_rounds.findMany({ select: { presentation_color: true } })
    *
    */
   findMany<T extends bingo_roundsFindManyArgs>(args?: Prisma.SelectSubset<T, bingo_roundsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$bingo_roundsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
@@ -1576,9 +1634,9 @@ export interface bingo_roundsDelegate<ExtArgs extends runtime.Types.Extensions.I
    *   ]
    * })
    *
-   * // Create many Bingo_rounds and only return the `term_snapshot`
-   * const bingo_roundsWithTerm_snapshotOnly = await prisma.bingo_rounds.createManyAndReturn({
-   *   select: { term_snapshot: true },
+   * // Create many Bingo_rounds and only return the `presentation_color`
+   * const bingo_roundsWithPresentation_colorOnly = await prisma.bingo_rounds.createManyAndReturn({
+   *   select: { presentation_color: true },
    *   data: [
    *     // ... provide data here
    *   ]
@@ -1667,9 +1725,9 @@ export interface bingo_roundsDelegate<ExtArgs extends runtime.Types.Extensions.I
    *   ]
    * })
    *
-   * // Update zero or more Bingo_rounds and only return the `term_snapshot`
-   * const bingo_roundsWithTerm_snapshotOnly = await prisma.bingo_rounds.updateManyAndReturn({
-   *   select: { term_snapshot: true },
+   * // Update zero or more Bingo_rounds and only return the `presentation_color`
+   * const bingo_roundsWithPresentation_colorOnly = await prisma.bingo_rounds.updateManyAndReturn({
+   *   select: { presentation_color: true },
    *   where: {
    *     // ... provide filter here
    *   },
@@ -1878,6 +1936,7 @@ export interface Prisma__bingo_roundsClient<T, Null = never, ExtArgs extends run
  * Fields of the bingo_rounds model
  */
 export interface bingo_roundsFieldRefs {
+  readonly presentation_color: Prisma.FieldRef<"bingo_rounds", 'String'>
   readonly term_snapshot: Prisma.FieldRef<"bingo_rounds", 'Json'>
   readonly id: Prisma.FieldRef<"bingo_rounds", 'String'>
   readonly game_id: Prisma.FieldRef<"bingo_rounds", 'String'>

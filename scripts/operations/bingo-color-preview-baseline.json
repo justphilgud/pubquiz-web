@@ -1,0 +1,124 @@
+{
+  "columns": [
+    {
+      "udt": "uuid",
+      "name": "id",
+      "type": "uuid",
+      "length": null,
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "udt": "uuid",
+      "name": "game_id",
+      "type": "uuid",
+      "length": null,
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "udt": "int4",
+      "name": "position",
+      "type": "integer",
+      "length": null,
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "udt": "varchar",
+      "name": "label",
+      "type": "character varying",
+      "length": 80,
+      "default": null,
+      "nullable": "NO"
+    },
+    {
+      "udt": "int4",
+      "name": "planned_draws",
+      "type": "integer",
+      "length": null,
+      "default": "30",
+      "nullable": "NO"
+    },
+    {
+      "udt": "varchar",
+      "name": "strategy",
+      "type": "character varying",
+      "length": 16,
+      "default": "'NEW'::character varying",
+      "nullable": "NO"
+    },
+    {
+      "udt": "int4",
+      "name": "issued_count",
+      "type": "integer",
+      "length": null,
+      "default": null,
+      "nullable": "YES"
+    },
+    {
+      "udt": "timestamptz",
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "length": null,
+      "default": "CURRENT_TIMESTAMP",
+      "nullable": "NO"
+    },
+    {
+      "udt": "jsonb",
+      "name": "term_snapshot",
+      "type": "jsonb",
+      "length": null,
+      "default": null,
+      "nullable": "YES"
+    }
+  ],
+  "indexes": [
+    {
+      "name": "bingo_rounds_game_id_position_key",
+      "definition": "CREATE UNIQUE INDEX bingo_rounds_game_id_position_key ON pubquiz.bingo_rounds USING btree (game_id, \"position\")"
+    },
+    {
+      "name": "bingo_rounds_id_game_id_key",
+      "definition": "CREATE UNIQUE INDEX bingo_rounds_id_game_id_key ON pubquiz.bingo_rounds USING btree (id, game_id)"
+    },
+    {
+      "name": "bingo_rounds_pkey",
+      "definition": "CREATE UNIQUE INDEX bingo_rounds_pkey ON pubquiz.bingo_rounds USING btree (id)"
+    }
+  ],
+  "constraints": [
+    {
+      "name": "bingo_round_terms_shape",
+      "definition": "CHECK (((term_snapshot IS NULL) OR ((jsonb_typeof(term_snapshot) = 'object'::text) AND ((term_snapshot ->> 'version'::text) = ANY (ARRAY['1'::text, '2'::text])))))"
+    },
+    {
+      "name": "bingo_rounds_game_id_fkey",
+      "definition": "FOREIGN KEY (game_id) REFERENCES pubquiz.game_drafts(id) ON UPDATE CASCADE ON DELETE RESTRICT"
+    },
+    {
+      "name": "bingo_rounds_issued_count_check",
+      "definition": "CHECK (((issued_count IS NULL) OR (issued_count >= 0)))"
+    },
+    {
+      "name": "bingo_rounds_label_check",
+      "definition": "CHECK (((length(btrim((label)::text)) >= 1) AND (length(btrim((label)::text)) <= 80)))"
+    },
+    {
+      "name": "bingo_rounds_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "name": "bingo_rounds_planned_draws_check",
+      "definition": "CHECK (((planned_draws >= 1) AND (planned_draws <= 75)))"
+    },
+    {
+      "name": "bingo_rounds_position_check",
+      "definition": "CHECK ((\"position\" > 0))"
+    },
+    {
+      "name": "bingo_rounds_strategy_check",
+      "definition": "CHECK (((strategy)::text = ANY (ARRAY[('NEW'::character varying)::text, ('EXISTING'::character varying)::text])))"
+    }
+  ]
+}

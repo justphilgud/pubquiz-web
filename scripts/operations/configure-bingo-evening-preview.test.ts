@@ -20,3 +20,11 @@ test('administrative configuration emits only four exact Preview branch database
     assert.throws(() => eveningPreviewVariables({ ...environment, [key]: value }), key);
   }
 });
+
+test('explicit Bingo color branch shares only the approved synthetic database',()=>{
+ const approved={...environment,DEPLOYMENT_BRANCH:'codex/bingo-presentation-colors',DEPLOYMENT_REF:'refs/heads/codex/bingo-presentation-colors'};
+ for(const variable of eveningPreviewVariables(approved))assert.equal(variable.gitBranch,approved.DEPLOYMENT_BRANCH);
+ assert.throws(()=>eveningPreviewVariables({...approved,DATABASE_URL:approved.DATABASE_URL.replace('bingo_evening_review','neondb')}));
+ assert.throws(()=>eveningPreviewVariables({...approved,DEPLOYMENT_ENV:'production'}));
+ assert.throws(()=>eveningPreviewVariables({...approved,DEPLOYMENT_BRANCH:'codex/bingo-presentation-colors-foreign'}));
+});

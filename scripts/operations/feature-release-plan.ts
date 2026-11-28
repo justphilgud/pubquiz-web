@@ -4,6 +4,7 @@ import {migrationFiles,type Migration} from './production-preflight';
 
 export const FEATURE_PLAN_PATH='release/plan.json';
 import {releaseCi} from './release-provenance';
+import {verifyBingoColorPlan} from './bingo-color-release-plan';
 export {verifiedReleaseCi,type CiRun,type MergedPull} from './release-provenance';
 export type FeaturePlan={version:1;kind:'NO_DELTA';baselineSha:string;migrationCount:number;lastMigration:string;manifestSha256:string;schemaSha256:string};
 const sha=(value:string)=>/^[a-f0-9]{40}$/.test(value);
@@ -14,6 +15,7 @@ export function featurePlanFor(baselineSha:string,files:readonly Migration[],sch
  return {version:1,kind:'NO_DELTA',baselineSha,migrationCount:files.length,lastMigration:files.at(-1)!.name,manifestSha256:hash(JSON.stringify(manifest(files))),schemaSha256:hash(schema)};
 }
 export function verifyFeaturePlan(value:unknown,baseline:string,candidate:string,before:readonly Migration[],after:readonly Migration[],beforeSchema:string,afterSchema:string){
+ if(value&&typeof value==='object'&&'kind' in value&&value.kind==='BINGO_ROUND_COLOR')return verifyBingoColorPlan(value,baseline,candidate,before,after,beforeSchema,afterSchema);
  if(!value||typeof value!=='object'||Array.isArray(value)||!sha(baseline)||!sha(candidate)||baseline===candidate)throw Error('FEATURE_PLAN_INVALID');
  const expected=featurePlanFor(baseline,before,beforeSchema),v=value as FeaturePlan;
  if(Object.keys(v).sort().join()!==Object.keys(expected).sort().join()||Object.entries(expected).some(([k,val])=>v[k as keyof FeaturePlan]!==val)||

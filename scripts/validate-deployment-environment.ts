@@ -33,6 +33,9 @@ export const BINGO_EVENING_REVIEW_DATABASE = {
   name: "bingo_evening_review",
 } as const;
 
+// Explicit user authorization: only this new branch reuses the existing synthetic Bingo review DB.
+export const BINGO_COLOR_REVIEW_BRANCH = 'codex/bingo-presentation-colors';
+
 export type DeploymentEnvironment = "preview" | "production";
 
 export type DeploymentValidationInput = Readonly<{
@@ -239,7 +242,7 @@ export function validateDeploymentEnvironment(
   const matching=BINGO_MATCHING_REVIEW_DATABASE;
   const matchingUx=BINGO_MATCHING_UX_REVIEW_DATABASE;
   const evening = BINGO_EVENING_REVIEW_DATABASE;
-  if (environment === 'preview' && context.ref === 'refs/heads/' + evening.branch) {
+  if (environment === 'preview' && (context.ref === 'refs/heads/' + evening.branch || context.ref === 'refs/heads/' + BINGO_COLOR_REVIEW_BRANCH)) {
     if (!isReviewHost || database.name !== evening.name || expectedBranch !== evening.endpoint) {
       throw new DeploymentValidationError('BINGO_EVENING_REVIEW_IDENTITY_MISMATCH', 'Dieser Bingoabend-Branch benötigt ausschließlich seine eigene isolierte Testdatenbank.');
     }

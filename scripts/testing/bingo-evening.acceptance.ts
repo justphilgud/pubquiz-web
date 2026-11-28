@@ -19,6 +19,11 @@ export async function exerciseBingoEvening(db:Client,api:typeof Prep&{creation:t
  await db.query(ddl);
  const full=await api.creation.createBingoEvent(1,{seriesId:10,title:'Binglöckchen · sechs Runden',date:'2026-12-08',time:'19:30',roundCount:6,requestId:randomUUID()});
  const prep=()=>api.readPreparation(1,full.id);
+ const saveColor=async(color:string|null)=>{const p=await prep(),r=p.rounds[0];return api.writePreparation(1,{operation:'saveRound',gameId:full.id,expectedSeriesId:10,revision:p.revision,roundId:r.id,label:r.label,target:r.target,strategy:r.strategy,issued:r.issued,color});};
+ await saveColor('#68bbcb');assert.equal((await prep()).rounds[0].color,'#68BBCB');
+ await saveColor(null);assert.equal((await prep()).rounds[0].color,null);
+ await saveColor('#68BBCB');
+
  const generate={operation:'generateEvening',gameId:full.id,expectedSeriesId:10,revision:(await prep()).revision,count:100,printLayout:{format:'SRA3_TWELVE',cardProfile:'A4_FOUR'},requestId:randomUUID()};
  // Evening generation uses the configured SRA3 format via the existing per-round renderer.
  const printJob=await api.writePreparation(1,generate);
@@ -44,6 +49,10 @@ export async function exerciseBingoEvening(db:Client,api:typeof Prep&{creation:t
  const send=async(command:EventCommand)=>{const v=(await view()).live!;const input={gameId:full.id,runId:start.runId,requestId:randomUUID(),revision:v.revision,command};await api.eventRun.commandEventRun(1,input);return input;};
  // Exercise the new journal command with real CAS, frozen cards and readback.
  const firstView=await view(),firstId=firstView.live!.round.id,secondId=firstView.plan[1].round_id;
+ assert.equal(firstView.live!.round.color,'#68BBCB');
+ await assert.rejects(saveColor('#FFF9E9'),/gestartet/);
+ assert.equal((await api.eventRun.readEventAudience(1,firstView.live!.audienceKey)).roundColor,'#68BBCB');
+
  const oldDraws=JSON.stringify(firstView.live!.state.run.rounds[0].draws);
  await send({kind:'navigateRound',roundId:secondId,preparationRevision:(await prep()).revision});
  assert.equal((await api.eventRun.readEventAudience(1,(await view()).live!.audienceKey)).roundNumber,2);
@@ -61,7 +70,7 @@ export async function exerciseBingoEvening(db:Client,api:typeof Prep&{creation:t
   let v=(await view()).live!;const card=v.cards[0];
   assert.equal((await api.eventRun.readEventAudience(1,v.audienceKey)).roundNumber,i+1);
   const [snapshot]=(await db.query('SELECT print_snapshot FROM pubquiz.bingo_card_series WHERE game_id=$1 AND origin_round_id=$2 LIMIT 1',[full.id,v.round.id])).rows;
-  assert.equal(snapshot.print_snapshot.settings.colors.back,roundColor(i+1).background);
+  assert.equal(snapshot.print_snapshot.settings.colors.back,roundColor(i+1,i===0?'#68BBCB':null).background);
   if(i===0){const other=(await db.query('SELECT c.id FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_card_series s ON s.id=c.series_id WHERE s.game_id=$1 AND s.origin_round_id<>$2 LIMIT 1',[full.id,v.round.id])).rows[0];await assert.rejects(send({kind:'check',cardId:other.id,context:v.callContext}),/WRONG_ROUND/);}
   const drawn=new Set(currentEventRound(v.state).draws.map(draw=>draw.number));
   for(const number of card.cells[0])if(!drawn.has(number!))await send({kind:'draw',number:number!});

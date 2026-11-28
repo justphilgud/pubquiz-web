@@ -73,6 +73,7 @@ jobs:
       github.ref != 'refs/heads/codex/bingo-matching-table' &&
       github.ref != 'refs/heads/codex/bingo-matching-ux-polish' &&
       github.ref != 'refs/heads/codex/bingo-evening-dramaturgy' &&
+      github.ref != 'refs/heads/codex/bingo-presentation-colors' &&
       !inputs.isolated_bingo_evening && !inputs.configure_bingo_database &&
       !inputs.editorial_dry_run_only && !inputs.editorial_repair_test_questions &&
       (github.ref != 'refs/heads/codex/shared-game-design' || inputs.isolated_shared_design) &&
@@ -317,14 +318,14 @@ jobs:
       inputs.isolated_bingo_evening &&
       github.event_name == 'workflow_dispatch' &&
       github.repository == 'justphilgud/pubquiz-web' &&
-      github.ref == 'refs/heads/codex/bingo-evening-dramaturgy'
+      (github.ref == 'refs/heads/codex/bingo-evening-dramaturgy' || github.ref == 'refs/heads/codex/bingo-presentation-colors')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     environment: preview
     env:
       DEPLOYMENT_ENV: preview
       DEPLOYMENT_EVENT: workflow_dispatch
-      DEPLOYMENT_BRANCH: codex/bingo-evening-dramaturgy
+      DEPLOYMENT_BRANCH: ${{ github.ref_name }}
       DEPLOYMENT_REF: ${{ github.ref }}
       DEPLOYMENT_SHA: ${{ github.sha }}
       DEPLOYMENT_REPOSITORY: ${{ github.repository }}
@@ -365,6 +366,9 @@ jobs:
       - run: npm ci
       - name: Validate isolated database identity
         run: npm run deployment:validate
+      - name: Apply committed migration only to the approved synthetic Bingo color Preview
+        if: github.ref == 'refs/heads/codex/bingo-presentation-colors'
+        run: node --import tsx scripts/operations/apply-bingo-color-preview.ts
       - name: Administrative exact branch database configuration
         if: inputs.configure_bingo_database
         run: node --import tsx scripts/operations/configure-bingo-evening-preview.ts
@@ -377,7 +381,12 @@ jobs:
         env:
           BINGO_EVENING_PREVIEW_URL: ${{ steps.deploy.outputs.url }}
           BINGO_EVENING_ACCOUNTS: ${{ secrets.BINGO_EVENING_ACCOUNTS }}
-        run: node scripts/testing/bingo-evening.http.browser.mjs --hosted
+        run: |
+          if [[ "$DEPLOYMENT_BRANCH" == "codex/bingo-presentation-colors" ]]; then
+            node scripts/testing/bingo-colors.http.browser.mjs --hosted
+          else
+            node scripts/testing/bingo-evening.http.browser.mjs --hosted
+          fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:

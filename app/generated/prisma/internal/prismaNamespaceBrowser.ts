@@ -1184,6 +1184,7 @@ export type Bingo_matching_assetsScalarFieldEnum = (typeof Bingo_matching_assets
 
 
 export const Bingo_roundsScalarFieldEnum = {
+  presentation_color: 'presentation_color',
   term_snapshot: 'term_snapshot',
   id: 'id',
   game_id: 'game_id',

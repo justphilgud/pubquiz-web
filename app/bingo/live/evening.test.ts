@@ -31,8 +31,8 @@ test('all four history sorts retain immutable drawing identity and position',()=
   const result=sortDraws(original,sort);assert.deepEqual(result.map(d=>d.number),expected);for(const draw of result)assert.equal(draw,original[draw.position-1]);
  }assert.deepEqual(original,before);
 });
-test('ten print/projector schemes have at least 4.5:1 text contrast, original LOVD red first',()=>{
- assert.equal(ROUND_COLORS.length,10);assert.equal(roundColor(1).background,'#74291D');assert.equal(new Set(ROUND_COLORS.map(t=>t.background)).size,10);
+test('seven print/projector schemes repeat through ten rounds with 4.5:1 text contrast',()=>{
+ assert.equal(ROUND_COLORS.length,7);assert.equal(roundColor(1).background,'#6A241C');assert.equal(new Set(ROUND_COLORS.map(t=>t.background)).size,7);assert.deepEqual(roundColor(8),roundColor(1));
  for(let i=1;i<=10;i++){const c=roundColor(i);assert.ok(contrastRatio(c.background,c.foreground)>=4.5,`${i}: ${contrastRatio(c.background,c.foreground)}`);}
  assert.throws(()=>roundColor(11));assert.throws(()=>roundColor(0));
 });
