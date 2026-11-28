@@ -1,3 +1,4 @@
+import './live/numberAppearance.test';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { contrastRatio } from '@/app/rendering/presentationTemplates/presentationTemplate';

@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "kind": "BINGO_ROUND_COLOR",
-  "baselineSha": "ba484967f4fa3bd1295954d21393261dbf30b0c8",
+  "kind": "NO_DELTA",
+  "baselineSha": "6b5156f666b5a5060aa6f7847eec8f94bedb08c8",
   "migrationCount": 82,
   "lastMigration": "20261127220000_bingo_round_color",
   "manifestSha256": "d460aa58ae0a2225d6fd4b462d051ae71cb1c55bb2b643eeca23c2e8dde989f9",
