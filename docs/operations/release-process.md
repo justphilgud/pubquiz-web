@@ -202,3 +202,20 @@ Assertions und keine Änderung an Anwendung, Datenbank oder Release-Gates.
 Die vorhandenen Endpunktregressionen prüfen verzögerten Start, Teilinhalte,
 ungültige Endpunkte, Timeout und vorzeitiges Prozessende. Der echte Excel-
 Browserablauf wird weiterhin im isolierten PostgreSQL-CI-Job ausgeführt.
+
+### Formular-Browserstart nach PR #198
+
+Die main-CI `46166938677` scheiterte in `GameDraftForm.browser.test.ts` beim
+WebSocket-Aufbau mit `Invalid URL`. Der bisherige Test las die Portdatei bereits
+bei ihrer Existenz; Chrome kann sie zu diesem Zeitpunkt noch teilweise schreiben.
+Der Formular-Browsertest verwendet nun ebenfalls `waitForChromeEndpoint` und
+wartet auf einen vollständig validierten Port und Browserpfad. Das bestehende
+30-Sekunden-Gesamtbudget bleibt erhalten; Prozessende oder Signal brechen ab.
+Es gibt weder Testwiederholung noch übersprungene fachliche Assertions.
+
+Regression: `scripts/testing/chrome-endpoint.test.ts` prüft fehlende, leere,
+teilweise und ungültige Inhalte, verzögerten Start, Timeout und Prozessende.
+`app/games/GameDraftForm.browser.test.ts` prüft weiterhin beide Formate,
+abgelehnte Schreibversuche, Abbrechen, Reload und identische Retry-Identitäten
+ausschließlich mit lokalen synthetischen Adaptern. Anwendung, Release-Plan,
+Migrationen, CI-Gates und Production-Daten bleiben durch diese Korrektur unverändert.
