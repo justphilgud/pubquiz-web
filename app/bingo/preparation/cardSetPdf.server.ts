@@ -11,6 +11,7 @@ import {createModernCardsPdf} from './pdfModern.server';
 import {createReferenceCardsPdf} from './pdfReference.server';
 import {CARD_SET_SHEET as g,cardSetSlot,mmToPt as pt} from './cardSetGeometry';
 import {canonical} from './printSnapshot';
+import {roundTheme} from '../roundColors';
 
 const ink=(color:string)=>rgb(...[1,3,5].map(i=>parseInt(color.slice(i,i+2),16)/255) as [number,number,number]);
 export type CardSetPrintSection={section:CardSetManifest['sections'][number];cards:StoredCard[]};
@@ -47,6 +48,8 @@ export async function imposeCardSet(sections:CardSetPrintSection[],title:string)
    const source=await PDFDocument.load(bytes),embedded=await out.embedPages(source.getPages());
    for(let start=0;start<batch.length;start+=12)for(const back of [false,true]){
     const page=out.addPage([pt(g.width),pt(g.height)]);
+    if(back)page.drawRectangle({x:0,y:0,width:pt(g.width),height:pt(g.height),color:ink(snap.settings.colors.back)});
+    const marks=back?ink(roundTheme(snap.settings.colors.back).foreground):rgb(0,0,0);
     // A sheet can have only one set of page boxes, not twelve independent TrimBoxes.
     page.setCropBox(0,0,pt(g.width),pt(g.height));page.setTrimBox(0,0,pt(g.width),pt(g.height));page.setBleedBox(0,0,pt(g.width),pt(g.height));
     for(let slot=0;slot<12&&start+slot<batch.length;slot++){
@@ -57,8 +60,8 @@ export async function imposeCardSet(sections:CardSetPrintSection[],title:string)
      page.drawPage(card,{x:pt(x),y:pt(y)});
      for(const dx of [0,w])for(const dy of [0,h]){
       const sx=dx?1:-1,sy=dy?1:-1,cx=x+dx,cy=y+dy;
-      page.drawLine({start:{x:pt(cx+sx*g.markOffset),y:pt(cy)},end:{x:pt(cx+sx*(g.markOffset+g.markLength)),y:pt(cy)},thickness:.3,color:rgb(0,0,0)});
-      page.drawLine({start:{x:pt(cx),y:pt(cy+sy*g.markOffset)},end:{x:pt(cx),y:pt(cy+sy*(g.markOffset+g.markLength))},thickness:.3,color:rgb(0,0,0)});
+      page.drawLine({start:{x:pt(cx+sx*g.markOffset),y:pt(cy)},end:{x:pt(cx+sx*(g.markOffset+g.markLength)),y:pt(cy)},thickness:.3,color:marks});
+      page.drawLine({start:{x:pt(cx),y:pt(cy+sy*g.markOffset)},end:{x:pt(cx),y:pt(cy+sy*(g.markOffset+g.markLength))},thickness:.3,color:marks});
      }
     }
    }

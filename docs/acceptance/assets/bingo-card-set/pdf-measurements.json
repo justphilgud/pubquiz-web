@@ -29,5 +29,8 @@
   ],
   "duplexCodesVerified": true,
   "boxes": "Sheet boxes are SRA3; per-card trim/bleed coordinates in attached ausschiessung.json",
-  "physicalPrint": "Not performed; printer-specific registration must be checked on one duplex proof sheet"
+  "physicalPrint": "Not performed; printer-specific registration must be checked on one duplex proof sheet",
+  "fullSheetBackFill": true,
+  "emptyBackSlotsColoured": true,
+  "cropMarks": "Contrast ink selected for each background"
 }

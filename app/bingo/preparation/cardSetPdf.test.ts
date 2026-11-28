@@ -24,6 +24,15 @@ test('new SRA3 imposition accepts real V3 and V4 single-card vectors without sca
   assert.equal((operators.match(/ Do\n/g)??[]).length,2,'wildcard back draws both brand logos');
   const before=JSON.stringify({snapshot,card}),pdf=await PDFDocument.load(await api.imposeCardSet([{section:{roundId:'fixture',label:'Wildcards',wildcard:true,cardIds:[card.id],snapshot},cards:[card]}],'Synthetic card set'));
   assert.equal(pdf.getPageCount(),2);for(const page of pdf.getPages()){assert.ok(Math.abs(page.getWidth()*25.4/72-320)<.001);assert.ok(Math.abs(page.getHeight()*25.4/72-450)<.001);}
+  const back=pdf.getPage(1),backStreams=back.node.Contents();assert.ok(backStreams instanceof PDFArray);
+  const backOperators=Array.from({length:backStreams.size()},(_,i)=>{const stream=pdf.context.lookup(backStreams.get(i));assert.ok(stream instanceof PDFRawStream);return Buffer.from(decodePDFRawStream(stream).decode()).toString('utf8');}).join('\n');
+  const firstFill=[...backOperators.matchAll(/^([\d.]+) ([\d.]+) ([\d.]+) rg$/gm)][0];assert.ok(firstFill);
+  firstFill.slice(1,4).map(Number).forEach((value,i)=>assert.ok(Math.abs(value-parseInt(WILDCARD_COLOR.slice(1+2*i,3+2*i),16)/255)<1e-6,'first fill is the frozen round colour'));
+  const corners=[...backOperators.matchAll(/^(-?[\d.]+) (-?[\d.]+) [ml]$/gm)].slice(0,4).map(m=>[Number(m[1]),Number(m[2])]);
+  assert.equal(corners.length,4);assert.equal(Math.min(...corners.map(p=>p[0])),0);assert.equal(Math.min(...corners.map(p=>p[1])),0);
+  assert.ok(Math.abs(Math.max(...corners.map(p=>p[0]))-back.getWidth())<1e-5,'full sheet width, including empty slots and margins');
+  assert.ok(Math.abs(Math.max(...corners.map(p=>p[1]))-back.getHeight())<1e-5,'full sheet height, including empty slots and margins');
+  assert.match(backOperators,/1 1 1 RG/,'dark sheet retains visible light crop marks');
   assert.equal(JSON.stringify({snapshot,card}),before,'renderer retains frozen inputs');
  }
 });

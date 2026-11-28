@@ -82,9 +82,17 @@ den beigen Karteninnenflächen und die Kopfzeile „Wildkart“ statt „Runde 7
 Die beiden Logo-Zeichenoperationen werden für V3 und V4 geprüft; die Phil-Gud-
 Bildbytes bleiben bei jeder Farbe identisch zum farbigen Original.
 
-Die weißen Stege auf dem Druckbogen liegen außerhalb der fertig geschnittenen
-Karten und ihres 3-mm-Anschnitts. Auf den Karten selbst gibt es keine weißen
-Logo-Unterleger oder Aussparungen. Der Farb-/Logo-Nachweis und die neuen Beispiele
+Nach ausdrücklicher Präzisierung wird die **gesamte SRA3-Rückseite** eingefärbt,
+auch die Stege, Außenränder und unbesetzten Plätze bei Teilbögen. Es bleiben
+keine unbedruckten weißen Flächen auf dem Rückseitenbogen. Die Schnittmarken
+wechseln abhängig vom Hintergrund zu kontrastreicher heller/dunkler Tinte.
+Die zusätzliche Bogenprüfung umfasst 116 Farbmesspunkte an Rändern, in
+Stegen und auf unbesetzten Teilbogenplätzen. Auf dem gesamten beigen
+Rückseitenbogen wurden null weiße Pixel gemessen. Der V3-/V4-Regressionstest
+prüft die Hintergrundfläche bis zu allen vier MediaBox-Kanten sowie
+kontrastreiche Schnittmarken bei einem Teilbogen mit nur einer Karte.
+Auf den Karten selbst gibt es weiterhin keine weißen Logo-Unterleger oder
+Aussparungen. Der Farb-/Logo-Nachweis und die neuen Beispiele
 sind rein synthetisch; bestehende Karten, Abende und Snapshots wurden nicht verändert.
 
 ![Sieben Farben mit beiden Logos](assets/bingo-card-set/farben-und-logos-uebersicht.png)

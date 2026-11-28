@@ -45,5 +45,9 @@
   "allSevenSolidAndBleedVerified": true,
   "beigeOpaqueWhitePixelsInsideCards": 0,
   "wildcardAdditionalLabels": false,
-  "wildcardHeading": "Wildkart"
+  "wildcardHeading": "Wildkart",
+  "fullSheetBackgroundVerified": true,
+  "sheetMarginGutterAndEmptySlotSamples": 116,
+  "beigeOpaqueWhitePixelsOnEntireSheet": 0,
+  "contrastCropMarks": true
 }
