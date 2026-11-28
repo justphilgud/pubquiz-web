@@ -127,3 +127,35 @@ denselben Hash aller bisherigen Rundenfelder und rollt bei Abweichung zurück.
 Ein bereits korrekt erweitertes Schema ist idempotent. Keine erfundene Baseline,
 kein historischer Replay, kein allgemeines `migrate deploy` auf dieser Preview.
 Production verwendet weiterhin die vollständige Historien- und Schemaprüfung.
+
+
+## Visuelle Präzisierung der Zahlen-Präsentation · 28.11.2026
+
+Der Folgeauftrag ersetzt ausschließlich in der numerischen Präsentation die
+bisherige Kachel-Aufhellung und die kombinierte LOVD/STELP-Marke. Fortschritt:
+`12/30` statt `12 von 30`, unveränderte Werte. Die vorhandene offizielle
+Kleinformat-Wortmarke `lovd-small-creme.png` zeigt LOVD ohne STELP; kein Beschnitt,
+keine Rekonstruktion und keine Dateiänderung. Das `×` bleibt bestehen. Die
+Wortmarke erhält 240 × 84, Phil Gud 120 × 84 CSS-Pixel mit `object-fit: contain`;
+unter 900 Pixeln 150 × 60 und 84 × 60. Die intrinsischen Proportionen bleiben.
+
+Der linke Zahlenbereich ist vertikal zur Tabelle zentriert: Sein unterer Abstand
+entspricht exakt der bestehenden 84-Pixel-Historienzeile plus 12-Pixel-Lücke.
+Die Historie, ihre Reihenfolge, Geometrie und zehn Spalten ändern sich nicht.
+Ungezogene Flächen mischen 28 % Weiß statt bisher 82 % über die Rundenfarbe.
+`numberAppearance.ts` berechnet dafür ausschließlich Darstellungswerte und
+wählt Schrift mit mindestens 4,5:1 Kontrast auch bei individuellen Farben.
+Konturen gezogener Zahlen und Inversion/Umrandung der aktuellen Zahl bleiben.
+
+`BingoBoard` behält Datenprojektion, Fitter, Polling und Zustände. Der numerische
+Darstellungsmarker begrenzt die Anpassung; Text-/Medien-/Matching-Darstellung
+behält Fortschrittsformulierung, Partnerlogo und Geometrie. Keine Änderung an
+Bingo-Kommandos, Vorbereitung, Content, Matching-Tabelle, Karten oder Druck.
+Keine Persistenz, Migration, neue Abhängigkeit oder Konfiguration.
+
+Regressionen prüfen die tatsächlich gerenderte Browsergeometrie bei 1280×600,
+1280×720, 1366×768 und 1920×1080, sieben Farben/zehn Runden, berechnete Kontraste,
+`12/30`, Originalwortmarke, unverzerrte Logos, unveränderte Zehnerhistorie sowie
+weiterhin getrennte Matching-Darstellung. Quellen: bestehende Asset-Provenienz
+`public/branding/bingo-print/SOURCES.md` und offizielle Logoseite
+https://www.branddoq.io/stelp/logo (Kleinformat-Variante).

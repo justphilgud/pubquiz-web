@@ -94,3 +94,13 @@
 .stage[data-light-round="true"] .partnerLogos img{filter:brightness(0)}
 
 .stage:not([data-term-mode]) .current strong{white-space:nowrap}
+
+/* Numeric presentation only. Matching, text/media and the history row stay unchanged. */
+.stage[data-numeric-presentation] .current{margin-bottom:96px}
+.stage[data-round-number][data-numeric-presentation] .partnerLogos img:first-child{width:240px;height:84px}
+.stage[data-round-number][data-numeric-presentation] .partnerLogos img:last-child{width:120px;height:84px}
+.stage[data-round-number][data-numeric-presentation] .board li[data-state="unseen"]{background:var(--bingo-unseen-surface);color:var(--bingo-unseen-ink)}
+@media(max-width:900px){
+ .stage[data-round-number][data-numeric-presentation] .partnerLogos img:first-child{width:150px;height:60px}
+ .stage[data-round-number][data-numeric-presentation] .partnerLogos img:last-child{width:84px;height:60px}
+}
