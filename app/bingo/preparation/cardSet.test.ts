@@ -1,8 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {parseCardSetConfig,cardSetSummary} from './cardSet';
+import {parseCardSetConfig,cardSetSummary,WILDCARD_COLOR} from './cardSet';
 import {CARD_SET_SHEET as g,cardSetSlot} from './cardSetGeometry';
-import {isWildcardCode,shortCardCode} from './bingoPrint';
+import {ROUND_COLORS} from '../roundColors';
+import {isWildcardCode,shortCardCode,cardBackHeading} from './bingoPrint';
 const id=(n:number)=>`00000000-0000-4000-8000-${String(n).padStart(12,'0')}`;
 test('wildcard namespace never reinterprets the existing ordinary WC prefix',()=>{
  const prefix=23*26+3;
@@ -28,3 +29,7 @@ test('12 finished 92.5 mm cards, 3 mm bleed and external marks fit without colli
  assert.ok(g.markOffset>g.bleed);
  assert.throws(()=>cardSetSlot(12));
 });
+
+test('wildcard uses one of the seven approved colours',()=>{assert.equal(WILDCARD_COLOR,'#062C3D');assert.ok(ROUND_COLORS.some(c=>c.background===WILDCARD_COLOR));});
+
+test('wildcard replaces the round heading without an extra caption',()=>{assert.equal(cardBackHeading(7,'WC-H-001'),'Wildkart');assert.equal(cardBackHeading(7,'G-001'),'Runde 7');assert.equal(cardBackHeading(7,'WC-001'),'Runde 7');});

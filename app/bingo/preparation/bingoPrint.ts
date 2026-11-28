@@ -50,6 +50,7 @@ export function printContrastIssues(config:BingoPrint):string[]{
 }
 /** Scoped to one game; prefix allocation is serialized and persisted, never truncated. */
 export const isWildcardCode=(code:string)=>/^WC-[A-Z]+-\d{3}$/.test(code);
+export const cardBackHeading=(round:number,code:string)=>isWildcardCode(code)?'Wildkart':`Runde ${round}`;
 export function shortCardCode(prefix:number,ordinal:number,wildcard=false){
   if(!Number.isSafeInteger(prefix)||prefix<1||!Number.isSafeInteger(ordinal)||ordinal<1||ordinal>500)throw Error('SHORT_CODE_INVALID');
   let letters='';for(let n=prefix;n>0;n=Math.floor((n-1)/26))letters=String.fromCharCode(65+(n-1)%26)+letters;

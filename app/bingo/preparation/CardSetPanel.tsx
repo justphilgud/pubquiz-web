@@ -38,7 +38,7 @@ export default function CardSetPanel({data}:{data:Data}){
     <Button type="button" variant="secondary" onClick={()=>act('extra',r.id)}>Zusatzkarten erzeugen · Runde {index+1}</Button>
    </div>;})}
    {!data.rounds.length&&<p role="note">Bitte zuerst eine Runde anlegen. Ohne letzte Runde sind keine Wildcards möglich.</p>}
-   <div className="space-y-2 rounded-lg border p-3"><h3>Wildcards für die letzte Runde</h3><p className="text-sm">{last?`${last.label} · ${last.special?'mit deren Themenzuordnung':'Zahlen-Bingo'}`:'Keine letzte Runde vorhanden.'} · eigener WC-Code und violette Rückseite. Wildcards stehen im PDF am Ende.</p>
+   <div className="space-y-2 rounded-lg border p-3"><h3>Wildcards für die letzte Runde</h3><p className="text-sm">{last?`${last.label} · ${last.special?'mit deren Themenzuordnung':'Zahlen-Bingo'}`:'Keine letzte Runde vorhanden.'} · eigener WC-Code und Rückseite in STELP-Dunkelblau mit beiden Logos. Wildcards stehen im PDF am Ende.</p>
     <label className="block max-w-sm">Anzahl Wildcards<Input id="card-set-wildcards" type="number" min={0} max={1000} value={config.wildcards} onChange={e=>setConfig({...config,wildcards:Number(e.target.value)})}/>{quantityProblem(config.wildcards,true)&&<span role="alert" className="text-sm text-red-700">{quantityProblem(config.wildcards,true)}</span>}</label>
     <p>{config.wildcards} vorgesehen · {data.wildcardStock} angelegt. Angelegte Wildcards binden die letzte Runde; diese bleibt anschließend die letzte Runde.</p>
     <Button type="button" variant="secondary" disabled={!last} onClick={()=>act('extra',last?.id,true)}>Zusatzkarten erzeugen · Wildcards</Button>

@@ -1,4 +1,4 @@
-import {roundColor} from "../roundColors";
+import {roundColor,roundTheme} from "../roundColors";
 import "server-only";
 import { readFile, realpath, stat } from "node:fs/promises";
 import { join, resolve, sep } from "node:path";
@@ -7,7 +7,7 @@ import { isSafeTemplateAssetReference } from "@/app/rendering/presentationTempla
 import { parseSharedDesign, type SharedDesign } from "@/app/rendering/sharedDesign/sharedDesign";
 import { asset, designHash, parsePrintSnapshot, type PrintSnapshot } from "./printSnapshot";
 import { BingoPreparationError } from "./policy";
-import { defaultBingoPrint, prepareLovdPrint, printFonts, printContrastIssues, type BingoPrint } from "@/app/bingo/preparation/bingoPrint";
+import { defaultBingoPrint, prepareLovdPrint, printFonts, printContrastIssues, LOVD_LIGHT_LOGO, PHIL_PRINT_LOGO, type BingoPrint } from "@/app/bingo/preparation/bingoPrint";
 
 const fonts: Record<string, string> = {
   "geist-sans": "geist", "geist-mono": "geistmono", "source-sans-3": "sourcesans3", "plus-jakarta-sans": "plusjakartasans", "space-grotesk": "spacegrotesk", montserrat: "montserrat", nunito: "nunito", oswald: "oswald", "roboto-slab": "robotoslab", lora: "lora", "playfair-display": "playfairdisplay",
@@ -60,10 +60,12 @@ export async function capturePrintSnapshot(input: SharedDesign, title: string, r
 /** Only called by new-card generation or an explicitly selected redesign, never by old exports. */
 export function captureNewPrintSnapshot(input:SharedDesign,title:string,roundLabel:string,settings:BingoPrint,templateSource?:{id:string;name:string},roundNumber?:number,color?:string){
  const prepared=prepareLovdPrint(settings.layout?settings:{...settings,layout:{version:3,format:'A4_FOUR',textFont:'ARIMO'}});
- if(roundNumber){prepared.colors.back=roundColor(roundNumber,color).background;prepared.backLogos=['/branding/lovd/lovd-stelp-creme-rgb.png','/branding/bingo-print/phil-gud.png'];prepared.partnerBack=1;}
+ prepared.backLogos=[LOVD_LIGHT_LOGO,PHIL_PRINT_LOGO];prepared.partnerBack=1;
+ if(roundNumber)prepared.colors.back=roundColor(roundNumber,color).background;
  return capturePrintSnapshot(input,title,roundLabel,prepared,templateSource).then(async snapshot=>{
-   if(roundNumber&&snapshot.version!==1&&roundColor(roundNumber,color).foreground!=='#FFFFFF'){
-     snapshot.backLogos=await Promise.all(snapshot.backLogos.map(async logo=>asset(logo.name,await sharp(Buffer.from(logo.bytes,'base64')).linear(0,0).png().toBuffer())));
+   if(snapshot.version!==1&&roundTheme(prepared.colors.back).foreground!=='#FFFFFF'){
+     // Only LOVD needs a dark contrast variant. Phil Gud retains its original colours.
+     snapshot.backLogos=await Promise.all(snapshot.backLogos.map(async (logo,index)=>index===0?asset(logo.name,await sharp(Buffer.from(logo.bytes,'base64')).linear(0,0).png().toBuffer()):logo));
    }
    return roundNumber?parsePrintSnapshot({...snapshot,roundNumber,roundInk:roundColor(roundNumber,color).foreground}):snapshot;
  });

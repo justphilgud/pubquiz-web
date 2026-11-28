@@ -42,8 +42,11 @@ Die öffentliche Kennung lautet `WC-<Serienbuchstaben>-<Ordinal>`, beispielsweis
 `WC-C-001`. Das normale `C-001` löst diese Karte ausdrücklich nicht auf. Die interne
 unveränderte UUID/BG-Identität bleibt erhalten; bestehende normale Kurzkennungen
 ändern sich nicht. Export, Kartenliste, Moderation und eingefrorene Deckanzeige
-verwenden denselben Formatter. Die Rückseite ist violett (`#38264F`), mit
-„WILDCARD“, „Nur in der letzten Runde“, Rundennummer und WC-Code beschriftet.
+verwenden denselben Formatter. Die Rückseite verwendet STELP-Dunkelblau (`#062C3D`) aus der bestätigten
+Sieben-Farben-Palette. Wie bei den Rundenkarten stehen LOVD und Phil Gud darauf,
+Phil Gud immer im farbigen Original. Oben steht „Wildkart“ statt der Rundennummer, der WC-Code bleibt erhalten;
+auf ausdrücklichen Nutzerwunsch gibt es keine zusätzlichen Texte „WILDCARD“ oder
+„Nur in der letzten Runde“ auf der Karte.
 Ein individuelles Umgestalten dieser neuen Serien ist gesperrt.
 
 Die Datenbank verhindert Fremdrunden-Zuordnungen. Nach angelegten Wildcards bleibt
@@ -115,6 +118,28 @@ Anschnittkoordinaten stehen in der eingebetteten `ausschiessung.json`; die
 Schnittmarken kennzeichnen die einzelnen Endformate. Die UI-Geometrievorschau
 unterscheidet Schnittkante (blau), Anschnitt (rosa) und Marken (schwarz). Diese
 Hilfslinien werden nicht auf den fertigen Karten gedruckt.
+
+## Rückseitenkorrektur 28.11.2026
+
+Die sieben HEX-Werte wurden auf der vom Nutzer genannten
+[LOVD/STELP-Farbseite](https://www.branddoq.io/stelp/farben) gegengeprüft.
+Die neue Aufnahme erzwingt beide Logos auch bei ausdrücklich neu gestalteten
+Serien. Auf hellen Flächen darf ausschließlich LOVD zur dunklen Kontrastvariante
+wechseln. Die eingebetteten PNG-Bytes von Phil Gud bleiben identisch zum farbigen
+Original. Das transparente LOVD-Lockup ersetzt bei neuen Aufnahmen das ältere opake
+quadratische Logo-Bild, auch bei ausdrücklich neu gestalteten Serien ohne
+Rundennummer. Das bestehende 40-%-Breitenlimit bleibt erhalten. Dies ist die
+bewusste Korrektur des alten Quadratbild-Vertrags für die nun freigegebenen
+farbigen Rückseiten; Vorderseiten und historische gespeicherte Logo-/
+Farbsnapshots werden nicht umgeschrieben.
+Alle sieben Rückseiten sind durchgehend bis in den 3-mm-Anschnitt eingefärbt;
+transparente Logobereiche erhalten keinen weißen Unterleger. Unbedruckte Stege
+außerhalb des Anschnitts bleiben weiß und gehören nicht zur fertigen Karte.
+
+Der Offline-Generator `scripts/testing/generate-bingo-color-examples.ts` liefert
+sieben Rundenfarben plus dunkelblaue Wildcard ohne Datenbankzugriff. Er prüft
+beide Logoassets und die unveränderten Phil-Gud-Bildbytes. Das Übersichts-PDF ist
+für die Designprüfung, das separate SRA3-PDF enthält vollständige Duplex-Bögen.
 
 ## Regressionen und Grenzen
 

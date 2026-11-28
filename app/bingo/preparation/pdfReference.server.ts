@@ -1,3 +1,4 @@
+import {cardBackHeading} from './bingoPrint';
 import 'server-only';
 import {randomBytes} from 'node:crypto';
 import {PDFDocument,rgb,type PDFFont} from 'pdf-lib';
@@ -65,7 +66,7 @@ export async function createReferenceCardsPdf(input:PrintSnapshot,cards:readonly
      else{let size=cardProfile(snap.settings.layout.format,snap.settings.layout.cardProfile)==='A4_SIX'?24:26;while(glyphGeometry(numbers.face,String(card.cells[row][col]),size).width>w-4&&size>10)size-=.25;const run=numbers.face.layout(String(card.cells[row][col])),ascent=Math.max(...run.glyphs.map(g=>g.bbox.maxY))*size/numbers.face.unitsPerEm,descent=Math.min(...run.glyphs.map(g=>g.bbox.minY))*size/numbers.face.unitsPerEm;draw(page,String(card.cells[row][col]),numbers,size,cx+2,cy+(h-ascent-descent)/2,w-4,ink(c.numbers));}
     }
    }
-      if(back&&snap.roundNumber){const label=`Runde ${snap.roundNumber}`;const labelFont=code;draw(page,label,labelFont,8,x+14,y+side-19,side-28,ink(snap.roundInk??'#FFFFFF'));}
+      if(back&&snap.roundNumber){const label=cardBackHeading(snap.roundNumber,card.shortCode!);const labelFont=code;draw(page,label,labelFont,8,x+14,y+side-19,side-28,ink(snap.roundInk??'#FFFFFF'));}
    if(!singleCard)for(const dx of [0,side])for(const dy of [0,side]){const sx=dx?1:-1,sy=dy?1:-1;page.drawLine({start:{x:x+dx+sx*2,y:y+dy},end:{x:x+dx+sx*5,y:y+dy},thickness:.3,color:rgb(.5,.5,.5)});page.drawLine({start:{x:x+dx,y:y+dy+sy*2},end:{x:x+dx,y:y+dy+sy*5},thickness:.3,color:rgb(.5,.5,.5)});}
   }
  }

@@ -16,7 +16,7 @@ Bestand ist ausdrücklich **Zusatzkarten erzeugen** erforderlich. Alte Serien,
 Codes, Druckversionen und Laufmitgliedschaften werden nicht überschrieben.
 
 Wildcards verwenden das Mapping der tatsächlichen letzten Runde, haben eigene
-`WC-…`-Kennungen und eine violette, ausdrücklich beschriftete Rückseite. Die
+`WC-…`-Kennungen und eine Rückseite in STELP-Dunkelblau aus der Sieben-Farben-Palette. Die
 letzte Runde bleibt nach ihrer Erzeugung die letzte Runde. Die PDF enthält nur
 ausgewählte Runden und abschließend einen eigenen Wildcard-Abschnitt.
 
@@ -65,6 +65,31 @@ Lokaler Browserlauf: [Prüfprotokoll](assets/bingo-card-set/http-results.json).
 PDF-Messung: [Werte und Grenzen](assets/bingo-card-set/pdf-measurements.json).
 Das vollständige [synthetische Beispiel-PDF](assets/bingo-card-set/beispiel-sra3.pdf)
 enthält die hier gerenderten Karten und kann bei 100 % geprüft werden.
+
+## Ergänzung: sieben Farben und beide Logos
+
+Vom Nutzer am 28.11.2026 korrigiert: keine achte/violette Wildcard-Farbe,
+LOVD und Phil Gud auf jeder Rückseite, Phil Gud immer im farbigen Original,
+alle sieben Kartenflächen durchgehend eingefärbt. Die zusätzliche Wildcard-
+Beschriftung entfällt; oben steht stattdessen „Wildkart“ anstelle der Rundennummer; der WC-Code bleibt.
+
+[Übersicht aller sieben Farben plus Wildcard](assets/bingo-card-set/farben-und-logos-uebersicht.pdf)
+· [SRA3-Duplex-Beispiele](assets/bingo-card-set/sieben-farben-sra3.pdf)
+· [Quellfarben und Bildbyte-Nachweis](assets/bingo-card-set/farben-und-logos-nachweis.json).
+Zusätzlich geprüft: 960 gerenderte Farbpunkte über alle sieben Farben und
+die Wildcard, durchgehende Flächen bis in den Anschnitt, null weiße Pixel in
+den beigen Karteninnenflächen und die Kopfzeile „Wildkart“ statt „Runde 7“, ohne Zusatztexte in der Kartenmitte.
+Die beiden Logo-Zeichenoperationen werden für V3 und V4 geprüft; die Phil-Gud-
+Bildbytes bleiben bei jeder Farbe identisch zum farbigen Original.
+
+Die weißen Stege auf dem Druckbogen liegen außerhalb der fertig geschnittenen
+Karten und ihres 3-mm-Anschnitts. Auf den Karten selbst gibt es keine weißen
+Logo-Unterleger oder Aussparungen. Der Farb-/Logo-Nachweis und die neuen Beispiele
+sind rein synthetisch; bestehende Karten, Abende und Snapshots wurden nicht verändert.
+
+![Sieben Farben mit beiden Logos](assets/bingo-card-set/farben-und-logos-uebersicht.png)
+
+![Creme Catalana vollflächig bis in den Anschnitt](assets/bingo-card-set/sra3-beige-vollflaechig.png)
 
 ## Tatsächliche Screenshots und PDF-Renderings
 

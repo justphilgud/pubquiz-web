@@ -1,4 +1,5 @@
 import {MAX_BINGO_ROUNDS,roundColor} from "../roundColors";
+import {WILDCARD_COLOR} from './cardSet';
 import {instantiateRoundTemplate} from '../content/repository.server';
 import { validateReferenceTerms } from './pdfReference.server';
 import { validateModernTerms } from './pdfModern.server';
@@ -169,7 +170,7 @@ export async function generationSnapshot(tx:Prisma.TransactionClient,game:Prisma
         const settings=await resolveSelectedPrint(tx,design,series.bingo_print_config,game.bingo_print_config);
         if(printLayout)settings.layout={version:settings.layout?.version??3,textFont:settings.layout?.textFont??'ARIMO',...printLayout};
         const roundNumber=await tx.bingo_rounds.count({where:{game_id:game.id,position:{lte:round.position}}});
-        const theme=roundColor(roundNumber,wildcard?'#38264F':round.presentation_color);
+        const theme=roundColor(roundNumber,wildcard?WILDCARD_COLOR:round.presentation_color);
         settings.colors={...settings.colors,back:theme.background};
         settings.backLogos=['/branding/bingo-print/lovd-small-creme.png','/branding/bingo-print/phil-gud.png'];
         let snapshot = await captureNewPrintSnapshot(design, game.titel, round.label,settings,await selectedPrintSource(tx,game.bingo_print_config??series.bingo_print_config),roundNumber,theme.background);

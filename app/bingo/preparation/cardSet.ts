@@ -2,7 +2,7 @@ import {isGameId} from '@/app/games/gameDraft';
 import {BingoPreparationError} from './policy';
 
 export const CARD_SET_LIMIT=1000;
-export const WILDCARD_COLOR='#38264F';
+export const WILDCARD_COLOR='#062C3D';
 export type CardSetConfig={version:1;defaultCount:number;rounds:{id:string;selected:boolean;count:number|null}[];wildcards:number};
 export function cardQuantity(value:unknown,zero=false):number{
  if(!Number.isSafeInteger(value)||Number(value)<(zero?0:1)||Number(value)>CARD_SET_LIMIT)throw new BingoPreparationError(`Bitte ${zero?'0':'1'} bis ${CARD_SET_LIMIT} Karten angeben.`);

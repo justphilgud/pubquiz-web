@@ -1,0 +1,49 @@
+{
+  "source": "https://www.branddoq.io/stelp/farben",
+  "colours": [
+    {
+      "name": "LOVD Red",
+      "background": "#6A241C",
+      "foreground": "#FFFFFF"
+    },
+    {
+      "name": "Caramel Rust",
+      "background": "#C64D3B",
+      "foreground": "#FFFFFF"
+    },
+    {
+      "name": "Creme Catalana",
+      "background": "#FFF9E9",
+      "foreground": "#062C3D"
+    },
+    {
+      "name": "STELP Events Pure Matcha",
+      "background": "#307065",
+      "foreground": "#FFFFFF"
+    },
+    {
+      "name": "STELP Events Matcha Latte",
+      "background": "#6FBEAC",
+      "foreground": "#062C3D"
+    },
+    {
+      "name": "STELP Dunkelblau",
+      "background": "#062C3D",
+      "foreground": "#FFFFFF"
+    },
+    {
+      "name": "STELP Hellblau",
+      "background": "#68BBCB",
+      "foreground": "#062C3D"
+    }
+  ],
+  "wildcard": "#062C3D",
+  "philOriginalBytesVerified": true,
+  "backLogosPerCard": 2,
+  "productionDataRead": false,
+  "backgroundSamples": 960,
+  "allSevenSolidAndBleedVerified": true,
+  "beigeOpaqueWhitePixelsInsideCards": 0,
+  "wildcardAdditionalLabels": false,
+  "wildcardHeading": "Wildkart"
+}
