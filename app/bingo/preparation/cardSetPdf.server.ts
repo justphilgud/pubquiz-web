@@ -33,11 +33,11 @@ export async function readCardSetPrint(userId:number,gameId:string,setId:string)
   return {manifest,sections};
  },{isolationLevel:'RepeatableRead'});
 }
-/** Reuse established vector card renderers; only this new imposition has 3 mm bleed. */
+/** Shared inner cuts; outer block bleed is supplied by the full-sheet background. */
 export async function imposeCardSet(sections:CardSetPrintSection[],title:string){
  const out=await PDFDocument.create();out.setTitle(`${title} · Abendkartensatz`);
- out.setSubject('SRA3 320 x 450 mm; Endformat 92,5 mm; Anschnitt 3 mm; 100 %; Duplex lange Kante');
- const geometry={unit:'mm',sheet:[g.width,g.height],trim:[g.side,g.side],bleed:g.bleed,duplex:'long-edge',front:Array.from({length:12},(_,i)=>cardSetSlot(i)),back:Array.from({length:12},(_,i)=>cardSetSlot(i,true)),cutMarks:cardSetCutMarks()};
+ out.setSubject('SRA3 320 x 450 mm; Endformat 92,5 mm; gemeinsame Innenkanten; Aussenanschnitt 3 mm; 100 %; Duplex lange Kante');
+ const geometry={unit:'mm',sheet:[g.width,g.height],trim:[g.side,g.side],bleed:g.bleed,bleedScope:'outer-block-only',sharedInnerCuts:true,gap:g.gap,duplex:'long-edge',front:Array.from({length:12},(_,i)=>cardSetSlot(i)),back:Array.from({length:12},(_,i)=>cardSetSlot(i,true)),cutMarks:cardSetCutMarks()};
  await out.attach(Buffer.from(canonical(geometry)), 'ausschiessung.json',{mimeType:'application/json',description:'Endformat und Anschnitt jeder Karte; alle Seitenboxen beziehen sich auf den ganzen Bogen.'});
  for(const {section,cards} of sections){
   const snap=section.snapshot;if(snap.version!==3&&snap.version!==4)throw denied();
@@ -54,8 +54,7 @@ export async function imposeCardSet(sections:CardSetPrintSection[],title:string)
     // A sheet can have only one set of page boxes, not twelve independent TrimBoxes.
     page.setCropBox(0,0,pt(g.width),pt(g.height));page.setTrimBox(0,0,pt(g.width),pt(g.height));page.setBleedBox(0,0,pt(g.width),pt(g.height));
     for(let slot=0;slot<12&&start+slot<batch.length;slot++){
-     const box=cardSetSlot(slot,back),[x,y,w,h]=box.trim,[bx,by,bw,bh]=box.bleed;
-     page.drawRectangle({x:pt(bx),y:pt(by),width:pt(bw),height:pt(bh),color:ink(back?snap.settings.colors.back:snap.settings.colors.background)});
+     const {trim:[x,y,w,h]}=cardSetSlot(slot,back);
      const card=embedded[(start+slot)*2+(back?1:0)];
      if(Math.abs(card.width-pt(w))>.01||Math.abs(card.height-pt(h))>.01)throw new BingoPreparationError('Karten-Endformat stimmt nicht mit 92,5 mm überein. Keine Skalierung vorgenommen.');
      page.drawPage(card,{x:pt(x),y:pt(y)});

@@ -44,17 +44,25 @@
   "fullSheetFrontFill": true,
   "fullSheetBackFill": true,
   "productionDataRead": false,
-  "backgroundSamples": 960,
-  "allSevenSolidAndBleedVerified": true,
-  "beigeOpaqueWhitePixelsInsideCards": 0,
-  "wildcardAdditionalLabels": false,
-  "wildcardHeading": "Wildkart",
-  "frontMarginGutterAndEmptySlotSamples": 116,
-  "fullSheetBackgroundVerified": true,
-  "sheetMarginGutterAndEmptySlotSamples": 116,
+  "backgroundSamples": 1344,
+  "allSevenSheetBackgroundsVerified": true,
+  "sharedInnerCuts": true,
+  "gapMm": 0,
+  "bleedScope": "outer-block-only",
+  "cutMarksPerPage": 18,
+  "verticalCutPositionsMm": [
+    21.25,
+    113.75,
+    206.25,
+    298.75
+  ],
+  "horizontalCutPositionsMm": [
+    40,
+    132.5,
+    225,
+    317.5,
+    410.0
+  ],
   "beigeOpaqueWhitePixelsOnEntireSheet": 0,
-  "contrastCropMarks": true,
-  "cutMarks": "outer-paper-edges-perpendicular",
-  "cutMarksPerPage": 28,
-  "fullAndPartialSheetsUseSameCutRaster": true
+  "wildcardHeading": "Wildkart"
 }

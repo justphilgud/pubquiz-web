@@ -9,36 +9,37 @@
     92.5,
     92.5
   ],
-  "bleedMm": 3,
-  "gapMm": 12,
-  "marksLengthMm": 4,
-  "pixelChecks": [
-    {
-      "page": "kartensatz-qa-02.png",
-      "color": "#6A241C",
-      "bleedSamples": 48,
-      "passed": true
-    },
-    {
-      "page": "kartensatz-wildcard-10.png",
-      "color": "#062C3D",
-      "bleedSamples": 48,
-      "passed": true
-    }
+  "gapMm": 0,
+  "outerBleedMm": 3,
+  "bleedScope": "outer-block-only",
+  "sharedInnerCuts": true,
+  "blockMm": [
+    277.5,
+    370
   ],
-  "duplexCodesVerified": true,
-  "boxes": "Sheet boxes are SRA3; per-card trim/bleed coordinates in attached ausschiessung.json",
-  "physicalPrint": "Not performed; printer-specific registration must be checked on one duplex proof sheet",
-  "fullSheetBackFill": true,
-  "emptyBackSlotsColoured": true,
-  "cropMarks": "Contrast ink selected for each background",
-  "fullSheetFrontFill": true,
-  "emptyFrontSlotsColoured": true,
+  "verticalCutPositionsMm": [
+    21.25,
+    113.75,
+    206.25,
+    298.75
+  ],
+  "horizontalCutPositionsMm": [
+    40,
+    132.5,
+    225,
+    317.5,
+    410.0
+  ],
+  "marksPerPage": 18,
   "marksPlacement": "outer-paper-edges-perpendicular",
   "marksInsetMm": 1,
+  "marksLengthMm": 4,
   "marksDashMm": [
     1,
     0.75
   ],
-  "marksPerPage": 28
+  "fullSheetFrontFill": true,
+  "fullSheetBackFill": true,
+  "actualPdfVectorsTested": true,
+  "physicalPrint": "Not performed; printer and cutter alignment need a physical proof"
 }

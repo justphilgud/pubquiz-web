@@ -91,11 +91,11 @@ geschützter Preflight und Deployment bleiben unverändert vorgeschrieben.
 | Alle PDF-Seiten | SRA3, 320 × 450 mm, Hochformat |
 | Ausschießung | 3 Spalten × 4 Zeilen, höchstens 12 Karten |
 | Karten-Endformat | 92,5 × 92,5 mm, keine nachträgliche Skalierung |
-| Fester Anschnitt | 3 mm umlaufend, Fläche 98,5 × 98,5 mm |
-| Abstand zwischen Endformaten | 12 mm |
+| Anschnitt | 3 mm an den Außenkanten des gemeinsamen Kartenblocks; innen gemeinsame Schnittkante ohne separaten Anschnittstreifen |
+| Abstand zwischen Endformaten | 0 mm: Endformate liegen unmittelbar aneinander |
 | Schnittmarken | Nur am Papieraußenrand: 1 mm eingerückt, 4 mm lang, 0,3 pt, gestrichelt und kontrastgerecht hell/dunkel |
 | Ausrichtung | Links/rechts waagerecht, oben/unten senkrecht: jeweils orthogonal zur Papierkante und exakt auf den Karten-Endkanten |
-| Freiraum zum Anschnitt | Mindestens 1,25 mm; keine Marken in Karten- oder Anschnittflächen |
+| Freiraum zum Außenanschnitt | Mindestens 13,25 mm; keine Marken in Karten- oder Anschnittflächen |
 | Rückseiten | Gesamter SRA3-Bogen vollflächig in Rundenfarbe, einschließlich Rändern, Stegen und leeren Plätzen |
 | Vorderseiten | Gesamter SRA3-Bogen in der gespeicherten Vorderseiten-Hintergrundfarbe, ebenfalls mit Rändern, Stegen und freien Plätzen |
 | Duplex | Lange Kante; Spalten gespiegelt, Zeilen unverändert |
@@ -126,14 +126,39 @@ Hilfslinien werden nicht auf den fertigen Karten gedruckt.
 Letzte Nutzerkorrektur: Die Marken dienen zum Ansetzen der Schneidemaschine und
 liegen deshalb ausschließlich am Papieraußenrand. Die bisherigen kurzen Marken
 an den Kartenecken im Bogeninneren entfallen ausdrücklich. Die zentrale Funktion
-`cardSetCutMarks()` liefert die 28 eindeutigen Vektoren: sechs senkrechte
-Schnittpositionen mit Marken oben/unten und acht waagerechte Schnittpositionen
+`cardSetCutMarks()` liefert die 18 eindeutigen Vektoren: vier senkrechte
+Schnittpositionen mit Marken oben/unten und fünf waagerechte Schnittpositionen
 mit Marken links/rechts. Alle zeigen rechtwinklig zur jeweiligen Papierkante
 auf die Karten-Endkante, nicht auf den äußeren Anschnitt. Sie beginnen 1 mm im
 Bogen und reichen 4 mm nach innen; die Strichelung beträgt 1 mm / 0,75 mm Pause.
 PDF und UI-Geometrievorschau verwenden dieselbe Quelle. Voll- und Teilbögen
 besitzen auf Vorder- und Rückseite dasselbe Raster. Es werden keine Schnittlinien
 über die fertigen Karten gedruckt. Die vollflächigen Hintergrundfarben bleiben.
+
+## Gemeinsame Innenkanten statt doppelter Schnitte
+
+Die letzte Nutzerpräzisierung ersetzt den bisherigen 12-mm-Zwischensteg:
+Drei Spalten und vier Reihen liegen jetzt ohne Zwischenraum aneinander. Jede
+Nachbarpaarung hat eine gemeinsame Schnittkante. Das Endformat bleibt unverändert
+92,5 × 92,5 mm. Der Block misst 277,5 × 370 mm und liegt mittig bei x=21,25 mm,
+y=40 mm auf SRA3. Die Schnittkoordinaten sind x=21,25/113,75/206,25/298,75 mm
+und y=40/132,5/225/317,5/410 mm. Innen gibt es damit nur zwei senkrechte und drei
+waagerechte Schnittpositionen statt jeweils zweier getrennter Kartenränder.
+
+Diese ausdrückliche Entscheidung für gemeinsame Schnitte ersetzt auch die
+bisherige Anforderung eigenständiger 3-mm-Anschnittstreifen an allen Innenkanten:
+Solche Streifen und direkt aneinanderliegende Endformate sind nicht gleichzeitig
+möglich. Außen bleibt der 3-mm-Hintergrundanschnitt erhalten. Innen entfallen getrennte
+Anschnittstreifen; dort teilen sich die Karten direkt eine Endkante. Die
+vollflächige Bogenfarbe bleibt erhalten. Innenkanten besitzen dadurch keine
+unabhängige Anschnittreserve für abweichende Motive an der jeweiligen Kante. Die eingebetteten
+Kartenzeichnungen werden nicht skaliert oder beschnitten; keine Anschnittfläche
+einer Karte wird über die Nachbarkarte gezeichnet. Die PDF-Beilage benennt dies
+als `bleedScope=outer-block-only`, `sharedInnerCuts=true` und `gap=0`. Die
+UI-Zusammenfassung und die Geometrievorschau machen den Außenanschnitt sichtbar.
+Die Ansatzmarken bleiben ausschließlich am Papieraußenrand und zeigen pro
+gemeinsamer Schnittachse nur eine Position an. Maße, Inhalte, Kennungen,
+Seitenzahl, beidseitige Flächenfarbe und Duplex-Spiegelung bleiben erhalten.
 
 ## Rückseitenkorrektur 28.11.2026
 
@@ -148,7 +173,7 @@ Rundennummer. Das bestehende 40-%-Breitenlimit bleibt erhalten. Dies ist die
 bewusste Korrektur des alten Quadratbild-Vertrags für die nun freigegebenen
 farbigen Rückseiten; Vorderseiten und historische gespeicherte Logo-/
 Farbsnapshots werden nicht umgeschrieben.
-Alle sieben Rückseiten sind durchgehend bis in den 3-mm-Anschnitt eingefärbt;
+Alle sieben Rückseiten sind durchgehend über den gesamten Bogen eingefärbt;
 transparente Logobereiche erhalten keinen weißen Unterleger.
 
 Präzisierung des Nutzers: Auch die bisherigen weißen Stege und Außenränder

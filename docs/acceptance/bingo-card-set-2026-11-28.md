@@ -45,8 +45,8 @@ Die vollständigen Linux-CI-Prüfungen des exakten PR-Heads sind im PR nachzuver
 | Autorisierung | Unberechtigte Nutzer abgewiesen; eigene Autorisierung auch bei Wiederholungen und Downloads |
 | PDF-Grenzen | Alle zwölf Seiten 320 × 450 mm; zwölf 92,5-mm-Endformate je vollem Bogen; kein gemischtes Trennformat |
 | V3/V4 | Neue Ausschießung mit beiden tatsächlichen Vektorrenderern geprüft; keine Skalierung, kein DB-Zugriff im Ausschießen, gefrorene Eingaben unverändert |
-| Anschnitt | 3 mm rundum, 96 tatsächliche Farbmesspunkte in normalen/Wildcard-Rückseiten gerendert und geprüft |
-| Marken/Abstände | Nach finaler Nutzerkorrektur 28 gestrichelte Ansatzmarken nur am Papieraußenrand, orthogonal zur Papierkante und auf den Endkanten-Koordinaten; 1 mm eingerückt, 4 mm lang, mindestens 1,25 mm Abstand zum Anschnitt |
+| Anschnitt | Nach finaler Nutzerpräzisierung 3 mm außen um den gemeinsamen Kartenblock; innen direkt gemeinsame Endkanten ohne separate Anschnittstreifen |
+| Marken/Abstände | Nach finaler Nutzerkorrektur 18 gestrichelte Ansatzmarken nur am Papieraußenrand, orthogonal zur Papierkante und auf den Endkanten-Koordinaten; 1 mm eingerückt, 4 mm lang, mindestens 13,25 mm Abstand zum Anschnitt |
 | Duplex | Vollraster-Spiegelung, Reihen unverändert; PDF-Transformationen und Codezuordnung einschließlich Teilbogen geprüft |
 | Read-only-Grenze | Beide PDF-Routen und Kartenübersicht importieren keine Karten-Erzeugung oder Quellasset-Ingestion |
 | Migration | Exakte additive SQL-/Schemabytes; keine alten Zeilen verändert, neue Tabellen leer; FK-/Unveränderlichkeits-/Letztrunden-Constraints und Transaktionsrückweg geprüft |
@@ -76,7 +76,7 @@ Beschriftung entfällt; oben steht stattdessen „Wildkart“ anstelle der Runde
 [Übersicht aller sieben Farben plus Wildcard](assets/bingo-card-set/farben-und-logos-uebersicht.pdf)
 · [SRA3-Duplex-Beispiele](assets/bingo-card-set/sieben-farben-sra3.pdf)
 · [Quellfarben und Bildbyte-Nachweis](assets/bingo-card-set/farben-und-logos-nachweis.json).
-Zusätzlich geprüft: 960 gerenderte Farbpunkte über alle sieben Farben und
+Zusätzlich geprüft: 1.344 gerenderte Farbpunkte auf Vorder- und Rückseiten über alle sieben Farben und
 die Wildcard, durchgehende Flächen bis in den Anschnitt, null weiße Pixel in
 den beigen Karteninnenflächen und die Kopfzeile „Wildkart“ statt „Runde 7“, ohne Zusatztexte in der Kartenmitte.
 Die beiden Logo-Zeichenoperationen werden für V3 und V4 geprüft; die Phil-Gud-
@@ -89,9 +89,7 @@ in ihrer gespeicherten Vorderseiten-Hintergrundfarbe eingefärbt. Die
 Zahlenfelder und Motive werden dabei nicht umgestaltet. Es bleiben
 keine unbedruckten weißen Flächen auf dem Rückseitenbogen. Die Schnittmarken
 wechseln abhängig vom Hintergrund zu kontrastreicher heller/dunkler Tinte.
-Die zusätzliche Bogenprüfung umfasst 116 Farbmesspunkte an Rändern, in
-Stegen und auf unbesetzten Teilbogenplätzen je Blattseite (232 zusätzliche
-Messpunkte für Vorder- und Rückseiten). Auf dem gesamten beigen
+Die aktuelle Bogenprüfung umfasst insgesamt 1.344 Farbmesspunkte auf 16 Seiten, einschließlich Rändern und gemeinsamer Schnittpositionen. Auf dem gesamten beigen
 Rückseitenbogen wurden null weiße Pixel gemessen. Der V3-/V4-Regressionstest
 prüft die Hintergrundfläche bis zu allen vier MediaBox-Kanten sowie
 kontrastreiche Schnittmarken bei einem Teilbogen mit nur einer Karte.
@@ -108,9 +106,25 @@ sind rein synthetisch; bestehende Karten, Abende und Snapshots wurden nicht ver�
 Die bisherigen Marken zwischen den Karten wurden durch äußere Ansatzmarken für
 die Schneidemaschine ersetzt. Links und rechts zeigen sie waagerecht nach innen,
 oben und unten senkrecht. Vorder- und Rückseite sowie Teilbögen verwenden stets
-die gleichen 28 Marken an den Endformat-Schnittpositionen. Keine Linie läuft
-über Kartenmotive oder Anschnitt. Die tatsächlichen PDF-Vektoren, Strichelung,
+die gleichen 18 Marken an den Endformat-Schnittpositionen. Keine Linie läuft
+über Kartenmotive oder Außenanschnitt. Die tatsächlichen PDF-Vektoren, Strichelung,
 Orthogonalität und deckungsgleichen Koordinaten sind automatisiert geprüft.
+
+## Gemeinsame Schnitte: abschließende Nutzerpräzisierung
+
+Die Zwischenstege entfallen. Bei unverändert 92,5 mm Endformat teilen direkt
+aneinanderliegende Karten ihre inneren Schnittkanten; pro Zwischenraum gibt es
+nur noch eine Schnittposition. Der 277,5 × 370 mm große Kartenblock liegt mittig
+auf SRA3. Das ergibt vier senkrechte und fünf waagerechte Schnittachsen, davon
+zwei bzw. drei gemeinsame innere Achsen. Die 18 äußeren Ansatzmarken zeigen genau
+diese Positionen; sie laufen nicht über die Karten.
+
+Dies ersetzt ausdrücklich die früher getrennten 3-mm-Anschnittstreifen im
+Bogeninneren. Außen bleiben 3 mm Anschnitt; innen teilen die Karten die
+gemeinsame Endkante ohne unabhängige innere Anschnittreserve. Kartenmotive und Texte werden nicht vergrößert,
+beschnitten oder durch eine Nachbar-Anschnittfläche übermalt. Nachgewiesen werden
+benachbarte deckungsgleiche Endkanten, Außenanschnitt ohne Überlappung,
+gemeinsame Schnittachsen, beidseitige Registrierung und tatsächliche PDF-Linien.
 
 ## Tatsächliche Screenshots und PDF-Renderings
 
