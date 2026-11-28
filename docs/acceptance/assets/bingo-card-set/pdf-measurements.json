@@ -32,5 +32,7 @@
   "physicalPrint": "Not performed; printer-specific registration must be checked on one duplex proof sheet",
   "fullSheetBackFill": true,
   "emptyBackSlotsColoured": true,
-  "cropMarks": "Contrast ink selected for each background"
+  "cropMarks": "Contrast ink selected for each background",
+  "fullSheetFrontFill": true,
+  "emptyFrontSlotsColoured": true
 }

@@ -38,7 +38,7 @@ async function main(){
  const terms=parseTermSet({version:1,name:'Musik',publication:'DIRECT',entries:Array.from({length:75},(_,i)=>({number:i+1,text:`Band ${i+1}`}))});
  const demo:CardSetPrintSection[]=[{...sections[0],cards:cards(1,13)},{...sections[2],cards:cards(2,14)},{...sections[7],cards:cards(3,13,true)}].map((s,i)=>{const snapshot=i===0?s.section.snapshot:parsePrintSnapshot({...s.section.snapshot,terms,...(i===2?{roundNumber:3,roundLabel:'Runde 3'}:{})});return {...s,section:{...s.section,snapshot,cardIds:s.cards.map(c=>c.id)}};});
  writeFileSync(`${out}/beispiel-sra3.pdf`,await api.imposeCardSet(demo,'Synthetischer Abendkartensatz'));
- writeFileSync(`${out}/farben-und-logos-nachweis.json`,JSON.stringify({source:'https://www.branddoq.io/stelp/farben',colours:ROUND_COLORS,wildcard:WILDCARD_COLOR,philOriginalBytesVerified:true,backLogosPerCard:2,productionDataRead:false},null,2)+'\n');
+ writeFileSync(`${out}/farben-und-logos-nachweis.json`,JSON.stringify({source:'https://www.branddoq.io/stelp/farben',colours:ROUND_COLORS,wildcard:WILDCARD_COLOR,philOriginalBytesVerified:true,backLogosPerCard:2,frontBackground:settings.colors.background,fullSheetFrontFill:true,fullSheetBackFill:true,productionDataRead:false},null,2)+'\n');
  console.info('Seven palette examples, both logos, original colour Phil Gud and dark-blue wildcard generated without database access.');
 }
 void main().catch(error=>{console.error(error);process.exitCode=1;});

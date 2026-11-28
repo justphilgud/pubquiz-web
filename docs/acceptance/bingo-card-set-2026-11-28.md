@@ -83,11 +83,15 @@ Die beiden Logo-Zeichenoperationen werden für V3 und V4 geprüft; die Phil-Gud-
 Bildbytes bleiben bei jeder Farbe identisch zum farbigen Original.
 
 Nach ausdrücklicher Präzisierung wird die **gesamte SRA3-Rückseite** eingefärbt,
-auch die Stege, Außenränder und unbesetzten Plätze bei Teilbögen. Es bleiben
+auch die Stege, Außenränder und unbesetzten Plätze bei Teilbögen.
+Auf zusätzlichen Nutzerwunsch werden ebenso die vollständigen Vorderseitenbögen
+in ihrer gespeicherten Vorderseiten-Hintergrundfarbe eingefärbt. Die
+Zahlenfelder und Motive werden dabei nicht umgestaltet. Es bleiben
 keine unbedruckten weißen Flächen auf dem Rückseitenbogen. Die Schnittmarken
 wechseln abhängig vom Hintergrund zu kontrastreicher heller/dunkler Tinte.
 Die zusätzliche Bogenprüfung umfasst 116 Farbmesspunkte an Rändern, in
-Stegen und auf unbesetzten Teilbogenplätzen. Auf dem gesamten beigen
+Stegen und auf unbesetzten Teilbogenplätzen je Blattseite (232 zusätzliche
+Messpunkte für Vorder- und Rückseiten). Auf dem gesamten beigen
 Rückseitenbogen wurden null weiße Pixel gemessen. Der V3-/V4-Regressionstest
 prüft die Hintergrundfläche bis zu allen vier MediaBox-Kanten sowie
 kontrastreiche Schnittmarken bei einem Teilbogen mit nur einer Karte.

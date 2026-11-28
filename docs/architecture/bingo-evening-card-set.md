@@ -96,6 +96,7 @@ geschützter Preflight und Deployment bleiben unverändert vorgeschrieben.
 | Schnittmarken | 4–5,5 mm außerhalb der Schnittkante, 0,3 pt, kontrastgerecht hell/dunkel |
 | Abstand gegenüberliegender Markenspitzen | 1 mm |
 | Rückseiten | Gesamter SRA3-Bogen vollflächig in Rundenfarbe, einschließlich Rändern, Stegen und leeren Plätzen |
+| Vorderseiten | Gesamter SRA3-Bogen in der gespeicherten Vorderseiten-Hintergrundfarbe, ebenfalls mit Rändern, Stegen und freien Plätzen |
 | Duplex | Lange Kante; Spalten gespiegelt, Zeilen unverändert |
 | Teilbogen | Keine zusätzlichen Kartenmotive; auch die unbesetzten Rückseitenplätze sind voll eingefärbt; Spiegelung im vollen Raster |
 | Ausgabe | 100 %, tatsächliche Größe; keine Druckdialog-Zugabe nötig |
@@ -140,8 +141,10 @@ werden auf der Rückseite eingefärbt. Der Export zeichnet deshalb zuerst eine
 Hintergrundfläche über die vollständige MediaBox (320 × 450 mm), auch bei
 Teilbögen über alle freien Plätze. Das ersetzt ausdrücklich die frühere
 Begrenzung auf Kartenfläche/Anschnitt. Schnittmarken verwenden dieselbe
-kontrastgeprüfte helle/dunkle Tinte wie die Rundenbeschriftung. Frontseiten,
-Kartenmotive, Maße, 3-mm-Anschnitt und Duplex-Zuordnung bleiben erhalten.
+kontrastgeprüfte helle/dunkle Tinte wie die Rundenbeschriftung. Die nachfolgend ebenfalls freigegebenen Vorderseiten erhalten denselben
+vollflächigen Bogenauftrag, jedoch mit ihrer gespeicherten Vorderseiten-
+Hintergrundfarbe. Kartenmotive, Zahlenfelder, Maße, 3-mm-Anschnitt und
+Duplex-Zuordnung bleiben erhalten.
 
 Der Offline-Generator `scripts/testing/generate-bingo-color-examples.ts` liefert
 sieben Rundenfarben plus dunkelblaue Wildcard ohne Datenbankzugriff. Er prüft

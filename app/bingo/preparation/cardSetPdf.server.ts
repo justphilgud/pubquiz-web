@@ -48,8 +48,9 @@ export async function imposeCardSet(sections:CardSetPrintSection[],title:string)
    const source=await PDFDocument.load(bytes),embedded=await out.embedPages(source.getPages());
    for(let start=0;start<batch.length;start+=12)for(const back of [false,true]){
     const page=out.addPage([pt(g.width),pt(g.height)]);
-    if(back)page.drawRectangle({x:0,y:0,width:pt(g.width),height:pt(g.height),color:ink(snap.settings.colors.back)});
-    const marks=back?ink(roundTheme(snap.settings.colors.back).foreground):rgb(0,0,0);
+    const background=back?snap.settings.colors.back:snap.settings.colors.background;
+    page.drawRectangle({x:0,y:0,width:pt(g.width),height:pt(g.height),color:ink(background)});
+    const marks=ink(roundTheme(background).foreground);
     // A sheet can have only one set of page boxes, not twelve independent TrimBoxes.
     page.setCropBox(0,0,pt(g.width),pt(g.height));page.setTrimBox(0,0,pt(g.width),pt(g.height));page.setBleedBox(0,0,pt(g.width),pt(g.height));
     for(let slot=0;slot<12&&start+slot<batch.length;slot++){
