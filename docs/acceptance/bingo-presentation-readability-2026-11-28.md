@@ -59,3 +59,13 @@ vorhandene implementierte und zuvor auf Production geprüfte Ansicht dient als
 Ausgangspunkt. Kein physischer Beamer-/Drucktest. Keine neue gehostete Preview,
 kein Merge, kein Backup und kein Production-Deployment in diesem Auftrag.
 Schreib- und Laufzustandsabläufe bleiben vollständig unverändert.
+
+
+### Korrigierter CI-Befund
+
+Der bestehende Test des PR196-Preview-Plans las den jeweils aktiven Releaseplan
+und verlangte dadurch auch in späteren No-Delta-PRs noch die alte Delta-Planart.
+Er liest nun Plan, Schema und Manifest gemeinsam aus dem unveränderlichen,
+bereits veröffentlichten PR196-Commit. Alle bisherigen historischen Assertions
+bleiben bestehen. Keine Änderung am Produktionsvalidator oder Deploymentworkflow.
+Die gezielte Plan-/Preview-Regressionssuite wurde erneut bestanden.

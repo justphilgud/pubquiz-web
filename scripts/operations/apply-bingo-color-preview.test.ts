@@ -18,11 +18,12 @@ test('synthetic Preview accepts only the single color delta or an already comple
  assert.throws(()=>verifyColorPreviewMigrations([...after,{name:'unreviewed',checksum:'d'.repeat(64)}],rows));
 });
 
-test('real committed candidate passes the exact manifest and schema proof before connecting',()=>{
- const candidate=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+test('released color candidate retains its exact historical manifest and schema proof',()=>{
+ // Later releases carry their own plan; preserve the actual PR196 proof as immutable evidence.
+ const candidate='6b5156f666b5a5060aa6f7847eec8f94bedb08c8';
  const after=migrationFiles(candidate),before=after.filter(f=>f.name!==COLOR_MIGRATION);
- const plan=JSON.parse(readFileSync('release/plan.json','utf8'));
- const schema=readFileSync('prisma/schema.prisma','utf8').replaceAll('\r\n','\n');
+ const plan=JSON.parse(execFileSync('git',['show',`${candidate}:release/plan.json`],{encoding:'utf8'}));
+ const schema=execFileSync('git',['show',`${candidate}:prisma/schema.prisma`],{encoding:'utf8'}).replaceAll('\r\n','\n');
  assert.equal(verifyBingoColorPlan(plan,plan.baselineSha,candidate,before,after,schema.replace('  presentation_color String? @db.VarChar(7)\n',''),schema).candidateSha,candidate);
 });
 
