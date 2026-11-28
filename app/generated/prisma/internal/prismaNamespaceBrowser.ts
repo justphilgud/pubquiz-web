@@ -132,6 +132,9 @@ export const ModelName = {
   bingo_term_sets: 'bingo_term_sets',
   excel_question_import_receipts: 'excel_question_import_receipts',
   bingo_round_templates: 'bingo_round_templates',
+  bingo_card_set_settings: 'bingo_card_set_settings',
+  bingo_evening_card_sets: 'bingo_evening_card_sets',
+  bingo_wildcard_series: 'bingo_wildcard_series',
   bingo_print_jobs: 'bingo_print_jobs',
   bingo_print_job_items: 'bingo_print_job_items'
 } as const
@@ -1410,6 +1413,35 @@ export const Bingo_round_templatesScalarFieldEnum = {
 } as const
 
 export type Bingo_round_templatesScalarFieldEnum = (typeof Bingo_round_templatesScalarFieldEnum)[keyof typeof Bingo_round_templatesScalarFieldEnum]
+
+
+export const Bingo_card_set_settingsScalarFieldEnum = {
+  game_id: 'game_id',
+  config: 'config'
+} as const
+
+export type Bingo_card_set_settingsScalarFieldEnum = (typeof Bingo_card_set_settingsScalarFieldEnum)[keyof typeof Bingo_card_set_settingsScalarFieldEnum]
+
+
+export const Bingo_evening_card_setsScalarFieldEnum = {
+  id: 'id',
+  game_id: 'game_id',
+  request_hash: 'request_hash',
+  manifest: 'manifest',
+  created_by: 'created_by',
+  created_at: 'created_at'
+} as const
+
+export type Bingo_evening_card_setsScalarFieldEnum = (typeof Bingo_evening_card_setsScalarFieldEnum)[keyof typeof Bingo_evening_card_setsScalarFieldEnum]
+
+
+export const Bingo_wildcard_seriesScalarFieldEnum = {
+  series_id: 'series_id',
+  game_id: 'game_id',
+  round_id: 'round_id'
+} as const
+
+export type Bingo_wildcard_seriesScalarFieldEnum = (typeof Bingo_wildcard_seriesScalarFieldEnum)[keyof typeof Bingo_wildcard_seriesScalarFieldEnum]
 
 
 export const Bingo_print_jobsScalarFieldEnum = {

@@ -1,3 +1,4 @@
+import {exerciseCardSet} from './bingo-card-set.acceptance';
 import {exerciseBingoEvening} from "./bingo-evening.acceptance";
 import {exerciseBingoBell} from './bingo-bell.acceptance';
 import {exerciseMatching} from './bingo-matching.acceptance';
@@ -75,6 +76,7 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   assert.equal((await db.query("SELECT to_regclass('pubquiz.bingo_round_templates') AS t")).rows[0].t,null);
   await db.query(bellMigration);
   await db.query(readFileSync('prisma/migrations/20261127220000_bingo_round_color/migration.sql','utf8'));
+  await db.query(readFileSync('prisma/migrations/20261128150000_bingo_evening_card_set/migration.sql','utf8'));
   const legacyV2=await seedLegacyPrintFixture(db);
   await db.query(v3Migration);
   assert.deepEqual(await legacyV2.read(),legacyV2.before,"V3 migration preserves genuine pre-existing card IDs, cells, print snapshot, round and prefix");
@@ -83,7 +85,7 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: target.toString() }), log:[{emit:"event",level:"query"}] });
   const pollingQueries:string[]=[];prisma.$on("query",e=>pollingQueries.push(e.query));
   t.after(async () => { await prisma.$disconnect(); });
-  const bundle = await build({ stdin: { contents: "export * from './app/bingo/preparation/repository.server'; export * as ceremony from './app/bingo/ceremonyRepository.server'; export * as content from './app/bingo/content/repository.server'; export * as evening from './app/bingo/preparation/eveningPrint.server'; export * as audit from './app/bingo/preparation/cardAudit.server';export * as proof from './app/bingo/live/readCheckedCard.server'; export * as live from './app/bingo/live/repository.server'; export * as print from './app/bingo/preparation/printDesignRepository.server'; export * as games from './app/games/gameDraftRepository.server'; export * as eventRun from './app/bingo/live/eventRepository.server'; export * as creation from './app/bingo/eventCreation.server'; export * as settings from './app/eventreihen/settingsRepository.server';export * as terms from './app/bingo/preparation/termRepository.server';export * as polling from './app/bingo/live/pollVersion.server';export * as pollRoute from './app/api/bingo/live/[gameId]/route';export * as matching from './app/bingo/matching/repository.server';export * as sources from './app/bingo/matching/source.server';export * from './app/bingo/preparation/pdf.server';", resolveDir: process.cwd() }, bundle: true, write: false, platform: "node", format: "cjs", packages: "external", plugins: [{ name: "database", setup(b) {
+  const bundle = await build({ stdin: { contents: "export * from './app/bingo/preparation/repository.server';export * as cardSetWrite from './app/bingo/preparation/cardSetRepository.server';export * as cardSet from './app/bingo/preparation/cardSetRead.server';export * as cardSetPdf from './app/bingo/preparation/cardSetPdf.server'; export * as ceremony from './app/bingo/ceremonyRepository.server'; export * as content from './app/bingo/content/repository.server'; export * as evening from './app/bingo/preparation/eveningPrint.server'; export * as audit from './app/bingo/preparation/cardAudit.server';export * as proof from './app/bingo/live/readCheckedCard.server'; export * as live from './app/bingo/live/repository.server'; export * as print from './app/bingo/preparation/printDesignRepository.server'; export * as games from './app/games/gameDraftRepository.server'; export * as eventRun from './app/bingo/live/eventRepository.server'; export * as creation from './app/bingo/eventCreation.server'; export * as settings from './app/eventreihen/settingsRepository.server';export * as terms from './app/bingo/preparation/termRepository.server';export * as polling from './app/bingo/live/pollVersion.server';export * as pollRoute from './app/api/bingo/live/[gameId]/route';export * as matching from './app/bingo/matching/repository.server';export * as sources from './app/bingo/matching/source.server';export * from './app/bingo/preparation/pdf.server';", resolveDir: process.cwd() }, bundle: true, write: false, platform: "node", format: "cjs", packages: "external", plugins: [{ name: "database", setup(b) {
     b.onResolve({ filter: /^(server-only|@\/auth|@\/app\/lib\/prisma|@\/app\/generated\/prisma\/client)$/ }, a => ({ path: a.path, namespace: "fixture" }));
     b.onLoad({ filter: /.*/, namespace: "fixture" }, a => ({ contents: a.path === "server-only" ? "" : a.path === "@/auth" ? 'export async function auth(){return {user:{id:"1"}}}' : a.path.includes("generated") ? "export const Prisma = globalThis.prismaRuntime;" : "export const prisma = globalThis.fixture;" }));
   } }] });
@@ -228,7 +230,7 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   await assert.rejects(api.writePreparation(3, generation)); await assert.rejects(api.readCards(3, game.id, sid));
   await assert.rejects(print.readPrintDesign(3,printTarget));await assert.rejects(print.redesignSeries(3,versionCommand));
   const columns = (await db.query(COLUMN_SQL)).rows[0].coalesce as Column[]; auditColumns(columns);
-  assert.equal(new Set(columns.filter(c => c.table.startsWith("bingo_")).map(c => c.table)).size, 12);
+  assert.equal(new Set(columns.filter(c => c.table.startsWith("bingo_")).map(c => c.table)).size, 15);
   const catalog = (await db.query(CATALOG_SQL)).rows[0].json_build_object as { constraints: { table: string }[] };
   assert.ok(catalog.constraints.filter(c => c.table.startsWith("bingo_")).length > 20);
   for (const table of ["bingo_round_templates", "bingo_print_jobs", "bingo_print_job_items", "bingo_term_sets", "bingo_preparations", "bingo_rounds", "bingo_card_series", "bingo_cards", "bingo_round_series", "bingo_issuance_changes", "bingo_print_versions", "bingo_series_labels"]) {
@@ -325,6 +327,7 @@ test("AP2 additive empty/populated migration and actual PostgreSQL policies, con
   await exerciseMatching(db,runtime.exports as Parameters<typeof exerciseMatching>[1],pollingQueries,prisma);
   await exerciseBingoBell(db,runtime.exports as Parameters<typeof exerciseBingoBell>[1]);
   await exerciseBingoEvening(db,runtime.exports as Parameters<typeof exerciseBingoEvening>[1]);
+  await exerciseCardSet(db,runtime.exports as Parameters<typeof exerciseCardSet>[1]);
   const withMatching=await snapshot();compareSnapshots(withMatching,await snapshot());
   await verifyBingoRestore(target,withMatching);
   console.info('Matching full populated snapshot and isolated restore integrity PASS');

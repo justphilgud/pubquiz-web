@@ -456,6 +456,21 @@ export type excel_question_import_receipts = Prisma.excel_question_import_receip
  */
 export type bingo_round_templates = Prisma.bingo_round_templatesModel
 /**
+ * Model bingo_card_set_settings
+ *
+ */
+export type bingo_card_set_settings = Prisma.bingo_card_set_settingsModel
+/**
+ * Model bingo_evening_card_sets
+ *
+ */
+export type bingo_evening_card_sets = Prisma.bingo_evening_card_setsModel
+/**
+ * Model bingo_wildcard_series
+ *
+ */
+export type bingo_wildcard_series = Prisma.bingo_wildcard_seriesModel
+/**
  * Model bingo_print_jobs
  *
  */

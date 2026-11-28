@@ -12,6 +12,7 @@ const subscribeToClient = () => () => {};
 export default function GameDraftForm({ type, initial, choices, canWrite, returnHref, teams, initialSeriesId }: { type: GameType; initial?: GameDraftView; choices: GameSeries[]; canWrite: boolean; returnHref: string; teams?: GameTeamsView; initialSeriesId?:number }) {
   const creationId=useRef<string|null>(null),saving=useRef(false);
   const [roundCount,setRoundCount]=useState(3);
+  const [defaultCardCount,setDefaultCardCount]=useState(100);
   const [unconfirmed,setUnconfirmed]=useState(false);
   const [teamBusy,setTeamBusy] = useState(false);
   const router = useRouter();
@@ -22,12 +23,12 @@ export default function GameDraftForm({ type, initial, choices, canWrite, return
   const [baseline, setBaseline] = useState(JSON.stringify(initialFields));
   const [message, setMessage] = useState<{ error: boolean; text: string } | null>(null);
   const [pending, startTransition] = useTransition();
-  const markSaved = useContentNavigationGuard(canWrite && (JSON.stringify(fields) !== baseline||(!initial&&type==="BINGO"&&roundCount!==3)));
+  const markSaved = useContentNavigationGuard(canWrite && (JSON.stringify(fields) !== baseline||(!initial&&type==="BINGO"&&(roundCount!==3||defaultCardCount!==100))));
   function change<K extends keyof GameDraftFields>(key: K, value: GameDraftFields[K]) { setFields(current => ({ ...current, [key]: value })); setMessage(null); creationId.current=null; }
   return <><form id={type==='BINGO'?'bingo-settings':undefined} onSubmit={event => { event.preventDefault(); startTransition(async () => {
     if(saving.current)return;saving.current=true;
     try {
-      const result = !game&&type==="BINGO"?await createBingoDraft({...fields,roundCount,requestId:creationId.current??(creationId.current=crypto.randomUUID())}):await saveGameDraft(type, { ...fields, ...(game ? { id: game.id, updatedAt: game.updatedAt } : {}) });
+      const result = !game&&type==="BINGO"?await createBingoDraft({...fields,roundCount,defaultCardCount,requestId:creationId.current??(creationId.current=crypto.randomUUID())}):await saveGameDraft(type, { ...fields, ...(game ? { id: game.id, updatedAt: game.updatedAt } : {}) });
       if (!result.success) { if("retryable" in result)setUnconfirmed(current=>current||Boolean(result.retryable)); setMessage({ error: true, text: result.message }); return; }
       const saved = { seriesId: result.game.seriesId, title: result.game.title, date: result.game.date, time: result.game.time };
       setUnconfirmed(false); setGame(result.game); setFields(saved); setBaseline(JSON.stringify(saved)); markSaved();
@@ -41,6 +42,7 @@ export default function GameDraftForm({ type, initial, choices, canWrite, return
     <fieldset disabled={!ready || pending || teamBusy || !canWrite || unconfirmed} className="min-w-0 space-y-4">
       <FormField label="Titel" htmlFor="game-title"><Input id="game-title" name="title" required maxLength={150} value={fields.title} onChange={event => change("title", event.target.value)} /></FormField>
       {!game&&type==="BINGO"&&<FormField label="Geplante Runden" htmlFor="game-rounds" hint="Standard: 3 Runden, je 30 geplante Ziehungen. Karten anschließend bewusst vorbereiten."><Input id="game-rounds" type="number" min={1} max={10} value={roundCount} onChange={e=>{setRoundCount(Number(e.target.value));creationId.current=null;}} required/></FormField>}
+      {!game&&type==="BINGO"&&<FormField label="Standardanzahl Karten pro Runde" htmlFor="game-card-count" hint="Wird je Runde übernommen und kann später einzeln überschrieben werden. Die Anlage erzeugt noch keine Karten."><Input id="game-card-count" type="number" min={1} max={1000} required value={defaultCardCount} onChange={e=>{setDefaultCardCount(Number(e.target.value));creationId.current=null;}}/></FormField>}
       <FormField label="Eventreihe" htmlFor="game-series"><Select id="game-series" name="seriesId" required value={fields.seriesId || ""} onChange={event => change("seriesId", Number(event.target.value))}><option value="">Eventreihe auswählen …</option>{choices.filter(c => c.canCreate || c.id === game?.seriesId).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}</Select></FormField>
       <div className="grid min-w-0 gap-4 sm:grid-cols-2">
         <FormField label="Datum (optional)" htmlFor="game-date"><Input id="game-date" type="date" name="date" min="0001-01-01" max="9999-12-31" value={fields.date} onChange={event => change("date", event.target.value)} /></FormField>

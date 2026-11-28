@@ -20,7 +20,7 @@ type Tx = Prisma.TransactionClient;
 type RunRow = { id: string; game_id: string; round_id: string; eventreihe_id: number; status: string; revision: number;
   started_at: Date; round_snapshot: FrozenRound; design_snapshot: SharedDesign; audience_key: string; start_request_hash: string };
 type EventRow = { request_id: string; request_hash: string; revision: number; actor_id: number; occurred_at: Date; command: unknown };
-type CardRow = { id: string; series_id: string; cells: unknown; layout_hash: string; printed_code: string; ordinal: number; prefix: number };
+type CardRow = { id: string; series_id: string; cells: unknown; layout_hash: string; printed_code: string; ordinal: number; prefix: number; wildcard:boolean };
 function fail(code: string): never { throw Error(code); }
 function integer(value: unknown): asserts value is number {
   if (!Number.isSafeInteger(value) || (value as number) < 0) fail("INVALID_REVISION");
@@ -40,7 +40,7 @@ function frozen(row: RunRow): FrozenRound {
   return r;
 }
 async function load(tx: Tx, row: RunRow) {
-  const cards = await tx.$queryRaw<CardRow[]>`SELECT c.id,c.series_id,c.cells,c.layout_hash,c.printed_code,c.ordinal,l.prefix
+  const cards = await tx.$queryRaw<CardRow[]>`SELECT c.id,c.series_id,c.cells,c.layout_hash,c.printed_code,c.ordinal,l.prefix,EXISTS(SELECT 1 FROM pubquiz.bingo_wildcard_series w WHERE w.series_id=c.series_id) AS wildcard
     FROM pubquiz.bingo_live_cards rc JOIN pubquiz.bingo_cards c ON c.id=rc.card_id
     JOIN pubquiz.bingo_card_series s ON s.id=c.series_id
     JOIN pubquiz.bingo_series_labels l ON l.series_id=s.id
@@ -49,7 +49,7 @@ async function load(tx: Tx, row: RunRow) {
   const snapshot = frozen(row);
   if ((snapshot.issued !== null && snapshot.issued > cards.length) ||
       canonical([...new Set(cards.map(c => c.series_id))].sort()) !== canonical(snapshot.seriesIds)) fail("INVALID_FROZEN_CARDS");
-  const stored = cards.map(c => ({ ...storedCard(c), shortCode: shortCardCode(c.prefix, c.ordinal) }));
+  const stored = cards.map(c => ({ ...storedCard(c), shortCode: shortCardCode(c.prefix, c.ordinal,c.wildcard) }));
   const rows = await tx.$queryRaw<EventRow[]>`SELECT request_id,request_hash,revision,actor_id,occurred_at,command
     FROM pubquiz.bingo_live_events WHERE run_id=${row.id}::uuid ORDER BY revision`;
   if (rows.length !== row.revision || rows.some((e, i) => e.revision !== i + 1)) fail("INVALID_EVENT_HISTORY");

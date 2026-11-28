@@ -1,3 +1,4 @@
+import {verifyCardSetPlan} from './bingo-card-set-release-plan';
 import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {migrationFiles,type Migration} from './production-preflight';
@@ -15,6 +16,7 @@ export function featurePlanFor(baselineSha:string,files:readonly Migration[],sch
  return {version:1,kind:'NO_DELTA',baselineSha,migrationCount:files.length,lastMigration:files.at(-1)!.name,manifestSha256:hash(JSON.stringify(manifest(files))),schemaSha256:hash(schema)};
 }
 export function verifyFeaturePlan(value:unknown,baseline:string,candidate:string,before:readonly Migration[],after:readonly Migration[],beforeSchema:string,afterSchema:string){
+ if(value&&typeof value==='object'&&'kind' in value&&value.kind==='BINGO_CARD_SET')return verifyCardSetPlan(value,baseline,candidate,before,after,beforeSchema,afterSchema);
  if(value&&typeof value==='object'&&'kind' in value&&value.kind==='BINGO_ROUND_COLOR')return verifyBingoColorPlan(value,baseline,candidate,before,after,beforeSchema,afterSchema);
  if(!value||typeof value!=='object'||Array.isArray(value)||!sha(baseline)||!sha(candidate)||baseline===candidate)throw Error('FEATURE_PLAN_INVALID');
  const expected=featurePlanFor(baseline,before,beforeSchema),v=value as FeaturePlan;

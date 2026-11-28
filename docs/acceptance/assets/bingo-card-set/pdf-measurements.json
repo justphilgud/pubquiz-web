@@ -1,0 +1,33 @@
+{
+  "pages": 12,
+  "formatMm": [
+    320,
+    450
+  ],
+  "cards": 40,
+  "trimMm": [
+    92.5,
+    92.5
+  ],
+  "bleedMm": 3,
+  "gapMm": 12,
+  "marksOffsetMm": 4,
+  "marksLengthMm": 1.5,
+  "pixelChecks": [
+    {
+      "page": "kartensatz-qa-02.png",
+      "color": "#6A241C",
+      "bleedSamples": 48,
+      "passed": true
+    },
+    {
+      "page": "kartensatz-wildcard-10.png",
+      "color": "#38264F",
+      "bleedSamples": 48,
+      "passed": true
+    }
+  ],
+  "duplexCodesVerified": true,
+  "boxes": "Sheet boxes are SRA3; per-card trim/bleed coordinates in attached ausschiessung.json",
+  "physicalPrint": "Not performed; printer-specific registration must be checked on one duplex proof sheet"
+}

@@ -1,5 +1,7 @@
 # Bingo v0.5 – AP2 preparation and printed cards
 
+Ergänzung 28.11.2026: [Abendkartensatz mit Mengenplanung, Wildcards und festem 3-mm-SRA3-Anschnitt](bingo-evening-card-set.md). Die dortige neue Sammelausgabe ersetzt keine historischen Druckstände; bisherige Einzel- und Abendexporte bleiben unverändert verfügbar.
+
 Status: AP2 implemented with local isolated acceptance; exact-head CI/hosted-preview
 evidence is tracked in PR #143 and the linked acceptance report. No runtime, public
 join link, draw state, claim workflow or AP3 implementation is included.

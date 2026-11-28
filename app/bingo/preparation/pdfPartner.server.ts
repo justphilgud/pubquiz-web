@@ -1,8 +1,15 @@
 import 'server-only';
 import {rgb,type PDFImage,type PDFPage} from 'pdf-lib';
 import {draw,logo,type Font} from './pdfDrawing.server';
+import {isWildcardCode} from './bingoPrint';
 /** Frozen partner-back contract, shared by new LOVD V3 variants and existing V4. */
 export function drawPartnerBack(page:PDFPage,{x,y,side}:{x:number;y:number;side:number},backs:PDFImage[],code:Font,shortCode:string,background:string,lovd=false){
+ if(isWildcardCode(shortCode)){
+  draw(page,'WILDCARD',code,19,x+14,y+side*.59,side-28,rgb(1,1,1));
+  draw(page,'Nur in der letzten Runde',code,9,x+14,y+side*.43,side-28,rgb(1,1,1));
+  draw(page,shortCode,code,10,x+14,y+22,side-28,rgb(1,1,1));
+  return;
+ }
  const l=[1,3,5].map(i=>parseInt(background.slice(i,i+2),16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((a,v,i)=>a+v*[.2126,.7152,.0722][i],0);
  const soft=.406,lightRatio=(soft+.05)/(l+.05),darkRatio=(l+.05)/(.0176+.05);
  const codeInk=lightRatio>=4.5?rgb(.67,.67,.67):darkRatio>=4.5?rgb(.14,.14,.14):l<.179?rgb(1,1,1):rgb(0,0,0);

@@ -1,9 +1,9 @@
 {
   "version": 1,
-  "kind": "NO_DELTA",
-  "baselineSha": "6b5156f666b5a5060aa6f7847eec8f94bedb08c8",
-  "migrationCount": 82,
-  "lastMigration": "20261127220000_bingo_round_color",
-  "manifestSha256": "d460aa58ae0a2225d6fd4b462d051ae71cb1c55bb2b643eeca23c2e8dde989f9",
-  "schemaSha256": "b6a1bbb0a58c5749e4e659ce306599f83d5e4238f423f99f1cf2498e49c25b48"
+  "kind": "BINGO_CARD_SET",
+  "baselineSha": "8dd64266678841c0702d476ae8270f5450dc551a",
+  "migrationCount": 83,
+  "lastMigration": "20261128150000_bingo_evening_card_set",
+  "manifestSha256": "501d920e9312d5b5071c2df9d9cde44a0c6a66bfad8902299cc361147bf1ac96",
+  "schemaSha256": "eb063fd9826140c93e5e583608b5c568ca3c2c2f6c99bfa2df0795bc9725d2c1"
 }

@@ -1,0 +1,54 @@
+import assert from 'node:assert/strict';
+import {randomUUID} from 'node:crypto';
+import {mkdirSync,writeFileSync} from 'node:fs';
+import {PDFDocument} from 'pdf-lib';
+import type {Client} from 'pg';
+type Api=typeof import('@/app/bingo/preparation/repository.server')&{
+ creation:typeof import('@/app/bingo/eventCreation.server');cardSet:typeof import('@/app/bingo/preparation/cardSetRead.server');cardSetWrite:typeof import('@/app/bingo/preparation/cardSetRepository.server');cardSetPdf:typeof import('@/app/bingo/preparation/cardSetPdf.server');
+ eventRun:typeof import('@/app/bingo/live/eventRepository.server');terms:typeof import('@/app/bingo/preparation/termRepository.server');
+};
+export async function exerciseCardSet(db:Client,api:Api){
+ const before=(await db.query('SELECT id,cells,printed_code,layout_hash FROM pubquiz.bingo_cards ORDER BY id')).rows;
+ const created=await api.creation.createBingoEvent(1,{seriesId:10,title:'SRA3 Abendkartensatz',date:'',time:'',roundCount:3,defaultCardCount:13,requestId:randomUUID()});
+ let view=await api.cardSet.readCardSet(1,created.id);assert.equal(view.config.defaultCount,13);assert.equal(view.rounds.length,3);
+ const last=view.rounds.at(-1)!;
+ const terms={version:1,name:'Musik',publication:'DIRECT',entries:Array.from({length:75},(_,i)=>({number:i+1,text:`Band ${i+1}`}))};
+ await api.terms.writeRoundTerms(1,{gameId:created.id,roundId:last.id,revision:view.revision,config:terms});view=await api.cardSet.readCardSet(1,created.id);
+ const config={...view.config,wildcards:13,rounds:view.config.rounds.map((r,i)=>({...r,selected:i!==1,count:i===2?14:null}))};
+ const command=()=>({gameId:created.id,expectedSeriesId:10,revision:view.revision,config,requestId:randomUUID()});
+ const count=async()=>Number((await db.query('SELECT count(*) n FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_card_series s ON s.id=c.series_id WHERE s.game_id=$1',[created.id])).rows[0].n);
+ await api.cardSetWrite.writeCardSet(1,{...command(),operation:'save'});assert.equal(await count(),0,'selection/save never generates');
+ view=await api.cardSet.readCardSet(1,created.id);
+ const request={...command(),operation:'prepare'};
+ for(const user of [2,4,5,6])await assert.rejects(api.cardSetWrite.writeCardSet(user,request));
+ const prepared=await api.cardSetWrite.writeCardSet(1,request);assert.ok(prepared.setId);await api.cardSetWrite.writeCardSet(1,request);assert.equal(await count(),40);
+ const saved=await api.cardSetPdf.readCardSetPrint(1,created.id,prepared.setId!);assert.equal(saved.sections.length,3);assert.deepEqual(saved.sections.map(s=>s.cards.length),[13,14,13]);const wildcardPrint=saved.sections.at(-1)!.section.snapshot;assert.deepEqual(wildcardPrint.version===3?wildcardPrint.terms:null,terms);
+ const wc=saved.sections.at(-1)!.cards[0];assert.match(wc.shortCode!,/^WC-[A-Z]+-\d{3}$/);assert.equal(await api.eventRun.resolveEveningCard(1,created.id,wc.shortCode!),wc.id);await assert.rejects(api.eventRun.resolveEveningCard(1,created.id,wc.shortCode!.slice(3)));
+ const firstCard=saved.sections[0].cards[0];assert.match(firstCard.shortCode!,/^[A-Z]+-\d{3}$/);assert.equal(await api.eventRun.resolveEveningCard(1,created.id,firstCard.shortCode!),firstCard.id);
+ const pdf=await api.cardSetPdf.createCardSetPdf(1,created.id,prepared.setId!);const document=await PDFDocument.load(pdf);assert.equal(document.getPageCount(),12);
+ for(const page of document.getPages()){assert.ok(Math.abs(page.getWidth()*25.4/72-320)<.001);assert.ok(Math.abs(page.getHeight()*25.4/72-450)<.001);assert.deepEqual(page.getTrimBox(),page.getMediaBox());assert.deepEqual(page.getBleedBox(),page.getMediaBox());}
+ mkdirSync('output/pdf',{recursive:true});writeFileSync('output/pdf/bingo-abendkartensatz-sra3.pdf',pdf);
+ await api.cardSetPdf.createCardSetPdf(1,created.id,prepared.setId!);assert.equal(await count(),40,'repeat downloads are read-only');
+ view=await api.cardSet.readCardSet(1,created.id);
+ await api.cardSetWrite.writeCardSet(1,{...command(),operation:'prepare'});assert.equal(await count(),40,'new manifest reuses stock');
+ view=await api.cardSet.readCardSet(1,created.id);
+ const higher={...config,defaultCount:15};await assert.rejects(api.cardSetWrite.writeCardSet(1,{...command(),config:higher,operation:'prepare'}),/Zusatzkarten/);assert.equal(await count(),40);
+ const extra={...command(),operation:'extra',roundId:view.rounds[0].id,wildcard:false,count:2};await api.cardSetWrite.writeCardSet(1,extra);await api.cardSetWrite.writeCardSet(1,extra);assert.equal(await count(),42);
+ view=await api.cardSet.readCardSet(1,created.id);await api.cardSetWrite.writeCardSet(1,{...command(),config:higher,operation:'prepare'});assert.equal(await count(),42);
+ const wildcardSeries=(await db.query('SELECT series_id FROM pubquiz.bingo_wildcard_series WHERE game_id=$1',[created.id])).rows[0].series_id;
+ view=await api.cardSet.readCardSet(1,created.id);
+ await api.cardSetWrite.writeCardSet(1,{...command(),operation:'extra',roundId:last.id,wildcard:true,count:507});
+ assert.equal((await api.cardSet.readCardSet(1,created.id)).wildcardStock,520,'wildcard extras split atomically into immutable chunks');
+ assert.equal((await db.query('SELECT count(*)::int n FROM pubquiz.bingo_wildcard_series WHERE game_id=$1',[created.id])).rows[0].n,3);
+ assert.deepEqual((await api.cardSetPdf.readCardSetPrint(1,created.id,prepared.setId!)).sections.map(s=>s.cards.map(c=>c.id)),saved.sections.map(s=>s.cards.map(c=>c.id)),'extra stock never changes an existing print set');
+ await assert.rejects(db.query('INSERT INTO pubquiz.bingo_round_series(game_id,round_id,series_id) VALUES($1,$2,$3)',[created.id,view.rounds[0].id,wildcardSeries]));
+ await assert.rejects(db.query('UPDATE pubquiz.bingo_evening_card_sets SET request_hash=request_hash WHERE id=$1',[prepared.setId]));
+ await assert.rejects(db.query('DELETE FROM pubquiz.bingo_wildcard_series WHERE series_id=$1',[wildcardSeries]));
+ const start=await api.eventRun.startEventRun(1,{gameId:created.id,requestId:randomUUID(),expectedSeriesId:10,preparationRevision:(await api.readPreparation(1,created.id)).revision});
+ const active=await api.eventRun.readEventModeration(1,created.id,start.runId);
+ assert.equal(active.frozenDecks.some(d=>d.wildcard),false,'first round never includes final-round wildcards');
+ view=await api.cardSet.readCardSet(1,created.id);
+ await assert.rejects(api.cardSetWrite.writeCardSet(1,{...command(),operation:'extra',roundId:last.id,wildcard:true,count:1}),/laufenden/);
+ const preserved=(await db.query('SELECT id,cells,printed_code,layout_hash FROM pubquiz.bingo_cards WHERE NOT series_id IN (SELECT id FROM pubquiz.bingo_card_series WHERE game_id=$1) ORDER BY id',[created.id])).rows;assert.deepEqual(preserved,before);
+ console.info('Abendkartensatz: defaults, selection, terms, wildcard codes/target, immutable stock, explicit extras, retry and read-only SRA3 export PASS');
+}

@@ -49,12 +49,12 @@ export async function readCards(userId: number, gameId: string, seriesId: string
   if (!isGameId(seriesId)) throw denied();
   return prisma.$transaction(async tx => {
     await context(tx, userId, gameId);
-    const series = await tx.bingo_card_series.findFirst({ where: { id: seriesId, game_id: gameId },include:{short_label:true,print_versions:{orderBy:{version:'desc'},select:{version:true,created_at:true,actor:{select:{name:true}}}}} });
+    const series = await tx.bingo_card_series.findFirst({ where: { id: seriesId, game_id: gameId },include:{wildcard:true,short_label:true,print_versions:{orderBy:{version:'desc'},select:{version:true,created_at:true,actor:{select:{name:true}}}}} });
     if (!series) throw denied();
-    const ordinals=series.short_label?Array.from({length:series.card_count},(_,i)=>i+1).filter(n=>shortCardCode(series.short_label!.prefix,n).toLowerCase().includes(search.toLowerCase())):[];
+    const ordinals=series.short_label?Array.from({length:series.card_count},(_,i)=>i+1).filter(n=>shortCardCode(series.short_label!.prefix,n,Boolean(series.wildcard)).toLowerCase().includes(search.toLowerCase())):[];
     const where = { series_id: series.id,OR:[{printed_code:{contains:search,mode:'insensitive' as const}},{ordinal:{in:ordinals}}] };
     const rows = await tx.bingo_cards.findMany({ where, orderBy: { ordinal: "asc" }, skip: (page - 1) * CARD_PAGE_SIZE, take: CARD_PAGE_SIZE });
     if(!Number.isSafeInteger(version)||version<1)throw denied();const historical=version===1?null:await tx.bingo_print_versions.findUnique({where:{series_id_version:{series_id:series.id,version}},select:{snapshot:true}});if(version!==1&&!historical)throw denied();
-    return {code:series.code,count:await tx.bingo_cards.count({where}),total:series.card_count,version,versions:[{version:1,at:series.created_at.toISOString(),actor:'Ursprüngliche Erzeugung'},...series.print_versions.map(v=>({version:v.version,at:v.created_at.toISOString(),actor:v.actor.name??'Benutzer'}))],snapshot:parsePrintSnapshot(historical?.snapshot??series.print_snapshot),cards:rows.map(r=>({...storedCard(r),shortCode:series.short_label?shortCardCode(series.short_label.prefix,r.ordinal):undefined}))};
+    return {wildcard:Boolean(series.wildcard),code:series.code,count:await tx.bingo_cards.count({where}),total:series.card_count,version,versions:[{version:1,at:series.created_at.toISOString(),actor:'Ursprüngliche Erzeugung'},...series.print_versions.map(v=>({version:v.version,at:v.created_at.toISOString(),actor:v.actor.name??'Benutzer'}))],snapshot:parsePrintSnapshot(historical?.snapshot??series.print_snapshot),cards:rows.map(r=>({...storedCard(r),shortCode:series.short_label?shortCardCode(series.short_label.prefix,r.ordinal,Boolean(series.wildcard)):undefined}))};
   }, { isolationLevel: "RepeatableRead" });
 }

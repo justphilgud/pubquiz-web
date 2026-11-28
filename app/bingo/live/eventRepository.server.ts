@@ -10,7 +10,7 @@ import {prisma} from "@/app/lib/prisma";
 import {preparationContext} from "../preparation/access.server";
 import {canonical,sha256} from "../preparation/printSnapshot";
 import {storedCard} from "../preparation/readExport.server";
-import {shortCardCode} from "../preparation/bingoPrint";
+import {isWildcardCode,shortCardCode} from "../preparation/bingoPrint";
 import {resolveSharedDesign} from "@/app/rendering/sharedDesign/sharedDesignRepository.server";
 import {parseSharedDesign,type SharedDesign} from "@/app/rendering/sharedDesign/sharedDesign";
 import {captureLiveAssets} from "./visualAssets.server";
@@ -22,7 +22,7 @@ import {readPreparation} from "../preparation/readPreparation.server";
 import {frozenMatching,readMatchingEntry,audienceMatching} from '../matching/repository.server';
 type Tx=Prisma.TransactionClient;
 type Row={id:string;game_id:string;round_id:string;eventreihe_id:number;status:string;revision:number;started_at:Date;round_snapshot:unknown;design_snapshot:SharedDesign;audience_key:string;start_request_hash:string};
-type CardRow={round_id:string;id:string;series_id:string;cells:unknown;layout_hash:string;printed_code:string;ordinal:number;prefix:number};
+type CardRow={round_id:string;id:string;series_id:string;cells:unknown;layout_hash:string;printed_code:string;ordinal:number;prefix:number;wildcard:boolean};
 import {parseEventEnvelope,type Envelope} from "./eventEnvelope";
 const integer=(v:unknown)=>{if(!Number.isSafeInteger(v)||Number(v)<0)throw Error("INVALID_REVISION");};
 async function clock(tx:Tx){return (await tx.$queryRaw<{at:Date}[]>`SELECT clock_timestamp()::timestamptz(3) AS at`)[0].at.getTime();}
@@ -35,17 +35,17 @@ async function load(tx:Tx,row:Row){
  const first=parseRoundSnapshot(row.round_snapshot,row.round_id);
  if(!parseSharedDesign(row.design_snapshot))throw Error("INVALID_PERSISTED_RUN");
  const frozenRows=await tx.$queryRaw<{round_id:string;round_snapshot:unknown;opened_at:Date}[]>`SELECT f.round_id,f.round_snapshot,f.opened_at FROM pubquiz.bingo_event_rounds f JOIN pubquiz.bingo_event_round_plan p ON p.run_id=f.run_id AND p.round_id=f.round_id WHERE f.run_id=${row.id}::uuid ORDER BY p.position`;
- const all=await tx.$queryRaw<CardRow[]>`SELECT rc.round_id,c.id,c.series_id,c.cells,c.layout_hash,c.printed_code,c.ordinal,l.prefix FROM pubquiz.bingo_event_round_cards rc JOIN pubquiz.bingo_cards c ON c.id=rc.card_id JOIN pubquiz.bingo_series_labels l ON l.series_id=c.series_id WHERE rc.run_id=${row.id}::uuid AND rc.game_id=${row.game_id}::uuid ORDER BY rc.round_id,c.id`;
+ const all=await tx.$queryRaw<CardRow[]>`SELECT rc.round_id,c.id,c.series_id,c.cells,c.layout_hash,c.printed_code,c.ordinal,l.prefix,EXISTS(SELECT 1 FROM pubquiz.bingo_wildcard_series w WHERE w.series_id=c.series_id) AS wildcard FROM pubquiz.bingo_event_round_cards rc JOIN pubquiz.bingo_cards c ON c.id=rc.card_id JOIN pubquiz.bingo_series_labels l ON l.series_id=c.series_id WHERE rc.run_id=${row.id}::uuid AND rc.game_id=${row.game_id}::uuid ORDER BY rc.round_id,c.id`;
  const cardsByRound=new Map(frozenRows.map(f=>{
   const snapshot=parseRoundSnapshot(f.round_snapshot,f.round_id),rows=all.filter(c=>c.round_id===f.round_id);
   if(!rows.length||(snapshot.issued!==null&&snapshot.issued>rows.length)||canonical([...new Set(rows.map(c=>c.series_id))].sort())!==canonical(snapshot.seriesIds))throw Error("INVALID_FROZEN_CARDS");
-  return [f.round_id,rows.map(c=>({...storedCard(c),shortCode:shortCardCode(c.prefix,c.ordinal)}))] as const;
+  return [f.round_id,rows.map(c=>({...storedCard(c),shortCode:shortCardCode(c.prefix,c.ordinal,c.wildcard)}))] as const;
  }));
  if(!frozenRows.length||frozenRows[0].opened_at.getTime()!==row.started_at.getTime()||canonical(frozenRows[0].round_snapshot)!==canonical(first))throw Error("INVALID_FROZEN_ROUND");
  const events=await tx.$queryRaw<{request_id:string;request_hash:string;revision:number;actor_id:number;occurred_at:Date;command:unknown;event_round_id:string}[]>`SELECT request_id,request_hash,revision,actor_id,occurred_at,command,event_round_id FROM pubquiz.bingo_live_events WHERE run_id=${row.id}::uuid ORDER BY revision`;
  const checkedIds=[...new Set(events.flatMap(e=>{const c=parseEventEnvelope(e.command).input.command;return c.kind==='check'?[c.cardId]:[];}))];
- const checkRows=checkedIds.length?await tx.$queryRaw<CardRow[]>`SELECT c.id,c.series_id,c.cells,c.layout_hash,c.printed_code,c.ordinal,l.prefix FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_series_labels l ON l.series_id=c.series_id WHERE l.game_id=${row.game_id}::uuid AND c.id=ANY(${checkedIds}::uuid[])`:[];
- const checkCards=checkRows.map(c=>({...storedCard(c),shortCode:shortCardCode(c.prefix,c.ordinal)}));
+ const checkRows=checkedIds.length?await tx.$queryRaw<CardRow[]>`SELECT c.id,c.series_id,c.cells,c.layout_hash,c.printed_code,c.ordinal,l.prefix,EXISTS(SELECT 1 FROM pubquiz.bingo_wildcard_series w WHERE w.series_id=c.series_id) AS wildcard FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_series_labels l ON l.series_id=c.series_id WHERE l.game_id=${row.game_id}::uuid AND c.id=ANY(${checkedIds}::uuid[])`:[];
+ const checkCards=checkRows.map(c=>({...storedCard(c),shortCode:shortCardCode(c.prefix,c.ordinal,c.wildcard)}));
  if(checkCards.length!==checkedIds.length)throw Error('INVALID_FROZEN_CARDS');
  if(events.length!==row.revision)throw Error("INVALID_EVENT_HISTORY");
  let state=initialEventRun(row.id,row.game_id,first,row.started_at.getTime()),previousAt=row.started_at.getTime();
@@ -147,7 +147,7 @@ export async function commandEventRun(userId:number,input:{gameId:string;runId:s
     if(!next||next.round_id!==command.roundId)throw Error("INVALID_NEXT_ROUND");opened=await freeze(tx,game.id,row.id,command.roundId,at);
    }
   }
-  const checkRows=command.kind==='check'?await tx.$queryRaw<CardRow[]>`SELECT c.id,c.series_id,c.cells,c.layout_hash,c.printed_code,c.ordinal,l.prefix FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_series_labels l ON l.series_id=c.series_id WHERE l.game_id=${game.id}::uuid AND c.id=${command.cardId}::uuid`:[];
+  const checkRows=command.kind==='check'?await tx.$queryRaw<CardRow[]>`SELECT c.id,c.series_id,c.cells,c.layout_hash,c.printed_code,c.ordinal,l.prefix,EXISTS(SELECT 1 FROM pubquiz.bingo_wildcard_series w WHERE w.series_id=c.series_id) AS wildcard FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_series_labels l ON l.series_id=c.series_id WHERE l.game_id=${game.id}::uuid AND c.id=${command.cardId}::uuid`:[];
   if(command.kind==='check'&&!checkRows.length)throw Error('CARD_OR_CALL_NOT_FOUND');
   if(command.kind==='check'&&!loaded.cardsByRound.get(round.id)?.some(card=>card.id===command.cardId))throw Error('WRONG_ROUND');
   if(command.kind==='decideCheck'&&command.action==='CONFIRM'&&!loaded.cardsByRound.get(round.id)?.some(card=>card.id===state.checks?.find(check=>check.id===command.checkId)?.cardId))throw Error('WRONG_ROUND');
@@ -179,8 +179,8 @@ export async function readEventModeration(userId:number,gameId:string,runId?:str
   const loaded=row?await load(tx,row):null,round=loaded?currentEventRound(loaded.state):null;
   const at=Math.max(await clock(tx),loaded?.previousAt??0);
   const plan=row?await tx.$queryRaw<{round_id:string;position:number}[]>`SELECT round_id,position FROM pubquiz.bingo_event_round_plan WHERE run_id=${row.id}::uuid ORDER BY position`:[];
-  const rounds=await tx.bingo_rounds.findMany({where:{game_id:gameId},orderBy:{position:"asc"},select:{id:true,position:true,label:true,series:{select:{series_id:true,series:{select:{code:true,card_count:true}}}}}});
-  const frozenDecks=row?await tx.$queryRaw<{roundId:string;id:string;code:string;count:number;firstOrdinal?:number;lastOrdinal?:number;prefix?:number}[]>`SELECT rc.round_id AS "roundId",s.id,s.code,count(*)::int AS count,min(c.ordinal)::int AS "firstOrdinal",max(c.ordinal)::int AS "lastOrdinal",l.prefix FROM pubquiz.bingo_event_round_cards rc JOIN pubquiz.bingo_card_series s ON s.id=rc.series_id JOIN pubquiz.bingo_cards c ON c.id=rc.card_id JOIN pubquiz.bingo_series_labels l ON l.series_id=s.id WHERE rc.run_id=${row.id}::uuid AND rc.game_id=${gameId}::uuid GROUP BY rc.round_id,s.id,s.code,l.prefix ORDER BY rc.round_id,s.code`:[];
+  const rounds=await tx.bingo_rounds.findMany({where:{game_id:gameId},orderBy:{position:"asc"},select:{id:true,position:true,label:true,series:{select:{series_id:true,series:{select:{code:true,card_count:true,wildcard:{select:{series_id:true}}}}}}}});
+  const frozenDecks=row?await tx.$queryRaw<{roundId:string;id:string;code:string;count:number;firstOrdinal?:number;lastOrdinal?:number;prefix?:number;wildcard?:boolean}[]>`SELECT rc.round_id AS "roundId",s.id,s.code,count(*)::int AS count,min(c.ordinal)::int AS "firstOrdinal",max(c.ordinal)::int AS "lastOrdinal",l.prefix,EXISTS(SELECT 1 FROM pubquiz.bingo_wildcard_series w WHERE w.series_id=s.id) AS wildcard FROM pubquiz.bingo_event_round_cards rc JOIN pubquiz.bingo_card_series s ON s.id=rc.series_id JOIN pubquiz.bingo_cards c ON c.id=rc.card_id JOIN pubquiz.bingo_series_labels l ON l.series_id=s.id WHERE rc.run_id=${row.id}::uuid AND rc.game_id=${gameId}::uuid GROUP BY rc.round_id,s.id,s.code,l.prefix ORDER BY rc.round_id,s.code`:[];
   const next=plan.find(p=>!loaded?.state.frozen.some(r=>r.id===p.round_id));
   const matching=round&&loaded?.state.frozen.find(f=>f.id===round.id)?.matching,last=round?.draws.at(-1);
   const matchingEntry=matching&&last?await readMatchingEntry(tx,gameId,matching,last.number):null;
@@ -226,12 +226,12 @@ export async function readEventAudience(userId:number,key:string){
 export async function resolveEveningCard(userId:number,gameId:string,code:string) {
  assertUuid(gameId);
  if(typeof code!=='string'||code.length>64||!code.trim())throw Error('CARD_NOT_FOUND');
- const normalized=code.trim().toUpperCase();
+ const normalized=code.trim().toUpperCase(),short=isWildcardCode(normalized)?normalized.slice(3):normalized;
  return prisma.$transaction(async tx=>{
   await tx.$executeRaw`SET TRANSACTION READ ONLY`;
   const {game}=await preparationContext(tx,userId,gameId);
-  const rows=await tx.$queryRaw<{id:string;game_id:string;ordinal:number;prefix:number;printed_code:string}[]>`SELECT c.id,l.game_id,c.ordinal,l.prefix,c.printed_code FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_series_labels l ON l.series_id=c.series_id JOIN pubquiz.game_drafts g ON g.id=l.game_id WHERE g.eventreihe_id=${game.eventreihe_id} AND (upper(c.printed_code)=${normalized} OR c.id::text=${normalized.toLowerCase()} OR (l.prefix=${/^([A-Z]+)-/.test(normalized)?shortPrefix(normalized.split('-')[0]):0} AND c.ordinal=${/^[A-Z]+-\d{1,3}$/.test(normalized)?Number(normalized.split('-')[1]):0}))`;
-  const matches=rows.filter(c=>[c.id,c.printed_code,shortCardCode(c.prefix,c.ordinal)].some(v=>v.toUpperCase()===normalized));
+  const rows=await tx.$queryRaw<{id:string;game_id:string;ordinal:number;prefix:number;wildcard:boolean;printed_code:string}[]>`SELECT c.id,l.game_id,c.ordinal,l.prefix,c.printed_code,EXISTS(SELECT 1 FROM pubquiz.bingo_wildcard_series w WHERE w.series_id=c.series_id) AS wildcard FROM pubquiz.bingo_cards c JOIN pubquiz.bingo_series_labels l ON l.series_id=c.series_id JOIN pubquiz.game_drafts g ON g.id=l.game_id WHERE g.eventreihe_id=${game.eventreihe_id} AND (upper(c.printed_code)=${normalized} OR c.id::text=${normalized.toLowerCase()} OR (l.prefix=${/^([A-Z]+)-/.test(short)?shortPrefix(short.split('-')[0]):0} AND c.ordinal=${/^[A-Z]+-\d{1,3}$/.test(short)?Number(short.split('-')[1]):0}))`;
+  const matches=rows.filter(c=>[c.id,c.printed_code,shortCardCode(c.prefix,c.ordinal,c.wildcard)].some(v=>v.toUpperCase()===normalized));
   const current=matches.filter(c=>c.game_id===gameId);
   if(current.length>1)throw Error('AMBIGUOUS_CARD');
   if(!current.length)throw Error(matches.length?'OLD_CARD':'CARD_NOT_FOUND');

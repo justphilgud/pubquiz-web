@@ -49,10 +49,11 @@ export function printContrastIssues(config:BingoPrint):string[]{
   return checks.flatMap(([name,a,b,min])=>{const l=luminance(a),r=luminance(b),ratio=(Math.max(l,r)+.05)/(Math.min(l,r)+.05);return ratio<min?[`${name}: Kontrast ${ratio.toFixed(1)}:1 ist zu niedrig (mindestens ${min}:1). Bitte Farben prüfen.`]:[];});
 }
 /** Scoped to one game; prefix allocation is serialized and persisted, never truncated. */
-export function shortCardCode(prefix:number,ordinal:number){
+export const isWildcardCode=(code:string)=>/^WC-[A-Z]+-\d{3}$/.test(code);
+export function shortCardCode(prefix:number,ordinal:number,wildcard=false){
   if(!Number.isSafeInteger(prefix)||prefix<1||!Number.isSafeInteger(ordinal)||ordinal<1||ordinal>500)throw Error('SHORT_CODE_INVALID');
   let letters='';for(let n=prefix;n>0;n=Math.floor((n-1)/26))letters=String.fromCharCode(65+(n-1)%26)+letters;
-  return `${letters}-${String(ordinal).padStart(3,'0')}`;
+  return `${wildcard?'WC-':''}${letters}-${String(ordinal).padStart(3,'0')}`;
 }
 
 /** Only absent configurations receive the new defaults. Explicit saved font choices stay untouched. */
