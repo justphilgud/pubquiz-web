@@ -9,7 +9,7 @@ import {BingoPreparationError,denied,type StoredCard} from './policy';
 import {assertUuid} from '../live/live';
 import {createModernCardsPdf} from './pdfModern.server';
 import {createReferenceCardsPdf} from './pdfReference.server';
-import {CARD_SET_SHEET as g,cardSetSlot,mmToPt as pt} from './cardSetGeometry';
+import {CARD_SET_SHEET as g,cardSetSlot,cardSetCutMarks,mmToPt as pt} from './cardSetGeometry';
 import {canonical} from './printSnapshot';
 import {roundTheme} from '../roundColors';
 
@@ -37,7 +37,7 @@ export async function readCardSetPrint(userId:number,gameId:string,setId:string)
 export async function imposeCardSet(sections:CardSetPrintSection[],title:string){
  const out=await PDFDocument.create();out.setTitle(`${title} · Abendkartensatz`);
  out.setSubject('SRA3 320 x 450 mm; Endformat 92,5 mm; Anschnitt 3 mm; 100 %; Duplex lange Kante');
- const geometry={unit:'mm',sheet:[g.width,g.height],trim:[g.side,g.side],bleed:g.bleed,duplex:'long-edge',front:Array.from({length:12},(_,i)=>cardSetSlot(i)),back:Array.from({length:12},(_,i)=>cardSetSlot(i,true))};
+ const geometry={unit:'mm',sheet:[g.width,g.height],trim:[g.side,g.side],bleed:g.bleed,duplex:'long-edge',front:Array.from({length:12},(_,i)=>cardSetSlot(i)),back:Array.from({length:12},(_,i)=>cardSetSlot(i,true)),cutMarks:cardSetCutMarks()};
  await out.attach(Buffer.from(canonical(geometry)), 'ausschiessung.json',{mimeType:'application/json',description:'Endformat und Anschnitt jeder Karte; alle Seitenboxen beziehen sich auf den ganzen Bogen.'});
  for(const {section,cards} of sections){
   const snap=section.snapshot;if(snap.version!==3&&snap.version!==4)throw denied();
@@ -59,12 +59,8 @@ export async function imposeCardSet(sections:CardSetPrintSection[],title:string)
      const card=embedded[(start+slot)*2+(back?1:0)];
      if(Math.abs(card.width-pt(w))>.01||Math.abs(card.height-pt(h))>.01)throw new BingoPreparationError('Karten-Endformat stimmt nicht mit 92,5 mm überein. Keine Skalierung vorgenommen.');
      page.drawPage(card,{x:pt(x),y:pt(y)});
-     for(const dx of [0,w])for(const dy of [0,h]){
-      const sx=dx?1:-1,sy=dy?1:-1,cx=x+dx,cy=y+dy;
-      page.drawLine({start:{x:pt(cx+sx*g.markOffset),y:pt(cy)},end:{x:pt(cx+sx*(g.markOffset+g.markLength)),y:pt(cy)},thickness:.3,color:marks});
-      page.drawLine({start:{x:pt(cx),y:pt(cy+sy*g.markOffset)},end:{x:pt(cx),y:pt(cy+sy*(g.markOffset+g.markLength))},thickness:.3,color:marks});
-     }
     }
+    for(const mark of cardSetCutMarks())page.drawLine({start:{x:pt(mark.start[0]),y:pt(mark.start[1])},end:{x:pt(mark.end[0]),y:pt(mark.end[1])},thickness:.3,color:marks,dashArray:[pt(1),pt(.75)]});
    }
   }
  }

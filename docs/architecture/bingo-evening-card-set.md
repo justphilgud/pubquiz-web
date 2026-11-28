@@ -93,8 +93,9 @@ geschützter Preflight und Deployment bleiben unverändert vorgeschrieben.
 | Karten-Endformat | 92,5 × 92,5 mm, keine nachträgliche Skalierung |
 | Fester Anschnitt | 3 mm umlaufend, Fläche 98,5 × 98,5 mm |
 | Abstand zwischen Endformaten | 12 mm |
-| Schnittmarken | 4–5,5 mm außerhalb der Schnittkante, 0,3 pt, kontrastgerecht hell/dunkel |
-| Abstand gegenüberliegender Markenspitzen | 1 mm |
+| Schnittmarken | Nur am Papieraußenrand: 1 mm eingerückt, 4 mm lang, 0,3 pt, gestrichelt und kontrastgerecht hell/dunkel |
+| Ausrichtung | Links/rechts waagerecht, oben/unten senkrecht: jeweils orthogonal zur Papierkante und exakt auf den Karten-Endkanten |
+| Freiraum zum Anschnitt | Mindestens 1,25 mm; keine Marken in Karten- oder Anschnittflächen |
 | Rückseiten | Gesamter SRA3-Bogen vollflächig in Rundenfarbe, einschließlich Rändern, Stegen und leeren Plätzen |
 | Vorderseiten | Gesamter SRA3-Bogen in der gespeicherten Vorderseiten-Hintergrundfarbe, ebenfalls mit Rändern, Stegen und freien Plätzen |
 | Duplex | Lange Kante; Spalten gespiegelt, Zeilen unverändert |
@@ -119,6 +120,20 @@ Anschnittkoordinaten stehen in der eingebetteten `ausschiessung.json`; die
 Schnittmarken kennzeichnen die einzelnen Endformate. Die UI-Geometrievorschau
 unterscheidet Schnittkante (blau), Anschnitt (rosa) und Marken (schwarz). Diese
 Hilfslinien werden nicht auf den fertigen Karten gedruckt.
+
+## Ansatzmarken für die Schneidemaschine
+
+Letzte Nutzerkorrektur: Die Marken dienen zum Ansetzen der Schneidemaschine und
+liegen deshalb ausschließlich am Papieraußenrand. Die bisherigen kurzen Marken
+an den Kartenecken im Bogeninneren entfallen ausdrücklich. Die zentrale Funktion
+`cardSetCutMarks()` liefert die 28 eindeutigen Vektoren: sechs senkrechte
+Schnittpositionen mit Marken oben/unten und acht waagerechte Schnittpositionen
+mit Marken links/rechts. Alle zeigen rechtwinklig zur jeweiligen Papierkante
+auf die Karten-Endkante, nicht auf den äußeren Anschnitt. Sie beginnen 1 mm im
+Bogen und reichen 4 mm nach innen; die Strichelung beträgt 1 mm / 0,75 mm Pause.
+PDF und UI-Geometrievorschau verwenden dieselbe Quelle. Voll- und Teilbögen
+besitzen auf Vorder- und Rückseite dasselbe Raster. Es werden keine Schnittlinien
+über die fertigen Karten gedruckt. Die vollflächigen Hintergrundfarben bleiben.
 
 ## Rückseitenkorrektur 28.11.2026
 

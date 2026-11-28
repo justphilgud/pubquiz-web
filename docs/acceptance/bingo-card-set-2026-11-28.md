@@ -46,7 +46,7 @@ Die vollständigen Linux-CI-Prüfungen des exakten PR-Heads sind im PR nachzuver
 | PDF-Grenzen | Alle zwölf Seiten 320 × 450 mm; zwölf 92,5-mm-Endformate je vollem Bogen; kein gemischtes Trennformat |
 | V3/V4 | Neue Ausschießung mit beiden tatsächlichen Vektorrenderern geprüft; keine Skalierung, kein DB-Zugriff im Ausschießen, gefrorene Eingaben unverändert |
 | Anschnitt | 3 mm rundum, 96 tatsächliche Farbmesspunkte in normalen/Wildcard-Rückseiten gerendert und geprüft |
-| Marken/Abstände | Marken 4–5,5 mm außerhalb der Schnittkante, außerhalb des 3-mm-Anschnitts; 12-mm-Zwischenraum, 1-mm-Markenspitzenabstand |
+| Marken/Abstände | Nach finaler Nutzerkorrektur 28 gestrichelte Ansatzmarken nur am Papieraußenrand, orthogonal zur Papierkante und auf den Endkanten-Koordinaten; 1 mm eingerückt, 4 mm lang, mindestens 1,25 mm Abstand zum Anschnitt |
 | Duplex | Vollraster-Spiegelung, Reihen unverändert; PDF-Transformationen und Codezuordnung einschließlich Teilbogen geprüft |
 | Read-only-Grenze | Beide PDF-Routen und Kartenübersicht importieren keine Karten-Erzeugung oder Quellasset-Ingestion |
 | Migration | Exakte additive SQL-/Schemabytes; keine alten Zeilen verändert, neue Tabellen leer; FK-/Unveränderlichkeits-/Letztrunden-Constraints und Transaktionsrückweg geprüft |
@@ -102,6 +102,15 @@ sind rein synthetisch; bestehende Karten, Abende und Snapshots wurden nicht ver�
 ![Sieben Farben mit beiden Logos](assets/bingo-card-set/farben-und-logos-uebersicht.png)
 
 ![Creme Catalana vollflächig bis in den Anschnitt](assets/bingo-card-set/sra3-beige-vollflaechig.png)
+
+## Ansatzmarken: letzte Nutzerkorrektur
+
+Die bisherigen Marken zwischen den Karten wurden durch äußere Ansatzmarken für
+die Schneidemaschine ersetzt. Links und rechts zeigen sie waagerecht nach innen,
+oben und unten senkrecht. Vorder- und Rückseite sowie Teilbögen verwenden stets
+die gleichen 28 Marken an den Endformat-Schnittpositionen. Keine Linie läuft
+über Kartenmotive oder Anschnitt. Die tatsächlichen PDF-Vektoren, Strichelung,
+Orthogonalität und deckungsgleichen Koordinaten sind automatisiert geprüft.
 
 ## Tatsächliche Screenshots und PDF-Renderings
 

@@ -53,5 +53,8 @@
   "fullSheetBackgroundVerified": true,
   "sheetMarginGutterAndEmptySlotSamples": 116,
   "beigeOpaqueWhitePixelsOnEntireSheet": 0,
-  "contrastCropMarks": true
+  "contrastCropMarks": true,
+  "cutMarks": "outer-paper-edges-perpendicular",
+  "cutMarksPerPage": 28,
+  "fullAndPartialSheetsUseSameCutRaster": true
 }

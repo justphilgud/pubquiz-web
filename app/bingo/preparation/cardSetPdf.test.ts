@@ -7,6 +7,7 @@ import {getPresentationTemplate} from '@/app/rendering/templateRegistry';
 import type {SharedDesign} from '@/app/rendering/sharedDesign/sharedDesign';
 import {systemPrintTemplates} from './printTemplates';
 import {WILDCARD_COLOR} from './cardSet';
+import {cardSetCutMarks,mmToPt} from './cardSetGeometry';
 import type {StoredCard} from './policy';
 
 test('new SRA3 imposition accepts real V3 and V4 single-card vectors without scaling or database access',{timeout:60000},async()=>{
@@ -34,6 +35,12 @@ test('new SRA3 imposition accepts real V3 and V4 single-card vectors without sca
   assert.ok(Math.abs(Math.max(...corners.map(p=>p[0]))-back.getWidth())<1e-5,'full sheet width, including empty slots and margins');
   assert.ok(Math.abs(Math.max(...corners.map(p=>p[1]))-back.getHeight())<1e-5,'full sheet height, including empty slots and margins');
   if(index===1)assert.match(backOperators,/1 1 1 RG/,'dark sheet retains visible light crop marks');
+  const lines=[...backOperators.matchAll(/^(-?[\d.]+) (-?[\d.]+) m\n(-?[\d.]+) (-?[\d.]+) l\nS$/gm)];
+  assert.equal(lines.length,28,'both actual PDF sides include the same complete outer-edge cut raster, even for a single card');
+  cardSetCutMarks().forEach((m,i)=>[...m.start,...m.end].forEach((value,j)=>assert.ok(Math.abs(Number(lines[i][j+1])-mmToPt(value))<1e-5,'actual vector line points to the trim coordinate from the outer paper edge')));
+  const dashes=[...backOperators.matchAll(/^\[([\d.]+) ([\d.]+)\] 0 d$/gm)];
+  assert.equal(dashes.length,28,'machine alignment marks are dashed');
+  dashes.forEach(m=>{assert.ok(Math.abs(Number(m[1])-mmToPt(1))<1e-5);assert.ok(Math.abs(Number(m[2])-mmToPt(.75))<1e-5);});
   }
   assert.equal(JSON.stringify({snapshot,card}),before,'renderer retains frozen inputs');
  }

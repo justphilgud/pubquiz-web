@@ -11,8 +11,7 @@
   ],
   "bleedMm": 3,
   "gapMm": 12,
-  "marksOffsetMm": 4,
-  "marksLengthMm": 1.5,
+  "marksLengthMm": 4,
   "pixelChecks": [
     {
       "page": "kartensatz-qa-02.png",
@@ -34,5 +33,12 @@
   "emptyBackSlotsColoured": true,
   "cropMarks": "Contrast ink selected for each background",
   "fullSheetFrontFill": true,
-  "emptyFrontSlotsColoured": true
+  "emptyFrontSlotsColoured": true,
+  "marksPlacement": "outer-paper-edges-perpendicular",
+  "marksInsetMm": 1,
+  "marksDashMm": [
+    1,
+    0.75
+  ],
+  "marksPerPage": 28
 }
