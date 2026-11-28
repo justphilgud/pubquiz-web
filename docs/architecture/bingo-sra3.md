@@ -1,5 +1,7 @@
 # Bingo-Druck auf SRA3
 
+Ergänzung 28.11.2026: [Abendkartensatz mit Mengenplanung, Wildcards und festem 3-mm-SRA3-Anschnitt](bingo-evening-card-set.md). Die dortige neue Sammelausgabe ersetzt keine historischen Druckstände; bisherige Einzel- und Abendexporte bleiben unverändert verfügbar.
+
 Stand: 20.11.2026. Ergänzt [V3](bingo-card-design-v3.md), [V4](bingo-print-templates-v4.md) und [Vorbereitung](bingo-preparation.md). Keine Änderung von Kartenidentität, Spielregeln, Livezustand oder Ausgabehistorie. Abnahme: [Prüfbericht](../acceptance/bingo-sra3-2026-11-20.md).
 
 ## Zuständigkeiten und Bedienung

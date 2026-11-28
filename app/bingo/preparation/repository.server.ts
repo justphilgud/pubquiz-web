@@ -1,4 +1,5 @@
 import {MAX_BINGO_ROUNDS,roundColor} from "../roundColors";
+import {WILDCARD_COLOR} from './cardSet';
 import {instantiateRoundTemplate} from '../content/repository.server';
 import { validateReferenceTerms } from './pdfReference.server';
 import { validateModernTerms } from './pdfModern.server';
@@ -63,6 +64,7 @@ export async function writePreparation(userId: number, input: unknown) {
         result={jobId:command.requestId};break;
       }
       case "createRound": {
+        if(await tx.bingo_wildcard_series.count({where:{game_id:game.id}}))throw new BingoPreparationError('Wildcards wurden bereits für die letzte Runde angelegt. Diese bleibt die letzte Runde; keine neue Runde dahinter anlegen.');
         if(await tx.bingo_rounds.count({where:{game_id:game.id}})>=MAX_BINGO_ROUNDS)throw new BingoPreparationError("Höchstens zehn Runden pro Bingoabend.");
         const max = (await tx.bingo_rounds.aggregate({ where: { game_id: game.id }, _max: { position: true } }))._max.position ?? 0;
         const template=command.templateId?await instantiateRoundTemplate(tx,userId,game.id,command.templateId,game.eventreihe_id):null;
@@ -86,6 +88,8 @@ export async function writePreparation(userId: number, input: unknown) {
       case 'reorderRounds': {
         const rounds=await tx.bingo_rounds.findMany({where:{game_id:game.id},orderBy:{position:'asc'}});
         if(rounds.length!==command.roundIds.length||rounds.some(r=>!command.roundIds.includes(r.id)))throw denied();
+        const wildcard=await tx.bingo_wildcard_series.findFirst({where:{game_id:game.id}});
+        if(wildcard&&command.roundIds.at(-1)!==wildcard.round_id)throw new BingoPreparationError('Die Runde mit den Wildcards muss die letzte Runde bleiben.');
         const available=(await tx.$queryRaw<{present:string|null}[]>`SELECT to_regclass('pubquiz.bingo_live_runs')::text present`)[0].present;
         const active=available?(await tx.$queryRaw<{n:number}[]>`SELECT count(*)::int n FROM pubquiz.bingo_live_runs WHERE game_id=${game.id}::uuid AND status IN ('RUNNING','PAUSED')`)[0]:{n:0};
         if(active.n)throw new BingoPreparationError('Reihenfolge eines laufenden Abends bleibt unverändert.');
@@ -97,6 +101,8 @@ export async function writePreparation(userId: number, input: unknown) {
       case "moveRound": {
         const adjacent = await tx.bingo_rounds.findFirst({ where: { game_id: game.id, position: command.direction === -1 ? { lt: round!.position } : { gt: round!.position } }, orderBy: { position: command.direction === -1 ? "desc" : "asc" } });
         if (!adjacent) throw new BingoPreparationError("Die Runde kann nicht weiter verschoben werden.");
+        const wildcard=await tx.bingo_wildcard_series.findFirst({where:{game_id:game.id}});
+        if(wildcard&&(wildcard.round_id===round!.id||wildcard.round_id===adjacent.id))throw new BingoPreparationError('Die Runde mit den Wildcards muss die letzte Runde bleiben.');
         const max = (await tx.bingo_rounds.aggregate({ where: { game_id: game.id }, _max: { position: true } }))._max.position!;
         await tx.bingo_rounds.update({ where: { id: round!.id }, data: { position: max + 1 } });
         await tx.bingo_rounds.update({ where: { id: adjacent.id }, data: { position: round!.position } });
@@ -133,18 +139,9 @@ export async function writePreparation(userId: number, input: unknown) {
 }
 
 
-async function generateRound(tx:Prisma.TransactionClient,userId:number,game:Prisma.game_draftsGetPayload<object>,series:Prisma.eventreihenGetPayload<object>,round:Prisma.bingo_roundsGetPayload<{include:{series:{include:{series:{select:{id:true;code:true;card_count:true;origin_round_id:true}}}}}}>,command:Extract<import('./policy').BingoCommand,{operation:'generate'}>,requestHash:string) {
+export async function generateRound(tx:Prisma.TransactionClient,userId:number,game:Prisma.game_draftsGetPayload<object>,series:Prisma.eventreihenGetPayload<object>,round:Prisma.bingo_roundsGetPayload<{include:{series:{include:{series:{select:{id:true;code:true;card_count:true;origin_round_id:true}}}}}}>,command:Extract<import('./policy').BingoCommand,{operation:'generate'}>,requestHash:string,wildcard=false) {
         if (round.strategy !== "NEW") throw new BingoPreparationError("Diese Runde verwendet vorhandene Karten. Bitte eine Serie ausdrücklich zuordnen.");
-        const design = (await resolveSharedDesign(tx, game.shared_design_template_id, series)).design;
-        const settings=await resolveSelectedPrint(tx,design,series.bingo_print_config,game.bingo_print_config);
-        if(command.printLayout)settings.layout={version:settings.layout?.version??3,textFont:settings.layout?.textFont??'ARIMO',...command.printLayout};
-        const roundNumber=await tx.bingo_rounds.count({where:{game_id:game.id,position:{lte:round.position}}});
-        const theme=roundColor(roundNumber,round.presentation_color);
-        settings.colors={...settings.colors,back:theme.background};
-        settings.backLogos=['/branding/bingo-print/lovd-small-creme.png','/branding/bingo-print/phil-gud.png'];
-        let snapshot = await captureNewPrintSnapshot(design, game.titel, round.label,settings,await selectedPrintSource(tx,game.bingo_print_config??series.bingo_print_config),roundNumber,theme.background);
-        if(round.term_snapshot!==null){if(snapshot.version!==3&&snapshot.version!==4)throw new BingoPreparationError('Für Textkarten bitte ein neues V3-Druckformat auswählen.');snapshot=parsePrintSnapshot({...snapshot,terms:parseTermSet(round.term_snapshot)});}
-        validateModernTerms(snapshot);validateReferenceTerms(snapshot);
+        const snapshot=await generationSnapshot(tx,game,series,round,command.printLayout,wildcard);
         // Game lock serializes generation. Include existing game layouts, not just this request.
         const hashes=new Set((await tx.bingo_cards.findMany({where:{series:{game_id:game.id}},select:{layout_hash:true}})).map(card=>card.layout_hash));
         let firstSeriesId:string|undefined;
@@ -166,4 +163,18 @@ async function generateRound(tx:Prisma.TransactionClient,userId:number,game:Pris
           firstSeriesId??=seriesId;
         }
         return {seriesId:firstSeriesId!,repeated:false};
+}
+
+export async function generationSnapshot(tx:Prisma.TransactionClient,game:Prisma.game_draftsGetPayload<object>,series:Prisma.eventreihenGetPayload<object>,round:Prisma.bingo_roundsGetPayload<object>,printLayout?:import('./printFormats').PrintLayout,wildcard=false) {
+        const design = (await resolveSharedDesign(tx, game.shared_design_template_id, series)).design;
+        const settings=await resolveSelectedPrint(tx,design,series.bingo_print_config,game.bingo_print_config);
+        if(printLayout)settings.layout={version:settings.layout?.version??3,textFont:settings.layout?.textFont??'ARIMO',...printLayout};
+        const roundNumber=await tx.bingo_rounds.count({where:{game_id:game.id,position:{lte:round.position}}});
+        const theme=roundColor(roundNumber,wildcard?WILDCARD_COLOR:round.presentation_color);
+        settings.colors={...settings.colors,back:theme.background};
+        settings.backLogos=['/branding/bingo-print/lovd-small-creme.png','/branding/bingo-print/phil-gud.png'];
+        let snapshot = await captureNewPrintSnapshot(design, game.titel, round.label,settings,await selectedPrintSource(tx,game.bingo_print_config??series.bingo_print_config),roundNumber,theme.background);
+        if(round.term_snapshot!==null){if(snapshot.version!==3&&snapshot.version!==4)throw new BingoPreparationError('Für Textkarten bitte ein neues V3-Druckformat auswählen.');snapshot=parsePrintSnapshot({...snapshot,terms:parseTermSet(round.term_snapshot)});}
+        validateModernTerms(snapshot);validateReferenceTerms(snapshot);
+        return snapshot;
 }

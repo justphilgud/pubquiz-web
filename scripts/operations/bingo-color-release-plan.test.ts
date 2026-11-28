@@ -10,7 +10,7 @@ import {verifyFeaturePlan} from './feature-release-plan';
 test('only exact additive Bingo color delta is admitted in the feature PR plan',()=>{
  const base='ba484967f4fa3bd1295954d21393261dbf30b0c8',candidate='b'.repeat(40),before=migrationFiles(base);
  const schema=execFileSync('git',['show',`${base}:prisma/schema.prisma`],{encoding:'utf8'}),afterSchema=schema.replace('model bingo_rounds {','model bingo_rounds {\n  presentation_color String? @db.VarChar(7)');
- assert.equal(readFileSync('prisma/schema.prisma','utf8').replaceAll('\r\n','\n'),afterSchema);
+ assert.equal(execFileSync('git',['show','6b5156f666b5a5060aa6f7847eec8f94bedb08c8:prisma/schema.prisma'],{encoding:'utf8'}),afterSchema);
  const plan=bingoColorPlanFor(base,before,schema),after=[...before,{name:COLOR_MIGRATION,checksum:createHash('sha256').update(COLOR_SQL).digest('hex')}];
  assert.equal(readFileSync(`prisma/migrations/${COLOR_MIGRATION}/migration.sql`,'utf8').replaceAll('\r\n','\n'),COLOR_SQL);
  assert.equal(verifyFeaturePlan(plan,base,candidate,before,after,schema,afterSchema).kind,'BINGO_ROUND_COLOR');

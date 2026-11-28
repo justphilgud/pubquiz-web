@@ -1,0 +1,140 @@
+{
+  "migrations": [
+    {
+      "name": "20261128150000_bingo_evening_card_set",
+      "sha256": "202113bda0a6ccdbdc1ac2d4bf8f0b3f14841655b4971d48360f3996d6c99e50"
+    }
+  ],
+  "tables": [
+    "bingo_card_set_settings",
+    "bingo_evening_card_sets",
+    "bingo_wildcard_series"
+  ],
+  "routines": [
+    {
+      "schema": "pubquiz",
+      "name": "bingo_wildcard_target",
+      "argumentTypes": [],
+      "argumentNames": null,
+      "result": "trigger",
+      "language": "plpgsql",
+      "kind": "f",
+      "securityDefiner": false,
+      "leakproof": false,
+      "strict": false,
+      "volatility": "v",
+      "parallel": "u",
+      "configuration": null,
+      "cost": 100,
+      "rows": 0,
+      "argumentModes": null,
+      "allArgumentTypes": null,
+      "defaultArguments": 0,
+      "variadic": false,
+      "support": false,
+      "binary": null,
+      "sourceSha256": "0ed53d421d07058fda56d71bcc2d006e4097d391be142947ed64197b44205af7"
+    },
+    {
+      "schema": "pubquiz",
+      "name": "bingo_wildcard_final_round",
+      "argumentTypes": [],
+      "argumentNames": null,
+      "result": "trigger",
+      "language": "plpgsql",
+      "kind": "f",
+      "securityDefiner": false,
+      "leakproof": false,
+      "strict": false,
+      "volatility": "v",
+      "parallel": "u",
+      "configuration": null,
+      "cost": 100,
+      "rows": 0,
+      "argumentModes": null,
+      "allArgumentTypes": null,
+      "defaultArguments": 0,
+      "variadic": false,
+      "support": false,
+      "binary": null,
+      "sourceSha256": "35dcc66a4575db0c7a29e9359e1e7f736087720af12ca7879a06452a889d2a78"
+    }
+  ],
+  "triggers": [
+    {
+      "schema": "pubquiz",
+      "name": "bingo_card_sets_immutable",
+      "table": "bingo_evening_card_sets",
+      "functionSchema": "pubquiz",
+      "functionName": "bingo_immutable_record",
+      "type": 27,
+      "enabled": "O",
+      "deferrable": false,
+      "deferred": false,
+      "constraint": false,
+      "columns": "",
+      "arguments": "",
+      "condition": null
+    },
+    {
+      "schema": "pubquiz",
+      "name": "bingo_wildcards_immutable",
+      "table": "bingo_wildcard_series",
+      "functionSchema": "pubquiz",
+      "functionName": "bingo_immutable_record",
+      "type": 27,
+      "enabled": "O",
+      "deferrable": false,
+      "deferred": false,
+      "constraint": false,
+      "columns": "",
+      "arguments": "",
+      "condition": null
+    },
+    {
+      "schema": "pubquiz",
+      "name": "bingo_wildcard_target",
+      "table": "bingo_round_series",
+      "functionSchema": "pubquiz",
+      "functionName": "bingo_wildcard_target",
+      "type": 23,
+      "enabled": "O",
+      "deferrable": false,
+      "deferred": false,
+      "constraint": false,
+      "columns": "",
+      "arguments": "",
+      "condition": null
+    },
+    {
+      "schema": "pubquiz",
+      "name": "bingo_wildcard_final_round",
+      "table": "bingo_rounds",
+      "functionSchema": "pubquiz",
+      "functionName": "bingo_wildcard_final_round",
+      "type": 21,
+      "enabled": "O",
+      "deferrable": true,
+      "deferred": true,
+      "constraint": true,
+      "columns": "",
+      "arguments": "",
+      "condition": null
+    },
+    {
+      "schema": "pubquiz",
+      "name": "bingo_wildcard_created",
+      "table": "bingo_wildcard_series",
+      "functionSchema": "pubquiz",
+      "functionName": "bingo_wildcard_final_round",
+      "type": 5,
+      "enabled": "O",
+      "deferrable": true,
+      "deferred": true,
+      "constraint": true,
+      "columns": "",
+      "arguments": "",
+      "condition": null
+    }
+  ]
+}

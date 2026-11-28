@@ -21,7 +21,9 @@ export async function createBingoEvent(userId:number,input:unknown):Promise<Game
   if(game.eventreihe_id!==parsed.seriesId||game.eventart!=="BINGO")throw new GameDraftError("Die Eventreihe wurde geändert. Bitte den Eventbestand neu öffnen.");
   if(!old){
    await tx.bingo_preparations.create({data:{game_id:game.id}});
-   await tx.bingo_rounds.createMany({data:Array.from({length:parsed.roundCount},(_,i)=>({id:randomUUID(),game_id:game.id,position:i+1,label:`Runde ${i+1}`,planned_draws:30,strategy:"NEW",issued_count:null}))});
+   const rounds=Array.from({length:parsed.roundCount},(_,i)=>({id:randomUUID(),game_id:game.id,position:i+1,label:`Runde ${i+1}`,planned_draws:30,strategy:"NEW",issued_count:null}));
+   await tx.bingo_rounds.createMany({data:rounds});
+   await tx.bingo_card_set_settings.create({data:{game_id:game.id,config:{version:1,defaultCount:parsed.defaultCardCount??100,wildcards:0,rounds:rounds.map(r=>({id:r.id,selected:true,count:null}))}}});
    await tx.$executeRaw`INSERT INTO pubquiz.bingo_event_creation_requests(request_id,game_id,created_by,request_hash) VALUES(${parsed.requestId}::uuid,${game.id}::uuid,${userId},${hash})`;
   }
   return {id:game.id,type:"BINGO",title:game.titel,seriesId:game.eventreihe_id,date:game.datum?.toISOString().slice(0,10)??"",time:game.uhrzeit??"",status:"DRAFT",createdAt:game.created_at.toISOString(),updatedAt:game.updated_at.toISOString()};

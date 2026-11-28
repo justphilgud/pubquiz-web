@@ -38,9 +38,11 @@ Standardfarbe zurück. Ein alter Client ohne Farbfeld setzt eine gespeicherte
 `roundColors.ts` ist die gemeinsame reine Quelle. Sie bestimmt eine Schriftfarbe
 mit mindestens 4,5:1 Kontrast; auf Creme Catalana ist diese dunkel. Konturen,
 Zahlen, Laufstatus und Beschriftungen bleiben zusätzlich zur Farbe erkennbar.
-Auf hellen Runden werden die unveränderten Logo-Silhouetten als dunkle
-Kontrastvariante gerendert. Quellen/Proportionen werden nicht verändert; bei
-neuen Druckständen wird diese Rückseitenvariante mit eingefroren. Kartenfront,
+Korrektur auf ausdrücklichen Nutzerwunsch vom 28.11.2026: Auf hellen
+Runden wechselt nur LOVD zur dunklen Kontrastvariante. Phil Gud bleibt bei neuen
+Druckständen immer im farbigen Original; beide Logos sind auf allen sieben
+Rückseiten enthalten. Quellen/Proportionen werden nicht verändert; die jeweilige
+Rückseitenvariante wird bei neuen Druckständen eingefroren. Kartenfront,
 Layout, Zahlen, Kurzkennungen und Originaldateien werden dafür nicht geändert.
 
 ## Persistenz, Ein-/Ausgaben und Invarianten

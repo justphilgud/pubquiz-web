@@ -1409,6 +1409,7 @@ enum LivePollPublicationMode {
 }
 
 model users {
+  bingo_evening_card_sets bingo_evening_card_sets[]
   bingo_round_templates bingo_round_templates[]
   bingo_print_jobs bingo_print_jobs[]
 
@@ -1590,6 +1591,8 @@ model benutzer_reihenrollen {
 
 /// Standalone non-playable game instances. No Quiz identity or live state.
 model game_drafts {
+  bingo_card_set_settings bingo_card_set_settings?
+  bingo_evening_card_sets bingo_evening_card_sets[]
   ceremony game_ceremonies?
   bingo_round_templates bingo_round_templates[]
   bingo_print_jobs bingo_print_jobs[]
@@ -1655,6 +1658,7 @@ model bingo_matching_assets {
  @@schema("pubquiz")
 }
 model bingo_rounds {
+  bingo_wildcard_series bingo_wildcard_series[]
   presentation_color String? @db.VarChar(7)
   bingo_print_job_items bingo_print_job_items[]
 
@@ -1679,6 +1683,7 @@ model bingo_rounds {
   @@schema("pubquiz")
 }
 model bingo_card_series {
+  wildcard bingo_wildcard_series?
   bingo_print_job_items bingo_print_job_items[]
 
   event_round_cards bingo_event_round_cards[]
@@ -1936,6 +1941,33 @@ model bingo_round_templates {
   source game_drafts? @relation(fields:[source_game_id],references:[id],onDelete:Restrict)
   actor users @relation(fields:[created_by],references:[id],onDelete:Restrict)
   @@index([eventreihe_id,created_at,id],map:"bingo_round_templates_series")
+  @@schema("pubquiz")
+}
+model bingo_card_set_settings {
+  game_id String @id @db.Uuid
+  config Json
+  game game_drafts @relation(fields:[game_id],references:[id],onDelete:Restrict)
+  @@schema("pubquiz")
+}
+model bingo_evening_card_sets {
+  id String @id @db.Uuid
+  game_id String @db.Uuid
+  request_hash String @db.Char(64)
+  manifest Json
+  created_by Int
+  created_at DateTime @default(dbgenerated("clock_timestamp()")) @db.Timestamptz(3)
+  game game_drafts @relation(fields:[game_id],references:[id],onDelete:Restrict)
+  actor users @relation(fields:[created_by],references:[id],onDelete:Restrict)
+  @@unique([id,game_id])
+  @@schema("pubquiz")
+}
+model bingo_wildcard_series {
+  series_id String @id @db.Uuid
+  game_id String @db.Uuid
+  round_id String @db.Uuid
+  series bingo_card_series @relation(fields:[series_id,game_id],references:[id,game_id],onDelete:Restrict)
+  round bingo_rounds @relation(fields:[round_id,game_id],references:[id,game_id],onDelete:Restrict)
+  @@unique([series_id,game_id])
   @@schema("pubquiz")
 }
 model bingo_print_jobs {

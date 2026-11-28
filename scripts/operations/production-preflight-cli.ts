@@ -1,3 +1,4 @@
+import {cardSetDeltaEvidence,CARD_SET_MIGRATION} from './bingo-card-set-release-plan';
 import {colorDeltaEvidence,COLOR_MIGRATION} from './bingo-color-release-plan';
 import {featureReleaseProof,completeFeatureHistory} from './feature-release-plan';
 import {approvedBingoPlan,assertBingoManifest} from "./production-preflight-bingo-plan";
@@ -28,16 +29,17 @@ async function main() {
     }
     try { execFileSync("git", ["merge-base", "--is-ancestor", baseline, candidate]); }
     catch { result = { gate: gate("BLOCKED", "RELEASE_ANCESTRY_UNVERIFIED") }; }
-    if(!result&&feature?.kind==='BINGO_ROUND_COLOR'){
+    if(!result&&(feature?.kind==='BINGO_ROUND_COLOR'||feature?.kind==='BINGO_CARD_SET')){
+      const cardSet=feature.kind==='BINGO_CARD_SET',validEvidence=cardSet?cardSetDeltaEvidence:colorDeltaEvidence,migration=cardSet?CARD_SET_MIGRATION:COLOR_MIGRATION,beforeCount=feature.migrationCount-1;
       const expected=JSON.parse(readFileSync('expected-schema.json','utf8'));
-      if(JSON.stringify(expected.featureProof)!==JSON.stringify(feature)||!colorDeltaEvidence(expected.deltaTest))throw Error('COLOR_ARTIFACT_MISMATCH');
+      if(JSON.stringify(expected.featureProof)!==JSON.stringify(feature)||!validEvidence(expected.deltaTest))throw Error('EXACT_DELTA_ARTIFACT_MISMATCH');
       const history=await readProductionMigrations(process.env.PRODUCTION_BACKUP_DATABASE_URL??'',migrationFiles(candidate),migrationFiles(baseline),{candidate:initRepositoryEvidence(candidate),baseline:initRepositoryEvidence(baseline),inventory:inventoryFromGit(baseline),expectedSchema:expected});
       const h=history as typeof history&{applied?:string[];pending?:string[];expected?:string[];migrationHistoryGate?:{status:string};databaseIdentityGate?:{status:string};privilegesGate?:{status:string};additionalDiagnostics?:{schemaGate?:{status:string}}};
       const schemaGate=h.additionalDiagnostics?.schemaGate??gate('BLOCKED','COLOR_SCHEMA_UNVERIFIED');
-      const pending=JSON.stringify(h.pending)===JSON.stringify([COLOR_MIGRATION])&&JSON.stringify(h.expected)===JSON.stringify([COLOR_MIGRATION])&&h.applied?.length===81&&new Set(h.applied).size===81&&feature.manifest.slice(0,81).every(f=>h.applied?.includes(f.name));
-      const expectedDeltaGate=gate(pending?'PASS':'BLOCKED','EXACT_COLOR_DELTA_ONLY'),deltaGate=gate(colorDeltaEvidence(expected.deltaTest)?'PASS':'BLOCKED','ISOLATED_COLOR_DELTA_VERIFIED');
+      const pending=JSON.stringify(h.pending)===JSON.stringify([migration])&&JSON.stringify(h.expected)===JSON.stringify([migration])&&h.applied?.length===beforeCount&&new Set(h.applied).size===beforeCount&&feature.manifest.slice(0,beforeCount).every(f=>h.applied?.includes(f.name));
+      const expectedDeltaGate=gate(pending?'PASS':'BLOCKED','EXACT_FEATURE_DELTA_ONLY'),deltaGate=gate(validEvidence(expected.deltaTest)?'PASS':'BLOCKED','ISOLATED_FEATURE_DELTA_VERIFIED');
       const gates=[h.migrationHistoryGate,h.databaseIdentityGate,h.privilegesGate,schemaGate,expectedDeltaGate,deltaGate];
-      result={...history,repositoryEvidence:feature,schemaGate,expectedDeltaGate,deltaGate,newInstallReplay:expected.newInstallReplay,gate:gate(gates.every(g=>g?.status==='PASS')?'PASS':'BLOCKED','COLOR_FEATURE_PLAN_CHECK')};
+      result={...history,repositoryEvidence:feature,schemaGate,expectedDeltaGate,deltaGate,newInstallReplay:expected.newInstallReplay,gate:gate(gates.every(g=>g?.status==='PASS')?'PASS':'BLOCKED','EXACT_FEATURE_PLAN_CHECK')};
     }
     if (!result && feature) {
       if(JSON.stringify(JSON.parse(readFileSync('expected-schema.json','utf8')))!==JSON.stringify(feature))throw Error('MANIFEST_ARTIFACT_MISMATCH');

@@ -1,0 +1,45 @@
+{
+  "pages": 12,
+  "formatMm": [
+    320,
+    450
+  ],
+  "cards": 40,
+  "trimMm": [
+    92.5,
+    92.5
+  ],
+  "gapMm": 0,
+  "outerBleedMm": 3,
+  "bleedScope": "outer-block-only",
+  "sharedInnerCuts": true,
+  "blockMm": [
+    277.5,
+    370
+  ],
+  "verticalCutPositionsMm": [
+    21.25,
+    113.75,
+    206.25,
+    298.75
+  ],
+  "horizontalCutPositionsMm": [
+    40,
+    132.5,
+    225,
+    317.5,
+    410.0
+  ],
+  "marksPerPage": 18,
+  "marksPlacement": "outer-paper-edges-perpendicular",
+  "marksInsetMm": 1,
+  "marksLengthMm": 4,
+  "marksDashMm": [
+    1,
+    0.75
+  ],
+  "fullSheetFrontFill": true,
+  "fullSheetBackFill": true,
+  "actualPdfVectorsTested": true,
+  "physicalPrint": "Not performed; printer and cutter alignment need a physical proof"
+}

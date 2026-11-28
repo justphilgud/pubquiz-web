@@ -53,7 +53,8 @@ test('new V3 LOVD keeps the old front typography on every profile, freezes code 
     }
     assert.equal(images.length,2);
     const [lovd,phil]=images,side=92.5*72/25.4;
-    assert.ok(Math.abs(lovd[0]-65.55)<.005&&Math.abs(lovd[3]-65.55)<.005,'actual smaller square LOVD image');
+    // Approved seven-colour correction: transparent lockup instead of the old opaque square tile.
+    assert.ok(Math.abs(lovd[0]-side*.40)<.005&&lovd[3]<side*.25,'transparent LOVD lockup fits the existing logo area without an opaque tile');
     assert.ok(Math.abs(phil[0]-78.78)<.005&&Math.abs(phil[3]-97.02)<.005,'Phil Gud image dimensions retained');
     assert.ok(lovd[3]<phil[3]);
     const cross=[...operators.matchAll(/0\.35 w[\s\S]*?(-?[\d.]+) (-?[\d.]+) m\n(-?[\d.]+) (-?[\d.]+) l/g)];assert.equal(cross.length,2);

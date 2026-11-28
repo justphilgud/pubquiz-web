@@ -5,9 +5,9 @@ import { createRequire } from 'node:module';
 import { PDFDocument } from 'pdf-lib';
 import { getPresentationTemplate } from '@/app/rendering/templateRegistry';
 import type { SharedDesign } from '@/app/rendering/sharedDesign/sharedDesign';
-import { newBingoPrint } from './bingoPrint';
+import { newBingoPrint,PHIL_PRINT_LOGO } from './bingoPrint';
 import { geometry, printFormats, type PrintFormat } from './printFormats';
-import { parsePrintSnapshot } from './printSnapshot';
+import { parsePrintSnapshot,sha256 } from './printSnapshot';
 import { parseTermSet } from './termSet';
 import type { StoredCard } from './policy';
 test('V3 renderer embeds original Phil Gud digits, separates IDs onto backs and renders all formats without changing V2', { timeout:120000 }, async()=>{
@@ -27,6 +27,12 @@ test('V3 renderer embeds original Phil Gud digits, separates IDs onto backs and 
       assert.ok(light.version===3);if(light.version!==3)throw Error('light snapshot');
       assert.equal(light.roundInk,'#062C3D');assert.equal(light.settings.colors.back,'#FFF9E9');
       assert.equal(light.logo.sha256,snapshot.logo.sha256);
+      const dark=await api.captureNewPrintSnapshot(design,'Titel','Runde 1',settings,undefined,1);
+      if(dark.version!==3)throw Error('dark snapshot');
+      assert.equal(light.backLogos.length,2);assert.equal(dark.backLogos.length,2);
+      assert.equal(light.backLogos[1].sha256,dark.backLogos[1].sha256,'Phil Gud remains the original full-colour asset on every background');
+      assert.equal(light.backLogos[1].sha256,sha256(await api.loadPrintLogo(PHIL_PRINT_LOGO)),'Phil Gud matches the original colour PNG, not a recoloured derivative');
+      assert.notEqual(light.backLogos[0].sha256,dark.backLogos[0].sha256,'only LOVD switches contrast variant');
       assert.deepEqual({...light.settings.colors,back:snapshot.settings.colors.back},snapshot.settings.colors);
       assert.equal(light.body.sha256,snapshot.body.sha256);assert.equal(light.display.sha256,snapshot.display.sha256);
       assert.equal(JSON.stringify(snapshot),before);
